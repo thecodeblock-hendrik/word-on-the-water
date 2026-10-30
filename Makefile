@@ -33,3 +33,12 @@ migrate:
 
 e2e:
 	pnpm --dir apps/web e2e
+
+.PHONY: types types-check
+
+types:
+	cd apps/api && uv run python -m app.openapi_export
+	pnpm --dir packages/api-types generate
+
+types-check: types
+	git diff --exit-code HEAD -- packages/api-types
