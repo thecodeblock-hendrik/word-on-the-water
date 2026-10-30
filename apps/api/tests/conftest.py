@@ -16,6 +16,7 @@ for key, value in TEST_ENV.items():
 from fastapi.testclient import TestClient  # noqa: E402
 
 from app.core.config import get_settings  # noqa: E402
+from app.db.session import get_engine  # noqa: E402
 from app.main import create_app  # noqa: E402
 
 
@@ -24,6 +25,7 @@ def settings_env(monkeypatch: pytest.MonkeyPatch) -> None:
     for key, value in TEST_ENV.items():
         monkeypatch.setenv(key, value)
     get_settings.cache_clear()
+    get_engine.cache_clear()
 
 
 @pytest.fixture
