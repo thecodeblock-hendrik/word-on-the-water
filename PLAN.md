@@ -53,7 +53,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [x] `core/rate_limit.py`: Redis sliding window keyed by hashed IP and email; generic 429
 - [x] Client IP taken only from Vercel-set headers
 - [x] Tests: health, auth rejected without token, rate limit trips, error shape
-- [x] Pre-commit hook for ruff; Makefile targets `migrate`, `lint`, `typecheck`, `test` cover the API
+- [x] Pre-commit hook for ruff; Makefile targets `lint`, `typecheck`, `test` cover the API (`migrate` is added in 0.4)
 - [x] Validate: `uv run pytest`, `uv run ruff check`, `uv run mypy --strict` all green
 
 ### 0.4 Database
