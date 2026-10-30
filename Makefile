@@ -11,3 +11,14 @@ down:
 
 logs:
 	docker compose logs -f
+
+.PHONY: lint typecheck test
+
+lint:
+	cd apps/api && uv run ruff check . && uv run ruff format --check .
+
+typecheck:
+	cd apps/api && uv run mypy app tests
+
+test:
+	cd apps/api && uv run pytest
