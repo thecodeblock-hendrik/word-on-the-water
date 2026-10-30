@@ -22,3 +22,15 @@ repos:
         args: [--fix]
       - id: ruff-format
         files: ^apps/api/
+  - repo: local
+    hooks:
+      - id: web-prettier
+        name: prettier
+        entry: bash -c 'cd apps/web && pnpm exec prettier --check --ignore-unknown "${@#apps/web/}"' --
+        language: system
+        files: ^apps/web/
+      - id: web-eslint
+        name: eslint
+        entry: bash -c 'cd apps/web && pnpm exec eslint "${@#apps/web/}"' --
+        language: system
+        files: ^apps/web/.*\.(ts|tsx|js|mjs)$
