@@ -18,16 +18,19 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 ## Phase 0 - Foundations (nothing public)
 
 ### 0.1 Repository and tooling
-- [ ] `git init`, `.gitignore` (node, python, env files, `.vercel`, build output), `.gitattributes`
+- [x] `git init`, `.gitignore` (node, python, env files, `.vercel`, build output), `.gitattributes`
 - [ ] Create GitHub repo `word-on-the-water` **(Hendrik: account/org)**
-- [ ] Monorepo skeleton: `apps/web`, `apps/api`, `packages/api-types`, `docs/{adr,runbooks}`, `.github`
-- [ ] `README.md` (concise quick start), `SECURITY.md`, `LICENSE` decision
-- [ ] `.editorconfig`, `.env.example` (names only, no values)
-- [ ] `docker-compose.yml`: Postgres 17 (with `citext`, `pgcrypto`), Redis/Valkey, Mailpit
-- [ ] Validate: `docker compose up` brings all three healthy; connect with `psql`, `redis-cli`; Mailpit UI loads
-- [ ] `Makefile` with targets: `setup up env migrate lint typecheck test e2e types`
-- [ ] Pre-commit hooks: gitleaks, ruff, prettier, eslint (staged files), commit-msg check for Conventional Commits
-- [ ] Validate: committing a fake secret is blocked
+- [x] Monorepo skeleton: `apps/web`, `apps/api`, `packages/api-types`, `docs/{adr,runbooks}`, `.github`
+- [x] `README.md` (concise quick start), `SECURITY.md`
+- [ ] `LICENSE` decision **(Hendrik)**
+- [x] `.editorconfig`, `.env.example` (names only, no values)
+- [x] `docker-compose.yml`: Postgres 17 (with `citext`, `pgcrypto`), Redis/Valkey, Mailpit
+- [x] Validate: `docker compose up` brings all three healthy; connect with `psql`, `redis-cli`; Mailpit UI loads
+- [x] `Makefile` base targets: `setup up down logs`
+- [ ] Makefile targets `env migrate lint typecheck test e2e types` (added as each app lands)
+- [x] Pre-commit hooks: gitleaks, file hygiene, Conventional Commits
+- [ ] Pre-commit hooks: ruff, prettier, eslint (added when `apps/api` and `apps/web` exist)
+- [x] Validate: committing a fake secret is blocked
 
 ### 0.2 Decision records
 - [ ] ADR 0001 BFF (browser never calls FastAPI)
