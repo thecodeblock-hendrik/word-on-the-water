@@ -1,0 +1,47 @@
+/* Design tokens from website/landing-page-mockup.html. Only these change with the colour scheme. */
+:root {
+  --bg: #f4f1ea;
+  --surface: #fbf9f4;
+  --ink: #13314a;
+  --muted: #4f6272;
+  --line: #d9d3c6;
+  --accent: #2e7275;
+  --accent-ink: #245d60;
+  --deep: #13314a;
+  --on-deep: #f4f1ea;
+  --on-deep-muted: #b9c6cf;
+  --accent-on-deep: #6fb8b4;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f2233;
+    --surface: #152c40;
+    --ink: #f4f1ea;
+    --muted: #a9b7c2;
+    --line: #28425a;
+    --accent: #4fa9a6;
+    --accent-ink: #6fc0bc;
+    --deep: #0a1825;
+    --on-deep: #f4f1ea;
+    --on-deep-muted: #9fb0bd;
+    --accent-on-deep: #4fa9a6;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f2233;
+  --surface: #152c40;
+  --ink: #f4f1ea;
+  --muted: #a9b7c2;
+  --line: #28425a;
+  --accent: #4fa9a6;
+  --accent-ink: #6fc0bc;
+  --deep: #0a1825;
+  --on-deep: #f4f1ea;
+  --on-deep-muted: #9fb0bd;
+  --accent-on-deep: #4fa9a6;
+  color-scheme: dark;
+}
