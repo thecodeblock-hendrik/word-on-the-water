@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, Lora } from "next/font/google";
+import { connection } from "next/server";
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -32,7 +33,9 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Nonces are per request, so every page must render at request time (ADR 0007).
+  await connection();
   return (
     <html lang="en" className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}>
       <body className="flex min-h-dvh flex-col">

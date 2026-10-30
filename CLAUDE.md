@@ -80,7 +80,7 @@ Estimated Phase 1 running cost: USD 0 on Hobby during build; roughly USD 20–40
 Browser (mobile first)
    │  HTTPS only (HSTS), Vercel Edge Network + Vercel Firewall
    ▼
-Next.js on Vercel (apps/web)  ── Server Components render pages (SSG/ISR for content)
+Next.js on Vercel (apps/web)  ── Server Components render pages (per request, nonce CSP; ADR 0007)
    │  Server Actions / Route Handlers  (the only thing the browser talks to)
    │  server-to-server, HTTPS, service token + forwarded client IP
    ▼
@@ -322,7 +322,7 @@ Settings via `pydantic-settings`, failing fast at startup if required secrets ar
 ## 9. Frontend conventions (Next.js)
 
 - Server Components by default; `"use client"` only for interactive islands (forms, menu, theme toggle).
-- Landing page is **statically generated**; forms post via Server Actions with progressive enhancement (they work before JS hydrates).
+- Pages render **per request** (required by the nonce-based CSP, see ADR 0007); static assets are still CDN-cached. Forms post via Server Actions with progressive enhancement (they work before JS hydrates).
 - `src/lib/env.ts` validates env vars with Zod at build/start.
 - SEO: `generateMetadata`, Open Graph image, `sitemap.ts`, `robots.ts`, JSON-LD (`Organization`, later `Article` for devotionals), canonical URLs.
 - Feature flags (simple env-based to start) gate Phase 2 routes so the framework exists but isn't public.

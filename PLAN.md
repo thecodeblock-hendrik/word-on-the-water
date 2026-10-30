@@ -118,7 +118,8 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Fonts via `next/font`: Barlow Condensed, Barlow, Lora (self-hosted, Latin, `display: swap`)
 - [x] Root layout, skip link, header, footer, `not-found.tsx`, `error.tsx`
 - [x] Static security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, COOP) in `next.config.ts`; `X-Powered-By` removed
-- [ ] Content-Security-Policy in `proxy.ts` (Next 16 renamed `middleware.ts`). **(Hendrik: decide nonce vs hash-based CSP, see ADR 0007; nonces force dynamic rendering)**
+- [x] Content-Security-Policy in `proxy.ts` (Next 16 renamed `middleware.ts`): nonce-based, pages render per request (ADR 0007); report-only mode via `CSP_REPORT_ONLY=1`
+- [x] ADR 0007 CSP approach (hash-based option tried and rejected: browser blocked 8 inline hydration scripts)
 - [x] `src/lib/env.ts`: Zod validation; `server-only` on every secret-touching module
 - [x] `src/lib/api-client.ts`: server-side calls with service token and forwarded client IP
 - [x] `api/health/route.ts`
@@ -236,7 +237,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] `/.well-known/security.txt`
 - [ ] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization`
 - [ ] `sitemap.ts`, `robots.ts`, `manifest.ts`, icons, theme colour
-- [ ] Switch CSP from report-only to enforce after violations reviewed
+- [ ] Run CSP in report-only on staging, then enforce in production after violations are reviewed
 
 ### 1.7 Retention and operations
 - [ ] Retention job: unconfirmed subscribers 7 days, prayer 90 days, contact 12 months, audit logs 1 year
@@ -249,6 +250,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] `@axe-core/playwright` on every page: zero serious or critical
 - [ ] Lighthouse CI mobile: Performance >= 95, Accessibility 100, Best Practices 100, SEO 100
 - [ ] LCP < 2.0 s, CLS < 0.05, INP < 200 ms, landing JS < 100 KB gzipped
+- [ ] Re-measure LCP on a deployed preview because pages render per request (ADR 0007); revisit hash-based CSP if the budget fails
 - [ ] API service coverage >= 85%
 - [ ] ZAP baseline scan against staging: no high findings
 - [ ] Manual pass: keyboard only, VoiceOver iOS, TalkBack

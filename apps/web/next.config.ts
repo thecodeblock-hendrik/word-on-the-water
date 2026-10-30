@@ -9,8 +9,6 @@ loadEnvConfig(path.resolve(__dirname, "../.."));
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  cacheComponents: true,
-  partialPrefetching: true,
   turbopack: {
     rules: {
       "*.css": {
