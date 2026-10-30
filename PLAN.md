@@ -15,6 +15,43 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 ---
 
+## Testing approach (applies to every step)
+
+Tests are written first for all logic. The order of items in this plan is not the order of work: where a step lists "Tests", write them before the code.
+
+**Red, green, refactor**
+1. Write a test for the next small behaviour. Run it and confirm it fails for the expected reason (not an import or typo error).
+2. Write the minimum code to pass. Run it and confirm it passes.
+3. Refactor with the tests green. Commit.
+
+**Definition of done for every step** (all must hold before a box is ticked)
+- [ ] New behaviour has tests that failed before the code existed
+- [ ] The full suite passes locally (`make test`), plus `make lint` and `make typecheck`
+- [ ] Negative and security cases are covered, not just the happy path: invalid input, missing or wrong auth, rate limits, expired or replayed tokens, no-leak assertions for personal data
+- [ ] Anything touching the database or Redis is tested against the real local services, not mocks. Mock only external third parties (Postmark, Turnstile)
+- [ ] Tests are deterministic: no sleeps, no real clock (inject or freeze time), no order dependence, no shared state between tests
+- [ ] A bug fix starts with a test that reproduces it and fails
+- [ ] The step's result is checked in the running system (curl, Mailpit, browser at 375px), not only by unit tests
+
+**What counts as test-first, by layer**
+- API services, validators, crypto, tokens, rate limiting, retention: strict TDD with pytest
+- API endpoints: integration tests through the HTTP client against real Postgres and Redis
+- Web components and forms: Vitest + Testing Library, test first for behaviour (validation messages, focus, aria-live)
+- Config, infrastructure, layout and styling: no TDD; use a verification step instead (CI run, header check with `curl -I`, screenshot at 375px, axe, Lighthouse)
+- End to end: Playwright journeys written when the feature's pieces exist, before the step is ticked
+
+**Test pyramid and gates (enforced in CI from step 0.8)**
+- Many unit tests, fewer integration tests, a small set of e2e journeys
+- Coverage: at least 85 percent on `services/`, with the threshold failing the build
+- Zero serious or critical axe violations; Lighthouse budgets in section 5 of `CLAUDE.md`
+- Security scans (gitleaks, pip-audit, pnpm audit, OSV-Scanner, Bandit, CodeQL, ZAP) block merges on high findings
+
+**Review**
+- Each PR description lists the tests added and states which behaviours they prove
+- Flaky tests are fixed or removed immediately, never retried into passing
+
+---
+
 ## Phase 0 - Foundations (nothing public)
 
 ### 0.1 Repository and tooling
@@ -96,6 +133,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 ### 0.8 CI and repo protection
 - [ ] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
+- [ ] Coverage gate in CI: `services/` at least 85 percent (configure `pytest-cov`), web coverage reported
 - [ ] `codeql.yml` (TypeScript, Python)
 - [ ] `security.yml`: gitleaks, pip-audit, pnpm audit, OSV-Scanner, Bandit
 - [ ] Actions pinned to commit SHAs; least-privilege `permissions:`
