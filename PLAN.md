@@ -31,12 +31,12 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [x] Validate: committing a fake secret is blocked
 
 ### 0.2 Decision records
-- [ ] ADR 0001 BFF (browser never calls FastAPI)
-- [ ] ADR 0002 PostgreSQL via Neon
-- [ ] ADR 0003 Auth approach (no login in Phase 1; admin passkey/magic link + 2FA in Phase 2)
-- [ ] ADR 0004 Email provider interface + Postmark
-- [ ] ADR 0005 Hosting on Vercel (two projects, Marketplace data services)
-- [ ] ADR 0006 Application-layer encryption of prayer requests
+- [x] ADR 0001 BFF (browser never calls FastAPI)
+- [x] ADR 0002 PostgreSQL via Neon
+- [x] ADR 0003 Auth approach (no login in Phase 1; admin passkey/magic link + 2FA in Phase 2)
+- [x] ADR 0004 Email provider interface + Postmark
+- [x] ADR 0005 Hosting on Vercel (two projects, Marketplace data services)
+- [x] ADR 0006 Application-layer encryption of prayer requests
 
 ### 0.3 API skeleton (`apps/api`)
 - [ ] `uv init`, Python 3.13, `pyproject.toml` with separate `dev` group (pytest, ruff, mypy, bandit, pip-audit)
