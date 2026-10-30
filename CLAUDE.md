@@ -6,6 +6,8 @@ Development plan and working rules for the **Word on the Water** web application
 
 This file is both the project plan and the instructions for anyone (human or Claude Code) working in the repository. Read it fully before making changes. When the plan and the code disagree, fix one of them in the same pull request.
 
+**Status (updated 2026-10-30):** Phase 0 in progress, steps 0.1 to 0.8 done (repo, ADRs, API, database, email outbox, web shell, OpenAPI types, CI and branch protection). Next: 0.9 Vercel and external services, 0.10 observability and docs. Step-by-step progress lives in [PLAN.md](PLAN.md); this file holds the stack, rules and decisions.
+
 ---
 
 ## 1. Goals and scope
@@ -20,7 +22,9 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 **Out of scope for Phase 1** but designed for: devotional library, teaching series, audio/podcast, public user accounts, admin CMS, search, newsletter sending.
 
-**Design source:** `website/landing-page-mockup.html` (published at https://claude.ai/artifact/UYYvSXJkgeofmJ8PchzgWw). The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped.
+**Design source:** `website/landing-page-mockup.html` (published at https://claude.ai/artifact/UYYvSXJkgeofmJ8PchzgWw). The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped. A PDF of the mockup is in `mockup_site.pdf`.
+
+**Repository:** public at https://github.com/thecodeblock-hendrik/word-on-the-water, no license (all rights reserved). Because it is public: never commit secrets, real prayer requests or subscriber data; gitleaks runs in pre-commit and CI.
 
 ---
 
@@ -28,7 +32,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend | **Next.js (App Router, latest stable LTS-era major) + React + TypeScript (strict)** | SSR/SSG for SEO and fast first paint on mobile, Server Components, Server Actions |
+| Frontend | **Next.js 16 (App Router) + React + TypeScript (strict)** | Server rendering for SEO and fast first paint on mobile (per request because of the nonce CSP, ADR 0007), Server Components, Server Actions |
 | Styling | **Tailwind CSS v4** driven by CSS custom-property design tokens | Tokens map 1:1 to the mockup's `--bg`, `--ink`, `--accent` etc.; mobile-first utilities |
 | UI primitives | Radix UI / shadcn-style components (copied in, not a dependency black box) | Accessible by default |
 | Forms & validation | `react-hook-form` + **Zod** (web), **Pydantic v2** (API) | Validate on both sides; API is the source of truth |
@@ -100,55 +104,49 @@ Public read-only content endpoints (devotionals, series) may later be exposed di
 ## 4. Repository layout (monorepo)
 
 ```
-word-on-the-water/
-├── CLAUDE.md                     ← this file
-├── README.md                     ← quick start for humans
-├── SECURITY.md                   ← how to report a vulnerability
-├── docker-compose.yml            ← local postgres, redis, mailpit
-├── Makefile                      ← (or justfile) one-word dev commands
+word-on-the-water/                (items marked "planned" do not exist yet)
+├── CLAUDE.md, PLAN.md, README.md, SECURITY.md
+├── docker-compose.yml            ← local Postgres 17, Valkey, Mailpit
+├── docker/postgres/init.sql      ← extensions and local roles (app_migrator, app_runtime)
+├── Makefile, pnpm-workspace.yaml, .pre-commit-config.yaml, .env.example
+├── scripts/setup_env.py          ← `make setup` writes .env with random local secrets
+├── website/landing-page-mockup.html, mockup_site.pdf   ← design reference
 ├── .github/
-│   ├── workflows/ (ci.yml, deploy.yml, codeql.yml, security.yml)
+│   ├── workflows/ (ci.yml, security.yml, codeql.yml; migrate.yml planned)
 │   ├── dependabot.yml
 │   └── pull_request_template.md
 ├── docs/
-│   ├── adr/                      ← architecture decision records (0001-bff.md …)
-│   ├── threat-model.md
-│   ├── privacy.md                ← data inventory, retention, lawful basis
-│   └── runbooks/ (deploy.md, incident.md, restore-db.md, rotate-secrets.md)
+│   ├── adr/                      ← 0001 to 0007
+│   ├── runbooks/                 ← planned (deploy, incident, restore-db, rotate-secrets)
+│   └── threat-model.md, privacy.md   ← planned (step 0.10)
 ├── apps/
-│   ├── web/                      ← Next.js
-│   │   ├── src/app/
-│   │   │   ├── (marketing)/page.tsx          ← landing page (Phase 1)
-│   │   │   ├── (marketing)/privacy/page.tsx
-│   │   │   ├── (marketing)/subscribe/confirm/page.tsx
-│   │   │   ├── (content)/devotionals/…       ← Phase 2 (route stubs behind flag)
-│   │   │   ├── (admin)/admin/…               ← Phase 2 (auth-gated)
-│   │   │   ├── api/health/route.ts
-│   │   │   ├── layout.tsx, not-found.tsx, error.tsx
-│   │   │   ├── sitemap.ts, robots.ts, manifest.ts, opengraph-image.tsx
-│   │   ├── src/components/ (ui/, sections/, layout/)
-│   │   ├── src/lib/ (api-client.ts, env.ts, actions/, validation/)
-│   │   ├── src/styles/tokens.css             ← design tokens from mockup
-│   │   ├── proxy.ts                          ← CSP (Next 16 name for middleware)
-│   │   ├── vercel.json                       ← headers, region
-│   │   └── tests/ (unit/, e2e/)
+│   ├── web/                      ← Next.js 16
+│   │   ├── AGENTS.md             ← generated by Next: read node_modules/next/dist/docs first
+│   │   ├── src/proxy.ts          ← per-request CSP nonce (Next 16 name for middleware)
+│   │   ├── src/app/ (layout.tsx, page.tsx, not-found.tsx, error.tsx, api/health/route.ts)
+│   │   │   └── planned: (marketing)/ privacy and subscribe pages, sitemap/robots/manifest/OG
+│   │   │       image, (content)/ and (admin)/ for Phase 2
+│   │   ├── src/components/layout/ (header, footer, skip-link); planned: ui/, sections/
+│   │   ├── src/lib/ (api-client.ts, env.ts, csp.ts, security-headers.ts); planned: actions/, validation/
+│   │   ├── src/styles/tokens.css ← design tokens from the mockup
+│   │   ├── tests/ (unit/, e2e/), vitest.config.ts, playwright.config.ts
+│   │   └── vercel.json           ← planned (step 0.9)
 │   └── api/                      ← FastAPI
-│       ├── pyproject.toml, uv.lock
-│       ├── vercel.json            ← Python runtime, region, crons, maxDuration
-│       ├── alembic/ (env.py, versions/)
+│       ├── pyproject.toml, uv.lock, alembic/ (env.py, versions/)
 │       ├── app/
-│       │   ├── main.py            ← app factory, middleware, routers
-│       │   ├── core/ (config.py, security.py, logging.py, rate_limit.py, crypto.py)
-│       │   ├── db/ (session.py, base.py)
-│       │   ├── models/            ← SQLAlchemy models
-│       │   ├── schemas/           ← Pydantic request/response models
-│       │   ├── routers/ (health.py, subscribers.py, prayer.py, contact.py, admin/…)
-│       │   ├── services/          ← business logic (no FastAPI imports)
-│       │   ├── integrations/ (email/, turnstile.py)
-│       │   └── jobs/              ← outbox drain + retention, invoked by Vercel Cron
-│       └── tests/ (unit/, integration/)
+│       │   ├── main.py, openapi_export.py
+│       │   ├── core/ (config, errors, logging, middleware, rate_limit, security; crypto planned)
+│       │   ├── db/ (base, ids, session)
+│       │   ├── models/ (subscriber, prayer_request, contact_message, email_outbox, audit_log)
+│       │   ├── routers/ (health, cron, v1; planned: subscribers, prayer, contact, admin/)
+│       │   ├── services/ (email_templates, outbox)
+│       │   ├── integrations/email/ (base, console, smtp, postmark, factory); turnstile planned
+│       │   ├── jobs/ (drain_outbox; retention planned)
+│       │   └── schemas/          ← planned (Pydantic models, added with the first endpoints)
+│       ├── tests/ (unit tests at the top level; integration/ against real Postgres, Valkey, Mailpit)
+│       └── vercel.json           ← planned (step 0.9)
 └── packages/
-    └── api-types/                ← TypeScript types generated from FastAPI OpenAPI
+    └── api-types/                ← openapi.json and src/schema.d.ts, generated by `make types`
 ```
 
 Layering rule for the API: `routers → services → models/db`. Routers handle HTTP only; services hold logic and are unit-testable without HTTP; integrations are behind interfaces so they can be faked in tests.
@@ -202,7 +200,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 ### 6.2 Transport and headers
 
 - HTTPS everywhere; **HSTS** `max-age=63072000; includeSubDomains; preload`; TLS 1.2+.
-- **Content-Security-Policy** with per-request nonces set in `proxy.ts` (nonce vs hash-based approach pending, see PLAN.md 0.6): `default-src 'self'; script-src 'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; img-src 'self' data:; style-src 'self' 'nonce-…'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests`. Start in report-only in staging, enforce in production.
+- **Content-Security-Policy** with per-request nonces set in `proxy.ts` (nonce vs hash-based approach pending, see PLAN.md 0.6): `default-src 'self'; script-src 'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; img-src 'self' data:; style-src 'self' 'nonce-…'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests`. Start in report-only in staging (`CSP_REPORT_ONLY=1`), enforce in production. The nonce is created in `src/proxy.ts` (ADR 0007); the other static headers are in `next.config.ts`. `upgrade-insecure-requests` is sent only on https requests, because WebKit rewrites `http://localhost` assets to https and breaks the page in local and CI runs.
 - `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (deny camera, mic, geolocation, etc.), `Cross-Origin-Opener-Policy: same-origin`. Remove `X-Powered-By`.
 - API responses: `Cache-Control: no-store` on anything personal; JSON only; strict `Content-Type` checks.
 
@@ -315,7 +313,9 @@ Phase 1 endpoints:
 | POST | `/v1/prayer-requests` | Submit a prayer request (202) |
 | POST | `/v1/contact` | Submit a general message (202) |
 
-Settings via `pydantic-settings`, failing fast at startup if required secrets are missing.
+Settings via `pydantic-settings`, failing fast at startup if required secrets are missing. Blank environment values count as unset.
+
+**Implemented so far:** `GET /health/live`, `GET /health/ready` (database and Redis), `GET /v1/ping` (service token required; stands in for the default-deny `/v1` router) and `GET /cron/drain-outbox` (`CRON_SECRET`). None of the Phase 1 endpoints in the table above exist yet; they arrive in steps 1.3 to 1.5.
 
 ---
 
@@ -336,7 +336,7 @@ Settings via `pydantic-settings`, failing fast at startup if required secrets ar
 | Level | Tools | Expectation |
 |---|---|---|
 | API unit | pytest, pytest-asyncio | Services and validators, ≥ 85% coverage on `services/` |
-| API integration | pytest + Testcontainers Postgres/Redis, httpx `AsyncClient` | Every endpoint incl. rate limit, enumeration-safety and token expiry cases |
+| API integration | pytest against real Postgres, Valkey and Mailpit (Docker Compose locally, GitHub Actions service containers in CI), `httpx2` test client | Every endpoint incl. rate limit, enumeration-safety and token expiry cases |
 | Web unit/component | Vitest + Testing Library | Forms, validation messages, theme toggle |
 | E2E | **Playwright** on mobile viewports (iPhone 13/SE, Pixel 7) + desktop Chromium/WebKit/Firefox | Sign-up flow end to end using Mailpit, prayer form, navigation |
 | Accessibility | `@axe-core/playwright` | Zero serious/critical violations |
@@ -353,7 +353,9 @@ Environments: **local** (Docker Compose for data services, Mailpit catches email
 
 Deployment is done by **Vercel's Git integration**; GitHub Actions does not build or upload the app. Monorepo settings: each Vercel project has its Root Directory set and an "Ignored Build Step" (`npx turbo-ignore` or a `git diff` check) so a docs-only change doesn't redeploy both apps.
 
-`ci.yml` on every PR: install (frozen) → lint (ESLint, Prettier, Ruff) → type-check (tsc, mypy --strict or pyright) → unit tests → integration tests (service containers) → build → Playwright + axe → Lighthouse CI → gitleaks, pip-audit, pnpm audit, OSV-Scanner. CodeQL runs separately.
+`ci.yml` on every PR and push to `main`: **API** (ruff, format check, mypy, migrations, pytest with an 85% coverage gate on `services/`, against Postgres, Valkey and Mailpit service containers), **Web** (eslint, prettier, tsc, Vitest, build), **types** (`make types-check` fails if the generated API types are stale) and **e2e** (Playwright on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox). `security.yml` runs gitleaks, pip-audit, Bandit, pnpm audit and OSV-Scanner (also weekly). `codeql.yml` covers TypeScript and Python. Planned: Lighthouse CI, axe and ZAP (step 1.8). All actions are pinned to commit SHAs and workflows default to read-only permissions.
+
+**Branch protection on `main`:** pull request required, 10 required checks, 1 approving review, no force-push or deletion, linear history, conversations resolved. Admins are not enforced, so the owner merges with `gh pr merge --admin` once checks are green (a solo owner cannot approve their own PR).
 
 `migrate.yml` on merge to `main`: run Alembic migrations against production with the direct (unpooled) `app_migrator` URL, gated by a **manual approval** GitHub Environment, *before* Vercel promotes the new production deployment (production auto-promotion is turned off; promotion happens after migrations succeed and smoke tests pass against the staged deployment). Preview branches run migrations on their own Neon branch in the Vercel build step. Rollback is Vercel **Instant Rollback** to the previous deployment. Migrations must be backward compatible (expand → migrate → contract) so a rollback of app code is always safe.
 
@@ -372,28 +374,21 @@ Conventional Commits; small PRs; every PR uses the template (what, why, screensh
 
 ## 13. Delivery phases
 
+Progress is tracked step by step in [PLAN.md](PLAN.md); this section only describes scope.
+
+| Phase | Status |
+|---|---|
+| 0 Foundations | In progress: 0.1 to 0.8 done; 0.9 Vercel and external services and 0.10 observability and docs remain |
+| 1 Landing page | Not started |
+| 2 Devotionals and admin | Not started |
+| 3 Teaching series and audio | Not started |
+| 4 Community | Not started (decision gate) |
+
 ### Phase 0 — Foundations (framework in place, nothing public yet)
-- [ ] Monorepo, Docker Compose (postgres, redis, mailpit), Makefile, `.env.example`
-- [ ] Vercel team (2FA on), two projects (`wotw-web`, `wotw-api`) linked to the GitHub repo, Neon and Upstash added from the Marketplace, env vars scoped per environment, preview Deployment Protection on
-- [ ] Next.js app shell: layout, tokens, fonts, header/footer, error/404 pages, security headers + CSP middleware
-- [ ] FastAPI app factory: settings, structured logging, request IDs, error handlers, health checks, service-token auth, rate limiter
-- [ ] SQLAlchemy + Alembic, DB roles, first migration (Phase 1 tables)
-- [ ] Email provider interface + Postmark and console/Mailpit implementations; outbox worker
-- [ ] OpenAPI → TS types pipeline
-- [ ] CI pipeline, CodeQL, Dependabot, branch protection, pre-commit hooks
-- [ ] Staging environment, Sentry, uptime monitoring, Vercel Web Analytics + Speed Insights, log drain
-- [ ] ADRs 0001–0005 (BFF, Postgres, auth approach, email provider, hosting); threat model v1; privacy doc v1
+Monorepo, local Docker services, Makefile and env setup; Vercel team, two projects, Neon and Upstash, scoped env vars; Next.js shell with tokens, fonts, security headers and CSP; FastAPI app factory with settings, logging, request IDs, errors, health, service-token auth and rate limiter; SQLAlchemy and Alembic with DB roles and the first migration; email provider interface with outbox worker; OpenAPI to TypeScript types; CI, CodeQL, Dependabot, branch protection and pre-commit hooks; staging, Sentry, uptime monitoring, analytics and log drain; ADRs, threat model v1 and privacy doc v1.
 
 ### Phase 1 — Landing page (first public release)
-- [ ] Build all mockup sections as responsive components, mobile first
-- [ ] Final colour scheme chosen and applied to tokens; light/dark
-- [ ] Email sign-up with double opt-in, confirm and unsubscribe pages
-- [ ] Prayer request form (encrypted storage, team notification, optional reply) and contact form
-- [ ] Privacy policy page, ESV copyright notice, `security.txt`
-- [ ] SEO metadata, OG image, sitemap, favicon/manifest
-- [ ] Retention job for expired data
-- [ ] Full test suite green; Lighthouse and axe budgets met; ZAP baseline clean
-- [ ] Upgrade to Vercel Pro, domain added to Vercel, Firewall rate-limit rules on form routes, SPF/DKIM/DMARC, production deploy, backup restore tested
+All mockup sections as responsive mobile-first components; final colour scheme with light and dark; email sign-up with double opt-in and confirm and unsubscribe pages; prayer request form (encrypted storage, team notification, optional reply) and contact form; privacy policy, ESV copyright notice and `security.txt`; SEO metadata, OG image, sitemap and manifest; retention job; full test suite with Lighthouse and axe budgets met and ZAP baseline clean; Vercel Pro, domain, Firewall rules, SPF/DKIM/DMARC, production deploy and a tested backup restore.
 - **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request; the prayer team receives it; no high security findings.
 
 ### Phase 2 — Devotionals and admin
@@ -417,20 +412,27 @@ Optional public accounts (save favourites, reading plans), comments with moderat
 - DB changes only via Alembic migrations, reviewed, backward compatible.
 - Keep the landing page JS budget; prefer Server Components.
 - Run before every PR: `make lint typecheck test` (and `make e2e` for UI changes).
+- **Workflow:** one branch and one PR per plan sub-step (for example `feat/0.9-vercel`), Conventional Commits, one commit per logical chunk, push once per sub-step. Merge with `gh pr merge --squash --admin` only when every check is green.
+- **Tests first** (red, green, refactor), shown failing for the right reason before the code is written. See the testing approach in `PLAN.md`.
+- Check `git status` and stage named files before committing; never a blanket `git add -A` (it once committed locally installed files to the public repo).
+- Python tooling always through `uv` (`uv run`, `uv add`); no bare `python3` or `pip`. Use the latest stable library APIs. For Next.js, read the bundled docs in `node_modules/next/dist/docs/` first: this is not the Next you may remember (`proxy.ts` replaces `middleware.ts`).
+- Reproduce and prove the root cause of a problem before fixing it, and record problems found along the way in the PR.
 
-### Commands (to be created in Phase 0)
+### Commands
 
 ```
-make setup        # install deps (pnpm, uv), copy .env.example → .env
-make up           # docker compose up: postgres, redis, mailpit; then run web + api dev servers
-make env          # vercel env pull for both projects (development scope)
-make migrate      # alembic upgrade head
-make lint         # eslint, prettier --check, ruff
-make typecheck    # tsc --noEmit, mypy
-make test         # vitest + pytest
-make e2e          # playwright (mobile + desktop projects)
-make types        # regenerate packages/api-types from OpenAPI
+make setup        # create .env with random local secrets (never overwrites an existing .env)
+make up / down    # docker compose: postgres, redis, mailpit (make logs to follow)
+make migrate      # alembic upgrade head (as app_migrator)
+make lint         # ruff + eslint + prettier --check
+make typecheck    # mypy + tsc
+make test         # pytest + vitest
+make e2e          # playwright, all six projects (builds and serves the app)
+make types        # regenerate packages/api-types from the OpenAPI schema
+make types-check  # regenerate and fail if the committed types differ (runs in CI)
 ```
+
+Planned: `make env` (`vercel env pull` for both projects, step 0.9). Run the apps with `uv run uvicorn app.main:app` in `apps/api` and `pnpm dev` in `apps/web`. Playwright's Firefox does not launch on the current macOS beta; CI covers it.
 
 ---
 
@@ -445,6 +447,14 @@ make types        # regenerate packages/api-types from OpenAPI
 | 5 | Auth needs: admin only, or public accounts eventually? | Admin-only (Phase 2); public accounts optional in Phase 4 |
 | 6 | Where are you and your audience based (for privacy law)? | Design to GDPR + POPIA, which covers most jurisdictions |
 | 7 | Content management: write devotionals in a built-in admin, or use a headless CMS? | Built-in admin in Phase 2 |
-| 8 | Which colour scheme from the mockup? | Navy/teal/sand default |
+| 8 | Which colour scheme from the mockup? | Navy/teal/sand default (applied to the tokens; final choice still open) |
 | 9 | Will there be donations/giving? | Not before Phase 4; hosted checkout only |
-| 10 | Where should the repository live (GitHub account/org, name)? | `word-on-the-water` on Hendrik's GitHub |
+| 10 | Where should the repository live (GitHub account/org, name)? | **Resolved:** public repo `thecodeblock-hendrik/word-on-the-water`, no license |
+
+### Decisions made during the build
+
+- **Database:** stay with Neon, not Supabase: native Vercel integration, a database branch per preview, and scale to zero on the free tier. Supabase would add an auto-generated REST API to lock down (ADR 0002).
+- **CSP:** nonce-based, so pages render per request. A hash-based CSP with static pages was tried first and failed in a real browser (8 inline hydration scripts blocked). Re-measure LCP on a preview deployment (ADR 0007).
+- **Licensing and visibility:** no license (all rights reserved); repository public.
+- **Testing:** test-first for all logic, with a definition of done per step (`PLAN.md`).
+- **Branch protection:** the owner is not enforced, so a solo developer can merge once checks are green.
