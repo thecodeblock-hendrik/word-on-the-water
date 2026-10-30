@@ -22,3 +22,8 @@ typecheck:
 
 test:
 	cd apps/api && uv run pytest
+
+.PHONY: migrate
+
+migrate:
+	cd apps/api && uv run --env-file ../../.env alembic upgrade head

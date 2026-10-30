@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import time
 import uuid
+from collections.abc import AsyncIterator
 from typing import Annotated
 
 from fastapi import Depends, Request
@@ -44,5 +45,9 @@ class RateLimiter:
             raise ApiError(429, "rate_limited", "Too many requests. Please try again later.")
 
 
-def get_redis(settings: Annotated[Settings, Depends(get_settings)]) -> Redis:
-    return Redis.from_url(settings.redis_url.get_secret_value())
+async def get_redis(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncIterator[Redis]:
+    redis = Redis.from_url(settings.redis_url.get_secret_value(), socket_connect_timeout=2)
+    try:
+        yield redis
+    finally:
+        await redis.aclose()

@@ -48,22 +48,22 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [x] Security middleware: `Cache-Control: no-store`, body size limit
 - [ ] Strict `Content-Type` check (added with the first POST route in 1.3)
 - [x] `routers/health.py`: `/health/live`
-- [ ] `/health/ready` (DB + Redis; needs the DB session from 0.4)
+- [x] `/health/ready` (DB + Redis)
 - [x] `core/security.py`: service-token dependency (constant-time compare), default deny on non-health routes
 - [x] `core/rate_limit.py`: Redis sliding window keyed by hashed IP and email; generic 429
 - [x] Client IP taken only from Vercel-set headers
 - [x] Tests: health, auth rejected without token, rate limit trips, error shape
-- [x] Pre-commit hook for ruff; Makefile targets `lint`, `typecheck`, `test` cover the API (`migrate` is added in 0.4)
+- [x] Pre-commit hook for ruff; Makefile targets `lint`, `typecheck`, `test` cover the API (`migrate` added in 0.4)
 - [x] Validate: `uv run pytest`, `uv run ruff check`, `uv run mypy --strict` all green
 
 ### 0.4 Database
-- [ ] `db/session.py`: async engine, `NullPool`, short timeouts, TLS
-- [ ] `db/base.py`: declarative base, UUID v7 id mixin, `created_at/updated_at` (UTC)
-- [ ] Alembic configured to use the direct (unpooled) URL
-- [ ] Models: `subscribers`, `prayer_requests`, `contact_messages`, `email_outbox`, `audit_log` (per CLAUDE.md section 7)
-- [ ] First migration generated, reviewed by hand, applied locally
-- [ ] DB roles: `app_migrator` (DDL) and `app_runtime` (DML only); runtime role cannot alter schema
-- [ ] Validate: migrate up, down, up again on a clean database; runtime role denied DDL
+- [x] `db/session.py`: async engine, `NullPool`, short timeouts, TLS
+- [x] `db/base.py`: declarative base, UUID v7 id mixin, `created_at/updated_at` (UTC)
+- [x] Alembic configured to use the direct (unpooled) URL
+- [x] Models: `subscribers`, `prayer_requests`, `contact_messages`, `email_outbox`, `audit_log` (per CLAUDE.md section 7)
+- [x] First migration generated, reviewed by hand, applied locally
+- [x] DB roles: `app_migrator` (DDL) and `app_runtime` (DML only); runtime role cannot alter schema
+- [x] Validate: migrate up, down, up again on a clean database; runtime role denied DDL
 
 ### 0.5 Email and outbox
 - [ ] `EmailProvider` interface in `integrations/email/`
