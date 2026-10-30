@@ -13,7 +13,9 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 class Settings(BaseSettings):
     """Required values have no default so a missing secret fails at startup."""
 
-    model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=REPO_ROOT / ".env", extra="ignore", env_ignore_empty=True
+    )
 
     environment: Literal["local", "preview", "production"] = "local"
     database_url: SecretStr
@@ -22,6 +24,11 @@ class Settings(BaseSettings):
     service_token: SecretStr
     cron_secret: SecretStr
     ip_hash_salt: SecretStr
+    email_provider: Literal["smtp", "postmark", "console"] = "smtp"
+    email_from: str = "Word on the Water <hello@example.invalid>"
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    postmark_server_token: SecretStr | None = None
 
     @property
     def docs_enabled(self) -> bool:

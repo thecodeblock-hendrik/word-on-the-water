@@ -103,14 +103,14 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Validate: migrate up, down, up again on a clean database; runtime role denied DDL
 
 ### 0.5 Email and outbox
-- [ ] `EmailProvider` interface in `integrations/email/`
-- [ ] Console and Mailpit (SMTP) implementations; Postmark implementation
-- [ ] Template renderer (plain text always, mobile-friendly HTML)
-- [ ] Outbox service: enqueue in same transaction as the business write
-- [ ] `jobs/drain_outbox.py`: lock rows, send, retry with backoff, mark failed after N attempts
-- [ ] Cron endpoint protected by `Authorization: Bearer $CRON_SECRET`
-- [ ] Tests: enqueue, drain success, drain failure and retry, cron auth
-- [ ] Validate: enqueued email appears in Mailpit
+- [x] `EmailProvider` interface in `integrations/email/`
+- [x] Console and Mailpit (SMTP) implementations; Postmark implementation
+- [x] Template renderer (plain text always, mobile-friendly HTML)
+- [x] Outbox service: enqueue in same transaction as the business write
+- [x] `jobs/drain_outbox.py`: lock rows, send, retry with backoff, mark failed after N attempts
+- [x] Cron endpoint protected by `Authorization: Bearer $CRON_SECRET`
+- [x] Tests: enqueue, drain success, drain failure and retry, cron auth
+- [x] Validate: enqueued email appears in Mailpit
 
 ### 0.6 Web skeleton (`apps/web`)
 - [ ] Create Next.js (latest stable, App Router, TypeScript strict), pnpm
