@@ -39,20 +39,22 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [x] ADR 0006 Application-layer encryption of prayer requests
 
 ### 0.3 API skeleton (`apps/api`)
-- [ ] `uv init`, Python 3.13, `pyproject.toml` with separate `dev` group (pytest, ruff, mypy, bandit, pip-audit)
-- [ ] Add runtime deps (latest): fastapi, uvicorn, pydantic, pydantic-settings, sqlalchemy[asyncio], asyncpg, alembic, structlog, cryptography, httpx, redis client
-- [ ] `app/core/config.py`: `pydantic-settings`, fail fast on missing secrets
-- [ ] `app/main.py`: app factory, router registration, `/docs` and `/openapi.json` disabled in production
-- [ ] `app/core/logging.py`: structlog JSON, request ID middleware, never log bodies
-- [ ] Error handlers returning `{ "error": { "code", "message" } }`, no stack traces
-- [ ] Security middleware: `Cache-Control: no-store`, content-type checks, body size limit
-- [ ] `routers/health.py`: `/health/live`, `/health/ready` (DB + Redis)
-- [ ] `core/security.py`: service-token dependency (constant-time compare), default deny on non-health routes
-- [ ] `core/rate_limit.py`: Redis sliding window keyed by hashed IP and email; generic 429
-- [ ] Client IP taken only from Vercel-set headers
-- [ ] Tests: health, auth rejected without token, rate limit trips, error shape
-- [ ] Pre-commit hook for ruff; Makefile targets `migrate`, `lint`, `typecheck`, `test` cover the API
-- [ ] Validate: `uv run pytest`, `uv run ruff check`, `uv run mypy --strict` all green
+- [x] `uv init`, Python 3.13, `pyproject.toml` with separate `dev` group (pytest, ruff, mypy, bandit, pip-audit)
+- [x] Add runtime deps (latest): fastapi, uvicorn, pydantic, pydantic-settings, sqlalchemy[asyncio], asyncpg, alembic, structlog, cryptography, httpx, redis client
+- [x] `app/core/config.py`: `pydantic-settings`, fail fast on missing secrets
+- [x] `app/main.py`: app factory, router registration, `/docs` and `/openapi.json` disabled in production
+- [x] `app/core/logging.py`: structlog JSON, request ID middleware, never log bodies
+- [x] Error handlers returning `{ "error": { "code", "message" } }`, no stack traces
+- [x] Security middleware: `Cache-Control: no-store`, body size limit
+- [ ] Strict `Content-Type` check (added with the first POST route in 1.3)
+- [x] `routers/health.py`: `/health/live`
+- [ ] `/health/ready` (DB + Redis; needs the DB session from 0.4)
+- [x] `core/security.py`: service-token dependency (constant-time compare), default deny on non-health routes
+- [x] `core/rate_limit.py`: Redis sliding window keyed by hashed IP and email; generic 429
+- [x] Client IP taken only from Vercel-set headers
+- [x] Tests: health, auth rejected without token, rate limit trips, error shape
+- [x] Pre-commit hook for ruff; Makefile targets `lint`, `typecheck`, `test` cover the API (`migrate` is added in 0.4)
+- [x] Validate: `uv run pytest`, `uv run ruff check`, `uv run mypy --strict` all green
 
 ### 0.4 Database
 - [ ] `db/session.py`: async engine, `NullPool`, short timeouts, TLS
