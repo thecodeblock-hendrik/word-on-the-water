@@ -9,7 +9,12 @@ export function proxy(request: NextRequest) {
     process.env.CSP_REPORT_ONLY === "1"
       ? "Content-Security-Policy-Report-Only"
       : "Content-Security-Policy";
-  const csp = buildCsp({ nonce, isDev: process.env.NODE_ENV === "development" });
+  const protocol = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol;
+  const csp = buildCsp({
+    nonce,
+    isDev: process.env.NODE_ENV === "development",
+    upgradeInsecure: protocol.replace(":", "") === "https",
+  });
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);

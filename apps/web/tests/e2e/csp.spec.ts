@@ -34,3 +34,17 @@ test("the policy forbids unsafe inline and eval scripts", async ({ request }) =>
   expect(scripts).not.toContain("unsafe-inline");
   expect(scripts).not.toContain("unsafe-eval");
 });
+
+test("every asset loads over the page's own protocol with no failed requests", async ({ page }) => {
+  const failed: string[] = [];
+  page.on("requestfailed", (request) => failed.push(request.url()));
+
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+
+  expect(failed).toEqual([]);
+  const ctaMinHeight = await page
+    .getByRole("link", { name: "Get the devotional" })
+    .evaluate((el) => getComputedStyle(el).minHeight);
+  expect(ctaMinHeight).toBe("44px"); // proves the stylesheet was applied
+});
