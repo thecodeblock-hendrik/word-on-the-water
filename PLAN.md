@@ -22,7 +22,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [x] Create GitHub repo `word-on-the-water` (private, thecodeblock-hendrik)
 - [x] Monorepo skeleton: `apps/web`, `apps/api`, `packages/api-types`, `docs/{adr,runbooks}`, `.github`
 - [x] `README.md` (concise quick start), `SECURITY.md`
-- [ ] `LICENSE` decision **(Hendrik)**
+- [x] `LICENSE` decision: none, all rights reserved (repo is public)
 - [x] `.editorconfig`, `.env.example` (names only, no values)
 - [x] `docker-compose.yml`: Postgres 17 (with `citext`, `pgcrypto`), Redis/Valkey, Mailpit
 - [x] Validate: `docker compose up` brings all three healthy; connect with `psql`, `redis-cli`; Mailpit UI loads
