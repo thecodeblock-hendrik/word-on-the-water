@@ -19,7 +19,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 ### 0.1 Repository and tooling
 - [x] `git init`, `.gitignore` (node, python, env files, `.vercel`, build output), `.gitattributes`
-- [ ] Create GitHub repo `word-on-the-water` **(Hendrik: account/org)**
+- [x] Create GitHub repo `word-on-the-water` (private, thecodeblock-hendrik)
 - [x] Monorepo skeleton: `apps/web`, `apps/api`, `packages/api-types`, `docs/{adr,runbooks}`, `.github`
 - [x] `README.md` (concise quick start), `SECURITY.md`
 - [ ] `LICENSE` decision **(Hendrik)**
