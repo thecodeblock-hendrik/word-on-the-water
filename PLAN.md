@@ -128,10 +128,11 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Validate: `pnpm dev` renders shell at 375px; response headers verified with `curl -I`
 
 ### 0.7 OpenAPI types pipeline
-- [ ] Script exports OpenAPI from FastAPI to a file
-- [ ] `openapi-typescript` generates `packages/api-types`
-- [ ] `make types` works; CI fails if generated types are stale
-- [ ] Makefile `types` target
+- [x] Script exports OpenAPI from FastAPI to a file
+- [x] `openapi-typescript` generates `packages/api-types`
+- [x] `make types` works; `make types-check` fails if generated types are stale (also guarded by a pytest)
+- [ ] CI runs `make types-check` (added with `ci.yml` in 0.8)
+- [x] Makefile `types` and `types-check` targets
 
 ### 0.8 CI and repo protection
 - [ ] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
