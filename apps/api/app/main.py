@@ -7,7 +7,7 @@ from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import register_middleware
 from app.core.security import require_service_token
-from app.routers import health, v1
+from app.routers import cron, health, v1
 
 
 def create_app() -> FastAPI:
@@ -22,6 +22,7 @@ def create_app() -> FastAPI:
     register_middleware(app)
     register_error_handlers(app)
     app.include_router(health.router)
+    app.include_router(cron.router)
     app.include_router(v1.router, prefix="/v1", dependencies=[Depends(require_service_token)])
     return app
 
