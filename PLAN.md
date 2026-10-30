@@ -113,17 +113,18 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Validate: enqueued email appears in Mailpit
 
 ### 0.6 Web skeleton (`apps/web`)
-- [ ] Create Next.js (latest stable, App Router, TypeScript strict), pnpm
-- [ ] Tailwind CSS v4 with `src/styles/tokens.css` (mockup tokens, navy/teal/sand default)
-- [ ] Fonts via `next/font`: Barlow Condensed, Barlow, Lora (self-hosted, Latin, `display: swap`)
-- [ ] Root layout, skip link, header, footer, `not-found.tsx`, `error.tsx`
-- [ ] `middleware.ts`: CSP with per-request nonce (report-only first), HSTS, nosniff, Referrer-Policy, Permissions-Policy, COOP; remove `X-Powered-By`
-- [ ] `src/lib/env.ts`: Zod validation; `server-only` on every secret-touching module
-- [ ] `src/lib/api-client.ts`: server-side calls with service token and forwarded client IP
-- [ ] `api/health/route.ts`
-- [ ] ESLint, Prettier, Vitest + Testing Library, Playwright configured
-- [ ] Pre-commit hooks for prettier and eslint; Makefile targets `lint`, `typecheck`, `test`, `e2e` extended to cover the web app
-- [ ] Validate: `pnpm dev` renders shell at 375px; response headers verified with `curl -I`
+- [x] Create Next.js (latest stable, App Router, TypeScript strict), pnpm
+- [x] Tailwind CSS v4 with `src/styles/tokens.css` (mockup tokens, navy/teal/sand default)
+- [x] Fonts via `next/font`: Barlow Condensed, Barlow, Lora (self-hosted, Latin, `display: swap`)
+- [x] Root layout, skip link, header, footer, `not-found.tsx`, `error.tsx`
+- [x] Static security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, COOP) in `next.config.ts`; `X-Powered-By` removed
+- [ ] Content-Security-Policy in `proxy.ts` (Next 16 renamed `middleware.ts`). **(Hendrik: decide nonce vs hash-based CSP, see ADR 0007; nonces force dynamic rendering)**
+- [x] `src/lib/env.ts`: Zod validation; `server-only` on every secret-touching module
+- [x] `src/lib/api-client.ts`: server-side calls with service token and forwarded client IP
+- [x] `api/health/route.ts`
+- [x] ESLint, Prettier, Vitest + Testing Library, Playwright configured
+- [x] Pre-commit hooks for prettier and eslint; Makefile targets `lint`, `typecheck`, `test`, `e2e` extended to cover the web app
+- [x] Validate: `pnpm dev` renders shell at 375px; response headers verified with `curl -I`
 
 ### 0.7 OpenAPI types pipeline
 - [ ] Script exports OpenAPI from FastAPI to a file
@@ -204,6 +205,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Token generation: 32 random bytes, store SHA-256 hash only, 48 hour expiry
 - [ ] Turnstile verification, honeypot, minimum time-to-submit
 - [ ] Rate limit 5/hour/IP; idempotency key support
+- [ ] API client IP: trust `X-Forwarded-For` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
 - [ ] Consent text version, timestamp and source recorded
 - [ ] Confirmation email via outbox
 - [ ] `POST /v1/subscribers/confirm` and `/unsubscribe` (including RFC 8058 one-click)

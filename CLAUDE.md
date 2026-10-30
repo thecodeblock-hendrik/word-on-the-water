@@ -129,7 +129,7 @@ word-on-the-water/
 │   │   ├── src/components/ (ui/, sections/, layout/)
 │   │   ├── src/lib/ (api-client.ts, env.ts, actions/, validation/)
 │   │   ├── src/styles/tokens.css             ← design tokens from mockup
-│   │   ├── middleware.ts                     ← CSP nonce, security headers
+│   │   ├── proxy.ts                          ← CSP (Next 16 name for middleware)
 │   │   ├── vercel.json                       ← headers, region
 │   │   └── tests/ (unit/, e2e/)
 │   └── api/                      ← FastAPI
@@ -202,7 +202,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 ### 6.2 Transport and headers
 
 - HTTPS everywhere; **HSTS** `max-age=63072000; includeSubDomains; preload`; TLS 1.2+.
-- **Content-Security-Policy** with per-request nonces set in `middleware.ts`: `default-src 'self'; script-src 'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; img-src 'self' data:; style-src 'self' 'nonce-…'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests`. Start in report-only in staging, enforce in production.
+- **Content-Security-Policy** with per-request nonces set in `proxy.ts` (nonce vs hash-based approach pending, see PLAN.md 0.6): `default-src 'self'; script-src 'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; img-src 'self' data:; style-src 'self' 'nonce-…'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests`. Start in report-only in staging, enforce in production.
 - `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (deny camera, mic, geolocation, etc.), `Cross-Origin-Opener-Policy: same-origin`. Remove `X-Powered-By`.
 - API responses: `Cache-Control: no-store` on anything personal; JSON only; strict `Content-Type` checks.
 
