@@ -9,8 +9,8 @@ from pathlib import Path
 
 OUTPUT_PATH = Path(__file__).resolve().parents[3] / "packages" / "api-types" / "openapi.json"
 
-# The schema does not depend on secrets, so placeholders are enough when none are configured.
-PLACEHOLDER_ENV = {
+# The schema does not depend on secrets, so fake placeholders are enough when none are set.
+PLACEHOLDER_ENV = {  # nosec B105
     "DATABASE_URL": "postgresql+asyncpg://placeholder:placeholder@localhost/placeholder",
     "REDIS_URL": "redis://localhost:6379/0",
     "SERVICE_TOKEN": "placeholder",

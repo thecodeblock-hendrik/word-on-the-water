@@ -6,6 +6,24 @@ import { proxy } from "@/proxy";
 const run = () => proxy(new NextRequest("http://localhost:3000/"));
 const nonceOf = (csp: string | null) => /'nonce-([^']+)'/.exec(csp ?? "")?.[1];
 
+const cspFor = (url: string, headers: Record<string, string> = {}) =>
+  proxy(new NextRequest(url, { headers })).headers.get("content-security-policy") ?? "";
+
+describe("proxy upgrade-insecure-requests", () => {
+  it("is omitted for plain http (WebKit would rewrite localhost assets to https and fail)", () => {
+    expect(cspFor("http://localhost:3000/")).not.toContain("upgrade-insecure-requests");
+  });
+
+  it("is sent for https requests", () => {
+    expect(cspFor("https://example.com/")).toContain("upgrade-insecure-requests");
+  });
+
+  it("is sent when a proxy reports https via x-forwarded-proto", () => {
+    const csp = cspFor("http://internal/", { "x-forwarded-proto": "https" });
+    expect(csp).toContain("upgrade-insecure-requests");
+  });
+});
+
 describe("proxy", () => {
   it("sets a CSP carrying a nonce on the response", () => {
     const csp = run().headers.get("content-security-policy");
