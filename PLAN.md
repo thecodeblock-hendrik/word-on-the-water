@@ -131,19 +131,21 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Script exports OpenAPI from FastAPI to a file
 - [x] `openapi-typescript` generates `packages/api-types`
 - [x] `make types` works; `make types-check` fails if generated types are stale (also guarded by a pytest)
-- [ ] CI runs `make types-check` (added with `ci.yml` in 0.8)
+- [x] CI runs `make types-check` (added with `ci.yml` in 0.8)
 - [x] Makefile `types` and `types-check` targets
 
 ### 0.8 CI and repo protection
-- [ ] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
-- [ ] Coverage gate in CI: `services/` at least 85 percent (configure `pytest-cov`), web coverage reported
-- [ ] `codeql.yml` (TypeScript, Python)
-- [ ] `security.yml`: gitleaks, pip-audit, pnpm audit, OSV-Scanner, Bandit
-- [ ] Actions pinned to commit SHAs; least-privilege `permissions:`
-- [ ] `dependabot.yml` (weekly, grouped)
-- [ ] PR template (what, why, mobile screenshots, security considerations, tests)
-- [ ] Branch protection on `main`: PR required, checks green, 1 review, no force-push
-- [ ] Validate: a test PR runs every workflow green
+- [x] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
+- [x] Coverage gate in CI: `services/` at least 85 percent (`pytest-cov`)
+- [ ] Web coverage reported in CI (Vitest coverage; add once there is logic worth measuring)
+- [x] `codeql.yml` (TypeScript, Python)
+- [x] `security.yml`: gitleaks, pip-audit, pnpm audit, OSV-Scanner, Bandit
+- [x] Actions pinned to commit SHAs; least-privilege `permissions:`
+- [x] `dependabot.yml` (weekly, grouped)
+- [ ] Confirm the first Dependabot run opens PRs for all four ecosystems (actions, uv, npm in a pnpm workspace, docker-compose)
+- [x] PR template (what, why, mobile screenshots, security considerations, tests)
+- [x] Branch protection on `main`: PR required, 10 required checks, 1 review, no force-push or deletion, linear history, conversations resolved. Admins are not enforced so the owner can merge their own PRs with `gh pr merge --admin`
+- [x] Validate: a test PR runs every workflow green (PR #10, all 11 checks, six Playwright browser projects)
 
 ### 0.9 Vercel and external services
 - [ ] Vercel team with 2FA for all members
