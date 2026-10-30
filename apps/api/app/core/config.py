@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     redis_url: SecretStr
     service_token: SecretStr
     cron_secret: SecretStr
+    ip_hash_salt: SecretStr
 
     @property
     def docs_enabled(self) -> bool:

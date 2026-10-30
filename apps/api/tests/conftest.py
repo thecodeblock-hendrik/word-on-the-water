@@ -7,6 +7,7 @@ TEST_ENV = {
     "REDIS_URL": "redis://localhost:6379/0",
     "SERVICE_TOKEN": "test-service-token",
     "CRON_SECRET": "test-cron-secret",
+    "IP_HASH_SALT": "test-salt",
 }
 # app.main builds the app at import time (needed by Vercel), so the env must exist first.
 for key, value in TEST_ENV.items():
