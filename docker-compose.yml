@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: wotw
+      POSTGRES_PASSWORD: wotw_local
+      POSTGRES_DB: wotw
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wotw -d wotw"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: valkey/valkey:8
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  pgdata:

@@ -1,0 +1,450 @@
+# CLAUDE.md — Word on the Water
+
+Development plan and working rules for the **Word on the Water** web application: an online Christian ministry publishing devotionals and Bible teaching for men and surfers.
+
+> *"Who then is this, that even the wind and the sea obey him?"* — Mark 4:41 (ESV)
+
+This file is both the project plan and the instructions for anyone (human or Claude Code) working in the repository. Read it fully before making changes. When the plan and the code disagree, fix one of them in the same pull request.
+
+---
+
+## 1. Goals and scope
+
+**Goal:** a production-ready, mobile-first, secure web application whose full framework (frontend, API, database, auth scaffolding, CI/CD, observability) is in place from day one, while **Phase 1 ships only the public landing page**.
+
+**Phase 1 user-facing features (from the mockup):**
+
+1. Landing page sections: hero (Mark 4:41 + logo), About / who it's for, What's coming (weekly devotional, teaching series, audio) with a sample "surf report" devotional, Start here (the gospel in 4 steps), statement of faith, founder bio, footer with ESV copyright notice.
+2. **Email sign-up** (first name optional, email required) with double opt-in.
+3. **Prayer request / contact form** (the mockup shows `mailto:` links; we replace them with a private, spam-protected form that stores the request and notifies the prayer inbox).
+
+**Out of scope for Phase 1** but designed for: devotional library, teaching series, audio/podcast, public user accounts, admin CMS, search, newsletter sending.
+
+**Design source:** `website/landing-page-mockup.html` (published at https://claude.ai/artifact/UYYvSXJkgeofmJ8PchzgWw). The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped.
+
+---
+
+## 2. Stack (decided)
+
+| Layer | Choice | Why |
+|---|---|---|
+| Frontend | **Next.js (App Router, latest stable LTS-era major) + React + TypeScript (strict)** | SSR/SSG for SEO and fast first paint on mobile, Server Components, Server Actions |
+| Styling | **Tailwind CSS v4** driven by CSS custom-property design tokens | Tokens map 1:1 to the mockup's `--bg`, `--ink`, `--accent` etc.; mobile-first utilities |
+| UI primitives | Radix UI / shadcn-style components (copied in, not a dependency black box) | Accessible by default |
+| Forms & validation | `react-hook-form` + **Zod** (web), **Pydantic v2** (API) | Validate on both sides; API is the source of truth |
+| Backend | **FastAPI** on **Python 3.13**, run with Uvicorn (Gunicorn workers in prod) | Typed, fast, OpenAPI out of the box |
+| ORM / migrations | **SQLAlchemy 2.x (async) + Alembic** | Mature, explicit, migration-first |
+| Database | **PostgreSQL 17** | Reliable, `citext`, `pgcrypto`, full-text search for later phases |
+| Cache / rate limits | **Valkey/Redis** (managed, e.g. Upstash) | Rate limiting, idempotency keys, later sessions/queues |
+| Background jobs | **Outbox table drained by Vercel Cron** (plus an immediate best-effort send after the request). Phase 2+: Vercel Queues or QStash if volume needs it | Vercel has no long-running workers; email sending must not block requests and must be retryable |
+| Transactional email | **Postmark** (assumed, swappable via an `EmailProvider` interface) | Strong deliverability, separate transactional/broadcast streams |
+| Bot protection | **Cloudflare Turnstile** + honeypot field + rate limits | Privacy-friendly, no Google reCAPTCHA |
+| Package managers | **pnpm** (web), **uv** (api) | Fast, lockfiles, reproducible |
+| Local dev | Docker Compose for Postgres, Redis and Mailpit; web and API run natively (`pnpm dev`, `uvicorn`) | Mirrors Vercel's runtime, which deploys source, not containers |
+| CI/CD | **GitHub Actions** | Lint, type-check, test, scan, build, deploy |
+| Analytics | **Vercel Web Analytics** (or Plausible) | Cookieless, no consent banner needed, respects privacy |
+| Errors / tracing | **Sentry** (web + API) with PII scrubbing; OpenTelemetry-ready structured logs | |
+
+### Hosting: Vercel (decided)
+
+Everything runs on **Vercel**, with data services from the Vercel Marketplace so billing, env vars and preview branches are managed in one place.
+
+| Component | Vercel setup |
+|---|---|
+| Web (Next.js) | Vercel project `wotw-web` (root `apps/web`), Fluid compute, Node runtime |
+| API (FastAPI) | Separate Vercel project `wotw-api` (root `apps/api`) using Vercel's native Python/FastAPI runtime (ASGI app exported from `app/main.py`). Same region as the database |
+| Postgres | **Neon via Vercel Marketplace** (pooled connection string, PITR backups, a database branch per preview deployment) |
+| Redis | **Upstash Redis via Vercel Marketplace** (HTTP/TLS, serverless-friendly) |
+| Scheduled jobs | **Vercel Cron** (`vercel.json` in `apps/api`) calling protected endpoints: drain email outbox (every 5 min), retention cleanup (daily) |
+| WAF / DDoS / rate rules | **Vercel Firewall** (managed rules, custom rate-limit rules on form routes, Attack Challenge Mode for emergencies) |
+| Bot protection | Turnstile on forms (optionally plus Vercel BotID) |
+| DNS | Domain on Vercel DNS (or registrar DNS pointing to Vercel). Do not put the Cloudflare proxy in front of Vercel; it breaks caching and the firewall's view of client IPs |
+| Analytics | Vercel Web Analytics + Speed Insights (cookieless, real-user Core Web Vitals) or Plausible |
+| Media (Phase 3 audio) | Vercel Blob (or Cloudflare R2 if bandwidth cost matters) |
+| Plan | Start on **Hobby** for Phase 0; move to **Pro** (~USD 20/month per seat) before public launch, since Hobby is for non-commercial use and Pro adds deployment protection options, more cron frequency and firewall rules |
+
+**Serverless rules that follow from Vercel:**
+- No long-running processes or in-memory state; anything stateful lives in Postgres or Redis.
+- SQLAlchemy uses Neon's **pooled** endpoint with `NullPool` (let PgBouncer pool) and short timeouts; Alembic migrations use the **direct** (unpooled) URL.
+- Keep API function cold starts small: lean dependencies, lazy-import heavy libraries, set `maxDuration` sensibly (10–30 s).
+- Region: pin both projects and the database to the same region nearest the audience (e.g. `fra1`/`lhr1` for Europe/Africa, `iad1` for US). Confirm with Hendrik.
+- Cron endpoints check the `Authorization: Bearer $CRON_SECRET` header Vercel sends.
+
+Estimated Phase 1 running cost: USD 0 on Hobby during build; roughly USD 20–40/month on Pro at launch (Neon and Upstash free tiers cover Phase 1 traffic).
+
+---
+
+## 3. Architecture
+
+```
+Browser (mobile first)
+   │  HTTPS only (HSTS), Vercel Edge Network + Vercel Firewall
+   ▼
+Next.js on Vercel (apps/web)  ── Server Components render pages (SSG/ISR for content)
+   │  Server Actions / Route Handlers  (the only thing the browser talks to)
+   │  server-to-server, HTTPS, service token + forwarded client IP
+   ▼
+FastAPI on Vercel Functions (apps/api)  ── validation, business rules, auth, rate limits
+   │                 ├── Upstash Redis  (rate limits, idempotency)
+   │                 ├── Email provider (via outbox, drained by Vercel Cron)
+   ▼
+Neon PostgreSQL  ── least-privilege role, TLS, encrypted at rest, PITR backups
+```
+
+**Key decision — backend-for-frontend (BFF):** the browser never calls FastAPI directly. Next.js Server Actions call the API server-side with a service credential. This removes CORS from the public surface, keeps the API URL and tokens out of the browser, and gives one place for session cookies later. FastAPI still validates everything as if it were public (defence in depth) and rejects any call without the service token. In production the API project's public `*.vercel.app` URL is covered by Vercel Deployment Protection, and only the web project (via a protection-bypass secret) and Vercel Cron can reach it.
+
+Public read-only content endpoints (devotionals, series) may later be exposed directly with caching if needed; that is a deliberate future decision, not a default.
+
+---
+
+## 4. Repository layout (monorepo)
+
+```
+word-on-the-water/
+├── CLAUDE.md                     ← this file
+├── README.md                     ← quick start for humans
+├── SECURITY.md                   ← how to report a vulnerability
+├── docker-compose.yml            ← local postgres, redis, mailpit
+├── Makefile                      ← (or justfile) one-word dev commands
+├── .github/
+│   ├── workflows/ (ci.yml, deploy.yml, codeql.yml, security.yml)
+│   ├── dependabot.yml
+│   └── pull_request_template.md
+├── docs/
+│   ├── adr/                      ← architecture decision records (0001-bff.md …)
+│   ├── threat-model.md
+│   ├── privacy.md                ← data inventory, retention, lawful basis
+│   └── runbooks/ (deploy.md, incident.md, restore-db.md, rotate-secrets.md)
+├── apps/
+│   ├── web/                      ← Next.js
+│   │   ├── src/app/
+│   │   │   ├── (marketing)/page.tsx          ← landing page (Phase 1)
+│   │   │   ├── (marketing)/privacy/page.tsx
+│   │   │   ├── (marketing)/subscribe/confirm/page.tsx
+│   │   │   ├── (content)/devotionals/…       ← Phase 2 (route stubs behind flag)
+│   │   │   ├── (admin)/admin/…               ← Phase 2 (auth-gated)
+│   │   │   ├── api/health/route.ts
+│   │   │   ├── layout.tsx, not-found.tsx, error.tsx
+│   │   │   ├── sitemap.ts, robots.ts, manifest.ts, opengraph-image.tsx
+│   │   ├── src/components/ (ui/, sections/, layout/)
+│   │   ├── src/lib/ (api-client.ts, env.ts, actions/, validation/)
+│   │   ├── src/styles/tokens.css             ← design tokens from mockup
+│   │   ├── middleware.ts                     ← CSP nonce, security headers
+│   │   ├── vercel.json                       ← headers, region
+│   │   └── tests/ (unit/, e2e/)
+│   └── api/                      ← FastAPI
+│       ├── pyproject.toml, uv.lock
+│       ├── vercel.json            ← Python runtime, region, crons, maxDuration
+│       ├── alembic/ (env.py, versions/)
+│       ├── app/
+│       │   ├── main.py            ← app factory, middleware, routers
+│       │   ├── core/ (config.py, security.py, logging.py, rate_limit.py, crypto.py)
+│       │   ├── db/ (session.py, base.py)
+│       │   ├── models/            ← SQLAlchemy models
+│       │   ├── schemas/           ← Pydantic request/response models
+│       │   ├── routers/ (health.py, subscribers.py, prayer.py, contact.py, admin/…)
+│       │   ├── services/          ← business logic (no FastAPI imports)
+│       │   ├── integrations/ (email/, turnstile.py)
+│       │   └── jobs/              ← outbox drain + retention, invoked by Vercel Cron
+│       └── tests/ (unit/, integration/)
+└── packages/
+    └── api-types/                ← TypeScript types generated from FastAPI OpenAPI
+```
+
+Layering rule for the API: `routers → services → models/db`. Routers handle HTTP only; services hold logic and are unit-testable without HTTP; integrations are behind interfaces so they can be faked in tests.
+
+---
+
+## 5. Mobile-first design system
+
+- **Write base styles for ~360px wide screens first**, then add `sm`/`md`/`lg` enhancements. Never design desktop and shrink.
+- Breakpoints (Tailwind): `sm 640`, `md 768`, `lg 1024`, `xl 1280`. The mockup's ad-hoc 420/520/760/800/860/900 breakpoints are consolidated onto these.
+- **Design tokens** (`tokens.css`) carry the mockup's variables: `--bg --surface --ink --muted --line --accent --accent-ink --deep --on-deep --on-deep-muted --accent-on-deep`. Default scheme is navy/teal/sand; dark mode via `prefers-color-scheme` plus a user toggle stored in a cookie (so SSR renders the right theme with no flash). The final colour scheme is still to be chosen; only tokens change when it is.
+- **Fonts:** Barlow Condensed (display), Barlow (UI), Lora (devotional body). Self-host via `next/font` (no Google Fonts request, better privacy and performance), `display: swap`, subset to Latin.
+- Readable measure `62ch` for devotional text; base font size ≥ 16px (prevents iOS zoom on inputs); line-height 1.5–1.7.
+- **Touch targets ≥ 44×44px**, spacing ≥ 8px between targets. Mobile navigation: sticky header with a single primary CTA ("Get the devotional") and an accessible menu (Radix Dialog/Sheet) replacing the hidden desktop nav.
+- Respect `prefers-reduced-motion`; respect safe-area insets (`env(safe-area-inset-*)`) for notched phones.
+- Images: `next/image`, AVIF/WebP, explicit sizes, lazy below the fold. Logo as inline SVG using `--logo-ring`/`--logo-wave` tokens as in the mockup.
+- Forms on mobile: correct `type`/`inputmode`/`autocomplete` (`email`, `given-name`), visible labels (not placeholder-only — fix from mockup), inline errors announced via `aria-live`.
+- **PWA basics:** `manifest.ts`, icons, theme colour. Offline/service worker is a Phase 3 consideration (offline devotionals for the beach), not Phase 1.
+
+### Performance budgets (enforced in CI with Lighthouse CI on a mobile profile)
+
+| Metric | Budget |
+|---|---|
+| LCP (mobile, 4G) | < 2.0 s |
+| CLS | < 0.05 |
+| INP | < 200 ms |
+| JS shipped on landing page | < 100 KB gzipped |
+| Lighthouse Performance / Accessibility / Best Practices / SEO | ≥ 95 / 100 / 100 / 100 |
+
+### Accessibility
+
+Target **WCAG 2.2 AA**. Semantic landmarks and headings (as in the mockup), skip link, focus-visible styles, colour contrast checked for every scheme, `axe` checks in Playwright on every page, keyboard-only and screen-reader (VoiceOver iOS, TalkBack) manual pass before each release.
+
+---
+
+## 6. Security (designed in from day one)
+
+Baseline: **OWASP ASVS 4.0 Level 2** for anything handling personal data, OWASP Top 10 as the review checklist. Maintain `docs/threat-model.md` (STRIDE) and update it when a feature adds data or an entry point.
+
+### 6.1 Data we hold and why it matters
+
+| Data | Sensitivity | Handling |
+|---|---|---|
+| Subscriber email + first name | Personal data | Stored, double opt-in, unsubscribe in every email, deletable on request |
+| Prayer requests | **Special-category / highly sensitive** (religious belief, health, family situations) | Field-level encryption, strict access, short retention, never in logs/analytics/Sentry |
+| Contact messages | Personal data | Stored, retention-limited |
+| IP address | Personal data | Used transiently for rate limiting; store only a salted hash, if at all |
+
+Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clear privacy notice, consent recorded with timestamp and source, right to access/delete, documented retention.
+
+### 6.2 Transport and headers
+
+- HTTPS everywhere; **HSTS** `max-age=63072000; includeSubDomains; preload`; TLS 1.2+.
+- **Content-Security-Policy** with per-request nonces set in `middleware.ts`: `default-src 'self'; script-src 'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; img-src 'self' data:; style-src 'self' 'nonce-…'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests`. Start in report-only in staging, enforce in production.
+- `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (deny camera, mic, geolocation, etc.), `Cross-Origin-Opener-Policy: same-origin`. Remove `X-Powered-By`.
+- API responses: `Cache-Control: no-store` on anything personal; JSON only; strict `Content-Type` checks.
+
+### 6.3 Input handling and abuse prevention
+
+- Validate with Zod on the web **and** Pydantic on the API (API wins). Strict length limits (e.g. name ≤ 80, email ≤ 254, prayer text ≤ 2,000 chars), reject unknown fields (`extra="forbid"`).
+- Never render user content as HTML. If rich text arrives later, sanitise server-side with an allow-list.
+- **Bot protection:** Turnstile token verified server-side by the API; hidden honeypot field; minimum time-to-submit check.
+- **Rate limiting** (Redis, sliding window) per hashed IP and per email: e.g. sign-up 5/hour/IP, prayer 3/hour/IP; plus Vercel Firewall rate-limit rules on the form routes. Take the client IP from `x-real-ip` / `x-vercel-forwarded-for` set by Vercel, never from a client-supplied header. Return generic `429`.
+- **No account/email enumeration:** sign-up always returns the same "check your inbox" response whether the email is new, pending, or already confirmed.
+- Idempotency keys on form submissions to stop double-posts on flaky mobile connections.
+- SQL only through SQLAlchemy bound parameters; no string-built SQL.
+- Request body size limit at the proxy and in the app.
+
+### 6.4 Server Actions / BFF
+
+- Server Actions validate input, check origin (Next.js built-in), then call the API with `Authorization: Bearer <SERVICE_TOKEN>` and `X-Forwarded-For` of the real client.
+- The API rejects requests without a valid service token on non-health routes. Tokens are rotated via the runbook.
+- `server-only` package imported in every module that touches secrets so they can never be bundled to the client. Only `NEXT_PUBLIC_*` variables reach the browser, and those contain nothing secret.
+
+### 6.5 Authentication and authorisation (scaffolded now, used in Phase 2)
+
+- Phase 1 has **no public login**. Prayer requests are emailed to the prayer inbox (content minimised, see 6.6) and stored encrypted.
+- Phase 2 admin: email magic-link or passkey (WebAuthn) login, with mandatory TOTP/passkey second factor for admins. Sessions are opaque random IDs in Postgres/Redis, sent as `__Host-` cookies: `HttpOnly; Secure; SameSite=Lax; Path=/`. Short idle timeout (30 min) for admin. No JWTs in localStorage.
+- **RBAC** from the start in the schema: roles `admin`, `editor`, `prayer_team`. Every admin endpoint declares its required permission via a FastAPI dependency; default deny. Audit log table records who viewed/changed what (especially prayer requests).
+- If public accounts are ever added: Argon2id password hashing (or passkeys only), breached-password check, lockout/backoff, email verification.
+
+### 6.6 Encryption and secrets
+
+- Database encrypted at rest (provider) and connections over TLS (`sslmode=verify-full`).
+- **Prayer request bodies encrypted at the application layer** (AES-256-GCM via `cryptography`, envelope encryption, key in the secret manager; key ID stored per row to allow rotation).
+- Prayer notification emails contain only first name and the request text if the requester ticked "OK to email the prayer team"; otherwise just "a new request is waiting" (Phase 2 admin view). Decide default with Hendrik.
+- Secrets live in **Vercel Environment Variables** marked *Sensitive*, scoped separately for Development, Preview and Production (preview never gets production keys), plus GitHub Environments for CI-only secrets. Pull locally with `vercel env pull`. Never in the repo or in client bundles. `.env.example` lists names only. **gitleaks** in pre-commit and CI.
+- Separate DB roles: `app_migrator` (DDL, used only by migrations) and `app_runtime` (DML on app tables only).
+
+### 6.7 Supply chain and code security
+
+- Lockfiles committed; `pnpm install --frozen-lockfile`, `uv sync --locked`.
+- Dependabot (weekly, grouped), `pnpm audit` and `pip-audit` in CI, **CodeQL** for TS and Python, **Bandit** + **Ruff** security rules, **OSV-Scanner** across both lockfiles.
+- Pin GitHub Actions to commit SHAs; least-privilege `permissions:` in workflows. Use a scoped Vercel token stored as a GitHub Environment secret only where CI must call Vercel; prefer Vercel OIDC federation for any cloud access from functions.
+- Vercel: enable Deployment Protection on preview deployments, restrict who can promote to production, turn on 2FA for every team member, enable the Vercel audit log on Pro.
+- Branch protection on `main`: PR required, checks green, 1 review, no force-push, signed commits recommended.
+- Keep production dependencies separate from dev dependencies (`uv` groups, `devDependencies`) so test tooling never ships in a function bundle.
+
+### 6.8 Logging, monitoring, incident response
+
+- Structured JSON logs (`structlog` in API) with request IDs; **never log request bodies, emails, or prayer text**. Sentry `before_send` scrubs PII; `sendDefaultPii: false`.
+- Alerts: error-rate spike, 5xx, failed email sends, DB connection failures, certificate expiry, uptime check (e.g. Better Stack/UptimeRobot on `/api/health`), Vercel Log Drains to a log store (e.g. Better Stack or Axiom) since Vercel's built-in log retention is short.
+- `SECURITY.md` with a contact address; `/.well-known/security.txt`.
+- `docs/runbooks/incident.md`: contain, assess, notify (data-breach notification duties under GDPR/POPIA), fix, review.
+
+### 6.9 Backups and data retention
+
+- Neon point-in-time recovery (≥ 7 days on the paid plan) plus a nightly `pg_dump` from a GitHub Actions schedule to separate storage (e.g. encrypted in Vercel Blob or S3); **restore tested quarterly** (runbook).
+- Retention (proposed): unconfirmed subscribers deleted after 7 days; prayer requests deleted (or anonymised) after 90 days; contact messages after 12 months; audit logs 1 year. Enforced by a daily Vercel Cron job.
+
+---
+
+## 7. Data model (Phase 1, with room to grow)
+
+All tables: `id UUID` (v7 preferred), `created_at`, `updated_at` (timestamptz, UTC). Use `citext` for emails.
+
+```
+subscribers
+  id, email citext unique, first_name varchar(80) null,
+  status enum(pending, active, unsubscribed, bounced),
+  confirm_token_hash, confirm_token_expires_at,
+  unsubscribe_token_hash,
+  consent_text_version, consent_at, confirmed_at, unsubscribed_at,
+  source varchar(40)            -- e.g. "landing_hero", "landing_footer"
+
+prayer_requests
+  id, first_name varchar(80) null, email citext null (for a reply, optional),
+  body_ciphertext bytea, key_id varchar(40),
+  share_with_team boolean, wants_reply boolean,
+  status enum(new, prayed_for, replied, archived),
+  delete_after timestamptz
+
+contact_messages
+  id, name, email, subject, body, status, delete_after
+
+email_outbox                    -- transactional outbox pattern
+  id, template, to_address, payload jsonb, status enum(pending, sent, failed),
+  attempts, last_error, next_attempt_at
+
+audit_log
+  id, actor_id null, action, entity_type, entity_id, ip_hash, metadata jsonb
+
+-- Phase 2 (create via migrations when the phase starts, not now)
+users, roles, user_roles, sessions, devotionals, series, scriptures, tags, media_assets
+```
+
+Tokens (confirm/unsubscribe) are random 32-byte values; only their SHA-256 hash is stored. Confirmation links expire in 48 hours.
+
+---
+
+## 8. API design (FastAPI)
+
+- Versioned under `/v1`. JSON only. Consistent error shape: `{ "error": { "code": "rate_limited", "message": "…" } }`. No stack traces in responses.
+- OpenAPI schema generated in CI → TypeScript types in `packages/api-types` (via `openapi-typescript`) so the web client is type-safe. Disable `/docs` and `/openapi.json` in production (or protect them).
+
+Phase 1 endpoints:
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/health/live`, `/health/ready` | Liveness; readiness checks DB + Redis |
+| POST | `/v1/subscribers` | Start double opt-in (always 202, same body) |
+| POST | `/v1/subscribers/confirm` | Confirm with token |
+| POST | `/v1/subscribers/unsubscribe` | One-click unsubscribe with token (also supports RFC 8058 `List-Unsubscribe-Post`) |
+| POST | `/v1/prayer-requests` | Submit a prayer request (202) |
+| POST | `/v1/contact` | Submit a general message (202) |
+
+Settings via `pydantic-settings`, failing fast at startup if required secrets are missing.
+
+---
+
+## 9. Frontend conventions (Next.js)
+
+- Server Components by default; `"use client"` only for interactive islands (forms, menu, theme toggle).
+- Landing page is **statically generated**; forms post via Server Actions with progressive enhancement (they work before JS hydrates).
+- `src/lib/env.ts` validates env vars with Zod at build/start.
+- SEO: `generateMetadata`, Open Graph image, `sitemap.ts`, `robots.ts`, JSON-LD (`Organization`, later `Article` for devotionals), canonical URLs.
+- Feature flags (simple env-based to start) gate Phase 2 routes so the framework exists but isn't public.
+- Content in Phase 1 lives in typed TS/MDX files in the repo. Phase 2 decides between DB-backed content with an admin UI (default plan) or a headless CMS (see §15).
+- **Scripture copyright:** ESV quotations follow Crossway's permissions (quote limits and the required copyright notice in the footer). Keep scripture references structured (`book`, `chapter`, `verse`) so translations can be swapped.
+
+---
+
+## 10. Testing strategy
+
+| Level | Tools | Expectation |
+|---|---|---|
+| API unit | pytest, pytest-asyncio | Services and validators, ≥ 85% coverage on `services/` |
+| API integration | pytest + Testcontainers Postgres/Redis, httpx `AsyncClient` | Every endpoint incl. rate limit, enumeration-safety and token expiry cases |
+| Web unit/component | Vitest + Testing Library | Forms, validation messages, theme toggle |
+| E2E | **Playwright** on mobile viewports (iPhone 13/SE, Pixel 7) + desktop Chromium/WebKit/Firefox | Sign-up flow end to end using Mailpit, prayer form, navigation |
+| Accessibility | `@axe-core/playwright` | Zero serious/critical violations |
+| Performance | Lighthouse CI (mobile) | Budgets in §5 |
+| Security | ZAP baseline scan against staging (weekly + pre-release) | No high findings |
+
+Rule: a bug fix comes with a test that fails before the fix.
+
+---
+
+## 11. Environments and CI/CD
+
+Environments: **local** (Docker Compose for data services, Mailpit catches email, Turnstile test keys) → **preview** (Vercel preview deployment of web and API for every PR, each with its own Neon database branch via the Neon–Vercel integration) → **staging** (a custom Vercel environment on Pro, or a long-lived `staging` branch with its own domain) → **production**.
+
+Deployment is done by **Vercel's Git integration**; GitHub Actions does not build or upload the app. Monorepo settings: each Vercel project has its Root Directory set and an "Ignored Build Step" (`npx turbo-ignore` or a `git diff` check) so a docs-only change doesn't redeploy both apps.
+
+`ci.yml` on every PR: install (frozen) → lint (ESLint, Prettier, Ruff) → type-check (tsc, mypy --strict or pyright) → unit tests → integration tests (service containers) → build → Playwright + axe → Lighthouse CI → gitleaks, pip-audit, pnpm audit, OSV-Scanner. CodeQL runs separately.
+
+`migrate.yml` on merge to `main`: run Alembic migrations against production with the direct (unpooled) `app_migrator` URL, gated by a **manual approval** GitHub Environment, *before* Vercel promotes the new production deployment (production auto-promotion is turned off; promotion happens after migrations succeed and smoke tests pass against the staged deployment). Preview branches run migrations on their own Neon branch in the Vercel build step. Rollback is Vercel **Instant Rollback** to the previous deployment. Migrations must be backward compatible (expand → migrate → contract) so a rollback of app code is always safe.
+
+Conventional Commits; small PRs; every PR uses the template (what, why, screenshots on mobile, security considerations, tests).
+
+---
+
+## 12. Email
+
+- Domain authentication before launch: **SPF, DKIM, DMARC** (start `p=none` with reporting, move to `quarantine`), custom return-path. Use a subdomain for sending (e.g. `mail.<domain>`).
+- Templates: subscribe confirmation, welcome, prayer-request received (to requester, optional), prayer-team notification, contact notification. Plain-text part always included; mobile-friendly HTML.
+- Every marketing email has a working one-click unsubscribe and the physical/contact details required by law.
+- Phase 1 only collects subscribers. Weekly devotional sending (Phase 2) uses Postmark's broadcast stream or a dedicated newsletter tool synced from our DB; we keep the subscriber list as the source of truth.
+
+---
+
+## 13. Delivery phases
+
+### Phase 0 — Foundations (framework in place, nothing public yet)
+- [ ] Monorepo, Docker Compose (postgres, redis, mailpit), Makefile, `.env.example`
+- [ ] Vercel team (2FA on), two projects (`wotw-web`, `wotw-api`) linked to the GitHub repo, Neon and Upstash added from the Marketplace, env vars scoped per environment, preview Deployment Protection on
+- [ ] Next.js app shell: layout, tokens, fonts, header/footer, error/404 pages, security headers + CSP middleware
+- [ ] FastAPI app factory: settings, structured logging, request IDs, error handlers, health checks, service-token auth, rate limiter
+- [ ] SQLAlchemy + Alembic, DB roles, first migration (Phase 1 tables)
+- [ ] Email provider interface + Postmark and console/Mailpit implementations; outbox worker
+- [ ] OpenAPI → TS types pipeline
+- [ ] CI pipeline, CodeQL, Dependabot, branch protection, pre-commit hooks
+- [ ] Staging environment, Sentry, uptime monitoring, Vercel Web Analytics + Speed Insights, log drain
+- [ ] ADRs 0001–0005 (BFF, Postgres, auth approach, email provider, hosting); threat model v1; privacy doc v1
+
+### Phase 1 — Landing page (first public release)
+- [ ] Build all mockup sections as responsive components, mobile first
+- [ ] Final colour scheme chosen and applied to tokens; light/dark
+- [ ] Email sign-up with double opt-in, confirm and unsubscribe pages
+- [ ] Prayer request form (encrypted storage, team notification, optional reply) and contact form
+- [ ] Privacy policy page, ESV copyright notice, `security.txt`
+- [ ] SEO metadata, OG image, sitemap, favicon/manifest
+- [ ] Retention job for expired data
+- [ ] Full test suite green; Lighthouse and axe budgets met; ZAP baseline clean
+- [ ] Upgrade to Vercel Pro, domain added to Vercel, Firewall rate-limit rules on form routes, SPF/DKIM/DMARC, production deploy, backup restore tested
+- **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request; the prayer team receives it; no high security findings.
+
+### Phase 2 — Devotionals and admin
+Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email sending, RSS feed, basic search (Postgres full-text).
+
+### Phase 3 — Teaching series and audio
+Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals.
+
+### Phase 4 — Community (only if wanted)
+Optional public accounts (save favourites, reading plans), comments with moderation, giving/donations via a hosted provider (Stripe Checkout; never handle card data ourselves).
+
+---
+
+## 14. Working rules for Claude Code / contributors
+
+- Read this file and the relevant ADRs before starting. Propose an ADR for any decision that changes the stack, data model or security posture.
+- **Mobile first, always**: build and screenshot at 375px before wider widths.
+- Never commit secrets, real prayer requests or real subscriber data. Use fixtures.
+- Never log or send to third parties (Sentry, analytics) any personal data or prayer content.
+- New endpoint checklist: Pydantic schema with `extra="forbid"` and limits → permission dependency → rate limit → service-layer logic → tests (happy path, validation, auth, rate limit) → OpenAPI types regenerated → threat model updated if it handles personal data.
+- DB changes only via Alembic migrations, reviewed, backward compatible.
+- Keep the landing page JS budget; prefer Server Components.
+- Run before every PR: `make lint typecheck test` (and `make e2e` for UI changes).
+
+### Commands (to be created in Phase 0)
+
+```
+make setup        # install deps (pnpm, uv), copy .env.example → .env
+make up           # docker compose up: postgres, redis, mailpit; then run web + api dev servers
+make env          # vercel env pull for both projects (development scope)
+make migrate      # alembic upgrade head
+make lint         # eslint, prettier --check, ruff
+make typecheck    # tsc --noEmit, mypy
+make test         # vitest + pytest
+make e2e          # playwright (mobile + desktop projects)
+make types        # regenerate packages/api-types from OpenAPI
+```
+
+---
+
+## 15. Open questions and current assumptions
+
+| # | Question | Assumption until answered |
+|---|---|---|
+| 1 | Monthly budget, and which region is closest to most of your audience? | Vercel (decided) with Neon + Upstash; Hobby while building, Pro (~USD 20–40/month) at launch; region chosen once audience location is confirmed |
+| 2 | Domain name registered? | Not yet; placeholders `hello@` / `prayer@` from mockup |
+| 3 | Email provider? | Postmark for transactional; newsletter sending decided in Phase 2 |
+| 4 | Who reads prayer requests in Phase 1, and may the full text be emailed to them? | Hendrik only; full text emailed only if the requester ticks consent, otherwise stored encrypted for the Phase 2 admin view |
+| 5 | Auth needs: admin only, or public accounts eventually? | Admin-only (Phase 2); public accounts optional in Phase 4 |
+| 6 | Where are you and your audience based (for privacy law)? | Design to GDPR + POPIA, which covers most jurisdictions |
+| 7 | Content management: write devotionals in a built-in admin, or use a headless CMS? | Built-in admin in Phase 2 |
+| 8 | Which colour scheme from the mockup? | Navy/teal/sand default |
+| 9 | Will there be donations/giving? | Not before Phase 4; hosted checkout only |
+| 10 | Where should the repository live (GitHub account/org, name)? | `word-on-the-water` on Hendrik's GitHub |
