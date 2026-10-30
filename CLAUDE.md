@@ -343,7 +343,7 @@ Settings via `pydantic-settings`, failing fast at startup if required secrets ar
 | Performance | Lighthouse CI (mobile) | Budgets in §5 |
 | Security | ZAP baseline scan against staging (weekly + pre-release) | No high findings |
 
-Rule: a bug fix comes with a test that fails before the fix.
+Rule: write tests first (red, green, refactor) for all logic; a bug fix comes with a test that fails before the fix. `PLAN.md` has the full testing approach and definition of done.
 
 ---
 
