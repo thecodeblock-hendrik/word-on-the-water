@@ -1,7 +1,7 @@
 .PHONY: setup up down logs
 
 setup:
-	test -f .env || cp .env.example .env
+	uv run scripts/setup_env.py .env.example .env
 
 up:
 	docker compose up -d --wait
