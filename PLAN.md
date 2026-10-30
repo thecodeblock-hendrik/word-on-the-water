@@ -27,9 +27,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [x] `docker-compose.yml`: Postgres 17 (with `citext`, `pgcrypto`), Redis/Valkey, Mailpit
 - [x] Validate: `docker compose up` brings all three healthy; connect with `psql`, `redis-cli`; Mailpit UI loads
 - [x] `Makefile` base targets: `setup up down logs`
-- [ ] Makefile targets `env migrate lint typecheck test e2e types` (added as each app lands)
 - [x] Pre-commit hooks: gitleaks, file hygiene, Conventional Commits
-- [ ] Pre-commit hooks: ruff, prettier, eslint (added when `apps/api` and `apps/web` exist)
 - [x] Validate: committing a fake secret is blocked
 
 ### 0.2 Decision records
@@ -53,6 +51,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [ ] `core/rate_limit.py`: Redis sliding window keyed by hashed IP and email; generic 429
 - [ ] Client IP taken only from Vercel-set headers
 - [ ] Tests: health, auth rejected without token, rate limit trips, error shape
+- [ ] Pre-commit hook for ruff; Makefile targets `migrate`, `lint`, `typecheck`, `test` cover the API
 - [ ] Validate: `uv run pytest`, `uv run ruff check`, `uv run mypy --strict` all green
 
 ### 0.4 Database
@@ -84,12 +83,14 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [ ] `src/lib/api-client.ts`: server-side calls with service token and forwarded client IP
 - [ ] `api/health/route.ts`
 - [ ] ESLint, Prettier, Vitest + Testing Library, Playwright configured
+- [ ] Pre-commit hooks for prettier and eslint; Makefile targets `lint`, `typecheck`, `test`, `e2e` extended to cover the web app
 - [ ] Validate: `pnpm dev` renders shell at 375px; response headers verified with `curl -I`
 
 ### 0.7 OpenAPI types pipeline
 - [ ] Script exports OpenAPI from FastAPI to a file
 - [ ] `openapi-typescript` generates `packages/api-types`
 - [ ] `make types` works; CI fails if generated types are stale
+- [ ] Makefile `types` target
 
 ### 0.8 CI and repo protection
 - [ ] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
@@ -112,7 +113,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 - [ ] `apps/api/vercel.json`: Python runtime, region, `maxDuration`, crons (outbox every 5 min, retention daily)
 - [ ] `apps/web/vercel.json`: region and headers
 - [ ] Deployment Protection on previews; API only reachable by web (bypass secret) and Cron
-- [ ] `make env` (`vercel env pull`) works for both projects
+- [ ] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
 - [ ] Validate: preview deploy of both apps; web health route reaches API health through the BFF
 
 ### 0.10 Observability and docs
