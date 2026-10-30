@@ -31,3 +31,7 @@ htmlcov/
 .idea/
 .vscode/
 .playwright-mcp/
+
+# Locally installed agent skills (not part of the project)
+.agents/
+skills-lock.json
