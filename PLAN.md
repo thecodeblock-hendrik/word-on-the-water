@@ -63,7 +63,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] `.editorconfig`, `.env.example` (names only, no values)
 - [x] `docker-compose.yml`: Postgres 17 (with `citext`, `pgcrypto`), Redis/Valkey, Mailpit
 - [x] Validate: `docker compose up` brings all three healthy; connect with `psql`, `redis-cli`; Mailpit UI loads
-- [x] `Makefile` base targets: `setup up down logs`
+- [x] `Makefile` base targets: `setup up down logs`; `make setup` generates a working local `.env` with random secrets (`scripts/setup_env.py`)
 - [x] Pre-commit hooks: gitleaks, file hygiene, Conventional Commits
 - [x] Validate: committing a fake secret is blocked
 
