@@ -16,6 +16,8 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Delete preview/<head branch>
+        # Explicit bash runs with -eo pipefail; the default (bash -e) let a failed curl pass as "nothing to delete".
+        shell: bash
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
           NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
