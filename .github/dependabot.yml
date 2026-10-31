@@ -21,9 +21,9 @@ updates:
         patterns: ["*"]
 
   - package-ecosystem: npm
-    directories:
-      - /apps/web
-      - /packages/api-types
+    # The workspace root: it holds pnpm-lock.yaml, so updates to apps/web and
+    # packages/api-types come with the lockfile change.
+    directory: /
     schedule:
       interval: weekly
     commit-message:
