@@ -145,13 +145,7 @@ Branch `docs/outbox-cron-frequency`. Files: `CLAUDE.md` §2, `PLAN.md` (1.3 and 
 
 The re-run of `/code-review` after Fixes 1 to 10 reported 10 more findings. They are claims until proven: each fix starts with a test that fails for the right reason, and a finding the test cannot reproduce is dropped here with the evidence.
 
-**Grouping.** The rules above say one PR per fix. Hobby allows 100 deployments per day per team and every non-docs PR creates 2 (plus 2 canceled ones on merge), so the fixes are grouped into three PRs by area, one commit per fix with its own test:
-
-| PR | Branch | Fixes |
-|---|---|---|
-| A | `fix/client-ip-hardening` | 11, 12 |
-| B | `fix/api-robustness` | 13, 15, 16, 20 |
-| C | `fix/web-and-tooling-edges` | 14, 17, 18, 19 |
+**One branch, one PR, one merge (Hendrik's decision).** The rules above say one PR per fix. Hobby allows 100 deployments per day per team and every non-docs push creates 2 (plus 2 canceled ones on merge). A push of Fixes 11 and 12 (PR #43) was already refused with "Deployment rate limited, retry in 24 hours" for `wotw-api`. So Fixes 11 to 20 are one commit each on `fix/client-ip-hardening`, pushed once at the end, with one PR (#43) and one merge. The first push of Fixes 11 and 12 is already on the PR.
 
 Same rules as above: test first, `make lint typecheck test` (plus `make e2e` for web, `make types-check` for API), merge with `gh pr merge --squash --admin` when every check is green.
 
