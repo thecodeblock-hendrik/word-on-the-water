@@ -215,6 +215,20 @@ Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/tests/test_err
 
 ## Addendum close-out
 
-- [ ] All of Fixes 11 to 20 merged (or dropped with evidence) and ticked above
-- [ ] Re-run `/code-review` on the files changed by Fixes 11 to 20
-- [ ] Archive note: update the Fixed column in `code_review.md` with a row per addendum fix
+- [ ] All of Fixes 11 to 20 merged (all ticked above; merge is PR #43, waiting on the Vercel quota)
+- [x] Re-run `/code-review` on the files changed by Fixes 11 to 20: 7 findings, triaged below (2 fixed, 5 declined with reasons)
+- [x] Archive note: `code_review.md` has a row per addendum fix
+
+### Second re-review (on Fixes 11 to 20)
+
+| Finding | Decision |
+|---|---|
+| The 8 s send cap can duplicate an email the provider already accepted; it also pre-empts the providers' own 10 s timeouts | Declined. Known and written into Fix 13: delivery is at-least-once, and a killed function (the old behaviour) duplicates more often. SMTP is the local Mailpit provider only |
+| `Retry-After` is the full window, not the time until a slot frees | Declined. A safe upper bound; the exact value needs a change to the Lua script and tests for little gain |
+| `socket_timeout=2` turns a slow Redis reply into a 500 | Declined. Any Redis error was already an unhandled 500, a stalled read used to hang until `maxDuration`, and failing closed was decided in Fix 16 |
+| The client IP fallback has no path context | Fixed: the warning now carries the path |
+| `make types-check` has overlapping `git diff` and `git status` checks | Declined. `git diff HEAD` already fails for tracked changes, so the status check only fires for untracked files and its message is accurate |
+| `x-forwarded-proto` is compared case-sensitively | Fixed: compared in lower case, test first |
+| `previewApiUrl` throws at request time, not at build | Declined. All env validation is lazy by design, the error appears in the runtime logs, and project hosts always start with `wotw-web-` |
+
+No third review is planned: the remaining findings are design trade-offs already decided, not defects.
