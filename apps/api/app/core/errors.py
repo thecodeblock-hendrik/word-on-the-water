@@ -1,9 +1,15 @@
 """Consistent error responses: {"error": {"code", "message"}} with no stack traces."""
 
+import traceback
+from pathlib import Path
+
+import structlog
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+log = structlog.get_logger()
 
 
 class ApiError(Exception):
@@ -34,7 +40,11 @@ async def _validation_error(_: Request, __: RequestValidationError) -> JSONRespo
     return error_response(422, "validation_error", "Invalid request.")
 
 
-async def _unhandled(_: Request, __: Exception) -> JSONResponse:
+async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
+    # Type and location only: exception messages can contain hosts, credentials or user data.
+    frame = traceback.extract_tb(exc.__traceback__)[-1]
+    where = f"{Path(frame.filename).name}:{frame.lineno}"
+    log.error("unhandled_error", error=type(exc).__name__, path=request.url.path, where=where)
     return error_response(500, "internal_error", "Something went wrong.")
 
 
