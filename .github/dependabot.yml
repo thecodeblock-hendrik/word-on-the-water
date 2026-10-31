@@ -31,6 +31,15 @@ updates:
     groups:
       node:
         patterns: ["*"]
+    ignore:
+      # typescript-eslint does not support TypeScript 7 yet, and eslint-config-next's plugins
+      # do not support eslint 10. @types/node follows the Node runtime (24.x, see engines).
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker-compose
     directory: /
