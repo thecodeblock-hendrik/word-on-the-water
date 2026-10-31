@@ -9,7 +9,7 @@ How Word on the Water is deployed on Vercel, and the one-off setup behind it.
 | Root directory | `apps/web` | `apps/api` |
 | Framework | Next.js | FastAPI (entrypoint `app/main.py`, Python from `.python-version`, deps from `uv.lock`) |
 | Region | `fra1` | `fra1` |
-| Production URL | `wotw-web.vercel.app` | `wotw-api.vercel.app` |
+| Production URL | `wotw-web.vercel.app`; custom domain `wordonthewater.net` planned for launch (step 1.9); DNS stays at Squarespace | `wotw-api.vercel.app` (stays on its protected URL) |
 | Deployment Protection | Previews (Standard) | All deployments; the web passes the automation bypass |
 | Data | none | Neon `wotw-db` (`NEON_*`), Upstash `wotw-redis` (`UPSTASH_*`) |
 

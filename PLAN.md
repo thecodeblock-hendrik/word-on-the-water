@@ -31,7 +31,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 **Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
 
-**Waiting on Hendrik:** Neon preview branching toggle (step 0.9), domain name, final colour scheme, prayer-notification default.
+**Waiting on Hendrik:** Neon preview branching toggle (step 0.9), final colour scheme, prayer-notification default.
 
 ---
 
@@ -231,7 +231,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 
 ### 1.3 Email sign-up (Kit, double opt-in)
 Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer (ADR 0008). Our API validates, defends and forwards.
-- [ ] Kit setup **(Hendrik)**: create the sign-up form in Kit with double opt-in on, a confirmation email and a redirect to our thank-you page; note the form id; create an API key in Kit developer settings
+- [ ] Kit setup **(Hendrik)**: create the sign-up form in Kit with double opt-in on, sender `hello@wordonthewater.net`, a confirmation email and a redirect to our thank-you page on `https://wordonthewater.net`; note the form id; create an API key in Kit developer settings
 - [ ] Spike first: against a Kit test form, prove which calls trigger the double opt-in confirmation email (create subscriber, then add to form by id or by email) and what state the subscriber has until confirmed; record the result in ADR 0008
 - [ ] `integrations/kit/`: small async client (httpx) for `https://api.kit.com/v4` with `X-Kit-Api-Key`; create subscriber, add to form, find by email, unsubscribe; backoff on 429 (120 requests per minute per key); tested against a fake Kit server, never real Kit in CI
 - [ ] API: Pydantic schema (`extra="forbid"`, name <= 80, email <= 254)
@@ -254,7 +254,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Encryption key in secret manager; key rotation documented in runbook
 - [ ] `POST /v1/prayer-requests` (202), text <= 2,000, `share_with_team` and `wants_reply` consent flags
 - [ ] Rate limit 3/hour/IP; Turnstile; honeypot; idempotency
-- [ ] Notification email: full text only if consent ticked, otherwise "a new request is waiting" **(Hendrik: confirm default)**
+- [ ] Notification email to `prayer@wordonthewater.net` (setting `PRAYER_INBOX`): full text only if consent ticked, otherwise "a new request is waiting" **(Hendrik: confirm default)**
 - [ ] `delete_after` set to 90 days
 - [ ] Prayer text never in logs, Sentry or analytics (verified by test)
 - [ ] Web form with same standards as sign-up
@@ -263,12 +263,13 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 
 ### 1.5 Contact form
 - [ ] `POST /v1/contact` (202) with limits, Turnstile, honeypot, rate limit
-- [ ] Notification via outbox; `delete_after` 12 months
+- [ ] Notification via outbox to `hello@wordonthewater.net` (setting `CONTACT_INBOX`); `delete_after` 12 months
 - [ ] Web form and tests
 
 ### 1.6 Legal, SEO and trust
 - [ ] Privacy policy page (matches `docs/privacy.md`) **(Hendrik: review)**
-- [ ] `/.well-known/security.txt`
+- [ ] `/.well-known/security.txt` (`Contact: mailto:hello@wordonthewater.net`, `Canonical: https://wordonthewater.net/.well-known/security.txt`, `Expires` within a year)
+- [ ] Real addresses on the page in place of the mockup placeholders: `prayer@wordonthewater.net` for prayer, `hello@wordonthewater.net` for contact and the footer
 - [ ] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization`
 - [ ] `sitemap.ts` and `robots.ts`
 - [ ] Installable, app-like experience with `app/manifest.ts` (`MetadataRoute.Manifest`, see `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`): `name`, `short_name` ("Word on the Water" / "WotW"), `description`, `id` and `start_url` `/`, `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang: "en"`, `categories`, `background_color` and `theme_color` from the tokens
@@ -297,13 +298,15 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Installability: Chrome DevTools Application panel shows no manifest errors (Lighthouse no longer has a PWA category); manual "Install app" on Android Chrome and "Add to Home Screen" on iOS Safari: icon, name, splash colours, standalone launch, safe areas
 
 ### 1.9 Launch
-- [ ] Domain registered and added to Vercel **(Hendrik)**
+- [x] Domain `wordonthewater.net` registered, with mailboxes `hello@` and `prayer@`
+- [ ] Add `wordonthewater.net` to the `wotw-web` Vercel project (apex primary, `www` redirecting to it), add the DNS records Vercel shows for the domain in **Squarespace DNS** (apex A record and `www` CNAME; copy the exact values from the Vercel dashboard), leave the MX records alone, check HTTPS and HSTS; keep `wotw-api` on its protected `vercel.app` URL **(Hendrik)**
+- [ ] Production env vars: `EMAIL_FROM=Word on the Water <hello@wordonthewater.net>`, `PRAYER_INBOX=prayer@wordonthewater.net`, `CONTACT_INBOX=hello@wordonthewater.net`, public site URL `https://wordonthewater.net` for metadata, sitemap and links in email; Preview keeps test inboxes
 - [ ] Upgrade to Vercel Pro; restrict production promotion; audit log on
 - [ ] Outbox cron to `*/5 * * * *` in `apps/api/vercel.json` and the deploy runbook (only possible on Pro; Hobby fails the deploy) **(Hendrik)**
 - [ ] Vercel Firewall rate-limit rules on form routes
-- [ ] SPF, DKIM, DMARC (`p=none` with reporting) on sending subdomain, custom return-path, covering both Postmark (transactional) and the Kit sending domain (newsletter)
-- [ ] Kit sending domain authenticated and confirmation email branded; production Kit API key and webhook secret set in Vercel Production only
-- [ ] Postmark production sender verified; real placeholder addresses replaced
+- [ ] On the root domain `wordonthewater.net` (the `From` addresses are on it): one merged SPF record in Squarespace DNS including the existing mailbox provider, Postmark and Kit (edit the current record, never add a second), DKIM for each, a custom return-path for each, DMARC at `_dmarc.wordonthewater.net` with `p=none` and reports to `hello@wordonthewater.net`
+- [ ] Kit sending domain authenticated, sender `hello@wordonthewater.net`, confirmation email branded; production Kit API key and webhook secret set in Vercel Production only
+- [ ] Postmark sender signature or domain verified for `hello@wordonthewater.net`; send a test to `prayer@` and `hello@` and confirm both mailboxes receive it and it passes SPF, DKIM and DMARC
 - [ ] `migrate.yml` with manual approval; production auto-promotion off; promote after migrations and smoke tests
 - [ ] Rollback rehearsed (Instant Rollback)
 - [ ] Backup restore tested from nightly dump and Neon PITR
@@ -396,7 +399,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 ## Open questions (from CLAUDE.md section 15)
 
 - [ ] 1. Budget and audience region
-- [ ] 2. Domain name
+- [x] 2. Domain name: `wordonthewater.net`, mailboxes `hello@wordonthewater.net` and `prayer@wordonthewater.net`
 - [x] 3. Email provider: Kit for subscriptions and newsletters; Postmark (assumed, still to confirm) for transactional mail, since Kit has no transactional send API
 - [ ] 4. Who reads prayer requests; may full text be emailed
 - [ ] 5. Auth needs beyond admin
