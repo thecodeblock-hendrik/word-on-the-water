@@ -10,7 +10,7 @@ How Word on the Water is deployed on Vercel, and the one-off setup behind it.
 | Framework | Next.js | FastAPI (entrypoint `app/main.py`, Python from `.python-version`, deps from `uv.lock`) |
 | Region | `fra1` | `fra1` |
 | Production URL | `wotw-web.vercel.app` | `wotw-api.vercel.app` |
-| Deployment Protection | Previews (Standard) | All deployments; the web passes the automation bypass |
+| Deployment Protection | Previews (Standard) | Previews (Standard); the web passes the automation bypass. Production is public so Vercel Cron can reach it (ADR 0008) |
 | Data | none | Neon `wotw-db` (`NEON_*`), Upstash `wotw-redis` (`UPSTASH_*`) |
 
 Team `thecodeblock`, Hobby plan. Vercel's Git integration deploys every push: a branch gets previews, `main` gets production.
