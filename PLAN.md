@@ -180,7 +180,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] `apps/api/vercel.json`: Python runtime, region, `maxDuration`, crons (outbox daily on Hobby, `*/5` on Pro; retention cron added with the retention job in Phase 1)
 - [x] `apps/web/vercel.json`: region (security headers stay in `next.config.ts` so there is one source)
 - [x] Deployment Protection on previews; API only reachable by web (bypass secret) and Cron
-- [x] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
+- [x] Makefile `env` target (`vercel env pull`); removed in the code review fixes because Development has no variables and the API reads only the root `.env`
 - [x] Validate: preview deploy of both apps; web health route reaches API health through the BFF (`/api/health` on the web preview returns ok after the API checks Neon and Upstash, served from `fra1`)
 - [x] Production: migrations run on Neon main as `app_migrator` (head `45f20f111f39`, tables owned by `app_migrator`, `app_runtime` denied DDL), then merged to deploy production
 - [x] Neon preview branches deleted when a PR closes (`neon-preview-cleanup.yml`, verified on #25): the Free plan allows 10 and previews failed with "Resource provisioning failed" once it was reached
