@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -109,3 +110,78 @@ async def test_bad_template_does_not_block_other_messages(session: AsyncSession)
 
     assert (result.sent, result.retried) == (1, 1)
     assert [m.to for m in provider.sent] == ["other@example.com"]
+
+
+class Interrupted(BaseException):
+    """Stands in for the function being killed mid-drain (not caught by `except Exception`)."""
+
+
+class ScriptedProvider:
+    """Succeeds by default; raises the scripted error for given addresses; can advance a clock."""
+
+    def __init__(self, errors: dict[str, BaseException] | None = None) -> None:
+        self.errors = errors or {}
+        self.sent: list[str] = []
+        self.clock = [0.0]
+        self.seconds_per_send = 0.0
+
+    async def send(self, message: EmailMessage) -> None:
+        self.clock[0] += self.seconds_per_send
+        if error := self.errors.get(message.to):
+            raise error
+        self.sent.append(message.to)
+
+
+async def _enqueue_many(session: AsyncSession, count: int) -> list[str]:
+    """Enqueue messages m1..mN, due in that order."""
+    start = datetime.now(UTC) - timedelta(hours=1)
+    addresses = [f"m{i}@example.com" for i in range(1, count + 1)]
+    for i, address in enumerate(addresses):
+        row = await enqueue(session, "subscribe_confirmation", address, PAYLOAD)
+        row.next_attempt_at = start + timedelta(seconds=i)
+    await session.commit()
+    return addresses
+
+
+async def _by_address(session: AsyncSession) -> dict[str, EmailOutbox]:
+    return {row.to_address: row for row in await _rows(session)}
+
+
+async def test_sent_messages_survive_an_interrupted_drain(session: AsyncSession) -> None:
+    addresses = await _enqueue_many(session, 4)
+    provider = ScriptedProvider({addresses[2]: Interrupted()})
+
+    with pytest.raises(Interrupted):
+        await drain_outbox(session, provider)
+    await session.rollback()
+
+    rows = await _by_address(session)
+    assert [rows[a].status for a in addresses[:2]] == [OutboxStatus.SENT] * 2
+    again = ScriptedProvider()
+    await drain_outbox(session, again)
+    assert again.sent == addresses[2:]
+
+
+async def test_attempts_are_saved_before_an_interruption(session: AsyncSession) -> None:
+    addresses = await _enqueue_many(session, 2)
+    provider = ScriptedProvider({addresses[0]: EmailSendError("down"), addresses[1]: Interrupted()})
+
+    with pytest.raises(Interrupted):
+        await drain_outbox(session, provider)
+    await session.rollback()
+
+    first = (await _by_address(session))[addresses[0]]
+    assert first.attempts == 1
+    assert first.last_error == "down"
+
+
+async def test_drain_stops_starting_sends_after_its_time_budget(session: AsyncSession) -> None:
+    addresses = await _enqueue_many(session, 5)
+    provider = ScriptedProvider()
+    provider.seconds_per_send = 10
+
+    result = await drain_outbox(session, provider, budget=25, clock=lambda: provider.clock[0])
+
+    assert result.sent == 3
+    rows = await _by_address(session)
+    assert [rows[a].status for a in addresses[3:]] == [OutboxStatus.PENDING] * 2
