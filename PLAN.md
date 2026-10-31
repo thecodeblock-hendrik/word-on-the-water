@@ -17,11 +17,11 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 ---
 
-## Status (updated 2026-10-30)
+## Status (updated 2026-10-31)
 
 | Phase | Status |
 |---|---|
-| 0 Foundations | In progress. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection. Remaining: 0.9 Vercel and external services, 0.10 observability and docs, exit gate |
+| 0 Foundations | In progress. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (preview branching and the first production migration open). Remaining: 0.10 observability and docs, exit gate |
 | 1 Landing page | Not started |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
@@ -31,7 +31,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 **Decisions made so far:** Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
 
-**Waiting on Hendrik:** audience region (to pin Vercel and Neon), creating the Vercel team and projects and adding Neon and Upstash from the Marketplace (step 0.9), domain name, final colour scheme, prayer-notification default.
+**Waiting on Hendrik:** Neon preview branching toggle and approval to migrate production (step 0.9), domain name, final colour scheme, prayer-notification default.
 
 ---
 
@@ -169,19 +169,20 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Validate: a test PR runs every workflow green (PR #10, all 11 checks, six Playwright browser projects)
 
 ### 0.9 Vercel and external services
-- [ ] Vercel team with 2FA for all members
-- [ ] Projects `wotw-web` (root `apps/web`) and `wotw-api` (root `apps/api`) linked to GitHub
-- [ ] Ignored Build Step per project so docs-only changes do not redeploy
-- [ ] Region chosen and pinned for both projects and the database **(Hendrik: audience location)**
-- [ ] Neon (Marketplace): pooled and direct URLs, branch per preview
-- [ ] `db/neon_roles.sql` creating `app_migrator` (owns the schema, DDL) and `app_runtime` (DML only) with the same default-privilege grants as `docker/postgres/init.sql`, generated passwords, documented in `docs/runbooks/deploy.md`; run once on Neon. Runtime uses the pooled URL, migrator the direct URL
-- [ ] Upstash Redis (Marketplace)
-- [ ] Env vars set per scope (Development, Preview, Production), secrets marked Sensitive, preview never gets production keys
-- [ ] `apps/api/vercel.json`: Python runtime, region, `maxDuration`, crons (outbox every 5 min, retention daily)
-- [ ] `apps/web/vercel.json`: region and headers
-- [ ] Deployment Protection on previews; API only reachable by web (bypass secret) and Cron
-- [ ] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
-- [ ] Validate: preview deploy of both apps; web health route reaches API health through the BFF
+- [x] Vercel team with 2FA for all members (team `thecodeblock`, Hobby)
+- [x] Projects `wotw-web` (root `apps/web`) and `wotw-api` (root `apps/api`) linked to GitHub
+- [x] Ignored Build Step per project so docs-only changes do not redeploy (diff against `VERCEL_GIT_PREVIOUS_SHA`; the API always builds previews so each web preview has an API to call)
+- [x] Region chosen and pinned for both projects and the database: `fra1` (Neon `aws-eu-central-1`)
+- [ ] Neon (Marketplace): pooled and direct URLs done (`NEON_*` prefix); **branch per preview still off** (Neon connection has no deployment actions, so previews use the main branch) **(Hendrik: enable in the store settings)**
+- [x] `db/neon_roles.sql` creating `app_migrator` (owns the schema, DDL) and `app_runtime` (DML only) with the same default-privilege grants as `docker/postgres/init.sql`, generated passwords, documented in `docs/runbooks/deploy.md`; run once on Neon. Runtime uses the pooled URL, migrator the direct URL
+- [x] Upstash Redis (Marketplace, `UPSTASH_*` prefix; `REDIS_URL` falls back to `UPSTASH_REDIS_URL`)
+- [x] Env vars set per scope (Preview and Production; Development left empty for our variables), secrets marked Sensitive, preview never gets production keys. Exceptions: the integration-managed `NEON_*`/`UPSTASH_*` variables are not Sensitive and include Development, and preview shares Redis and the role passwords with production (one Upstash database, Neon branches copy roles)
+- [x] `apps/api/vercel.json`: Python runtime, region, `maxDuration`, crons (outbox daily on Hobby, `*/5` on Pro; retention cron added with the retention job in Phase 1)
+- [x] `apps/web/vercel.json`: region (security headers stay in `next.config.ts` so there is one source)
+- [x] Deployment Protection on previews; API only reachable by web (bypass secret) and Cron
+- [x] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
+- [x] Validate: preview deploy of both apps; web health route reaches API health through the BFF (`/api/health` on the web preview returns ok after the API checks Neon and Upstash, served from `fra1`)
+- [ ] Production: run migrations on Neon main as `app_migrator` **(Hendrik: approve)**, then merge to deploy production
 
 ### 0.10 Observability and docs
 - [ ] Sentry in web and API with `sendDefaultPii: false` and `before_send` scrubbing
