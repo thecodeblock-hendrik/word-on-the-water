@@ -18,7 +18,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 1. Landing page sections: hero (Mark 4:41 + logo), About / who it's for, What's coming (weekly devotional, teaching series, audio) with a sample "surf report" devotional, Start here (the gospel in 4 steps), statement of faith, founder bio, footer with ESV copyright notice.
 2. **Email sign-up** (first name optional, email required) with double opt-in.
-3. **Prayer request / contact form** (the mockup shows `mailto:` links; we replace them with a private, spam-protected form that stores the request and notifies the prayer inbox).
+3. **Prayer request / contact form** (the mockup shows `mailto:` links; we replace them with a private, spam-protected form that stores the request and notifies the prayer inbox (`prayer@wordonthewater.net`)).
 
 **Out of scope for Phase 1** but designed for: devotional library, teaching series, audio/podcast, public user accounts, admin CMS, search, newsletter sending.
 
@@ -65,7 +65,7 @@ Everything runs on **Vercel**, with data services from the Vercel Marketplace so
 | Scheduled jobs | **Vercel Cron** (`vercel.json` in `apps/api`) calling protected endpoints: drain email outbox (daily on Hobby, because Hobby only allows daily crons; every 5 min after the move to Pro), retention cleanup (daily). Until Pro, the immediate best-effort send after each request is what delivers email promptly |
 | WAF / DDoS / rate rules | **Vercel Firewall** (managed rules, custom rate-limit rules on form routes, Attack Challenge Mode for emergencies) |
 | Bot protection | Turnstile on forms (optionally plus Vercel BotID) |
-| DNS | Domain on Vercel DNS (or registrar DNS pointing to Vercel). Do not put the Cloudflare proxy in front of Vercel; it breaks caching and the firewall's view of client IPs |
+| DNS | Production domain **`wordonthewater.net`** (registered; `www` redirects to the apex), with DNS hosted at **Squarespace** (Squarespace DNS records pointing the site at Vercel; nameservers are not moved to Vercel). Keep the existing MX records for the `hello@` and `prayer@` mailboxes untouched. Do not put the Cloudflare proxy in front of Vercel; it breaks caching and the firewall's view of client IPs |
 | Analytics | Vercel Web Analytics + Speed Insights (cookieless, real-user Core Web Vitals) or Plausible |
 | Media (Phase 3 audio) | Vercel Blob (or Cloudflare R2 if bandwidth cost matters) |
 | Plan | Start on **Hobby** for Phase 0; move to **Pro** (~USD 20/month per seat) before public launch, since Hobby is for non-commercial use and Pro adds deployment protection options, more cron frequency and firewall rules |
@@ -235,7 +235,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 
 ### 6.5 Authentication and authorisation (scaffolded now, used in Phase 2)
 
-- Phase 1 has **no public login**. Prayer requests are emailed to the prayer inbox (content minimised, see 6.6) and stored encrypted.
+- Phase 1 has **no public login**. Prayer requests are emailed to the prayer inbox, `prayer@wordonthewater.net` (content minimised, see 6.6) and stored encrypted.
 - Phase 2 admin: email magic-link or passkey (WebAuthn) login, with mandatory TOTP/passkey second factor for admins. Sessions are opaque random IDs in Postgres/Redis, sent as `__Host-` cookies: `HttpOnly; Secure; SameSite=Lax; Path=/`. Short idle timeout (30 min) for admin. No JWTs in localStorage.
 - **RBAC** from the start in the schema: roles `admin`, `editor`, `prayer_team`. Every admin endpoint declares its required permission via a FastAPI dependency; default deny. Audit log table records who viewed/changed what (especially prayer requests).
 - If public accounts are ever added: Argon2id password hashing (or passkeys only), breached-password check, lockout/backoff, email verification.
@@ -262,7 +262,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 
 - Structured JSON logs (`structlog` in API) with request IDs; **never log request bodies, emails, or prayer text**. Sentry `before_send` scrubs PII; `sendDefaultPii: false`.
 - Alerts: error-rate spike, 5xx, failed email sends, DB connection failures, certificate expiry, uptime check (e.g. Better Stack/UptimeRobot on `/api/health`), Vercel Log Drains to a log store (e.g. Better Stack or Axiom) since Vercel's built-in log retention is short.
-- `SECURITY.md` with a contact address; `/.well-known/security.txt`.
+- `SECURITY.md` with a contact address (`hello@wordonthewater.net` until a dedicated `security@` alias exists); `/.well-known/security.txt` with the same `Contact:` and a `Canonical:` of `https://wordonthewater.net/.well-known/security.txt`.
 - `docs/runbooks/incident.md`: contain, assess, notify (data-breach notification duties under GDPR/POPIA), fix, review.
 
 ### 6.9 Backups and data retention
@@ -389,7 +389,15 @@ Two systems, split by purpose:
 - **Kit integration:** API v4 at `https://api.kit.com/v4`, `X-Kit-Api-Key` header (an API key is right for automating our own account; OAuth is only needed for multi-account apps and bulk endpoints). Sign-up: create subscriber (`POST /subscribers`, an upsert), then add to the double opt-in form; unsubscribe: `POST /subscribers/{id}/unsubscribe`. Webhooks via `POST /webhook_endpoints` with events `subscriber.activated`, `subscriber.unsubscribed`, `subscriber.bounced`, `subscriber.complained`. Broadcasts (Phase 2): `POST /broadcasts` as a draft, then scheduled with `send_at`. Details and open points are in ADR 0008.
 - **Kit is the list's source of truth.** Our `subscribers` table is a mirror for status, consent evidence and retention. If the two disagree, Kit wins.
 - Kit failures never lose a sign-up: the call runs from the outbox with retries.
-- Domain authentication before launch for both senders: **SPF, DKIM, DMARC** (start `p=none` with reporting, move to `quarantine`), custom return-path, a sending subdomain (e.g. `mail.<domain>`), and Kit's own sending-domain setup.
+- **Domain and addresses.** The domain is `wordonthewater.net`. Two mailboxes are registered:
+
+  | Address | Used for |
+  |---|---|
+  | `hello@wordonthewater.net` | Public contact address; `From` and `Reply-To` of all outgoing mail (Kit newsletters and confirmation, Postmark transactional); recipient of contact-form notifications; security reports until a `security@` alias exists |
+  | `prayer@wordonthewater.net` | Public prayer address on the page; recipient of prayer-request notifications from Postmark; reply address for prayer follow-ups |
+
+  The addresses live in configuration, not code: `EMAIL_FROM` (`Word on the Water <hello@wordonthewater.net>`), plus the notification recipients `PRAYER_INBOX` and `CONTACT_INBOX`, set per environment. Preview and local runs never use the real addresses (Mailpit locally, test inboxes in Preview).
+- Domain authentication before launch, on the root domain because the `From` addresses are on it: **SPF** (one record that includes the mailbox provider already in place, Postmark and Kit; edit the existing record at Squarespace, never add a second), **DKIM** for each sender, **DMARC** at `_dmarc.wordonthewater.net` (start `p=none` with reporting to `hello@wordonthewater.net`, move to `quarantine`), a custom return-path per sender, and Kit's own sending-domain setup. Only one SPF record may exist; merge the includes.
 - Transactional templates: plain-text part always included; mobile-friendly HTML.
 - Every newsletter has a working one-click unsubscribe and the physical/contact details required by law (Kit supplies both; verify in a test send).
 - Tests mock Kit with a fake server and never call real Kit; Preview and Development use a separate Kit test form or account.
@@ -466,7 +474,7 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 | # | Question | Assumption until answered |
 |---|---|---|
 | 1 | Monthly budget, and which region is closest to most of your audience? | Vercel (decided) with Neon + Upstash; Hobby while building, Pro (~USD 20–40/month) at launch. **Region resolved:** `fra1` (Europe/Africa) |
-| 2 | Domain name registered? | Not yet; placeholders `hello@` / `prayer@` from mockup |
+| 2 | Domain name registered? | **Resolved:** `wordonthewater.net`, with `hello@wordonthewater.net` and `prayer@wordonthewater.net` registered |
 | 3 | Email provider? | **Resolved for subscriptions:** Kit. Postmark (assumed) stays for transactional mail |
 | 4 | Who reads prayer requests in Phase 1, and may the full text be emailed to them? | Hendrik only; full text emailed only if the requester ticks consent, otherwise stored encrypted for the Phase 2 admin view |
 | 5 | Auth needs: admin only, or public accounts eventually? | Admin-only (Phase 2); public accounts optional in Phase 4 |
@@ -478,6 +486,7 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 
 ### Decisions made during the build
 
+- **Domain and mailboxes (2026-10-31):** production domain `wordonthewater.net`; `hello@` (public contact, all outgoing mail, contact notifications) and `prayer@` (prayer notifications). Mail is authenticated on the root domain, not a `mail.` subdomain, because the `From` addresses are on the root. DNS stays at Squarespace; all records (Vercel, SPF, DKIM, DMARC, return-paths) are added there.
 - **Kit for subscriptions and newsletters (2026-10-31):** Kit owns the list, double opt-in, unsubscribe and broadcasts; we keep a mirror table and verify Kit webhooks. Kit has no transactional send API, so Postmark stays for prayer and contact notifications. This replaces our own token-based confirm and unsubscribe endpoints and the Postmark broadcast idea (ADR 0008, written with the 1.3 spike).
 - **Database:** stay with Neon, not Supabase: native Vercel integration, a database branch per preview, and scale to zero on the free tier. Supabase would add an auto-generated REST API to lock down (ADR 0002).
 - **CSP:** nonce-based, so pages render per request. A hash-based CSP with static pages was tried first and failed in a real browser (8 inline hydration scripts blocked). Re-measure LCP on a preview deployment (ADR 0007).

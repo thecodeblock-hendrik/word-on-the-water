@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email security@example.invalid (placeholder, to be replaced with the real address before launch). Do not open a public issue.
+Email hello@wordonthewater.net with "Security" in the subject. Do not open a public issue.
 
 Please include steps to reproduce. We aim to acknowledge reports within 3 business days.
 
