@@ -24,3 +24,17 @@ def test_v1_accepts_token(client: TestClient) -> None:
 
 def test_health_needs_no_token(client: TestClient) -> None:
     assert client.get("/health/live").status_code == 200
+
+
+def test_v1_rejects_non_ascii_token(client: TestClient) -> None:
+    headers = {b"Authorization": "Bearer café".encode()}
+    response = client.get("/v1/ping", headers=headers)
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "unauthorized"
+
+
+def test_cron_rejects_non_ascii_token(client: TestClient) -> None:
+    headers = {b"Authorization": "Bearer café".encode()}
+    response = client.get("/cron/drain-outbox", headers=headers)
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "unauthorized"
