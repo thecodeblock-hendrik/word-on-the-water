@@ -15,7 +15,7 @@ How Word on the Water is deployed on Vercel, and the one-off setup behind it.
 
 Team `thecodeblock`, Hobby plan. Vercel's Git integration deploys every push: a branch gets previews, `main` gets production.
 
-**Ignored builds** (`ignoreCommand` in each `vercel.json`): a build is skipped when nothing under the app changed since `VERCEL_GIT_PREVIOUS_SHA`, the last successful deployment of the branch. A redeploy of the same commit (for example after changing env vars) always builds. The API always builds previews, so every web preview has an API preview to call.
+**Ignored builds** (`ignoreCommand` in each `vercel.json`): a build is skipped when nothing under the app changed since `VERCEL_GIT_PREVIOUS_SHA`, the last successful deployment of the branch. A redeploy of the same commit (for example after changing env vars) always builds. If that commit is not in Vercel's clone (a squash-merge replaces the branch commits), `git diff` exits 128, which Vercel reports as a failed deployment; the command therefore ends with `|| exit 1` so anything but "no changes" builds. The API always builds previews, so every web preview has an API preview to call.
 
 **Preview wiring:** a web preview derives `API_BASE_URL` from `VERCEL_BRANCH_URL` (`wotw-web-git-<branch>-thecodeblock.vercel.app` becomes `wotw-api-git-…`). Production uses `API_BASE_URL=https://wotw-api.vercel.app`.
 
