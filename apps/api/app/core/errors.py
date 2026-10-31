@@ -45,7 +45,10 @@ async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
     frame = traceback.extract_tb(exc.__traceback__)[-1]
     where = f"{Path(frame.filename).name}:{frame.lineno}"
     log.error("unhandled_error", error=type(exc).__name__, path=request.url.path, where=where)
-    return error_response(500, "internal_error", "Something went wrong.")
+    response = error_response(500, "internal_error", "Something went wrong.")
+    response.headers["X-Request-ID"] = structlog.contextvars.get_contextvars().get("request_id", "")
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 def register_error_handlers(app: FastAPI) -> None:
