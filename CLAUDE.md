@@ -95,7 +95,7 @@ FastAPI on Vercel Functions (apps/api)  ── validation, business rules, auth,
 Neon PostgreSQL  ── least-privilege role, TLS, encrypted at rest, PITR backups
 ```
 
-**Key decision — backend-for-frontend (BFF):** the browser never calls FastAPI directly. Next.js Server Actions call the API server-side with a service credential. This removes CORS from the public surface, keeps the API URL and tokens out of the browser, and gives one place for session cookies later. FastAPI still validates everything as if it were public (defence in depth) and rejects any call without the service token. API previews are covered by Vercel Deployment Protection (the web sends a protection-bypass secret). The production API URL is public so Vercel Cron can reach it; it relies on the service token, `CRON_SECRET` and disabled docs (ADR 0008).
+**Key decision — backend-for-frontend (BFF):** the browser never calls FastAPI directly. Next.js Server Actions call the API server-side with a service credential. This removes CORS from the public surface, keeps the API URL and tokens out of the browser, and gives one place for session cookies later. FastAPI still validates everything as if it were public (defence in depth) and rejects any call without the service token. In production the API project's public `*.vercel.app` URL is covered by Vercel Deployment Protection, and only the web project (via a protection-bypass secret) and Vercel Cron can reach it.
 
 Public read-only content endpoints (devotionals, series) may later be exposed directly with caching if needed; that is a deliberate future decision, not a default.
 
@@ -117,7 +117,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │   ├── dependabot.yml
 │   └── pull_request_template.md
 ├── docs/
-│   ├── adr/                      ← 0001 to 0008
+│   ├── adr/                      ← 0001 to 0007
 │   ├── runbooks/                 ← deploy.md; planned: incident, restore-db, rotate-secrets
 │   └── threat-model.md, privacy.md   ← planned (step 0.10)
 ├── apps/

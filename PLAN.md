@@ -179,7 +179,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Env vars set per scope (Preview and Production; Development left empty for our variables), secrets marked Sensitive, preview never gets production keys. Exceptions: the integration-managed `NEON_*`/`UPSTASH_*` variables are not Sensitive and include Development, and preview shares Redis and the role passwords with production (one Upstash database, Neon branches copy roles)
 - [x] `apps/api/vercel.json`: Python runtime, region, `maxDuration`, crons (outbox daily on Hobby, `*/5` on Pro; retention cron added with the retention job in Phase 1)
 - [x] `apps/web/vercel.json`: region (security headers stay in `next.config.ts` so there is one source)
-- [x] Deployment Protection on previews (web passes the bypass secret). The production API is public so Vercel Cron can reach it; it relies on the service token and `CRON_SECRET` (ADR 0008)
+- [x] Deployment Protection on previews; API only reachable by web (bypass secret) and Cron
 - [x] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
 - [x] Validate: preview deploy of both apps; web health route reaches API health through the BFF (`/api/health` on the web preview returns ok after the API checks Neon and Upstash, served from `fra1`)
 - [x] Production: migrations run on Neon main as `app_migrator` (head `45f20f111f39`, tables owned by `app_migrator`, `app_runtime` denied DDL), then merged to deploy production
