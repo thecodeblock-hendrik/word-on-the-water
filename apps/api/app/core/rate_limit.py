@@ -7,11 +7,14 @@ import uuid
 from collections.abc import AsyncIterator
 from typing import Annotated
 
+import structlog
 from fastapi import Depends, Request
 from redis.asyncio import Redis
 
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
+
+log = structlog.get_logger()
 
 
 def client_ip(request: Request) -> str:
@@ -19,10 +22,12 @@ def client_ip(request: Request) -> str:
 
     Behind the BFF, Vercel's own headers carry the web function's address, not the visitor's
     (proved on a preview deployment), so the BFF sends X-Client-IP. A client-supplied header is
-    never trusted without a valid service token.
+    never trusted without a valid service token. Falling back is logged: every visitor would
+    then share the web function's rate-limit key.
     """
     if bff_ip := getattr(request.state, "client_ip", None):
         return str(bff_ip)
+    log.warning("client_ip_fallback")
     for header in ("x-real-ip", "x-vercel-forwarded-for"):
         if value := request.headers.get(header):
             return value.split(",")[0].strip()
