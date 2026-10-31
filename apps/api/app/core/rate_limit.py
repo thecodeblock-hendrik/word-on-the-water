@@ -2,16 +2,37 @@
 
 import hashlib
 import hmac
+import ipaddress
 import time
 import uuid
 from collections.abc import AsyncIterator
 from typing import Annotated
 
+import structlog
 from fastapi import Depends, Request
 from redis.asyncio import Redis
 
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
+
+log = structlog.get_logger()
+
+
+def limit_subject(value: str) -> str:
+    """The address a visitor is limited by: IPv4-mapped IPv6 as IPv4, other IPv6 as its /64.
+
+    One home connection holds a whole /64, so keying on the full IPv6 address would give a
+    visitor a fresh bucket per address. Values that are not IP addresses pass through.
+    """
+    try:
+        ip = ipaddress.ip_address(value)
+    except ValueError:
+        return value
+    if isinstance(ip, ipaddress.IPv6Address):
+        if ip.ipv4_mapped:
+            return str(ip.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{ip}/64", strict=False).network_address)
+    return str(ip)
 
 
 def client_ip(request: Request) -> str:
@@ -19,14 +40,16 @@ def client_ip(request: Request) -> str:
 
     Behind the BFF, Vercel's own headers carry the web function's address, not the visitor's
     (proved on a preview deployment), so the BFF sends X-Client-IP. A client-supplied header is
-    never trusted without a valid service token.
+    never trusted without a valid service token. Falling back is logged: every visitor would
+    then share the web function's rate-limit key.
     """
     if bff_ip := getattr(request.state, "client_ip", None):
-        return str(bff_ip)
+        return limit_subject(str(bff_ip))
+    log.warning("client_ip_fallback", path=request.scope.get("path"))
     for header in ("x-real-ip", "x-vercel-forwarded-for"):
         if value := request.headers.get(header):
-            return value.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+            return limit_subject(value.split(",")[0].strip())
+    return limit_subject(request.client.host) if request.client else "unknown"
 
 
 def hash_key(value: str, salt: str) -> str:
@@ -63,11 +86,18 @@ class RateLimiter:
             _HIT_SCRIPT, 1, key, now, window_seconds, limit, uuid.uuid4().hex
         )
         if not allowed:
-            raise ApiError(429, "rate_limited", "Too many requests. Please try again later.")
+            raise ApiError(
+                429,
+                "rate_limited",
+                "Too many requests. Please try again later.",
+                headers={"Retry-After": str(window_seconds)},
+            )
 
 
 async def get_redis(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncIterator[Redis]:
-    redis = Redis.from_url(settings.redis_url.get_secret_value(), socket_connect_timeout=2)
+    redis = Redis.from_url(
+        settings.redis_url.get_secret_value(), socket_connect_timeout=2, socket_timeout=2
+    )
     try:
         yield redis
     finally:

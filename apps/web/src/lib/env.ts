@@ -2,7 +2,8 @@ import "server-only";
 import { z } from "zod";
 
 const schema = z.object({
-  API_BASE_URL: z.url(),
+  /** Without trailing slashes: callers append paths that start with one. */
+  API_BASE_URL: z.url().transform((url) => url.replace(/\/+$/, "")),
   SERVICE_TOKEN: z.string().min(16),
   /** The API project's protection-bypass secret (not this project's VERCEL_AUTOMATION_BYPASS_SECRET). */
   API_BYPASS_SECRET: z.string().min(1).optional(),
@@ -24,6 +25,12 @@ function previewApiUrl(source: Record<string, string | undefined>): string | und
     throw new Error(
       `Cannot derive the API preview URL: the branch name is too long, so Vercel truncated ${host}. ` +
         "Use a branch name of 36 characters or fewer, or set API_BASE_URL for this preview.",
+    );
+  }
+  if (!host.startsWith("wotw-web-")) {
+    throw new Error(
+      `Cannot derive the API preview URL: ${host} does not start with wotw-web-. ` +
+        "Set API_BASE_URL for this preview.",
     );
   }
   return `https://${host.replace(/^wotw-web-/, "wotw-api-")}`;

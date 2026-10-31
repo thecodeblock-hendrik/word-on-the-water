@@ -136,5 +136,99 @@ Branch `docs/outbox-cron-frequency`. Files: `CLAUDE.md` §2, `PLAN.md` (1.3 and 
 ## Close-out
 
 - [x] All 10 findings ticked in `code_review.md`, with the PR number for each (Fixed column in the summary table; finding 1's live two-network check waits for step 1.3's e2e)
-- [ ] Re-run `/code-review` on the changed files to confirm no regressions or new findings
+- [x] Re-run `/code-review` (high) on the 11 changed source files: not clean, 10 further findings, handled as Fixes 11 to 20 in the addendum below
 - [x] Archived with this plan under `docs/reviews/2026-10-31/`, as Hendrik chose (2026-10-31)
+
+---
+
+# Addendum: findings from the re-review (Fixes 11 to 20)
+
+The re-run of `/code-review` after Fixes 1 to 10 reported 10 more findings. They are claims until proven: each fix starts with a test that fails for the right reason, and a finding the test cannot reproduce is dropped here with the evidence.
+
+**One branch, one PR, one merge (Hendrik's decision).** The rules above say one PR per fix. Hobby allows 100 deployments per day per team and every non-docs push creates 2 (plus 2 canceled ones on merge). A push of Fixes 11 and 12 (PR #43) was already refused with "Deployment rate limited, retry in 24 hours" for `wotw-api`. So Fixes 11 to 20 are one commit each on `fix/client-ip-hardening`, pushed once at the end, with one PR (#43) and one merge. The first push of Fixes 11 and 12 is already on the PR.
+
+Same rules as above: test first, `make lint typecheck test` (plus `make e2e` for web, `make types-check` for API), merge with `gh pr merge --squash --admin` when every check is green.
+
+## Fix 11: a missing or malformed `X-Client-IP` silently shares one rate-limit key
+Introduced by Fix 5. `apps/api/app/core/security.py`, `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_client_ip.py`.
+
+- [x] Test: with a valid service token and a missing or malformed `X-Client-IP`, a warning is logged (no header values), so the fallback to the proxy address is visible. Failed first (no log today), passes now
+- [x] Log `client_ip_fallback` when `client_ip` falls back to a proxy header or the socket address (every rate-limited route sits behind the service token, so a fallback there is always the missing BFF IP)
+- [x] Add a PLAN.md 1.3 item: every visitor-facing `apiFetch` passes `clientIp`, with a test that two visitors do not share a limit
+- [x] Decision kept from Fix 5: a malformed value falls back instead of rejecting, so a BFF bug cannot take sign-up down; the warning makes it visible
+
+## Fix 12: IPv6 visitors get a fresh rate-limit bucket per address
+Introduced by Fix 5. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_client_ip.py`.
+
+- [x] Test: two addresses in the same /64 give the same rate-limit subject; an IPv4-mapped IPv6 address equals its IPv4 form; plain IPv4 and non-IP values are unchanged; the BFF's IPv6 address is reduced too. The three real cases failed first, the guards passed
+- [x] `limit_subject` in `rate_limit.py`, applied to every path in `client_ip`: IPv4-mapped to IPv4, other IPv6 to its /64 network address; non-IP strings pass through
+- [x] Update CLAUDE.md §6.3 (limit is per /64 for IPv6)
+
+## Fix 13: the outbox time budget is only checked before a send
+Introduced by Fix 6. `apps/api/app/jobs/drain_outbox.py`, `apps/api/tests/integration/test_outbox.py`.
+
+- [x] Test: a send that hangs is cut off at a hard per-send cap and the row is recorded as a failed attempt with backoff; a second test reads `vercel.json` and checks budget plus cap stay below `maxDuration`. The hang test failed first (the send ran its full 1 second), then passed
+- [x] Wrap each send in `asyncio.timeout(send_timeout)`: 20 s budget plus 8 s cap is 28 s, under the 30 s `maxDuration`
+- [x] Note in the PR: a send cut off after the provider accepted it can still be duplicated on retry, as with any timeout
+
+## Fix 14: `previewApiUrl` does not check that the `wotw-web-` prefix matched
+Introduced by Fix 9. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
+
+- [x] Test: a preview `VERCEL_BRANCH_URL` that does not start with `wotw-web-` gives a clear error, not the web host as the API URL. Failed first (no error), passes now
+- [x] Throw naming the unexpected host
+
+## Fix 15: `_http_error` drops `exc.headers`; 429 has no `Retry-After`
+Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/app/core/rate_limit.py`, tests.
+
+- [x] Test: a 405 keeps its `Allow` header; an `HTTPException(401, headers=WWW-Authenticate)` keeps it; an `ApiError` with headers sends them; a rate-limited 429 carries `Retry-After`. All failed first (header missing), pass now
+- [x] Pass `exc.headers` through; give `ApiError` optional headers and set `Retry-After` (the window length) on the rate limiter's 429
+
+## Fix 16: the Redis client has no read timeout
+Present since Phase 0.4. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_redis_client.py`.
+
+- [x] Test: the client from `get_redis` has a socket timeout (read as well as connect). Failed first (`KeyError: 'socket_timeout'`), passes now
+- [x] Add `socket_timeout=2`. Not changed on purpose: a connection per request (the serverless norm here) and failing closed when Redis is down (forms should not accept unlimited requests)
+
+## Fix 17: a trailing slash on `API_BASE_URL` produces `//v1/...`
+Present since Phase 0.6. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
+
+- [x] Test: `API_BASE_URL` with trailing slashes gives a request URL with a single slash. Failed first (`//` kept), passes now
+- [x] Strip trailing slashes when parsing the variable (a zod transform on `API_BASE_URL`)
+
+## Fix 18: `x-forwarded-proto` as a list drops `upgrade-insecure-requests`
+Present since Phase 0.8. `apps/web/src/proxy.ts`, `apps/web/tests/unit/proxy.test.ts`.
+
+- [x] Test: `x-forwarded-proto: https, http` still adds `upgrade-insecure-requests`, and `http, https` does not. The list case failed first (directive dropped), the other passed as a guard
+- [x] Use the first value of the header
+
+## Fix 19: `make types-check` ignores untracked generated files
+Present since Phase 0.7. `Makefile`.
+
+- [x] Prove: with an untracked `packages/api-types/src/untracked_probe.d.ts`, `make types-check` exited 0 (wrongly)
+- [x] Fail on any `git status --porcelain -- packages/api-types` output: the same probe now fails (it prints the file), and the target passes again once the probe is removed
+
+## Fix 20: `_unhandled` assumes a non-empty traceback
+Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/tests/test_errors.py`.
+
+- [x] Test: an exception with no traceback frames still gives the 500 with `no-store` and is logged (location `unknown`). Failed first with `IndexError: list index out of range`, passes now
+- [x] Guard the empty traceback
+
+## Addendum close-out
+
+- [ ] All of Fixes 11 to 20 merged (all ticked above; merge is PR #43, waiting on the Vercel quota)
+- [x] Re-run `/code-review` on the files changed by Fixes 11 to 20: 7 findings, triaged below (2 fixed, 5 declined with reasons)
+- [x] Archive note: `code_review.md` has a row per addendum fix
+
+### Second re-review (on Fixes 11 to 20)
+
+| Finding | Decision |
+|---|---|
+| The 8 s send cap can duplicate an email the provider already accepted; it also pre-empts the providers' own 10 s timeouts | Declined. Known and written into Fix 13: delivery is at-least-once, and a killed function (the old behaviour) duplicates more often. SMTP is the local Mailpit provider only |
+| `Retry-After` is the full window, not the time until a slot frees | Declined. A safe upper bound; the exact value needs a change to the Lua script and tests for little gain |
+| `socket_timeout=2` turns a slow Redis reply into a 500 | Declined. Any Redis error was already an unhandled 500, a stalled read used to hang until `maxDuration`, and failing closed was decided in Fix 16 |
+| The client IP fallback has no path context | Fixed: the warning now carries the path |
+| `make types-check` has overlapping `git diff` and `git status` checks | Declined. `git diff HEAD` already fails for tracked changes, so the status check only fires for untracked files and its message is accurate |
+| `x-forwarded-proto` is compared case-sensitively | Fixed: compared in lower case, test first |
+| `previewApiUrl` throws at request time, not at build | Declined. All env validation is lazy by design, the error appears in the runtime logs, and project hosts always start with `wotw-web-` |
+
+No third review is planned: the remaining findings are design trade-offs already decided, not defects.

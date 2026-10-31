@@ -24,6 +24,12 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ ...valid, API_BASE_URL: "not a url" })).toThrow(/API_BASE_URL/);
   });
 
+  it("drops trailing slashes from the API URL so paths join with a single slash", () => {
+    const env = parseEnv({ ...valid, API_BASE_URL: "https://wotw-api.vercel.app//" });
+    expect(env.API_BASE_URL).toBe("https://wotw-api.vercel.app");
+    expect(`${env.API_BASE_URL}/v1/subscribers`).toBe("https://wotw-api.vercel.app/v1/subscribers");
+  });
+
   it("treats blank optional values as unset", () => {
     const env = parseEnv({ ...valid, API_BYPASS_SECRET: "" });
     expect(env.API_BYPASS_SECRET).toBeUndefined();
@@ -87,6 +93,16 @@ describe("parseEnv", () => {
   it("prefers an explicit API URL even when the branch alias is truncated", () => {
     const env = parseEnv({ ...valid, VERCEL_ENV: "preview", VERCEL_BRANCH_URL: truncatedAlias });
     expect(env.API_BASE_URL).toBe(valid.API_BASE_URL);
+  });
+
+  it("on a preview whose host is not a wotw-web alias, refuses to point the API URL at itself", () => {
+    expect(() =>
+      parseEnv({
+        SERVICE_TOKEN: valid.SERVICE_TOKEN,
+        VERCEL_ENV: "preview",
+        VERCEL_BRANCH_URL: "renamed-web-git-x-thecodeblock.vercel.app",
+      }),
+    ).toThrow(/wotw-web-/);
   });
 
   it("does not derive the API URL outside previews", () => {

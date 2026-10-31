@@ -59,3 +59,11 @@ async def test_concurrent_hits_allow_exactly_the_limit(limiter: RateLimiter) -> 
     )
     assert sum(r is None for r in results) == 5
     assert sum(isinstance(r, ApiError) for r in results) == 5
+
+
+async def test_the_429_tells_the_client_when_to_retry(limiter: RateLimiter) -> None:
+    subject = uuid.uuid4().hex
+    await limiter.hit("test", subject, limit=1, window_seconds=60)
+    with pytest.raises(ApiError) as exc:
+        await limiter.hit("test", subject, limit=1, window_seconds=60)
+    assert exc.value.headers == {"Retry-After": "60"}
