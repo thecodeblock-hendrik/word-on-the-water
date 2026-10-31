@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from structlog.testing import capture_logs
 
 from app.main import create_app
 
@@ -13,3 +14,12 @@ def test_ready_503_without_database(client: TestClient) -> None:
     response = client.get("/health/ready")
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "not_ready"
+
+
+def test_ready_failure_logs_dependency_without_details(client: TestClient) -> None:
+    with capture_logs() as logs:
+        client.get("/health/ready")
+    failure = next(entry for entry in logs if entry["event"] == "readiness_failed")
+    assert failure["dependency"] == "database"
+    assert failure["error"]
+    assert "localhost" not in str(failure)
