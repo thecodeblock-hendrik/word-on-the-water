@@ -304,9 +304,9 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Upgrade to Vercel Pro; restrict production promotion; audit log on
 - [ ] Outbox cron to `*/5 * * * *` in `apps/api/vercel.json` and the deploy runbook (only possible on Pro; Hobby fails the deploy) **(Hendrik)**
 - [ ] Vercel Firewall rate-limit rules on form routes
-- [ ] On the root domain `wordonthewater.net` (the `From` addresses are on it): one merged SPF record in Squarespace DNS including the existing mailbox provider, Postmark and Kit (edit the current record, never add a second), DKIM for each, a custom return-path for each, DMARC at `_dmarc.wordonthewater.net` with `p=none` and reports to `hello@wordonthewater.net`
+- [ ] On the root domain `wordonthewater.net` (the `From` addresses are on it): one merged SPF record in Squarespace DNS including Postmark and Kit (edit the current record and keep what Squarespace email forwarding put there, never add a second), DKIM for each, a custom return-path for each, DMARC at `_dmarc.wordonthewater.net` with `p=none` and reports to `hello@wordonthewater.net`
 - [ ] Kit sending domain authenticated, sender `hello@wordonthewater.net`, confirmation email branded; production Kit API key and webhook secret set in Vercel Production only
-- [ ] Postmark sender signature or domain verified for `hello@wordonthewater.net`; send a test to `prayer@` and `hello@` and confirm both mailboxes receive it and it passes SPF, DKIM and DMARC
+- [ ] Postmark sender signature or domain verified for `hello@wordonthewater.net`; `hello@` and `prayer@` are Squarespace forwards to Hendrik's mailbox, so send a test from Postmark to each and confirm it arrives after forwarding (inbox, not spam) and check the SPF, DKIM and DMARC results in the headers; if forwarding is unreliable, point `PRAYER_INBOX` and `CONTACT_INBOX` straight at the destination mailbox; optionally set up "send mail as" so replies come from `hello@` and `prayer@`
 - [ ] `migrate.yml` with manual approval; production auto-promotion off; promote after migrations and smoke tests
 - [ ] Rollback rehearsed (Instant Rollback)
 - [ ] Backup restore tested from nightly dump and Neon PITR
