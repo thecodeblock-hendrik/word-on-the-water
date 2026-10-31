@@ -21,7 +21,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 | Phase | Status |
 |---|---|
-| 0 Foundations | In progress. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (preview branching and the first production migration open). Remaining: 0.10 observability and docs, exit gate |
+| 0 Foundations | In progress. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (Neon preview branching open). Remaining: 0.10 observability and docs, exit gate |
 | 1 Landing page | Not started |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
@@ -31,7 +31,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 **Decisions made so far:** Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
 
-**Waiting on Hendrik:** Neon preview branching toggle and approval to migrate production (step 0.9), domain name, final colour scheme, prayer-notification default.
+**Waiting on Hendrik:** Neon preview branching toggle (step 0.9), domain name, final colour scheme, prayer-notification default.
 
 ---
 
@@ -182,7 +182,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Deployment Protection on previews; API only reachable by web (bypass secret) and Cron
 - [x] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
 - [x] Validate: preview deploy of both apps; web health route reaches API health through the BFF (`/api/health` on the web preview returns ok after the API checks Neon and Upstash, served from `fra1`)
-- [ ] Production: run migrations on Neon main as `app_migrator` **(Hendrik: approve)**, then merge to deploy production
+- [x] Production: migrations run on Neon main as `app_migrator` (head `45f20f111f39`, tables owned by `app_migrator`, `app_runtime` denied DDL), then merged to deploy production
 
 ### 0.10 Observability and docs
 - [ ] Sentry in web and API with `sendDefaultPii: false` and `before_send` scrubbing
