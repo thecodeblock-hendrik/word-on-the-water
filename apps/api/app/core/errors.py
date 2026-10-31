@@ -50,8 +50,8 @@ async def _validation_error(_: Request, __: RequestValidationError) -> JSONRespo
 
 async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
     # Type and location only: exception messages can contain hosts, credentials or user data.
-    frame = traceback.extract_tb(exc.__traceback__)[-1]
-    where = f"{Path(frame.filename).name}:{frame.lineno}"
+    frames = traceback.extract_tb(exc.__traceback__)
+    where = f"{Path(frames[-1].filename).name}:{frames[-1].lineno}" if frames else "unknown"
     log.error("unhandled_error", error=type(exc).__name__, path=request.url.path, where=where)
     response = error_response(500, "internal_error", "Something went wrong.")
     response.headers["X-Request-ID"] = structlog.contextvars.get_contextvars().get("request_id", "")

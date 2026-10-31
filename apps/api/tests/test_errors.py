@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
+from starlette.requests import Request
 from structlog.testing import capture_logs
 
-from app.core.errors import ApiError, register_error_handlers
+from app.core.errors import ApiError, _unhandled, register_error_handlers
 
 
 def _failing_app() -> FastAPI:
@@ -66,3 +67,13 @@ def test_http_exception_keeps_its_headers() -> None:
 def test_api_error_headers_are_sent() -> None:
     response = TestClient(_header_app()).get("/slow-down")
     assert response.headers["retry-after"] == "60"
+
+
+async def test_an_exception_without_traceback_frames_still_gives_the_500() -> None:
+    scope = {"type": "http", "method": "GET", "path": "/boom", "headers": [], "query_string": b""}
+    with capture_logs() as logs:
+        response = await _unhandled(Request(scope), RuntimeError("never raised"))
+    assert response.status_code == 500
+    assert response.headers["cache-control"] == "no-store"
+    entry = next(entry for entry in logs if entry["event"] == "unhandled_error")
+    assert entry["where"] == "unknown"

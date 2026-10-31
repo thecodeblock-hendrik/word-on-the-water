@@ -210,8 +210,8 @@ Present since Phase 0.7. `Makefile`.
 ## Fix 20: `_unhandled` assumes a non-empty traceback
 Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/tests/test_errors.py`.
 
-- [ ] Test: an exception with no traceback frames still gives the 500 JSON body with `X-Request-ID` and `no-store`, and is logged. Confirm it fails
-- [ ] Guard the empty traceback
+- [x] Test: an exception with no traceback frames still gives the 500 with `no-store` and is logged (location `unknown`). Failed first with `IndexError: list index out of range`, passes now
+- [x] Guard the empty traceback
 
 ## Addendum close-out
 
