@@ -19,6 +19,8 @@ Team `thecodeblock`, Hobby plan. Vercel's Git integration deploys every push: a 
 
 **Preview wiring:** a web preview derives `API_BASE_URL` from `VERCEL_BRANCH_URL` (`wotw-web-git-<branch>-thecodeblock.vercel.app` becomes `wotw-api-git-…`). Production uses `API_BASE_URL=https://wotw-api.vercel.app`.
 
+**Neon preview branches:** each preview gets a Neon branch `preview/<git branch>`, and the Free plan allows 10. `.github/workflows/neon-preview-cleanup.yml` deletes it when the PR closes (secret `NEON_API_KEY` for Actions and Dependabot, variable `NEON_PROJECT_ID`). If previews fail with "Resource provisioning failed", check the branch count in the Neon console and delete stale `preview/...` branches (never `main`).
+
 ## Environment variables
 
 Set for **Preview and Production only**. Development is empty: local work uses the root `.env` from `make setup`. Secrets are Sensitive (write-only), with separate values for Preview and Production.
