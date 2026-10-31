@@ -58,6 +58,37 @@ describe("parseEnv", () => {
     expect(env.API_BASE_URL).toBe(valid.API_BASE_URL);
   });
 
+  // Real aliases Vercel gave one long Dependabot branch: the hash suffix differs per project,
+  // so swapping the project name yields a host that does not exist.
+  const truncatedAlias =
+    "wotw-web-git-dependabot-npmandyarnappswebno-0b4701-thecodeblock.vercel.app";
+
+  it("on a preview with a truncated branch alias, fails with a clear cause", () => {
+    expect(() =>
+      parseEnv({
+        SERVICE_TOKEN: valid.SERVICE_TOKEN,
+        VERCEL_ENV: "preview",
+        VERCEL_BRANCH_URL: truncatedAlias,
+      }),
+    ).toThrow(/branch name is too long/);
+  });
+
+  it("still derives the API URL for the longest branch alias that is not truncated", () => {
+    const label = `wotw-web-git-${"a".repeat(36)}-thecodeblock`;
+    expect(label).toHaveLength(62);
+    const env = parseEnv({
+      SERVICE_TOKEN: valid.SERVICE_TOKEN,
+      VERCEL_ENV: "preview",
+      VERCEL_BRANCH_URL: `${label}.vercel.app`,
+    });
+    expect(env.API_BASE_URL).toBe(`https://${label.replace("wotw-web-", "wotw-api-")}.vercel.app`);
+  });
+
+  it("prefers an explicit API URL even when the branch alias is truncated", () => {
+    const env = parseEnv({ ...valid, VERCEL_ENV: "preview", VERCEL_BRANCH_URL: truncatedAlias });
+    expect(env.API_BASE_URL).toBe(valid.API_BASE_URL);
+  });
+
   it("does not derive the API URL outside previews", () => {
     const source = { SERVICE_TOKEN: valid.SERVICE_TOKEN, VERCEL_ENV: "production" };
     expect(() =>
