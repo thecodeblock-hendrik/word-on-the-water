@@ -25,8 +25,8 @@ describe("parseEnv", () => {
   });
 
   it("treats blank optional values as unset", () => {
-    const env = parseEnv({ ...valid, VERCEL_AUTOMATION_BYPASS_SECRET: "" });
-    expect(env.VERCEL_AUTOMATION_BYPASS_SECRET).toBeUndefined();
+    const env = parseEnv({ ...valid, API_BYPASS_SECRET: "" });
+    expect(env.API_BYPASS_SECRET).toBeUndefined();
   });
 
   it("does not leak secret values in the error message", () => {

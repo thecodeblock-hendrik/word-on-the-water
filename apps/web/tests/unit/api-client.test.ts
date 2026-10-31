@@ -43,7 +43,7 @@ describe("createApiClient", () => {
     await without.apiFetch("/x");
     expect(without.lastCall().headers.has("x-vercel-protection-bypass")).toBe(false);
 
-    const withSecret = setup({ VERCEL_AUTOMATION_BYPASS_SECRET: "bypass-secret" });
+    const withSecret = setup({ API_BYPASS_SECRET: "bypass-secret" });
     await withSecret.apiFetch("/x");
     expect(withSecret.lastCall().headers.get("x-vercel-protection-bypass")).toBe("bypass-secret");
   });

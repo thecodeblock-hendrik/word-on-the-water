@@ -4,7 +4,8 @@ import { z } from "zod";
 const schema = z.object({
   API_BASE_URL: z.url(),
   SERVICE_TOKEN: z.string().min(16),
-  VERCEL_AUTOMATION_BYPASS_SECRET: z.string().min(1).optional(),
+  /** The API project's protection-bypass secret (not this project's VERCEL_AUTOMATION_BYPASS_SECRET). */
+  API_BYPASS_SECRET: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof schema>;
