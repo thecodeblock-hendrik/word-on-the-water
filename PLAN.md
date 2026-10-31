@@ -236,7 +236,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Rate limit 5/hour/IP; idempotency key support
 - [ ] API client IP: trust `X-Client-IP` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
 - [ ] Consent text version, timestamp and source recorded
-- [ ] Confirmation email via outbox, plus an immediate best-effort send after the request (the cron drain remains the safety net)
+- [ ] Confirmation email via outbox, plus an immediate best-effort send after the request (the cron drain remains the safety net); a test shows the message is sent without waiting for the cron
 - [ ] `POST /v1/subscribers/confirm` and `/unsubscribe` (including RFC 8058 one-click)
 - [ ] Web: `react-hook-form` + Zod, Server Action with progressive enhancement, visible labels, correct `type/inputmode/autocomplete`, errors in `aria-live`
 - [ ] Pages: `/subscribe/confirm` and unsubscribe, with clear success, expired and invalid states
@@ -293,6 +293,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 ### 1.9 Launch
 - [ ] Domain registered and added to Vercel **(Hendrik)**
 - [ ] Upgrade to Vercel Pro; restrict production promotion; audit log on
+- [ ] Outbox cron to `*/5 * * * *` in `apps/api/vercel.json` and the deploy runbook (only possible on Pro; Hobby fails the deploy) **(Hendrik)**
 - [ ] Vercel Firewall rate-limit rules on form routes
 - [ ] SPF, DKIM, DMARC (`p=none` with reporting) on sending subdomain, custom return-path
 - [ ] Postmark production sender verified; real placeholder addresses replaced
