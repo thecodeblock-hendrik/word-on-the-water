@@ -89,6 +89,16 @@ describe("parseEnv", () => {
     expect(env.API_BASE_URL).toBe(valid.API_BASE_URL);
   });
 
+  it("on a preview whose host is not a wotw-web alias, refuses to point the API URL at itself", () => {
+    expect(() =>
+      parseEnv({
+        SERVICE_TOKEN: valid.SERVICE_TOKEN,
+        VERCEL_ENV: "preview",
+        VERCEL_BRANCH_URL: "renamed-web-git-x-thecodeblock.vercel.app",
+      }),
+    ).toThrow(/wotw-web-/);
+  });
+
   it("does not derive the API URL outside previews", () => {
     const source = { SERVICE_TOKEN: valid.SERVICE_TOKEN, VERCEL_ENV: "production" };
     expect(() =>

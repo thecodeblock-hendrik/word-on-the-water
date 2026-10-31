@@ -174,8 +174,8 @@ Introduced by Fix 6. `apps/api/app/jobs/drain_outbox.py`, `apps/api/tests/integr
 ## Fix 14: `previewApiUrl` does not check that the `wotw-web-` prefix matched
 Introduced by Fix 9. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
 
-- [ ] Test: a preview `VERCEL_BRANCH_URL` that does not start with `wotw-web-` gives a clear error, not the web host as the API URL. Confirm it fails
-- [ ] Throw naming the unexpected host
+- [x] Test: a preview `VERCEL_BRANCH_URL` that does not start with `wotw-web-` gives a clear error, not the web host as the API URL. Failed first (no error), passes now
+- [x] Throw naming the unexpected host
 
 ## Fix 15: `_http_error` drops `exc.headers`; 429 has no `Retry-After`
 Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/app/core/rate_limit.py`, tests.

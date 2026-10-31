@@ -26,6 +26,12 @@ function previewApiUrl(source: Record<string, string | undefined>): string | und
         "Use a branch name of 36 characters or fewer, or set API_BASE_URL for this preview.",
     );
   }
+  if (!host.startsWith("wotw-web-")) {
+    throw new Error(
+      `Cannot derive the API preview URL: ${host} does not start with wotw-web-. ` +
+        "Set API_BASE_URL for this preview.",
+    );
+  }
   return `https://${host.replace(/^wotw-web-/, "wotw-api-")}`;
 }
 
