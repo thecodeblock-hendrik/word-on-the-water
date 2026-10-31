@@ -23,6 +23,23 @@ Findings are ordered most severe first. **Reproduced** means the reviewer trigge
 
 Related fix found along the way: #34 (Vercel `ignoreCommand` exit 128).
 
+### Re-review of the fixes (2026-10-31)
+
+Re-running `/code-review` (high) on the files changed by fixes 1 to 10 gave 10 further findings. Each was checked with a test that failed first. All fixed in PR #43 (one commit per fix); details in the addendum of `code_review_plan.md`.
+
+| Fix | Finding | Origin |
+|---|---|---|
+| 11 | Missing or malformed `X-Client-IP` silently shares one rate-limit key (now logged) | Fix 5 |
+| 12 | IPv6 visitors got a fresh rate-limit bucket per address (now per /64) | Fix 5 |
+| 13 | Outbox time budget only checked before a send (now a per-send cap) | Fix 6 |
+| 14 | `previewApiUrl` did not check the `wotw-web-` prefix | Fix 9 |
+| 15 | Error handler dropped `exc.headers`; 429 had no `Retry-After` | Phase 0.3 |
+| 16 | Redis client had no read timeout | Phase 0.4 |
+| 17 | Trailing slash on `API_BASE_URL` produced `//v1/...` | Phase 0.6 |
+| 18 | `x-forwarded-proto` list dropped `upgrade-insecure-requests` | Phase 0.8 |
+| 19 | `make types-check` ignored untracked generated files | Phase 0.7 |
+| 20 | `_unhandled` crashed on an exception without traceback frames | Phase 0.3 |
+
 ## Findings
 
 ### 1. All visitors share one rate-limit key behind the BFF
