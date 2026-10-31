@@ -136,5 +136,91 @@ Branch `docs/outbox-cron-frequency`. Files: `CLAUDE.md` §2, `PLAN.md` (1.3 and 
 ## Close-out
 
 - [x] All 10 findings ticked in `code_review.md`, with the PR number for each (Fixed column in the summary table; finding 1's live two-network check waits for step 1.3's e2e)
-- [ ] Re-run `/code-review` on the changed files to confirm no regressions or new findings
+- [x] Re-run `/code-review` (high) on the 11 changed source files: not clean, 10 further findings, handled as Fixes 11 to 20 in the addendum below
 - [x] Archived with this plan under `docs/reviews/2026-10-31/`, as Hendrik chose (2026-10-31)
+
+---
+
+# Addendum: findings from the re-review (Fixes 11 to 20)
+
+The re-run of `/code-review` after Fixes 1 to 10 reported 10 more findings. They are claims until proven: each fix starts with a test that fails for the right reason, and a finding the test cannot reproduce is dropped here with the evidence.
+
+**Grouping.** The rules above say one PR per fix. Hobby allows 100 deployments per day per team and every non-docs PR creates 2 (plus 2 canceled ones on merge), so the fixes are grouped into three PRs by area, one commit per fix with its own test:
+
+| PR | Branch | Fixes |
+|---|---|---|
+| A | `fix/client-ip-hardening` | 11, 12 |
+| B | `fix/api-robustness` | 13, 15, 16, 20 |
+| C | `fix/web-and-tooling-edges` | 14, 17, 18, 19 |
+
+Same rules as above: test first, `make lint typecheck test` (plus `make e2e` for web, `make types-check` for API), merge with `gh pr merge --squash --admin` when every check is green.
+
+## Fix 11: a missing or malformed `X-Client-IP` silently shares one rate-limit key
+Introduced by Fix 5. `apps/api/app/core/security.py`, `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_client_ip.py`.
+
+- [ ] Test: with a valid service token and a missing or malformed `X-Client-IP`, a warning is logged (no header values), so the fallback to the proxy address is visible. Confirm it fails (no log today)
+- [ ] Log `client_ip_fallback` once when `client_ip` falls back to a proxy header or the socket address on a request that passed the service-token check
+- [ ] Add a PLAN.md 1.3 item: every visitor-facing `apiFetch` passes `clientIp`, with a test that two visitors do not share a limit
+- [ ] Decision kept from Fix 5: a malformed value falls back instead of rejecting, so a BFF bug cannot take sign-up down; the warning makes it visible
+
+## Fix 12: IPv6 visitors get a fresh rate-limit bucket per address
+Introduced by Fix 5. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_client_ip.py`.
+
+- [ ] Test: two addresses in the same /64 give the same rate-limit subject; an IPv4-mapped IPv6 address equals its IPv4 form; plain IPv4 is unchanged. Confirm it fails
+- [ ] Normalise in `client_ip`: IPv4-mapped to IPv4, other IPv6 to its /64 network address; non-IP strings pass through
+- [ ] Update CLAUDE.md §6.3 (limit is per /64 for IPv6)
+
+## Fix 13: the outbox time budget is only checked before a send
+Introduced by Fix 6. `apps/api/app/jobs/drain_outbox.py`, `apps/api/tests/integration/test_outbox.py`.
+
+- [ ] Test: a send that hangs is cut off at a hard per-send cap and the row is recorded as a failed attempt with backoff, within the run budget. Confirm it hangs or overruns today
+- [ ] Wrap each send in `asyncio.timeout(SEND_TIMEOUT)` with `SEND_TIMEOUT` plus the budget below the function's `maxDuration`
+- [ ] Note in the PR: a send cut off after the provider accepted it can still be duplicated on retry, as with any timeout
+
+## Fix 14: `previewApiUrl` does not check that the `wotw-web-` prefix matched
+Introduced by Fix 9. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
+
+- [ ] Test: a preview `VERCEL_BRANCH_URL` that does not start with `wotw-web-` gives a clear error, not the web host as the API URL. Confirm it fails
+- [ ] Throw naming the unexpected host
+
+## Fix 15: `_http_error` drops `exc.headers`; 429 has no `Retry-After`
+Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/app/core/rate_limit.py`, tests.
+
+- [ ] Test: a 405 keeps its `Allow` header; an `HTTPException(401, headers=WWW-Authenticate)` keeps it; a rate-limited 429 carries `Retry-After`. Confirm they fail
+- [ ] Pass `exc.headers` through; give `ApiError` optional headers and set `Retry-After` (the window length) on the rate limiter's 429
+
+## Fix 16: the Redis client has no read timeout
+Present since Phase 0.4. `apps/api/app/core/rate_limit.py`, `apps/api/tests/integration/test_rate_limit.py`.
+
+- [ ] Test: the client from `get_redis` has a socket timeout (read as well as connect). Confirm it fails
+- [ ] Add `socket_timeout=2`. Not changed on purpose: a connection per request (the serverless norm here) and failing closed when Redis is down (forms should not accept unlimited requests)
+
+## Fix 17: a trailing slash on `API_BASE_URL` produces `//v1/...`
+Present since Phase 0.6. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
+
+- [ ] Test: `API_BASE_URL` with a trailing slash gives a request URL with a single slash. Confirm it fails
+- [ ] Strip trailing slashes when parsing the variable
+
+## Fix 18: `x-forwarded-proto` as a list drops `upgrade-insecure-requests`
+Present since Phase 0.8. `apps/web/src/proxy.ts`, `apps/web/tests/unit/proxy.test.ts`.
+
+- [ ] Test: `x-forwarded-proto: https, http` still adds `upgrade-insecure-requests`. Confirm it fails
+- [ ] Use the first value of the header
+
+## Fix 19: `make types-check` ignores untracked generated files
+Present since Phase 0.7. `Makefile`.
+
+- [ ] Prove: create an untracked file under `packages/api-types`, run `make types-check`, confirm it passes (wrongly)
+- [ ] Fail on any `git status --porcelain -- packages/api-types` output; rerun the proof and confirm it now fails; remove the file
+
+## Fix 20: `_unhandled` assumes a non-empty traceback
+Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/tests/test_errors.py`.
+
+- [ ] Test: an exception with no traceback frames still gives the 500 JSON body with `X-Request-ID` and `no-store`, and is logged. Confirm it fails
+- [ ] Guard the empty traceback
+
+## Addendum close-out
+
+- [ ] All of Fixes 11 to 20 merged (or dropped with evidence) and ticked above
+- [ ] Re-run `/code-review` on the files changed by Fixes 11 to 20
+- [ ] Archive note: update the Fixed column in `code_review.md` with a row per addendum fix
