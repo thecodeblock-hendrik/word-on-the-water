@@ -183,6 +183,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Makefile `env` target; `make env` (`vercel env pull`) works for both projects
 - [x] Validate: preview deploy of both apps; web health route reaches API health through the BFF (`/api/health` on the web preview returns ok after the API checks Neon and Upstash, served from `fra1`)
 - [x] Production: migrations run on Neon main as `app_migrator` (head `45f20f111f39`, tables owned by `app_migrator`, `app_runtime` denied DDL), then merged to deploy production
+- [ ] Neon preview branches deleted when a PR closes (`neon-preview-cleanup.yml`): the Free plan allows 10 and previews failed with "Resource provisioning failed" once it was reached
 
 ### 0.10 Observability and docs
 - [ ] Sentry in web and API with `sendDefaultPii: false` and `before_send` scrubbing
