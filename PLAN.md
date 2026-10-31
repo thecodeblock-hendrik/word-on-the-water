@@ -163,7 +163,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Actions pinned to commit SHAs; least-privilege `permissions:`
 - [x] `dependabot.yml` (weekly, grouped)
 - [x] First Dependabot run: docker-compose (PR #12, Valkey 8 to 9) and npm for `apps/web` (PR #13, 5 updates) opened PRs; github-actions and uv ran with nothing to update
-- [ ] Fix the Dependabot npm run for `packages/api-types` (it failed in the first run; likely the pnpm workspace layout with the lockfile at the repo root). Review PRs #12 and #13 (CI uses `valkey/valkey:8`; a major bump needs the compose file and `ci.yml` changed together)
+- [ ] Fix the Dependabot npm run for `packages/api-types` (it failed in the first run; likely the pnpm workspace layout with the lockfile at the repo root). Review PR #13. PR #12 (Valkey 8 to 9) is merged, with `ci.yml` bumped to match
 - [x] PR template (what, why, mobile screenshots, security considerations, tests)
 - [x] Branch protection on `main`: PR required, 10 required checks, 1 review, no force-push or deletion, linear history, conversations resolved. Admins are not enforced so the owner can merge their own PRs with `gh pr merge --admin`
 - [x] Validate: a test PR runs every workflow green (PR #10, all 11 checks, six Playwright browser projects)
