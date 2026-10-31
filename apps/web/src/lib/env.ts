@@ -10,9 +10,16 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>;
 
+/** On a preview, the API preview of the same branch: its alias differs only in the project name. */
+function previewApiUrl(source: Record<string, string | undefined>): string | undefined {
+  if (source.VERCEL_ENV !== "preview" || !source.VERCEL_BRANCH_URL) return undefined;
+  return `https://${source.VERCEL_BRANCH_URL.replace(/^wotw-web-/, "wotw-api-")}`;
+}
+
 /** Validates server-side environment variables. Blank values count as unset. */
 export function parseEnv(source: Record<string, string | undefined>): Env {
   const present = Object.fromEntries(Object.entries(source).filter(([, value]) => value));
+  present.API_BASE_URL ??= previewApiUrl(present);
   const result = schema.safeParse(present);
   if (!result.success) {
     const names = result.error.issues.map((issue) => issue.path.join(".")).join(", ");
