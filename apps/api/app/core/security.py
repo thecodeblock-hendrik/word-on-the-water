@@ -11,7 +11,7 @@ from app.core.errors import ApiError
 
 def _check(provided: str | None, expected: str) -> None:
     scheme, _, token = (provided or "").partition(" ")
-    if scheme.lower() != "bearer" or not hmac.compare_digest(token, expected):
+    if scheme.lower() != "bearer" or not hmac.compare_digest(token.encode(), expected.encode()):
         raise ApiError(401, "unauthorized", "Missing or invalid credentials.")
 
 
