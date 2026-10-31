@@ -100,3 +100,10 @@ def test_non_ip_values_pass_through() -> None:
 def test_the_bff_ipv6_address_is_also_reduced_to_its_64() -> None:
     response = _app().get("/ip", headers={**GOOD, "X-Client-IP": "2001:db8:1:2:aaaa::1"})
     assert response.json() == "2001:db8:1:2::"
+
+
+def test_the_fallback_log_names_the_path() -> None:
+    with capture_logs() as logs:
+        _app().get("/ip", headers=GOOD)
+    [entry] = [log for log in logs if log["event"] == "client_ip_fallback"]
+    assert entry["path"] == "/ip"

@@ -45,7 +45,7 @@ def client_ip(request: Request) -> str:
     """
     if bff_ip := getattr(request.state, "client_ip", None):
         return limit_subject(str(bff_ip))
-    log.warning("client_ip_fallback")
+    log.warning("client_ip_fallback", path=request.scope.get("path"))
     for header in ("x-real-ip", "x-vercel-forwarded-for"):
         if value := request.headers.get(header):
             return limit_subject(value.split(",")[0].strip())
