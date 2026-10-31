@@ -44,7 +44,7 @@ def test_database_urls_built_from_neon_branch_host(monkeypatch: pytest.MonkeyPat
     )
     assert settings.database_url_direct is not None
     assert settings.database_url_direct.get_secret_value() == (
-        "postgresql+asyncpg://app_migrator:migrator-pw@ep-x.neon.tech/neondb?ssl=verify-full"
+        "postgresql+asyncpg://app_migrator:migrator-pw@ep-x.neon.tech/neondb"
     )
 
 

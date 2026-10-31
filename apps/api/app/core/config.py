@@ -47,7 +47,7 @@ class Settings(BaseSettings):
         if unpooled and db and "database_url_direct" not in data and "db_migrator_password" in data:
             password = data["db_migrator_password"]
             data["database_url_direct"] = (
-                f"postgresql+asyncpg://app_migrator:{password}@{unpooled}/{db}?ssl=verify-full"
+                f"postgresql+asyncpg://app_migrator:{password}@{unpooled}/{db}"
             )
         return data
 
