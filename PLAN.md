@@ -48,7 +48,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] New behaviour has tests that failed before the code existed
 - [ ] The full suite passes locally (`make test`), plus `make lint` and `make typecheck`
 - [ ] Negative and security cases are covered, not just the happy path: invalid input, missing or wrong auth, rate limits, expired or replayed tokens, no-leak assertions for personal data
-- [ ] Anything touching the database or Redis is tested against the real local services, not mocks. Mock only external third parties (Postmark, Turnstile)
+- [ ] Anything touching the database or Redis is tested against the real local services, not mocks. Mock only external third parties (Postmark, Kit, Turnstile)
 - [ ] Tests are deterministic: no sleeps, no real clock (inject or freeze time), no order dependence, no shared state between tests
 - [ ] A bug fix starts with a test that reproduces it and fails
 - [ ] The step's result is checked in the running system (curl, Mailpit, browser at 375px), not only by unit tests
@@ -94,6 +94,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] ADR 0004 Email provider interface + Postmark
 - [x] ADR 0005 Hosting on Vercel (two projects, Marketplace data services)
 - [x] ADR 0006 Application-layer encryption of prayer requests
+- [ ] ADR 0008 Kit for subscriptions and newsletters (written with the 1.3 spike; narrows ADR 0004 to transactional email only)
 
 ### 0.3 API skeleton (`apps/api`)
 - [x] `uv init`, Python 3.13, `pyproject.toml` with separate `dev` group (pytest, ruff, mypy, bandit, pip-audit)
@@ -228,20 +229,25 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Images via `next/image` (AVIF/WebP, explicit sizes, lazy below the fold)
 - [ ] Screenshot review at 375, 768, 1280 against `website/landing-page-mockup.html`
 
-### 1.3 Email sign-up (double opt-in)
+### 1.3 Email sign-up (Kit, double opt-in)
+Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer (ADR 0008). Our API validates, defends and forwards.
+- [ ] Kit setup **(Hendrik)**: create the sign-up form in Kit with double opt-in on, a confirmation email and a redirect to our thank-you page; note the form id; create an API key in Kit developer settings
+- [ ] Spike first: against a Kit test form, prove which calls trigger the double opt-in confirmation email (create subscriber, then add to form by id or by email) and what state the subscriber has until confirmed; record the result in ADR 0008
+- [ ] `integrations/kit/`: small async client (httpx) for `https://api.kit.com/v4` with `X-Kit-Api-Key`; create subscriber, add to form, find by email, unsubscribe; backoff on 429 (120 requests per minute per key); tested against a fake Kit server, never real Kit in CI
 - [ ] API: Pydantic schema (`extra="forbid"`, name <= 80, email <= 254)
 - [ ] `POST /v1/subscribers`: always 202 with identical body (no enumeration across new, pending, confirmed)
-- [ ] Token generation: 32 random bytes, store SHA-256 hash only, 48 hour expiry
 - [ ] Turnstile verification, honeypot, minimum time-to-submit
 - [ ] Rate limit 5/hour/IP; idempotency key support
 - [ ] API client IP: trust `X-Client-IP` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
-- [ ] Consent text version, timestamp and source recorded
-- [ ] Confirmation email via outbox, plus an immediate best-effort send after the request (the cron drain remains the safety net); a test shows the message is sent without waiting for the cron
-- [ ] `POST /v1/subscribers/confirm` and `/unsubscribe` (including RFC 8058 one-click)
+- [ ] Consent text version, timestamp and source recorded in our `subscribers` row and sent to Kit as the form `referrer`
+- [ ] Kit call goes through the outbox (a `kit_subscribe` job) with an immediate best-effort attempt after the request; retries with backoff if Kit is down, so a Kit outage never loses a sign-up or breaks the form
+- [ ] Migration: add `kit_subscriber_id` to `subscribers`; drop the confirm and unsubscribe token columns (Kit handles tokens)
+- [ ] `POST /v1/webhooks/kit`: verify `X-Kit-Signature` (`t=...,v1=...`, HMAC-SHA256 over `{t}.{raw body}`, constant-time compare, 5 minute tolerance, any matching `v1` accepted), dedupe on event id, update `subscribers.status` from `subscriber.activated`, `subscriber.unsubscribed`, `subscriber.bounced`, `subscriber.complained`
+- [ ] Webhook endpoint registered in Kit (`POST /v4/webhook_endpoints`, secret stored as `KIT_WEBHOOK_SECRET`); decide how Kit reaches the protected API project (Vercel protection bypass in the URL, or a route on the web project) and record it in ADR 0008
 - [ ] Web: `react-hook-form` + Zod, Server Action with progressive enhancement, visible labels, correct `type/inputmode/autocomplete`, errors in `aria-live`
-- [ ] Pages: `/subscribe/confirm` and unsubscribe, with clear success, expired and invalid states
-- [ ] Tests: happy path, validation, enumeration safety, expiry, replay, rate limit, bot rejection
-- [ ] Threat model updated
+- [ ] Pages: "check your inbox" and a branded thank-you page after Kit confirmation; confirmation and unsubscribe pages themselves are Kit-hosted
+- [ ] Tests: happy path, validation, enumeration safety, rate limit, bot rejection, Kit down then retried, webhook signature valid, invalid, expired and replayed
+- [ ] Threat model updated (new third party holding subscriber email, new inbound webhook)
 
 ### 1.4 Prayer request form
 - [ ] `crypto.py`: AES-256-GCM envelope encryption, `key_id` per row, rotation supported
@@ -273,7 +279,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Run CSP in report-only on staging, then enforce in production after violations are reviewed
 
 ### 1.7 Retention and operations
-- [ ] Retention job: unconfirmed subscribers 7 days, prayer 90 days, contact 12 months, audit logs 1 year
+- [ ] Retention job: unconfirmed subscribers 7 days (mirror row and, if Kit keeps them, the Kit subscriber via API), prayer 90 days, contact 12 months, audit logs 1 year
 - [ ] Tests with time-shifted fixtures
 - [ ] Vercel Cron configured and verified in preview
 - [ ] Alerts: error rate, 5xx, failed email sends, DB connection failures, cert expiry
@@ -295,12 +301,13 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Upgrade to Vercel Pro; restrict production promotion; audit log on
 - [ ] Outbox cron to `*/5 * * * *` in `apps/api/vercel.json` and the deploy runbook (only possible on Pro; Hobby fails the deploy) **(Hendrik)**
 - [ ] Vercel Firewall rate-limit rules on form routes
-- [ ] SPF, DKIM, DMARC (`p=none` with reporting) on sending subdomain, custom return-path
+- [ ] SPF, DKIM, DMARC (`p=none` with reporting) on sending subdomain, custom return-path, covering both Postmark (transactional) and the Kit sending domain (newsletter)
+- [ ] Kit sending domain authenticated and confirmation email branded; production Kit API key and webhook secret set in Vercel Production only
 - [ ] Postmark production sender verified; real placeholder addresses replaced
 - [ ] `migrate.yml` with manual approval; production auto-promotion off; promote after migrations and smoke tests
 - [ ] Rollback rehearsed (Instant Rollback)
 - [ ] Backup restore tested from nightly dump and Neon PITR
-- [ ] Production smoke test: subscribe, confirm, unsubscribe, prayer request received by prayer inbox
+- [ ] Production smoke test: subscribe, confirm via the Kit email, unsubscribe via the Kit link (our mirror shows `unsubscribed`), prayer request received by prayer inbox
 
 **Exit gate Phase 1**
 - [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request; the prayer team receives it
@@ -323,7 +330,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 ### 2.2 Admin UI
 - [ ] `(admin)` routes behind auth and feature flag
 - [ ] Prayer request inbox: decrypt on view, status changes, audit trail
-- [ ] Subscriber list and export (admin only)
+- [ ] Subscriber counts and status read from our mirror; list management and export stay in the Kit dashboard
 - [ ] Contact messages view
 
 ### 2.3 Devotional content
@@ -334,10 +341,11 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Basic search with Postgres full-text
 
 ### 2.4 Weekly email
-- [ ] Newsletter send via Postmark broadcast stream (or chosen tool) from our subscriber list
-- [ ] Unsubscribe header and link in every email; send only to `active` subscribers
-- [ ] Bounce and complaint webhooks update subscriber status
-- [ ] Send preview to self before broadcast
+- [ ] Publishing a devotional creates a Kit broadcast (`POST /v4/broadcasts`) as a draft (`send_at` null): subject, preview text, rendered HTML content, internal description, subscriber filter by tag or segment
+- [ ] Spike first: confirm how a draft is scheduled (update with `send_at`), whether the chosen Kit template adds the unsubscribe link and address footer, and that sending is allowed on our Kit plan; otherwise put `{{ unsubscribe_url }}` and `{{ address }}` in our content
+- [ ] Send a test to Hendrik before scheduling; the editor schedules from our admin UI or from Kit
+- [ ] Kit sends only to active subscribers and adds the unsubscribe link; bounces and complaints reach us through the Kit webhook (built in 1.3)
+- [ ] Failed broadcast creation is visible in the admin UI and retried
 
 ### 2.5 Mobile app decision gate
 - [ ] Revisit the native app (`FLUTTER.md`, option B: keep this Next.js site and add a Flutter app for iOS and Android on the same FastAPI) once devotionals exist **(Hendrik)**
@@ -389,7 +397,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 
 - [ ] 1. Budget and audience region
 - [ ] 2. Domain name
-- [ ] 3. Email provider confirmation (Postmark assumed)
+- [x] 3. Email provider: Kit for subscriptions and newsletters; Postmark (assumed, still to confirm) for transactional mail, since Kit has no transactional send API
 - [ ] 4. Who reads prayer requests; may full text be emailed
 - [ ] 5. Auth needs beyond admin
 - [ ] 6. Audience jurisdictions for privacy law

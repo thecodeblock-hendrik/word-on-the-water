@@ -43,7 +43,8 @@ This file is both the project plan and the instructions for anyone (human or Cla
 | Database | **PostgreSQL 17** | Reliable, `citext`, `pgcrypto`, full-text search for later phases |
 | Cache / rate limits | **Valkey/Redis** (managed, e.g. Upstash) | Rate limiting, idempotency keys, later sessions/queues |
 | Background jobs | **Outbox table drained by Vercel Cron** (plus an immediate best-effort send after the request). Phase 2+: Vercel Queues or QStash if volume needs it | Vercel has no long-running workers; email sending must not block requests and must be retryable |
-| Transactional email | **Postmark** (assumed, swappable via an `EmailProvider` interface) | Strong deliverability, separate transactional/broadcast streams |
+| Subscriptions and newsletter | **Kit** (kit.com, API v4, API key auth) | Owns the subscriber list, double opt-in confirmation email, unsubscribe links, legal footer and broadcasts (ADR 0008). Our API forwards sign-ups and receives Kit webhooks |
+| Transactional email | **Postmark** (assumed, swappable via an `EmailProvider` interface) | Kit has no transactional send API, so prayer and contact notifications still need this |
 | Bot protection | **Cloudflare Turnstile** + honeypot field + rate limits | Privacy-friendly, no Google reCAPTCHA |
 | Package managers | **pnpm** (web), **uv** (api) | Fast, lockfiles, reproducible |
 | Local dev | Docker Compose for Postgres, Redis and Mailpit; web and API run natively (`pnpm dev`, `uvicorn`) | Mirrors Vercel's runtime, which deploys source, not containers |
@@ -93,6 +94,7 @@ Next.js on Vercel (apps/web)  ── Server Components render pages (per request
 FastAPI on Vercel Functions (apps/api)  ── validation, business rules, auth, rate limits
    │                 ├── Upstash Redis  (rate limits, idempotency)
    │                 ├── Email provider (via outbox, drained by Vercel Cron)
+   │                 ├── Kit API (sign-ups via outbox job; Kit webhooks call back into the API)
    ▼
 Neon PostgreSQL  ── least-privilege role, TLS, encrypted at rest, PITR backups
 ```
@@ -144,6 +146,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │       │   ├── routers/ (health, cron, v1; planned: subscribers, prayer, contact, admin/)
 │       │   ├── services/ (email_templates, outbox)
 │       │   ├── integrations/email/ (base, console, smtp, postmark, factory); turnstile planned
+│       │   ├── integrations/kit/ ← planned: Kit v4 client, webhook signature check
 │       │   ├── jobs/ (drain_outbox; retention planned)
 │       │   └── schemas/          ← planned (Pydantic models, added with the first endpoints)
 │       ├── tests/ (unit tests at the top level; integration/ against real Postgres, Valkey, Mailpit)
@@ -198,7 +201,7 @@ Baseline: **OWASP ASVS 4.0 Level 2** for anything handling personal data, OWASP 
 
 | Data | Sensitivity | Handling |
 |---|---|---|
-| Subscriber email + first name | Personal data | Stored, double opt-in, unsubscribe in every email, deletable on request |
+| Subscriber email + first name | Personal data | Held by Kit (processor) with a minimal mirror in our database; double opt-in and unsubscribe handled by Kit; deletable on request in both places |
 | Prayer requests | **Special-category / highly sensitive** (religious belief, health, family situations) | Field-level encryption, strict access, short retention, never in logs/analytics/Sentry |
 | Contact messages | Personal data | Stored, retention-limited |
 | IP address | Personal data | Used transiently for rate limiting; store only a salted hash, if at all |
@@ -218,7 +221,8 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 - Never render user content as HTML. If rich text arrives later, sanitise server-side with an allow-list.
 - **Bot protection:** Turnstile token verified server-side by the API; hidden honeypot field; minimum time-to-submit check.
 - **Rate limiting** (Redis, sliding window) per hashed IP and per email: e.g. sign-up 5/hour/IP, prayer 3/hour/IP; plus Vercel Firewall rate-limit rules on the form routes. Take the client IP from the BFF's `X-Client-IP` only after the service token check (Vercel's `x-real-ip` is the web function behind the BFF), otherwise from `x-real-ip` / `x-vercel-forwarded-for`, never from an unauthenticated client-supplied header. Return generic `429`.
-- **No account/email enumeration:** sign-up always returns the same "check your inbox" response whether the email is new, pending, or already confirmed.
+- **No account/email enumeration:** sign-up always returns the same "check your inbox" response whether the email is new, pending, or already confirmed, and whether or not the Kit call succeeded (it is retried from the outbox).
+- **Kit webhooks are untrusted until verified:** check `X-Kit-Signature` (`t=<unix>,v1=<hex>`, HMAC-SHA256 over `{t}.{raw body}` with the endpoint secret, constant-time compare, 5 minute tolerance, accept any matching `v1` during rotation) against the raw body, and dedupe on event id.
 - Idempotency keys on form submissions to stop double-posts on flaky mobile connections.
 - SQL only through SQLAlchemy bound parameters; no string-built SQL.
 - Request body size limit at the proxy and in the app.
@@ -242,6 +246,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 - **Prayer request bodies encrypted at the application layer** (AES-256-GCM via `cryptography`, envelope encryption, key in the secret manager; key ID stored per row to allow rotation).
 - Prayer notification emails contain only first name and the request text if the requester ticked "OK to email the prayer team"; otherwise just "a new request is waiting" (Phase 2 admin view). Decide default with Hendrik.
 - Secrets live in **Vercel Environment Variables** marked *Sensitive*, scoped separately for Development, Preview and Production (preview never gets production keys), plus GitHub Environments for CI-only secrets. Local runs use the root `.env` from `make setup`. Never in the repo or in client bundles. `.env.example` lists names only. **gitleaks** in pre-commit and CI.
+- `KIT_API_KEY` and `KIT_WEBHOOK_SECRET` are Sensitive Vercel variables on the API project only, with the Production key never in Preview or Development (use a separate Kit test form or account there). Kit allows 120 requests per minute per API key.
 - Separate DB roles: `app_migrator` (DDL, used only by migrations) and `app_runtime` (DML on app tables only).
 
 ### 6.7 Supply chain and code security
@@ -272,13 +277,14 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 All tables: `id UUID` (v7 preferred), `created_at`, `updated_at` (timestamptz, UTC). Use `citext` for emails.
 
 ```
-subscribers
+subscribers                     -- mirror of Kit; Kit is the source of truth for the list
   id, email citext unique, first_name varchar(80) null,
   status enum(pending, active, unsubscribed, bounced),
-  confirm_token_hash, confirm_token_expires_at,
-  unsubscribe_token_hash,
+  kit_subscriber_id bigint null,   -- added in 1.3
   consent_text_version, consent_at, confirmed_at, unsubscribed_at,
   source varchar(40)            -- e.g. "landing_hero", "landing_footer"
+  -- status is updated from Kit webhooks (activated, unsubscribed, bounced, complained)
+  -- the confirm and unsubscribe token columns are dropped in 1.3: Kit issues those tokens
 
 prayer_requests
   id, first_name varchar(80) null, email citext null (for a reply, optional),
@@ -301,7 +307,7 @@ audit_log
 users, roles, user_roles, sessions, devotionals, series, scriptures, tags, media_assets
 ```
 
-Tokens (confirm/unsubscribe) are random 32-byte values; only their SHA-256 hash is stored. Confirmation links expire in 48 hours.
+Subscriber confirm and unsubscribe tokens and links are issued and expired by Kit; we store none. The `email_outbox` also carries retryable `kit_subscribe` jobs.
 
 ---
 
@@ -315,9 +321,8 @@ Phase 1 endpoints:
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/health/live`, `/health/ready` | Liveness; readiness checks DB + Redis |
-| POST | `/v1/subscribers` | Start double opt-in (always 202, same body) |
-| POST | `/v1/subscribers/confirm` | Confirm with token |
-| POST | `/v1/subscribers/unsubscribe` | One-click unsubscribe with token (also supports RFC 8058 `List-Unsubscribe-Post`) |
+| POST | `/v1/subscribers` | Validate, then create the subscriber in Kit and add it to the double opt-in form via the outbox (always 202, same body). Kit sends the confirmation email |
+| POST | `/v1/webhooks/kit` | Kit webhook receiver: signature verified, updates subscriber status (no service token; the signature is the auth) |
 | POST | `/v1/prayer-requests` | Submit a prayer request (202) |
 | POST | `/v1/contact` | Submit a general message (202) |
 
@@ -374,10 +379,20 @@ Conventional Commits; small PRs; every PR uses the template (what, why, screensh
 
 ## 12. Email
 
-- Domain authentication before launch: **SPF, DKIM, DMARC** (start `p=none` with reporting, move to `quarantine`), custom return-path. Use a subdomain for sending (e.g. `mail.<domain>`).
-- Templates: subscribe confirmation, welcome, prayer-request received (to requester, optional), prayer-team notification, contact notification. Plain-text part always included; mobile-friendly HTML.
-- Every marketing email has a working one-click unsubscribe and the physical/contact details required by law.
-- Phase 1 only collects subscribers. Weekly devotional sending (Phase 2) uses Postmark's broadcast stream or a dedicated newsletter tool synced from our DB; we keep the subscriber list as the source of truth.
+Two systems, split by purpose:
+
+| Kind | System | Mail |
+|---|---|---|
+| Subscriber-facing | **Kit** | Double opt-in confirmation, welcome, weekly devotional broadcasts. Kit adds the unsubscribe link and legal address |
+| Transactional | **Postmark** via `EmailProvider` and the outbox | Prayer-team notification, contact notification, prayer-request received (to requester, optional) |
+
+- **Kit integration:** API v4 at `https://api.kit.com/v4`, `X-Kit-Api-Key` header (an API key is right for automating our own account; OAuth is only needed for multi-account apps and bulk endpoints). Sign-up: create subscriber (`POST /subscribers`, an upsert), then add to the double opt-in form; unsubscribe: `POST /subscribers/{id}/unsubscribe`. Webhooks via `POST /webhook_endpoints` with events `subscriber.activated`, `subscriber.unsubscribed`, `subscriber.bounced`, `subscriber.complained`. Broadcasts (Phase 2): `POST /broadcasts` as a draft, then scheduled with `send_at`. Details and open points are in ADR 0008.
+- **Kit is the list's source of truth.** Our `subscribers` table is a mirror for status, consent evidence and retention. If the two disagree, Kit wins.
+- Kit failures never lose a sign-up: the call runs from the outbox with retries.
+- Domain authentication before launch for both senders: **SPF, DKIM, DMARC** (start `p=none` with reporting, move to `quarantine`), custom return-path, a sending subdomain (e.g. `mail.<domain>`), and Kit's own sending-domain setup.
+- Transactional templates: plain-text part always included; mobile-friendly HTML.
+- Every newsletter has a working one-click unsubscribe and the physical/contact details required by law (Kit supplies both; verify in a test send).
+- Tests mock Kit with a fake server and never call real Kit; Preview and Development use a separate Kit test form or account.
 
 ---
 
@@ -397,11 +412,11 @@ Progress is tracked step by step in [PLAN.md](PLAN.md); this section only descri
 Monorepo, local Docker services, Makefile and env setup; Vercel team, two projects, Neon and Upstash, scoped env vars; Next.js shell with tokens, fonts, security headers and CSP; FastAPI app factory with settings, logging, request IDs, errors, health, service-token auth and rate limiter; SQLAlchemy and Alembic with DB roles and the first migration; email provider interface with outbox worker; OpenAPI to TypeScript types; CI, CodeQL, Dependabot, branch protection and pre-commit hooks; staging, Sentry, uptime monitoring, analytics and log drain; ADRs, threat model v1 and privacy doc v1.
 
 ### Phase 1 — Landing page (first public release)
-All mockup sections as responsive mobile-first components; final colour scheme with light and dark; email sign-up with double opt-in and confirm and unsubscribe pages; prayer request form (encrypted storage, team notification, optional reply) and contact form; privacy policy, ESV copyright notice and `security.txt`; SEO metadata, OG image, sitemap and manifest; retention job; full test suite with Lighthouse and axe budgets met and ZAP baseline clean; Vercel Pro, domain, Firewall rules, SPF/DKIM/DMARC, production deploy and a tested backup restore.
+All mockup sections as responsive mobile-first components; final colour scheme with light and dark; email sign-up through Kit with double opt-in (Kit hosts confirm and unsubscribe), plus the Kit webhook mirror; prayer request form (encrypted storage, team notification, optional reply) and contact form; privacy policy, ESV copyright notice and `security.txt`; SEO metadata, OG image, sitemap and manifest; retention job; full test suite with Lighthouse and axe budgets met and ZAP baseline clean; Vercel Pro, domain, Firewall rules, SPF/DKIM/DMARC, production deploy and a tested backup restore.
 - **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request; the prayer team receives it; no high security findings.
 
 ### Phase 2 — Devotionals and admin
-Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email sending, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](FLUTTER.md), option B) and Web Push for the weekly devotional.
+Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email as Kit broadcasts created from published devotionals, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](FLUTTER.md), option B) and Web Push for the weekly devotional.
 
 ### Phase 3 — Teaching series and audio
 Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals. If the Phase 2 gate chose it, the Flutter app for iOS and Android is built here.
@@ -452,7 +467,7 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 |---|---|---|
 | 1 | Monthly budget, and which region is closest to most of your audience? | Vercel (decided) with Neon + Upstash; Hobby while building, Pro (~USD 20–40/month) at launch. **Region resolved:** `fra1` (Europe/Africa) |
 | 2 | Domain name registered? | Not yet; placeholders `hello@` / `prayer@` from mockup |
-| 3 | Email provider? | Postmark for transactional; newsletter sending decided in Phase 2 |
+| 3 | Email provider? | **Resolved for subscriptions:** Kit. Postmark (assumed) stays for transactional mail |
 | 4 | Who reads prayer requests in Phase 1, and may the full text be emailed to them? | Hendrik only; full text emailed only if the requester ticks consent, otherwise stored encrypted for the Phase 2 admin view |
 | 5 | Auth needs: admin only, or public accounts eventually? | Admin-only (Phase 2); public accounts optional in Phase 4 |
 | 6 | Where are you and your audience based (for privacy law)? | Design to GDPR + POPIA, which covers most jurisdictions |
@@ -463,6 +478,7 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 
 ### Decisions made during the build
 
+- **Kit for subscriptions and newsletters (2026-10-31):** Kit owns the list, double opt-in, unsubscribe and broadcasts; we keep a mirror table and verify Kit webhooks. Kit has no transactional send API, so Postmark stays for prayer and contact notifications. This replaces our own token-based confirm and unsubscribe endpoints and the Postmark broadcast idea (ADR 0008, written with the 1.3 spike).
 - **Database:** stay with Neon, not Supabase: native Vercel integration, a database branch per preview, and scale to zero on the free tier. Supabase would add an auto-generated REST API to lock down (ADR 0002).
 - **CSP:** nonce-based, so pages render per request. A hash-based CSP with static pages was tried first and failed in a real browser (8 inline hydration scripts blocked). Re-measure LCP on a preview deployment (ADR 0007).
 - **Licensing and visibility:** no license (all rights reserved); repository public.
