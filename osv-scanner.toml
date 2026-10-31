@@ -1,0 +1,6 @@
+# Accepted vulnerabilities. Every entry needs a reason and an expiry; review when it lapses.
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2026-12-31
+reason = "minimatch DoS via globparts amplification (medium). Only patched in 11.0.1; the 3.x, 5.x and 10.x lines our dev tooling uses have no fix. Dev-only (no production dependency), and it only expands our own build globs, never user input."
