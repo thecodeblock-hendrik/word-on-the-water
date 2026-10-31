@@ -38,8 +38,6 @@ Set for **Preview and Production only**. Development is empty: local work uses t
 
 `DB_MIGRATOR_PASSWORD` is never given to the deployed API: the runtime has no DDL credentials.
 
-`make env` pulls the Development variables of both projects into `apps/*/.env.local`.
-
 ## One-off: Neon roles
 
 Run once on the Neon **main** branch, as the owner (`neondb_owner`). Preview branches copy roles from main.

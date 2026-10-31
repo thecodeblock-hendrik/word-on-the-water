@@ -241,7 +241,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 - Database encrypted at rest (provider) and connections over TLS (`sslmode=verify-full`).
 - **Prayer request bodies encrypted at the application layer** (AES-256-GCM via `cryptography`, envelope encryption, key in the secret manager; key ID stored per row to allow rotation).
 - Prayer notification emails contain only first name and the request text if the requester ticked "OK to email the prayer team"; otherwise just "a new request is waiting" (Phase 2 admin view). Decide default with Hendrik.
-- Secrets live in **Vercel Environment Variables** marked *Sensitive*, scoped separately for Development, Preview and Production (preview never gets production keys), plus GitHub Environments for CI-only secrets. Pull locally with `vercel env pull`. Never in the repo or in client bundles. `.env.example` lists names only. **gitleaks** in pre-commit and CI.
+- Secrets live in **Vercel Environment Variables** marked *Sensitive*, scoped separately for Development, Preview and Production (preview never gets production keys), plus GitHub Environments for CI-only secrets. Local runs use the root `.env` from `make setup`. Never in the repo or in client bundles. `.env.example` lists names only. **gitleaks** in pre-commit and CI.
 - Separate DB roles: `app_migrator` (DDL, used only by migrations) and `app_runtime` (DML on app tables only).
 
 ### 6.7 Supply chain and code security
@@ -442,7 +442,7 @@ make types        # regenerate packages/api-types from the OpenAPI schema
 make types-check  # regenerate and fail if the committed types differ (runs in CI)
 ```
 
-`make env` pulls Vercel Development variables for both projects. Run the apps with `uv run uvicorn app.main:app` in `apps/api` and `pnpm dev` in `apps/web`. Playwright's Firefox does not launch on the current macOS beta; CI covers it.
+Local runs read the root `.env` written by `make setup` (Vercel Development has no variables, so there is nothing to pull). Run the apps with `uv run uvicorn app.main:app` in `apps/api` and `pnpm dev` in `apps/web`. Playwright's Firefox does not launch on the current macOS beta; CI covers it.
 
 ---
 

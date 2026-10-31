@@ -42,10 +42,3 @@ types:
 
 types-check: types
 	git diff --exit-code HEAD -- packages/api-types
-
-.PHONY: env
-
-# Pulls each Vercel project's Development variables into apps/*/.env.local (gitignored).
-env:
-	vercel env pull .env.local --cwd apps/web --environment development --yes
-	vercel env pull .env.local --cwd apps/api --environment development --yes
