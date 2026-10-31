@@ -416,6 +416,7 @@ Optional public accounts (save favourites, reading plans), comments with moderat
 - **Workflow:** one branch and one PR per plan sub-step (for example `feat/0.9-vercel`), Conventional Commits, one commit per logical chunk, push once per sub-step. Merge with `gh pr merge --squash --admin` only when every check is green.
 - **Tests first** (red, green, refactor), shown failing for the right reason before the code is written. See the testing approach in `PLAN.md`.
 - Check `git status` and stage named files before committing; never a blanket `git add -A` (it once committed locally installed files to the public repo).
+- Dependabot npm PRs do not update the root `pnpm-lock.yaml`: check out the PR, run `pnpm install`, commit the lockfile and push before merging (see PLAN.md 0.8).
 - Python tooling always through `uv` (`uv run`, `uv add`); no bare `python3` or `pip`. Use the latest stable library APIs. For Next.js, read the bundled docs in `node_modules/next/dist/docs/` first: this is not the Next you may remember (`proxy.ts` replaces `middleware.ts`).
 - Reproduce and prove the root cause of a problem before fixing it, and record problems found along the way in the PR.
 

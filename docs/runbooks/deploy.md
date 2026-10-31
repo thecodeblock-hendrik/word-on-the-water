@@ -28,7 +28,7 @@ Set for **Preview and Production only**. Development is empty: local work uses t
 | api | `ENVIRONMENT` | `preview` or `production` (production disables `/docs`) |
 | api | `DB_RUNTIME_PASSWORD` | `app_runtime` password. The URL is built from `NEON_PGHOST`, so each preview branch is used automatically |
 | api | `SERVICE_TOKEN`, `CRON_SECRET`, `IP_HASH_SALT` | Random, 32 bytes hex |
-| api | `EMAIL_PROVIDER` | `console` until Postmark is set up |
+| api | `EMAIL_PROVIDER` | Unset until Postmark is set up (step 1.x). Never `console` outside local: the factory refuses it, since it would log email contents |
 | api | `NEON_*`, `UPSTASH_*` | Managed by the integrations; `REDIS_URL` falls back to `UPSTASH_REDIS_URL` |
 | web | `SERVICE_TOKEN` | Same value as the API in the same environment |
 | web | `API_BYPASS_SECRET` | The API project's automation bypass secret (not the web's own `VERCEL_AUTOMATION_BYPASS_SECRET`) |
@@ -71,6 +71,8 @@ ENVIRONMENT=production uv run alembic upgrade head
 vercel curl /api/health --deployment <web deployment URL>   # {"status":"ok"} means web, API, Neon and Upstash are all reachable
 vercel logs --deployment <api deployment URL>                # readiness_failed names the failing dependency
 ```
+
+Vercel Cron gets through Deployment Protection by itself: it calls the deployment-specific production URL (seen in the request logs). Check a run with `vercel crons run /cron/drain-outbox`, then `vercel logs` for `outbox_drained` (or `unhandled_error`). Request logs in the dashboard show the status code of every call.
 
 `vercel curl` adds the protection bypass. The `x-vercel-id` response header shows the function region (for example `cpt1::fra1::…`).
 
