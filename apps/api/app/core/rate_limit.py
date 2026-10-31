@@ -86,7 +86,12 @@ class RateLimiter:
             _HIT_SCRIPT, 1, key, now, window_seconds, limit, uuid.uuid4().hex
         )
         if not allowed:
-            raise ApiError(429, "rate_limited", "Too many requests. Please try again later.")
+            raise ApiError(
+                429,
+                "rate_limited",
+                "Too many requests. Please try again later.",
+                headers={"Retry-After": str(window_seconds)},
+            )
 
 
 async def get_redis(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncIterator[Redis]:

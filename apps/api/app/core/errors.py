@@ -1,6 +1,7 @@
 """Consistent error responses: {"error": {"code", "message"}} with no stack traces."""
 
 import traceback
+from collections.abc import Mapping
 from pathlib import Path
 
 import structlog
@@ -13,27 +14,34 @@ log = structlog.get_logger()
 
 
 class ApiError(Exception):
-    def __init__(self, status_code: int, code: str, message: str) -> None:
+    def __init__(
+        self, status_code: int, code: str, message: str, headers: dict[str, str] | None = None
+    ) -> None:
         self.status_code = status_code
         self.code = code
         self.message = message
+        self.headers = headers
 
 
-def error_response(status_code: int, code: str, message: str) -> JSONResponse:
+def error_response(
+    status_code: int, code: str, message: str, headers: Mapping[str, str] | None = None
+) -> JSONResponse:
     return JSONResponse(
-        status_code=status_code, content={"error": {"code": code, "message": message}}
+        status_code=status_code,
+        content={"error": {"code": code, "message": message}},
+        headers=headers,
     )
 
 
 async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
-    return error_response(exc.status_code, exc.code, exc.message)
+    return error_response(exc.status_code, exc.code, exc.message, exc.headers)
 
 
 async def _http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
     code = {401: "unauthorized", 404: "not_found", 405: "method_not_allowed"}.get(
         exc.status_code, "http_error"
     )
-    return error_response(exc.status_code, code, "Request failed.")
+    return error_response(exc.status_code, code, "Request failed.", exc.headers)
 
 
 async def _validation_error(_: Request, __: RequestValidationError) -> JSONResponse:

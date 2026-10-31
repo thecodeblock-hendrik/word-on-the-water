@@ -180,8 +180,8 @@ Introduced by Fix 9. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts
 ## Fix 15: `_http_error` drops `exc.headers`; 429 has no `Retry-After`
 Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/app/core/rate_limit.py`, tests.
 
-- [ ] Test: a 405 keeps its `Allow` header; an `HTTPException(401, headers=WWW-Authenticate)` keeps it; a rate-limited 429 carries `Retry-After`. Confirm they fail
-- [ ] Pass `exc.headers` through; give `ApiError` optional headers and set `Retry-After` (the window length) on the rate limiter's 429
+- [x] Test: a 405 keeps its `Allow` header; an `HTTPException(401, headers=WWW-Authenticate)` keeps it; an `ApiError` with headers sends them; a rate-limited 429 carries `Retry-After`. All failed first (header missing), pass now
+- [x] Pass `exc.headers` through; give `ApiError` optional headers and set `Retry-After` (the window length) on the rate limiter's 429
 
 ## Fix 16: the Redis client has no read timeout
 Present since Phase 0.4. `apps/api/app/core/rate_limit.py`, `apps/api/tests/integration/test_rate_limit.py`.
