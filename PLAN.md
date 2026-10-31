@@ -11,7 +11,27 @@ Step-by-step build plan derived from `CLAUDE.md`. Tick boxes as work completes. 
 - Security items are part of each phase, not a separate phase at the end.
 - Anything that changes the stack, data model or security posture needs an ADR first.
 
+- **Workflow:** one branch and one PR per sub-step (for example `feat/0.9-vercel`), Conventional Commits, one commit per logical chunk, push once per sub-step. Merge with `gh pr merge --squash --admin` only when every check is green. Stage named files, never a blanket `git add -A`.
+
 Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed from the owner.
+
+---
+
+## Status (updated 2026-10-30)
+
+| Phase | Status |
+|---|---|
+| 0 Foundations | In progress. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection. Remaining: 0.9 Vercel and external services, 0.10 observability and docs, exit gate |
+| 1 Landing page | Not started |
+| 2 Devotionals and admin | Not started |
+| 3 Teaching series and audio | Not started |
+| 4 Community | Not started (decision gate) |
+
+**Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js shell with tokens, fonts, nonce CSP, security headers and a dynamic health route; generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. No product features yet (sign-up, prayer and contact forms, landing sections).
+
+**Decisions made so far:** Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
+
+**Waiting on Hendrik:** audience region (to pin Vercel and Neon), creating the Vercel team and projects and adding Neon and Upstash from the Marketplace (step 0.9), domain name, final colour scheme, prayer-notification default.
 
 ---
 
@@ -131,19 +151,22 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Script exports OpenAPI from FastAPI to a file
 - [x] `openapi-typescript` generates `packages/api-types`
 - [x] `make types` works; `make types-check` fails if generated types are stale (also guarded by a pytest)
-- [ ] CI runs `make types-check` (added with `ci.yml` in 0.8)
+- [x] CI runs `make types-check` (added with `ci.yml` in 0.8)
 - [x] Makefile `types` and `types-check` targets
 
 ### 0.8 CI and repo protection
-- [ ] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
-- [ ] Coverage gate in CI: `services/` at least 85 percent (configure `pytest-cov`), web coverage reported
-- [ ] `codeql.yml` (TypeScript, Python)
-- [ ] `security.yml`: gitleaks, pip-audit, pnpm audit, OSV-Scanner, Bandit
-- [ ] Actions pinned to commit SHAs; least-privilege `permissions:`
-- [ ] `dependabot.yml` (weekly, grouped)
-- [ ] PR template (what, why, mobile screenshots, security considerations, tests)
-- [ ] Branch protection on `main`: PR required, checks green, 1 review, no force-push
-- [ ] Validate: a test PR runs every workflow green
+- [x] `ci.yml`: frozen installs, lint, type-check, unit tests, integration tests (service containers), build
+- [x] Coverage gate in CI: `services/` at least 85 percent (`pytest-cov`)
+- [ ] Web coverage reported in CI (Vitest coverage; add once there is logic worth measuring)
+- [x] `codeql.yml` (TypeScript, Python)
+- [x] `security.yml`: gitleaks, pip-audit, pnpm audit, OSV-Scanner, Bandit
+- [x] Actions pinned to commit SHAs; least-privilege `permissions:`
+- [x] `dependabot.yml` (weekly, grouped)
+- [x] First Dependabot run: docker-compose (PR #12, Valkey 8 to 9) and npm for `apps/web` (PR #13, 5 updates) opened PRs; github-actions and uv ran with nothing to update
+- [ ] Fix the Dependabot npm run for `packages/api-types` (it failed in the first run; likely the pnpm workspace layout with the lockfile at the repo root). Review PR #13. PR #12 (Valkey 8 to 9) is merged, with `ci.yml` bumped to match
+- [x] PR template (what, why, mobile screenshots, security considerations, tests)
+- [x] Branch protection on `main`: PR required, 10 required checks, 1 review, no force-push or deletion, linear history, conversations resolved. Admins are not enforced so the owner can merge their own PRs with `gh pr merge --admin`
+- [x] Validate: a test PR runs every workflow green (PR #10, all 11 checks, six Playwright browser projects)
 
 ### 0.9 Vercel and external services
 - [ ] Vercel team with 2FA for all members
@@ -151,6 +174,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Ignored Build Step per project so docs-only changes do not redeploy
 - [ ] Region chosen and pinned for both projects and the database **(Hendrik: audience location)**
 - [ ] Neon (Marketplace): pooled and direct URLs, branch per preview
+- [ ] `db/neon_roles.sql` creating `app_migrator` (owns the schema, DDL) and `app_runtime` (DML only) with the same default-privilege grants as `docker/postgres/init.sql`, generated passwords, documented in `docs/runbooks/deploy.md`; run once on Neon. Runtime uses the pooled URL, migrator the direct URL
 - [ ] Upstash Redis (Marketplace)
 - [ ] Env vars set per scope (Development, Preview, Production), secrets marked Sensitive, preview never gets production keys
 - [ ] `apps/api/vercel.json`: Python runtime, region, `maxDuration`, crons (outbox every 5 min, retention daily)
@@ -209,7 +233,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Rate limit 5/hour/IP; idempotency key support
 - [ ] API client IP: trust `X-Forwarded-For` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
 - [ ] Consent text version, timestamp and source recorded
-- [ ] Confirmation email via outbox
+- [ ] Confirmation email via outbox, plus an immediate best-effort send after the request (the cron drain remains the safety net)
 - [ ] `POST /v1/subscribers/confirm` and `/unsubscribe` (including RFC 8058 one-click)
 - [ ] Web: `react-hook-form` + Zod, Server Action with progressive enhancement, visible labels, correct `type/inputmode/autocomplete`, errors in `aria-live`
 - [ ] Pages: `/subscribe/confirm` and unsubscribe, with clear success, expired and invalid states
@@ -355,6 +379,6 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] 5. Auth needs beyond admin
 - [ ] 6. Audience jurisdictions for privacy law
 - [ ] 7. Built-in admin vs headless CMS
-- [ ] 8. Final colour scheme
+- [ ] 8. Final colour scheme (navy/teal/sand default is applied to the tokens; confirm or change)
 - [ ] 9. Donations timing
-- [ ] 10. GitHub account/org and repo name
+- [x] 10. GitHub account/org and repo name (public repo `thecodeblock-hendrik/word-on-the-water`, no license)
