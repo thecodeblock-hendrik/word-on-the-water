@@ -18,6 +18,16 @@ describe("proxy upgrade-insecure-requests", () => {
     expect(cspFor("https://example.com/")).toContain("upgrade-insecure-requests");
   });
 
+  it("uses the first value when a proxy chain sends a list in x-forwarded-proto", () => {
+    const csp = cspFor("http://internal/", { "x-forwarded-proto": "https, http" });
+    expect(csp).toContain("upgrade-insecure-requests");
+  });
+
+  it("is omitted when the first x-forwarded-proto value is http", () => {
+    const csp = cspFor("https://example.com/", { "x-forwarded-proto": "http, https" });
+    expect(csp).not.toContain("upgrade-insecure-requests");
+  });
+
   it("is sent when a proxy reports https via x-forwarded-proto", () => {
     const csp = cspFor("http://internal/", { "x-forwarded-proto": "https" });
     expect(csp).toContain("upgrade-insecure-requests");

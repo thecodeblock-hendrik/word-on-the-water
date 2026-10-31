@@ -198,8 +198,8 @@ Present since Phase 0.6. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.tes
 ## Fix 18: `x-forwarded-proto` as a list drops `upgrade-insecure-requests`
 Present since Phase 0.8. `apps/web/src/proxy.ts`, `apps/web/tests/unit/proxy.test.ts`.
 
-- [ ] Test: `x-forwarded-proto: https, http` still adds `upgrade-insecure-requests`. Confirm it fails
-- [ ] Use the first value of the header
+- [x] Test: `x-forwarded-proto: https, http` still adds `upgrade-insecure-requests`, and `http, https` does not. The list case failed first (directive dropped), the other passed as a guard
+- [x] Use the first value of the header
 
 ## Fix 19: `make types-check` ignores untracked generated files
 Present since Phase 0.7. `Makefile`.

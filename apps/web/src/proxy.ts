@@ -9,7 +9,9 @@ export function proxy(request: NextRequest) {
     process.env.CSP_REPORT_ONLY === "1"
       ? "Content-Security-Policy-Report-Only"
       : "Content-Security-Policy";
-  const protocol = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol;
+  // A proxy chain can send a list ("https, http"); the first value is the client-facing one.
+  const forwarded = request.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const protocol = forwarded || request.nextUrl.protocol;
   const csp = buildCsp({
     nonce,
     isDev: process.env.NODE_ENV === "development",
