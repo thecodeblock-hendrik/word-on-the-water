@@ -238,7 +238,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] `POST /v1/subscribers`: always 202 with identical body (no enumeration across new, pending, confirmed)
 - [ ] Turnstile verification, honeypot, minimum time-to-submit
 - [ ] Rate limit 5/hour/IP; idempotency key support
-- [ ] API client IP: trust `X-Client-IP` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
+- [ ] API client IP: trust `X-Client-IP` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's); every visitor-facing `apiFetch` passes `clientIp`, with a test that two visitors do not share a limit (the API logs `client_ip_fallback` when it is missing)
 - [ ] Consent text version, timestamp and source recorded in our `subscribers` row and sent to Kit as the form `referrer`
 - [ ] Kit call goes through the outbox (a `kit_subscribe` job) with an immediate best-effort attempt after the request; retries with backoff if Kit is down, so a Kit outage never loses a sign-up or breaks the form
 - [ ] Migration: add `kit_subscriber_id` to `subscribers`; drop the confirm and unsubscribe token columns (Kit handles tokens)
