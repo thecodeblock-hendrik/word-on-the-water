@@ -26,22 +26,36 @@ def hash_key(value: str, salt: str) -> str:
     return hmac.new(salt.encode(), value.lower().encode(), hashlib.sha256).hexdigest()
 
 
+# Count the window first and record the hit only when allowed, atomically.
+_HIT_SCRIPT = """
+redis.call('ZREMRANGEBYSCORE', KEYS[1], 0, ARGV[1] - ARGV[2])
+if redis.call('ZCARD', KEYS[1]) >= tonumber(ARGV[3]) then
+  return 0
+end
+redis.call('ZADD', KEYS[1], ARGV[1], ARGV[4])
+redis.call('EXPIRE', KEYS[1], ARGV[2])
+return 1
+"""
+
+
 class RateLimiter:
     def __init__(self, redis: Redis, salt: str) -> None:
         self.redis = redis
         self.salt = salt
 
-    async def hit(self, scope: str, subject: str, limit: int, window_seconds: int) -> None:
-        """Record a hit and raise a generic 429 when the window is full."""
+    async def hit(
+        self, scope: str, subject: str, limit: int, window_seconds: int, now: float | None = None
+    ) -> None:
+        """Record a hit and raise a generic 429 when the window is full.
+
+        Rejected hits are not recorded, so they never extend the window.
+        """
         key = f"rl:{scope}:{hash_key(subject, self.salt)}"
-        now = time.time()
-        async with self.redis.pipeline(transaction=True) as pipe:
-            pipe.zremrangebyscore(key, 0, now - window_seconds)
-            pipe.zadd(key, {uuid.uuid4().hex: now})
-            pipe.zcard(key)
-            pipe.expire(key, window_seconds)
-            _, _, count, _ = await pipe.execute()
-        if count > limit:
+        now = time.time() if now is None else now
+        allowed = await self.redis.eval(
+            _HIT_SCRIPT, 1, key, now, window_seconds, limit, uuid.uuid4().hex
+        )
+        if not allowed:
             raise ApiError(429, "rate_limited", "Too many requests. Please try again later.")
 
 
