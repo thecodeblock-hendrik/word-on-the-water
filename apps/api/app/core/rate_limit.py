@@ -2,6 +2,7 @@
 
 import hashlib
 import hmac
+import ipaddress
 import time
 import uuid
 from collections.abc import AsyncIterator
@@ -17,6 +18,23 @@ from app.core.errors import ApiError
 log = structlog.get_logger()
 
 
+def limit_subject(value: str) -> str:
+    """The address a visitor is limited by: IPv4-mapped IPv6 as IPv4, other IPv6 as its /64.
+
+    One home connection holds a whole /64, so keying on the full IPv6 address would give a
+    visitor a fresh bucket per address. Values that are not IP addresses pass through.
+    """
+    try:
+        ip = ipaddress.ip_address(value)
+    except ValueError:
+        return value
+    if isinstance(ip, ipaddress.IPv6Address):
+        if ip.ipv4_mapped:
+            return str(ip.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{ip}/64", strict=False).network_address)
+    return str(ip)
+
+
 def client_ip(request: Request) -> str:
     """The BFF's client IP once the service token passed, else headers set by Vercel.
 
@@ -26,12 +44,12 @@ def client_ip(request: Request) -> str:
     then share the web function's rate-limit key.
     """
     if bff_ip := getattr(request.state, "client_ip", None):
-        return str(bff_ip)
+        return limit_subject(str(bff_ip))
     log.warning("client_ip_fallback")
     for header in ("x-real-ip", "x-vercel-forwarded-for"):
         if value := request.headers.get(header):
-            return value.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+            return limit_subject(value.split(",")[0].strip())
+    return limit_subject(request.client.host) if request.client else "unknown"
 
 
 def hash_key(value: str, salt: str) -> str:

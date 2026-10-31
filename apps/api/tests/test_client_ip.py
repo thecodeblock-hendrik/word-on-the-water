@@ -76,3 +76,27 @@ def test_fallback_is_logged_when_the_bff_ip_is_malformed_without_the_value() -> 
 
 def test_no_fallback_is_logged_when_the_bff_ip_is_valid() -> None:
     assert _events("203.0.113.9") == []
+
+
+def test_ipv6_addresses_in_one_64_share_a_subject() -> None:
+    first = client_ip(_request({"x-real-ip": "2001:db8:1:2:aaaa:bbbb:cccc:dddd"}))
+    second = client_ip(_request({"x-real-ip": "2001:db8:1:2:1111:2222:3333:4444"}))
+    assert first == second == "2001:db8:1:2::"
+
+
+def test_different_ipv6_64s_stay_apart() -> None:
+    first = client_ip(_request({"x-real-ip": "2001:db8:1:2::1"}))
+    assert first != client_ip(_request({"x-real-ip": "2001:db8:1:3::1"}))
+
+
+def test_ipv4_mapped_ipv6_equals_the_ipv4_address() -> None:
+    assert client_ip(_request({"x-real-ip": "::ffff:1.2.3.4"})) == "1.2.3.4"
+
+
+def test_non_ip_values_pass_through() -> None:
+    assert client_ip(_request({"x-real-ip": "unknown"})) == "unknown"
+
+
+def test_the_bff_ipv6_address_is_also_reduced_to_its_64() -> None:
+    response = _app().get("/ip", headers={**GOOD, "X-Client-IP": "2001:db8:1:2:aaaa::1"})
+    assert response.json() == "2001:db8:1:2::"
