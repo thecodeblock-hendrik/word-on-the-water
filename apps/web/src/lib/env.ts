@@ -10,10 +10,23 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>;
 
-/** On a preview, the API preview of the same branch: its alias differs only in the project name. */
+/** DNS labels hold at most 63 characters; Vercel shortens longer branch aliases and adds a per-project hash. */
+const MAX_ALIAS_LABEL = 63;
+
+/**
+ * On a preview, the API preview of the same branch: its alias differs only in the project name,
+ * unless Vercel truncated it, in which case the API's alias cannot be derived.
+ */
 function previewApiUrl(source: Record<string, string | undefined>): string | undefined {
-  if (source.VERCEL_ENV !== "preview" || !source.VERCEL_BRANCH_URL) return undefined;
-  return `https://${source.VERCEL_BRANCH_URL.replace(/^wotw-web-/, "wotw-api-")}`;
+  const host = source.VERCEL_BRANCH_URL;
+  if (source.VERCEL_ENV !== "preview" || !host) return undefined;
+  if (host.split(".")[0].length >= MAX_ALIAS_LABEL) {
+    throw new Error(
+      `Cannot derive the API preview URL: the branch name is too long, so Vercel truncated ${host}. ` +
+        "Use a branch name of 36 characters or fewer, or set API_BASE_URL for this preview.",
+    );
+  }
+  return `https://${host.replace(/^wotw-web-/, "wotw-api-")}`;
 }
 
 /** Validates server-side environment variables. Blank values count as unset. */
