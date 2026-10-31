@@ -19,6 +19,8 @@ Team `thecodeblock`, Hobby plan. Vercel's Git integration deploys every push: a 
 
 **Preview wiring:** a web preview derives `API_BASE_URL` from `VERCEL_BRANCH_URL` (`wotw-web-git-<branch>-thecodeblock.vercel.app` becomes `wotw-api-git-…`). Production uses `API_BASE_URL=https://wotw-api.vercel.app`.
 
+**Long branch names break the derivation.** The alias label is `wotw-web-git-<branch>-thecodeblock`, which must stay under 63 characters, so keep the branch name to 36 characters or fewer (Vercel drops `_` and turns `/` into `-`). Beyond that Vercel shortens the label and appends a hash that differs per project (observed on a Dependabot branch: web `…appswebno-0b4701-…`, API `…appswebno-5dfe3b-…`), so the swapped host does not exist. The web app now refuses to guess: `env.ts` throws "the branch name is too long" naming the alias. To use such a preview anyway, set `API_BASE_URL` for that branch to the API preview's real alias.
+
 **Neon preview branches:** each preview gets a Neon branch `preview/<git branch>`, and the Free plan allows 10. `.github/workflows/neon-preview-cleanup.yml` deletes it when the PR closes (secret `NEON_API_KEY` for Actions and Dependabot, variable `NEON_PROJECT_ID`). If previews fail with "Resource provisioning failed", check the branch count in the Neon console and delete stale `preview/...` branches (never `main`).
 
 ## Environment variables

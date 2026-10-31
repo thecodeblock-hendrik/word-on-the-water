@@ -447,6 +447,7 @@ Optional public accounts (save favourites, reading plans), comments with moderat
 - Keep the landing page JS budget; prefer Server Components.
 - Run before every PR: `make lint typecheck test` (and `make e2e` for UI changes).
 - **Workflow:** one branch and one PR per plan sub-step (for example `feat/0.9-vercel`), Conventional Commits, one commit per logical chunk, push once per sub-step. Merge with `gh pr merge --squash --admin` only when every check is green.
+- **Branch names of 36 characters or fewer.** A web preview finds its API preview by swapping the project name in its alias, and Vercel truncates aliases over 63 characters with a hash that differs per project, so the swap breaks (the web preview then fails with a message naming the cause). Dependabot branches always exceed this; set `API_BASE_URL` on such a preview if you need it to work.
 - **Tests first** (red, green, refactor), shown failing for the right reason before the code is written. See the testing approach in `PLAN.md`.
 - Check `git status` and stage named files before committing; never a blanket `git add -A` (it once committed locally installed files to the public repo).
 - Dependabot npm PRs do not update the root `pnpm-lock.yaml`: check out the PR, run `pnpm install`, commit the lockfile and push before merging (see PLAN.md 0.8).
