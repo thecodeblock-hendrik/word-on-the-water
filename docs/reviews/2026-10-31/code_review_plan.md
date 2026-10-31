@@ -158,17 +158,17 @@ Same rules as above: test first, `make lint typecheck test` (plus `make e2e` for
 ## Fix 11: a missing or malformed `X-Client-IP` silently shares one rate-limit key
 Introduced by Fix 5. `apps/api/app/core/security.py`, `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_client_ip.py`.
 
-- [ ] Test: with a valid service token and a missing or malformed `X-Client-IP`, a warning is logged (no header values), so the fallback to the proxy address is visible. Confirm it fails (no log today)
-- [ ] Log `client_ip_fallback` once when `client_ip` falls back to a proxy header or the socket address on a request that passed the service-token check
-- [ ] Add a PLAN.md 1.3 item: every visitor-facing `apiFetch` passes `clientIp`, with a test that two visitors do not share a limit
-- [ ] Decision kept from Fix 5: a malformed value falls back instead of rejecting, so a BFF bug cannot take sign-up down; the warning makes it visible
+- [x] Test: with a valid service token and a missing or malformed `X-Client-IP`, a warning is logged (no header values), so the fallback to the proxy address is visible. Failed first (no log today), passes now
+- [x] Log `client_ip_fallback` when `client_ip` falls back to a proxy header or the socket address (every rate-limited route sits behind the service token, so a fallback there is always the missing BFF IP)
+- [x] Add a PLAN.md 1.3 item: every visitor-facing `apiFetch` passes `clientIp`, with a test that two visitors do not share a limit
+- [x] Decision kept from Fix 5: a malformed value falls back instead of rejecting, so a BFF bug cannot take sign-up down; the warning makes it visible
 
 ## Fix 12: IPv6 visitors get a fresh rate-limit bucket per address
 Introduced by Fix 5. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_client_ip.py`.
 
-- [ ] Test: two addresses in the same /64 give the same rate-limit subject; an IPv4-mapped IPv6 address equals its IPv4 form; plain IPv4 is unchanged. Confirm it fails
-- [ ] Normalise in `client_ip`: IPv4-mapped to IPv4, other IPv6 to its /64 network address; non-IP strings pass through
-- [ ] Update CLAUDE.md §6.3 (limit is per /64 for IPv6)
+- [x] Test: two addresses in the same /64 give the same rate-limit subject; an IPv4-mapped IPv6 address equals its IPv4 form; plain IPv4 and non-IP values are unchanged; the BFF's IPv6 address is reduced too. The three real cases failed first, the guards passed
+- [x] `limit_subject` in `rate_limit.py`, applied to every path in `client_ip`: IPv4-mapped to IPv4, other IPv6 to its /64 network address; non-IP strings pass through
+- [x] Update CLAUDE.md §6.3 (limit is per /64 for IPv6)
 
 ## Fix 13: the outbox time budget is only checked before a send
 Introduced by Fix 6. `apps/api/app/jobs/drain_outbox.py`, `apps/api/tests/integration/test_outbox.py`.
