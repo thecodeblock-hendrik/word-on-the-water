@@ -192,8 +192,8 @@ Present since Phase 0.4. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test
 ## Fix 17: a trailing slash on `API_BASE_URL` produces `//v1/...`
 Present since Phase 0.6. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
 
-- [ ] Test: `API_BASE_URL` with a trailing slash gives a request URL with a single slash. Confirm it fails
-- [ ] Strip trailing slashes when parsing the variable
+- [x] Test: `API_BASE_URL` with trailing slashes gives a request URL with a single slash. Failed first (`//` kept), passes now
+- [x] Strip trailing slashes when parsing the variable (a zod transform on `API_BASE_URL`)
 
 ## Fix 18: `x-forwarded-proto` as a list drops `upgrade-insecure-requests`
 Present since Phase 0.8. `apps/web/src/proxy.ts`, `apps/web/tests/unit/proxy.test.ts`.

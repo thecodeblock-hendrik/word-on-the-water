@@ -2,7 +2,8 @@ import "server-only";
 import { z } from "zod";
 
 const schema = z.object({
-  API_BASE_URL: z.url(),
+  /** Without trailing slashes: callers append paths that start with one. */
+  API_BASE_URL: z.url().transform((url) => url.replace(/\/+$/, "")),
   SERVICE_TOKEN: z.string().min(16),
   /** The API project's protection-bypass secret (not this project's VERCEL_AUTOMATION_BYPASS_SECRET). */
   API_BYPASS_SECRET: z.string().min(1).optional(),

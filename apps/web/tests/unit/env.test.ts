@@ -24,6 +24,12 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ ...valid, API_BASE_URL: "not a url" })).toThrow(/API_BASE_URL/);
   });
 
+  it("drops trailing slashes from the API URL so paths join with a single slash", () => {
+    const env = parseEnv({ ...valid, API_BASE_URL: "https://wotw-api.vercel.app//" });
+    expect(env.API_BASE_URL).toBe("https://wotw-api.vercel.app");
+    expect(`${env.API_BASE_URL}/v1/subscribers`).toBe("https://wotw-api.vercel.app/v1/subscribers");
+  });
+
   it("treats blank optional values as unset", () => {
     const env = parseEnv({ ...valid, API_BYPASS_SECRET: "" });
     expect(env.API_BYPASS_SECRET).toBeUndefined();
