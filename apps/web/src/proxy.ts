@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
   const csp = buildCsp({
     nonce,
     isDev: process.env.NODE_ENV === "development",
-    upgradeInsecure: protocol.replace(":", "") === "https",
+    upgradeInsecure: protocol.replace(":", "").toLowerCase() === "https",
   });
 
   const requestHeaders = new Headers(request.headers);

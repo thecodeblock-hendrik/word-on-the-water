@@ -23,6 +23,11 @@ describe("proxy upgrade-insecure-requests", () => {
     expect(csp).toContain("upgrade-insecure-requests");
   });
 
+  it("treats the x-forwarded-proto value case-insensitively", () => {
+    const csp = cspFor("http://internal/", { "x-forwarded-proto": "HTTPS" });
+    expect(csp).toContain("upgrade-insecure-requests");
+  });
+
   it("is omitted when the first x-forwarded-proto value is http", () => {
     const csp = cspFor("https://example.com/", { "x-forwarded-proto": "http, https" });
     expect(csp).not.toContain("upgrade-insecure-requests");
