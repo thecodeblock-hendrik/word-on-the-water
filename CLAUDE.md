@@ -61,7 +61,7 @@ Everything runs on **Vercel**, with data services from the Vercel Marketplace so
 | API (FastAPI) | Separate Vercel project `wotw-api` (root `apps/api`) using Vercel's native Python/FastAPI runtime (ASGI app exported from `app/main.py`). Same region as the database |
 | Postgres | **Neon via Vercel Marketplace** (pooled connection string, PITR backups, a database branch per preview deployment) |
 | Redis | **Upstash Redis via Vercel Marketplace** (HTTP/TLS, serverless-friendly) |
-| Scheduled jobs | **Vercel Cron** (`vercel.json` in `apps/api`) calling protected endpoints: drain email outbox (every 5 min), retention cleanup (daily) |
+| Scheduled jobs | **Vercel Cron** (`vercel.json` in `apps/api`) calling protected endpoints: drain email outbox (daily on Hobby, because Hobby only allows daily crons; every 5 min after the move to Pro), retention cleanup (daily). Until Pro, the immediate best-effort send after each request is what delivers email promptly |
 | WAF / DDoS / rate rules | **Vercel Firewall** (managed rules, custom rate-limit rules on form routes, Attack Challenge Mode for emergencies) |
 | Bot protection | Turnstile on forms (optionally plus Vercel BotID) |
 | DNS | Domain on Vercel DNS (or registrar DNS pointing to Vercel). Do not put the Cloudflare proxy in front of Vercel; it breaks caching and the firewall's view of client IPs |
