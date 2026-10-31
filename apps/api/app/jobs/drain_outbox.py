@@ -1,5 +1,6 @@
 """Sends pending outbox emails. Delivery is at-least-once, retried with backoff."""
 
+import asyncio
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -17,6 +18,7 @@ MAX_ATTEMPTS = 5
 BASE_BACKOFF = timedelta(minutes=5)
 BATCH_SIZE = 20
 TIME_BUDGET_SECONDS = 20.0
+SEND_TIMEOUT_SECONDS = 8.0
 
 
 @dataclass
@@ -37,6 +39,7 @@ async def drain_outbox(
     now: datetime | None = None,
     budget: float = TIME_BUDGET_SECONDS,
     clock: Callable[[], float] = time.monotonic,
+    send_timeout: float = SEND_TIMEOUT_SECONDS,
 ) -> DrainResult:
     """Send due messages one at a time, committing after each.
 
@@ -58,18 +61,27 @@ async def drain_outbox(
         )
         if row is None:
             break
-        await _deliver(row, provider, now, result)
+        await _deliver(row, provider, now, result, send_timeout)
         await session.commit()
     return result
 
 
 async def _deliver(
-    row: EmailOutbox, provider: EmailProvider, now: datetime, result: DrainResult
+    row: EmailOutbox,
+    provider: EmailProvider,
+    now: datetime,
+    result: DrainResult,
+    send_timeout: float,
 ) -> None:
-    """Send one row and record the outcome on it; the caller commits."""
+    """Send one row and record the outcome on it; the caller commits.
+
+    The send is cut off after send_timeout, so budget plus cap stays inside maxDuration and a
+    slow provider cannot get the function killed between sending and committing.
+    """
     row.attempts += 1
     try:
-        await provider.send(render(row.template, row.to_address, row.payload))
+        async with asyncio.timeout(send_timeout):
+            await provider.send(render(row.template, row.to_address, row.payload))
     except Exception as exc:  # noqa: BLE001  one bad message must not block the others
         row.last_error = _error_text(exc)
         if row.attempts >= MAX_ATTEMPTS:

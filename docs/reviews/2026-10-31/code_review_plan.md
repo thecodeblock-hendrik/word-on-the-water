@@ -167,9 +167,9 @@ Introduced by Fix 5. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_cli
 ## Fix 13: the outbox time budget is only checked before a send
 Introduced by Fix 6. `apps/api/app/jobs/drain_outbox.py`, `apps/api/tests/integration/test_outbox.py`.
 
-- [ ] Test: a send that hangs is cut off at a hard per-send cap and the row is recorded as a failed attempt with backoff, within the run budget. Confirm it hangs or overruns today
-- [ ] Wrap each send in `asyncio.timeout(SEND_TIMEOUT)` with `SEND_TIMEOUT` plus the budget below the function's `maxDuration`
-- [ ] Note in the PR: a send cut off after the provider accepted it can still be duplicated on retry, as with any timeout
+- [x] Test: a send that hangs is cut off at a hard per-send cap and the row is recorded as a failed attempt with backoff; a second test reads `vercel.json` and checks budget plus cap stay below `maxDuration`. The hang test failed first (the send ran its full 1 second), then passed
+- [x] Wrap each send in `asyncio.timeout(send_timeout)`: 20 s budget plus 8 s cap is 28 s, under the 30 s `maxDuration`
+- [x] Note in the PR: a send cut off after the provider accepted it can still be duplicated on retry, as with any timeout
 
 ## Fix 14: `previewApiUrl` does not check that the `wotw-web-` prefix matched
 Introduced by Fix 9. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.

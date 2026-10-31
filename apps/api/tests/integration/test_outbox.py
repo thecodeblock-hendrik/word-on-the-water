@@ -1,11 +1,20 @@
+import asyncio
+import json
+import time
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.integrations.email.base import EmailMessage, EmailSendError
-from app.jobs.drain_outbox import MAX_ATTEMPTS, drain_outbox
+from app.jobs.drain_outbox import (
+    MAX_ATTEMPTS,
+    SEND_TIMEOUT_SECONDS,
+    TIME_BUDGET_SECONDS,
+    drain_outbox,
+)
 from app.models import EmailOutbox
 from app.models.email_outbox import OutboxStatus
 from app.services.outbox import enqueue
@@ -185,3 +194,31 @@ async def test_drain_stops_starting_sends_after_its_time_budget(session: AsyncSe
     assert result.sent == 3
     rows = await _by_address(session)
     assert [rows[a].status for a in addresses[3:]] == [OutboxStatus.PENDING] * 2
+
+
+class HangingProvider:
+    async def send(self, message: EmailMessage) -> None:
+        await asyncio.sleep(1)
+
+
+async def test_a_send_that_hangs_is_cut_off_and_retried(session: AsyncSession) -> None:
+    await enqueue(session, "subscribe_confirmation", ADDRESS, PAYLOAD)
+    await session.commit()
+    started = time.monotonic()
+
+    result = await drain_outbox(session, HangingProvider(), send_timeout=0.05)
+
+    assert time.monotonic() - started < 0.5
+    assert (result.sent, result.retried, result.failed) == (0, 1, 0)
+    [row] = await _rows(session)
+    assert (row.status, row.attempts, row.last_error) == (
+        OutboxStatus.PENDING,
+        1,
+        "TimeoutError",
+    )
+
+
+def test_budget_plus_send_cap_fits_inside_the_function_time_limit() -> None:
+    config = json.loads((Path(__file__).parents[2] / "vercel.json").read_text())
+    max_duration = config["functions"]["app/main.py"]["maxDuration"]
+    assert max_duration > TIME_BUDGET_SECONDS + SEND_TIMEOUT_SECONDS
