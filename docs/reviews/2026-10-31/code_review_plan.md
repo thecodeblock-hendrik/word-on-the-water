@@ -204,8 +204,8 @@ Present since Phase 0.8. `apps/web/src/proxy.ts`, `apps/web/tests/unit/proxy.tes
 ## Fix 19: `make types-check` ignores untracked generated files
 Present since Phase 0.7. `Makefile`.
 
-- [ ] Prove: create an untracked file under `packages/api-types`, run `make types-check`, confirm it passes (wrongly)
-- [ ] Fail on any `git status --porcelain -- packages/api-types` output; rerun the proof and confirm it now fails; remove the file
+- [x] Prove: with an untracked `packages/api-types/src/untracked_probe.d.ts`, `make types-check` exited 0 (wrongly)
+- [x] Fail on any `git status --porcelain -- packages/api-types` output: the same probe now fails (it prints the file), and the target passes again once the probe is removed
 
 ## Fix 20: `_unhandled` assumes a non-empty traceback
 Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/tests/test_errors.py`.

@@ -42,3 +42,7 @@ types:
 
 types-check: types
 	git diff --exit-code HEAD -- packages/api-types
+	@if [ -n "$$(git status --porcelain -- packages/api-types)" ]; then \
+		git status --short -- packages/api-types; \
+		echo "packages/api-types has untracked files"; exit 1; \
+	fi
