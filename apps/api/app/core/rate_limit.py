@@ -95,7 +95,9 @@ class RateLimiter:
 
 
 async def get_redis(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncIterator[Redis]:
-    redis = Redis.from_url(settings.redis_url.get_secret_value(), socket_connect_timeout=2)
+    redis = Redis.from_url(
+        settings.redis_url.get_secret_value(), socket_connect_timeout=2, socket_timeout=2
+    )
     try:
         yield redis
     finally:

@@ -184,10 +184,10 @@ Present since Phase 0.3. `apps/api/app/core/errors.py`, `apps/api/app/core/rate_
 - [x] Pass `exc.headers` through; give `ApiError` optional headers and set `Retry-After` (the window length) on the rate limiter's 429
 
 ## Fix 16: the Redis client has no read timeout
-Present since Phase 0.4. `apps/api/app/core/rate_limit.py`, `apps/api/tests/integration/test_rate_limit.py`.
+Present since Phase 0.4. `apps/api/app/core/rate_limit.py`, `apps/api/tests/test_redis_client.py`.
 
-- [ ] Test: the client from `get_redis` has a socket timeout (read as well as connect). Confirm it fails
-- [ ] Add `socket_timeout=2`. Not changed on purpose: a connection per request (the serverless norm here) and failing closed when Redis is down (forms should not accept unlimited requests)
+- [x] Test: the client from `get_redis` has a socket timeout (read as well as connect). Failed first (`KeyError: 'socket_timeout'`), passes now
+- [x] Add `socket_timeout=2`. Not changed on purpose: a connection per request (the serverless norm here) and failing closed when Redis is down (forms should not accept unlimited requests)
 
 ## Fix 17: a trailing slash on `API_BASE_URL` produces `//v1/...`
 Present since Phase 0.6. `apps/web/src/lib/env.ts`, `apps/web/tests/unit/env.test.ts`.
