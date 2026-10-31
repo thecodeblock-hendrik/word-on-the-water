@@ -29,7 +29,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 **Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js shell with tokens, fonts, nonce CSP, security headers and a dynamic health route; generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. No product features yet (sign-up, prayer and contact forms, landing sections).
 
-**Decisions made so far:** Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
+**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
 
 **Waiting on Hendrik:** Neon preview branching toggle (step 0.9), domain name, final colour scheme, prayer-notification default.
 
@@ -210,6 +210,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Shared UI primitives: button, input, textarea, checkbox, label, field error (Radix/shadcn style)
 - [ ] Sticky header with single CTA; accessible mobile menu (Radix Dialog)
 - [ ] Touch targets at least 44px; safe-area insets; `prefers-reduced-motion` respected
+- [ ] Browser chrome follows the scheme: `export const viewport` in `layout.tsx` with `themeColor` for light and dark (`prefers-color-scheme` media), values from the tokens; `viewport-fit=cover` so safe-area insets apply on notched phones
 - [ ] Inline SVG logo using `--logo-ring` and `--logo-wave` tokens
 - [ ] Tests: theme toggle, menu keyboard and focus behaviour
 
@@ -262,7 +263,12 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Privacy policy page (matches `docs/privacy.md`) **(Hendrik: review)**
 - [ ] `/.well-known/security.txt`
 - [ ] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization`
-- [ ] `sitemap.ts`, `robots.ts`, `manifest.ts`, icons, theme colour
+- [ ] `sitemap.ts` and `robots.ts`
+- [ ] Installable, app-like experience with `app/manifest.ts` (`MetadataRoute.Manifest`, see `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`): `name`, `short_name` ("Word on the Water" / "WotW"), `description`, `id` and `start_url` `/`, `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang: "en"`, `categories`, `background_color` and `theme_color` from the tokens
+- [ ] Icons: 192 and 512 px PNG (`purpose: "any"`), 512 px maskable with the logo inside the safe zone, `app/icon.svg` favicon and `app/apple-icon.png` (180 px) for iOS home screens; generated from the inline SVG logo
+- [ ] Manifest `shortcuts` to the sections people return to ("Start here", "Prayer request") and `screenshots` (narrow, 375 px) for the richer install sheet on Android
+- [ ] iOS: `metadata.appleWebApp` (`capable`, `title`, `statusBarStyle`) so the home-screen launch looks native
+- [ ] Tests: unit test of the manifest object (required fields, icon sizes and purposes, colours match tokens); e2e that `/manifest.webmanifest` and every icon return 200 with the right content type under the CSP
 - [ ] Run CSP in report-only on staging, then enforce in production after violations are reviewed
 
 ### 1.7 Retention and operations
@@ -281,6 +287,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] ZAP baseline scan against staging: no high findings
 - [ ] Manual pass: keyboard only, VoiceOver iOS, TalkBack
 - [ ] Real device check on a mid-range Android phone
+- [ ] Installability: Chrome DevTools Application panel shows no manifest errors (Lighthouse no longer has a PWA category); manual "Install app" on Android Chrome and "Add to Home Screen" on iOS Safari: icon, name, splash colours, standalone launch, safe areas
 
 ### 1.9 Launch
 - [ ] Domain registered and added to Vercel **(Hendrik)**
@@ -330,6 +337,10 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Bounce and complaint webhooks update subscriber status
 - [ ] Send preview to self before broadcast
 
+### 2.5 Mobile app decision gate
+- [ ] Revisit the native app (`FLUTTER.md`, option B: keep this Next.js site and add a Flutter app for iOS and Android on the same FastAPI) once devotionals exist **(Hendrik)**
+- [ ] Until then, consider Web Push for the weekly devotional (Next PWA guide; iOS only for sites added to the home screen, iOS 16.4+)
+
 **Exit gate Phase 2**
 - [ ] Editor publishes a devotional and it goes out by email; prayer team reviews requests with a full audit trail
 - [ ] Phase 1 quality gates still pass; ZAP and e2e extended to admin
@@ -343,7 +354,8 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Audio upload with signed URLs, size and type limits, malware/content-type checks
 - [ ] Embedded accessible audio player (keyboard, captions/transcripts where possible)
 - [ ] Podcast RSS feed validated against Apple and Spotify requirements
-- [ ] PWA offline caching of recent devotionals (service worker, update strategy)
+- [ ] PWA offline caching of recent devotionals: service worker (`public/sw.js` with `Cache-Control: no-cache` and its own CSP, per the Next PWA guide), update strategy, offline page; evaluate Next's experimental `useOffline`
+- [ ] If the Phase 2 gate chose a Flutter app: build it here (`FLUTTER.md`)
 - [ ] Re-run performance budgets with audio pages
 
 **Exit gate Phase 3**

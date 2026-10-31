@@ -22,6 +22,8 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 **Out of scope for Phase 1** but designed for: devotional library, teaching series, audio/podcast, public user accounts, admin CMS, search, newsletter sending.
 
+**Mobile strategy (decided, option B in [FLUTTER.md](FLUTTER.md)):** the Next.js site is the mobile experience: mobile-first, fast, and installable as a PWA through `app/manifest.ts`. A native Flutter app for iOS and Android may be added later on the same FastAPI; it is revisited at the Phase 2 gate. Until then, no Flutter work and no changes to the web stack.
+
 **Design source:** `website/landing-page-mockup.html` (published at https://claude.ai/artifact/UYYvSXJkgeofmJ8PchzgWw). The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped. A PDF of the mockup is in `mockup_site.pdf`.
 
 **Repository:** public at https://github.com/thecodeblock-hendrik/word-on-the-water, no license (all rights reserved). Because it is public: never commit secrets, real prayer requests or subscriber data; gitleaks runs in pre-commit and CI.
@@ -105,7 +107,7 @@ Public read-only content endpoints (devotionals, series) may later be exposed di
 
 ```
 word-on-the-water/                (items marked "planned" do not exist yet)
-├── CLAUDE.md, PLAN.md, README.md, SECURITY.md
+├── CLAUDE.md, PLAN.md, README.md, SECURITY.md, FLUTTER.md (future native app assessment)
 ├── docker-compose.yml            ← local Postgres 17, Valkey, Mailpit
 ├── docker/postgres/init.sql      ← extensions and local roles (app_migrator, app_runtime)
 ├── Makefile, pnpm-workspace.yaml, .pre-commit-config.yaml, .env.example
@@ -165,7 +167,12 @@ Layering rule for the API: `routers → services → models/db`. Routers handle 
 - Respect `prefers-reduced-motion`; respect safe-area insets (`env(safe-area-inset-*)`) for notched phones.
 - Images: `next/image`, AVIF/WebP, explicit sizes, lazy below the fold. Logo as inline SVG using `--logo-ring`/`--logo-wave` tokens as in the mockup.
 - Forms on mobile: correct `type`/`inputmode`/`autocomplete` (`email`, `given-name`), visible labels (not placeholder-only — fix from mockup), inline errors announced via `aria-live`.
-- **PWA basics:** `manifest.ts`, icons, theme colour. Offline/service worker is a Phase 3 consideration (offline devotionals for the beach), not Phase 1.
+- **Installable PWA (Phase 1):** the site must feel like an app on a phone. Read `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md` and `.../03-file-conventions/01-metadata/manifest.md` first.
+  - `app/manifest.ts` returning `MetadataRoute.Manifest`: `name`, `short_name`, `description`, `id`, `start_url` and `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang`, `categories`, `background_color` and `theme_color` from the tokens, `shortcuts` (Start here, Prayer request) and narrow `screenshots`.
+  - Icons: 192 and 512 px PNG, a 512 px maskable icon (logo inside the safe zone), `app/icon.svg`, and `app/apple-icon.png` (180 px) for iOS.
+  - `export const viewport` with `themeColor` per colour scheme (light and dark media queries) and `viewport-fit=cover`; `metadata.appleWebApp` for the iOS home-screen launch.
+  - When the colour scheme changes, the manifest, theme colours and icons change with it (only tokens should drive them).
+  - Offline reading (service worker) and Web Push are Phase 2 and 3 decisions, not Phase 1.
 
 ### Performance budgets (enforced in CI with Lighthouse CI on a mobile profile)
 
@@ -326,6 +333,7 @@ Settings via `pydantic-settings`, failing fast at startup if required secrets ar
 - Pages render **per request** (required by the nonce-based CSP, see ADR 0007); static assets are still CDN-cached. Forms post via Server Actions with progressive enhancement (they work before JS hydrates).
 - `src/lib/env.ts` validates env vars with Zod at build/start.
 - SEO: `generateMetadata`, Open Graph image, `sitemap.ts`, `robots.ts`, JSON-LD (`Organization`, later `Article` for devotionals), canonical URLs.
+- PWA: `app/manifest.ts`, icons and `viewport.themeColor` are part of the shell and are tested (manifest unit test, e2e that the manifest and icons load under the CSP). See section 5.
 - Feature flags (simple env-based to start) gate Phase 2 routes so the framework exists but isn't public.
 - Content in Phase 1 lives in typed TS/MDX files in the repo. Phase 2 decides between DB-backed content with an admin UI (default plan) or a headless CMS (see §15).
 - **Scripture copyright:** ESV quotations follow Crossway's permissions (quote limits and the required copyright notice in the footer). Keep scripture references structured (`book`, `chapter`, `verse`) so translations can be swapped.
@@ -393,10 +401,10 @@ All mockup sections as responsive mobile-first components; final colour scheme w
 - **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request; the prayer team receives it; no high security findings.
 
 ### Phase 2 — Devotionals and admin
-Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email sending, RSS feed, basic search (Postgres full-text).
+Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email sending, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](FLUTTER.md), option B) and Web Push for the weekly devotional.
 
 ### Phase 3 — Teaching series and audio
-Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals.
+Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals. If the Phase 2 gate chose it, the Flutter app for iOS and Android is built here.
 
 ### Phase 4 — Community (only if wanted)
 Optional public accounts (save favourites, reading plans), comments with moderation, giving/donations via a hosted provider (Stripe Checkout; never handle card data ourselves).
@@ -460,3 +468,4 @@ make types-check  # regenerate and fail if the committed types differ (runs in C
 - **Licensing and visibility:** no license (all rights reserved); repository public.
 - **Testing:** test-first for all logic, with a definition of done per step (`PLAN.md`).
 - **Branch protection:** the owner is not enforced, so a solo developer can merge once checks are green.
+- **Mobile strategy:** option B in `FLUTTER.md`. The Next.js site stays the public, SEO-friendly mobile experience and becomes an installable PWA (`app/manifest.ts`) in Phase 1. A Flutter app for iOS and Android, on the same Vercel, Neon and FastAPI, is revisited at the Phase 2 gate. Replacing Next.js with Flutter web was rejected: it cannot meet the SEO, first-load and accessibility budgets for the landing page.
