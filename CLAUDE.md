@@ -217,7 +217,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 - Validate with Zod on the web **and** Pydantic on the API (API wins). Strict length limits (e.g. name ≤ 80, email ≤ 254, prayer text ≤ 2,000 chars), reject unknown fields (`extra="forbid"`).
 - Never render user content as HTML. If rich text arrives later, sanitise server-side with an allow-list.
 - **Bot protection:** Turnstile token verified server-side by the API; hidden honeypot field; minimum time-to-submit check.
-- **Rate limiting** (Redis, sliding window) per hashed IP and per email: e.g. sign-up 5/hour/IP, prayer 3/hour/IP; plus Vercel Firewall rate-limit rules on the form routes. Take the client IP from `x-real-ip` / `x-vercel-forwarded-for` set by Vercel, never from a client-supplied header. Return generic `429`.
+- **Rate limiting** (Redis, sliding window) per hashed IP and per email: e.g. sign-up 5/hour/IP, prayer 3/hour/IP; plus Vercel Firewall rate-limit rules on the form routes. Take the client IP from the BFF's `X-Client-IP` only after the service token check (Vercel's `x-real-ip` is the web function behind the BFF), otherwise from `x-real-ip` / `x-vercel-forwarded-for`, never from an unauthenticated client-supplied header. Return generic `429`.
 - **No account/email enumeration:** sign-up always returns the same "check your inbox" response whether the email is new, pending, or already confirmed.
 - Idempotency keys on form submissions to stop double-posts on flaky mobile connections.
 - SQL only through SQLAlchemy bound parameters; no string-built SQL.
@@ -225,7 +225,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 
 ### 6.4 Server Actions / BFF
 
-- Server Actions validate input, check origin (Next.js built-in), then call the API with `Authorization: Bearer <SERVICE_TOKEN>` and `X-Forwarded-For` of the real client.
+- Server Actions validate input, check origin (Next.js built-in), then call the API with `Authorization: Bearer <SERVICE_TOKEN>` and `X-Client-IP` of the real client (Vercel overwrites `X-Forwarded-For` between the two projects; the API trusts `X-Client-IP` only after the token check).
 - The API rejects requests without a valid service token on non-health routes. Tokens are rotated via the runbook.
 - `server-only` package imported in every module that touches secrets so they can never be bundled to the client. Only `NEXT_PUBLIC_*` variables reach the browser, and those contain nothing secret.
 

@@ -1,6 +1,9 @@
+from fastapi import Depends, FastAPI
+from fastapi.testclient import TestClient
 from starlette.requests import Request
 
 from app.core.rate_limit import client_ip, hash_key
+from app.core.security import require_service_token
 
 
 def _request(headers: dict[str, str]) -> Request:
@@ -19,3 +22,32 @@ def test_ignores_client_supplied_forwarded_for() -> None:
 def test_hash_is_stable_case_insensitive_and_not_plain() -> None:
     assert hash_key("A@b.com", "s") == hash_key("a@b.com", "s")
     assert "a@b.com" not in hash_key("a@b.com", "s")
+
+
+def _app() -> TestClient:
+    """A route behind the service token that echoes the IP the rate limiter would use."""
+    app = FastAPI()
+
+    @app.get("/ip", dependencies=[Depends(require_service_token)])
+    async def ip(request: Request) -> str:
+        return client_ip(request)
+
+    return TestClient(app)
+
+
+GOOD = {"Authorization": "Bearer test-service-token", "X-Real-IP": "10.0.0.1"}
+
+
+def test_bff_header_is_used_after_service_token_check() -> None:
+    response = _app().get("/ip", headers={**GOOD, "X-Client-IP": "203.0.113.9"})
+    assert response.json() == "203.0.113.9"
+
+
+def test_bff_header_is_ignored_without_valid_service_token() -> None:
+    headers = {"x-real-ip": "10.0.0.1", "x-client-ip": "6.6.6.6"}
+    assert client_ip(_request(headers)) == "10.0.0.1"
+
+
+def test_malformed_bff_header_falls_back_to_vercel_header() -> None:
+    response = _app().get("/ip", headers={**GOOD, "X-Client-IP": "not-an-ip"})
+    assert response.json() == "10.0.0.1"

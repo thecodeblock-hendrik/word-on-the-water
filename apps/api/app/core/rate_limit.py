@@ -15,7 +15,14 @@ from app.core.errors import ApiError
 
 
 def client_ip(request: Request) -> str:
-    """Use only headers set by Vercel; a client-supplied header is never trusted."""
+    """The BFF's client IP once the service token passed, else headers set by Vercel.
+
+    Behind the BFF, Vercel's own headers carry the web function's address, not the visitor's
+    (proved on a preview deployment), so the BFF sends X-Client-IP. A client-supplied header is
+    never trusted without a valid service token.
+    """
+    if bff_ip := getattr(request.state, "client_ip", None):
+        return str(bff_ip)
     for header in ("x-real-ip", "x-vercel-forwarded-for"):
         if value := request.headers.get(header):
             return value.split(",")[0].strip()

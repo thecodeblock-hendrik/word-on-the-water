@@ -15,7 +15,7 @@ export type ApiOptions = {
 export function createApiClient(env: Env, fetchImpl: typeof fetch = fetch) {
   return function apiFetch(path: string, options: ApiOptions = {}): Promise<Response> {
     const headers = new Headers({ Authorization: `Bearer ${env.SERVICE_TOKEN}` });
-    if (options.clientIp) headers.set("X-Forwarded-For", options.clientIp);
+    if (options.clientIp) headers.set("X-Client-IP", options.clientIp);
     if (env.API_BYPASS_SECRET) {
       headers.set("x-vercel-protection-bypass", env.API_BYPASS_SECRET);
     }

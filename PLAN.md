@@ -234,7 +234,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Token generation: 32 random bytes, store SHA-256 hash only, 48 hour expiry
 - [ ] Turnstile verification, honeypot, minimum time-to-submit
 - [ ] Rate limit 5/hour/IP; idempotency key support
-- [ ] API client IP: trust `X-Forwarded-For` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
+- [ ] API client IP: trust `X-Client-IP` from the web app only on requests that passed service-token auth (the API otherwise sees the web function's IP, not the visitor's)
 - [ ] Consent text version, timestamp and source recorded
 - [ ] Confirmation email via outbox, plus an immediate best-effort send after the request (the cron drain remains the safety net)
 - [ ] `POST /v1/subscribers/confirm` and `/unsubscribe` (including RFC 8058 one-click)

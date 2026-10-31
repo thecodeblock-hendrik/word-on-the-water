@@ -23,10 +23,10 @@ describe("createApiClient", () => {
     expect(headers.get("authorization")).toBe("Bearer service-token-1234567890");
   });
 
-  it("forwards the real client IP", async () => {
+  it("forwards the real client IP in X-Client-IP", async () => {
     const { apiFetch, lastCall } = setup();
     await apiFetch("/v1/ping", { clientIp: "203.0.113.9" });
-    expect(lastCall().headers.get("x-forwarded-for")).toBe("203.0.113.9");
+    expect(lastCall().headers.get("x-client-ip")).toBe("203.0.113.9");
   });
 
   it("sends JSON bodies with the right content type", async () => {
