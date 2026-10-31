@@ -25,8 +25,8 @@ describe("parseEnv", () => {
   });
 
   it("treats blank optional values as unset", () => {
-    const env = parseEnv({ ...valid, VERCEL_AUTOMATION_BYPASS_SECRET: "" });
-    expect(env.VERCEL_AUTOMATION_BYPASS_SECRET).toBeUndefined();
+    const env = parseEnv({ ...valid, API_BYPASS_SECRET: "" });
+    expect(env.API_BYPASS_SECRET).toBeUndefined();
   });
 
   it("does not leak secret values in the error message", () => {
@@ -38,5 +38,30 @@ describe("parseEnv", () => {
     }
     expect(message).toContain("SERVICE_TOKEN");
     expect(message).not.toContain("leaky");
+  });
+
+  it("on a preview, points at the API preview of the same branch", () => {
+    const env = parseEnv({
+      SERVICE_TOKEN: valid.SERVICE_TOKEN,
+      VERCEL_ENV: "preview",
+      VERCEL_BRANCH_URL: "wotw-web-git-feat-09-vercel-thecodeblock.vercel.app",
+    });
+    expect(env.API_BASE_URL).toBe("https://wotw-api-git-feat-09-vercel-thecodeblock.vercel.app");
+  });
+
+  it("prefers an explicit API URL on a preview", () => {
+    const env = parseEnv({
+      ...valid,
+      VERCEL_ENV: "preview",
+      VERCEL_BRANCH_URL: "wotw-web-git-x-thecodeblock.vercel.app",
+    });
+    expect(env.API_BASE_URL).toBe(valid.API_BASE_URL);
+  });
+
+  it("does not derive the API URL outside previews", () => {
+    const source = { SERVICE_TOKEN: valid.SERVICE_TOKEN, VERCEL_ENV: "production" };
+    expect(() =>
+      parseEnv({ ...source, VERCEL_BRANCH_URL: "wotw-web-git-main-x.vercel.app" }),
+    ).toThrow(/API_BASE_URL/);
   });
 });

@@ -11,7 +11,7 @@ export default defineConfig({
   use: { baseURL: `http://localhost:${port}`, trace: "retain-on-failure" },
   webServer: {
     command: `pnpm build && pnpm start -p ${port}`,
-    url: `http://localhost:${port}/api/health`,
+    url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },

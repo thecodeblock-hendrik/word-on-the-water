@@ -10,6 +10,7 @@ import app.models  # noqa: F401  (registers tables on the metadata)
 from alembic import context
 from app.core.config import get_settings
 from app.db.base import Base
+from app.db.session import tls_for
 
 target_metadata = Base.metadata
 
@@ -28,7 +29,8 @@ def _run(connection: Connection) -> None:
 
 
 async def _run_online() -> None:
-    engine = create_async_engine(_url(), poolclass=pool.NullPool)
+    ssl = tls_for(get_settings().environment)
+    engine = create_async_engine(_url(), poolclass=pool.NullPool, connect_args={"ssl": ssl})
     async with engine.connect() as connection:
         await connection.run_sync(_run)
     await engine.dispose()

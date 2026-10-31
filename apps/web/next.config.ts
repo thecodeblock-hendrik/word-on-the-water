@@ -5,7 +5,13 @@ import path from "node:path";
 import { securityHeaders } from "./src/lib/security-headers";
 
 // The API and web share one .env at the repository root (created by `make setup`).
-loadEnvConfig(path.resolve(__dirname, "../.."));
+// forceReload: Next has already loaded env for apps/web, and @next/env returns that cached result otherwise.
+loadEnvConfig(
+  path.resolve(__dirname, "../.."),
+  process.env.NODE_ENV !== "production",
+  console,
+  true,
+);
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
