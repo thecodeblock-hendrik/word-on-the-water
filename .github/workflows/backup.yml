@@ -1,0 +1,71 @@
+name: Database backup
+
+# Nightly pg_dump of production (Neon `main`, read-only role `app_backup`, direct host) to the
+# private Cloudflare R2 bucket. The dump is encrypted with age on the runner before upload; only
+# the public key is stored in GitHub. The bucket deletes objects 30 days after upload.
+# Restore: docs/runbooks/restore-db.md (route 2). Secrets: the `backup` environment.
+on:
+  schedule:
+    - cron: "23 1 * * *" # 01:23 UTC (03:23 in South Africa), off the hour to avoid the queue
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Dump, encrypt, upload
+    runs-on: ubuntu-latest
+    environment: backup
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+
+      - name: Install pg_dump 17 and age
+        run: scripts/install_backup_tools.sh
+
+      - name: Dump and encrypt
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          AGE_PUBLIC_KEY: ${{ secrets.AGE_PUBLIC_KEY }}
+        run: |
+          name="wotw-db-$(date -u +%Y%m%dT%H%M%SZ).dump.age"
+          uv run --no-project scripts/backup_db.py "$RUNNER_TEMP/$name"
+          {
+            echo "DUMP_FILE=$RUNNER_TEMP/$name"
+            echo "OBJECT_KEY=nightly/$(date -u +%Y/%m)/$name"
+          } >> "$GITHUB_ENV"
+
+      - name: Upload to R2 and check the stored size
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          # R2 accepts these only when required; newer AWS CLI defaults add checksums it rejects.
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws s3 cp "$DUMP_FILE" "s3://${R2_BUCKET}/${OBJECT_KEY}" \
+            --endpoint-url "$endpoint" --only-show-errors
+          stored=$(aws s3api head-object --bucket "$R2_BUCKET" --key "$OBJECT_KEY" \
+            --endpoint-url "$endpoint" --query ContentLength --output text)
+          local_size=$(stat -c %s "$DUMP_FILE")
+          if [ "$stored" != "$local_size" ]; then
+            echo "Stored size $stored differs from local size $local_size." >&2
+            exit 1
+          fi
+          echo "Uploaded $OBJECT_KEY ($local_size bytes)." | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove the local dump
+        if: always()
+        run: rm -f "${DUMP_FILE:-/nonexistent}"
