@@ -60,7 +60,7 @@ jobs:
         working-directory: .
         run: psql "postgresql://wotw:wotw_local@localhost:5432/wotw" -f docker/postgres/init.sql
       - run: uv run alembic upgrade head
-      - name: Install pg_dump 17 and age (backup tests)
+      - name: Install pg_dump 18 and age (backup tests)
         working-directory: .
         run: scripts/install_backup_tools.sh
       - name: Tests with coverage gate on services

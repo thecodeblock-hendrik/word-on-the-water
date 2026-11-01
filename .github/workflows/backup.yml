@@ -28,7 +28,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
 
-      - name: Install pg_dump 17 and age
+      - name: Install pg_dump 18 and age
         run: scripts/install_backup_tools.sh
 
       - name: Dump and encrypt
