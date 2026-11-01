@@ -37,7 +37,10 @@ test("the policy forbids unsafe inline and eval scripts", async ({ request }) =>
 
 test("every asset loads over the page's own protocol with no failed requests", async ({ page }) => {
   const failed: string[] = [];
-  page.on("requestfailed", (request) => failed.push(request.url()));
+  // /_vercel/* is served by the Vercel platform only, so it is a 404 under a local server.
+  page.on("requestfailed", (request) => {
+    if (!new URL(request.url()).pathname.startsWith("/_vercel/")) failed.push(request.url());
+  });
 
   await page.goto("/");
   await page.waitForLoadState("networkidle");
@@ -47,4 +50,22 @@ test("every asset loads over the page's own protocol with no failed requests", a
     .getByRole("link", { name: "Get the devotional" })
     .evaluate((el) => getComputedStyle(el).minHeight);
   expect(ctaMinHeight).toBe("44px"); // proves the stylesheet was applied
+});
+
+test("Vercel analytics and speed insights scripts are injected and not blocked by the CSP", async ({
+  page,
+}) => {
+  const requested: string[] = [];
+  const violations: string[] = [];
+  page.on("request", (request) => requested.push(new URL(request.url()).pathname));
+  page.on("console", (message) => {
+    if (message.text().includes("Content Security Policy")) violations.push(message.text());
+  });
+
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+
+  expect(requested).toContain("/_vercel/insights/script.js");
+  expect(requested).toContain("/_vercel/speed-insights/script.js");
+  expect(violations).toEqual([]);
 });
