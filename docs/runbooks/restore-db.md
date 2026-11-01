@@ -25,26 +25,28 @@ Safest order: look first, then decide.
 
 `.github/workflows/backup.yml` runs every night at 01:23 UTC (and on demand: Actions, Database backup, Run workflow). It dumps Neon `main` as the read-only `app_backup` role (`pg_dump --format=custom --no-owner --no-privileges`), encrypts the dump with age on the runner, and uploads it to the private R2 bucket `wotw-db-backups` (Western Europe) as `nightly/YYYY/MM/wotw-db-<UTC time>.dump.age`. A lifecycle rule deletes each dump 30 days after upload. A failed run shows a red cross in Actions and GitHub emails the owner.
 
-What you need: the **age backup key** (password manager; without it no dump can be read), access to the Cloudflare dashboard, and `pg_restore` 18 or newer on your Mac (Neon `main` runs PostgreSQL 18; an older `pg_restore` cannot read its dumps) (`brew install libpq`; it installs to `$(brew --prefix libpq)/bin`, which is not on the PATH by default).
+What you need: the **age backup key** (password manager, the whole key file including the line starting `AGE-SECRET-KEY-1`; the `age1...` public key alone cannot decrypt anything, and without the private key no dump can be read), access to the Cloudflare dashboard, and `pg_restore` 18 or newer on your Mac (Neon `main` runs PostgreSQL 18; an older `pg_restore` cannot read its dumps) (`brew install libpq`; it installs to `$(brew --prefix libpq)/bin`, which is not on the PATH by default).
 
 Use this route when the point-in-time window has passed, or when Neon itself is unavailable.
 
-1. **Download the dump.** Cloudflare dashboard, R2 Object Storage, `wotw-db-backups`, Objects, `nightly/`, the month, then the newest file before the problem started; Download.
-2. **Make a scratch target.** Neon console, Branches, create a branch named `restore-drill` from `main` (the Free plan allows 10 branches; delete it afterwards). Then Databases, add a database `restore_drill` on that branch owned by `neondb_owner`. Copy the branch's **direct** connection string for `restore_drill` (Connect, connection pooling off) and keep it in your shell only:
+1. **Download the dump.** Cloudflare dashboard, R2 Object Storage, `wotw-db-backups`, Objects, `nightly/`, the month, then the newest file before the problem started; the row's **⋯** menu, Download. The browser may change the file name; in the next steps set `FILE=` and drag the downloaded file into the terminal so the path is exact.
+2. **Make a scratch target.** Neon console, Branches, create a branch named `restore-drill` from `main` (the Free plan allows 10 branches; delete it afterwards). Then Databases, add a database `restore_drill` on that branch owned by `neondb_owner`. Copy the branch's **direct** connection string for `restore_drill` (Connect, connection pooling off, and set the **database** dropdown to `restore_drill`: it defaults to `neondb`, which on the branch is a copy of production with the tables already there) and keep it in your shell only:
 
    ```bash
    read -rs SCRATCH_URL   # paste the connection string, press Enter; nothing is shown
    export SCRATCH_URL
+   echo "${SCRATCH_URL##*@}"   # host and database only: must be the restore-drill host and /restore_drill
    ```
 
-3. **Decrypt and restore in one pipe**, so the plaintext dump never lands on disk. Copy the whole age backup key from the password manager to the clipboard, then:
+3. **Decrypt and restore in one pipe**, so the plaintext dump never lands on disk. Copy the age backup key from the password manager to the clipboard, check it is the private key (`pbpaste | grep -c '^AGE-SECRET-KEY-1'` prints `1`), then paste each command as one line:
 
    ```bash
    PG="$(brew --prefix libpq)/bin"
-   pbpaste | age --decrypt --identity - ~/Downloads/wotw-db-<time>.dump.age \
-     | "$PG/pg_restore" --no-owner --no-privileges --exit-on-error --dbname "$SCRATCH_URL"
+   pbpaste | age --decrypt --identity - "$FILE" | "$PG/pg_restore" --no-owner --no-privileges --exit-on-error --dbname "$SCRATCH_URL" && echo "RESTORE OK"
    pbcopy < /dev/null     # clear the clipboard
    ```
+
+   An error such as `type ... already exists` means the target database is not empty (usually `neondb` instead of `restore_drill`); `--exit-on-error` stops at the first statement, so nothing was changed.
 
 4. **Check the copy** (below, "Checks on a restored copy").
 5. **Clean up:** delete the `restore-drill` branch in Neon, delete the downloaded file, `unset SCRATCH_URL`.
@@ -58,7 +60,7 @@ Use this route when the point-in-time window has passed, or when Neon itself is 
 ```
 
 - `alembic_version` equals the head the deployed code expects.
-- Every application table is there (`audit_log`, `contact_messages`, `email_outbox`, `prayer_requests`, `subscribers`), with row counts close to production at the time of the dump. `n_live_tup` is an estimate; use `select count(*)` for an exact number.
+- Every application table is there (`audit_log`, `contact_messages`, `email_outbox`, `prayer_requests`, `subscribers`), with row counts close to production at the time of the dump. `n_live_tup` is an estimate (it can read 0 straight after a restore); compare exact `select count(*)` per table with the same query on `main` in the Neon SQL Editor.
 - Prayer request bodies are still ciphertext: the dump holds them encrypted, and they are readable only with the application key.
 
 ## After any restore
@@ -76,4 +78,5 @@ Restore a copy quarterly (Ongoing tasks in PLAN.md), alternating the routes: rou
 
 | Date | Route | Result | Time taken |
 |---|---|---|---|
-| | | First drill due at step 1.9 | |
+| 2026-11-01 | 2 (nightly dump `wotw-db-20261101T161734Z`, manual run) | Passed: decrypted with the age key, `pg_restore` 18 into `restore_drill` on a `restore-drill` branch with no errors; revision `45f20f111f39` and exact row counts (all 0, no user data yet) match `main`. Found on the way: Neon `main` is PostgreSQL 18 (fixed in #54); the first key pair's private half was not saved, so a new pair was made before this drill | About 1 hour including setup and fixes |
+| | 1 | Next drill, at step 1.9 or by 2027-02-01, whichever is first | |
