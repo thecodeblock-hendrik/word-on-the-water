@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     smtp_host: str = "localhost"
     smtp_port: int = 1025
     postmark_server_token: SecretStr | None = None
+    sentry_dsn: SecretStr | None = None
     neon_pghost: str | None = None
     neon_pghost_unpooled: str | None = None
     neon_pgdatabase: str | None = None

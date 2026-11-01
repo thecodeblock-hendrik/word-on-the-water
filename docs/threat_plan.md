@@ -20,7 +20,7 @@ Deadline: before step 1.3 starts collecting anything.
 
 ## 2. Phase 0 exit (step 0.10)
 
-- [ ] **I1 (part)** Sentry in web and API with `before_send` scrubbing and `sendDefaultPii: false`. Test: an event containing a fake email and prayer text arrives scrubbed.
+- [x] **I1 (part)** Sentry in web and API with `before_send` scrubbing and `sendDefaultPii: false`. Test: an event containing a fake email and prayer text arrives scrubbed.
 - [ ] **I1 (part)** Confirm no request body, email or prayer text reaches logs (test with a captured log stream).
 - [ ] **I3** Client bundle check: build the web app and grep the output for every secret name and value pattern. Add it to CI or the exit gate.
 - [ ] **R1 (part)** Request IDs appear in every API log line and response header (already true; add a test if missing).
