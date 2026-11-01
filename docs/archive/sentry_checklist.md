@@ -36,7 +36,7 @@ Mark every variable **Sensitive**.
 
 Run this after the Sentry PR is merged to `main` and production has redeployed.
 
-- [ ] Redeploy production for `wotw-api` and `wotw-web` so the new variable is picked up (a variable change only applies to new deployments).
+- [x] Redeploy production for `wotw-api` and `wotw-web` so the new variable is picked up (a variable change only applies to new deployments).
 - [x] Send one test error from each app (ask Claude for the command or a temporary route; it is removed afterwards).
 - [x] In Sentry, the event appears in the matching project with the environment `production` or `preview`.
 - [x] Open the event and confirm it shows no request body, cookies, query string, email address or user. If anything personal is visible, stop and tell Claude.
@@ -45,8 +45,8 @@ Result of step 5 (preview, verified in Sentry): both events arrived with the ema
 
 ## Step 6: Alerts
 
-- [ ] In each project, create an alert for a new issue, sent to your email.
-- [ ] Optionally add an alert for an error-rate spike.
+- [x] In each project, create an alert for a new issue, sent to your email.
+- [x] Optionally add an alert for an error-rate spike.
 
 ## Afterwards
 
