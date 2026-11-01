@@ -25,7 +25,7 @@ jobs:
       IP_HASH_SALT: ci-salt-not-a-secret
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_USER: wotw
           POSTGRES_PASSWORD: wotw_local

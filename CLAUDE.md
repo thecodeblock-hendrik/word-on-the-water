@@ -40,7 +40,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 | Forms & validation | `react-hook-form` + **Zod** (web), **Pydantic v2** (API) | Validate on both sides; API is the source of truth |
 | Backend | **FastAPI** on **Python 3.13**, run with Uvicorn (Gunicorn workers in prod) | Typed, fast, OpenAPI out of the box |
 | ORM / migrations | **SQLAlchemy 2.x (async) + Alembic** | Mature, explicit, migration-first |
-| Database | **PostgreSQL 17** | Reliable, `citext`, `pgcrypto`, full-text search for later phases |
+| Database | **PostgreSQL 18** | Reliable, `citext`, `pgcrypto`, full-text search for later phases |
 | Cache / rate limits | **Valkey/Redis** (managed, e.g. Upstash) | Rate limiting, idempotency keys, later sessions/queues |
 | Background jobs | **Outbox table drained by Vercel Cron** (plus an immediate best-effort send after the request). Phase 2+: Vercel Queues or QStash if volume needs it | Vercel has no long-running workers; email sending must not block requests and must be retryable |
 | Subscriptions and newsletter | **Kit** (kit.com, API v4, API key auth) | Owns the subscriber list, double opt-in confirmation email, unsubscribe links, legal footer and broadcasts (ADR 0008). Our API forwards sign-ups and receives Kit webhooks |
@@ -110,7 +110,7 @@ Public read-only content endpoints (devotionals, series) may later be exposed di
 ```
 word-on-the-water/                (items marked "planned" do not exist yet)
 ├── CLAUDE.md, README.md, SECURITY.md
-├── docker-compose.yml            ← local Postgres 17, Valkey, Mailpit
+├── docker-compose.yml            ← local Postgres 18, Valkey, Mailpit
 ├── docker/postgres/init.sql      ← extensions and local roles (app_migrator, app_runtime)
 ├── Makefile, pnpm-workspace.yaml, .pre-commit-config.yaml, .env.example
 ├── scripts/setup_env.py          ← `make setup` writes .env with random local secrets
