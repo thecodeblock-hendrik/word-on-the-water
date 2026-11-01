@@ -25,7 +25,7 @@ Safest order: look first, then decide.
 
 `.github/workflows/backup.yml` runs every night at 01:23 UTC (and on demand: Actions, Database backup, Run workflow). It dumps Neon `main` as the read-only `app_backup` role (`pg_dump --format=custom --no-owner --no-privileges`), encrypts the dump with age on the runner, and uploads it to the private R2 bucket `wotw-db-backups` (Western Europe) as `nightly/YYYY/MM/wotw-db-<UTC time>.dump.age`. A lifecycle rule deletes each dump 30 days after upload. A failed run shows a red cross in Actions and GitHub emails the owner.
 
-What you need: the **age backup key** (password manager; without it no dump can be read), access to the Cloudflare dashboard, and `pg_restore` 17 or newer on your Mac (`brew install libpq`; it installs to `$(brew --prefix libpq)/bin`, which is not on the PATH by default).
+What you need: the **age backup key** (password manager; without it no dump can be read), access to the Cloudflare dashboard, and `pg_restore` 18 or newer on your Mac (Neon `main` runs PostgreSQL 18; an older `pg_restore` cannot read its dumps) (`brew install libpq`; it installs to `$(brew --prefix libpq)/bin`, which is not on the PATH by default).
 
 Use this route when the point-in-time window has passed, or when Neon itself is unavailable.
 
