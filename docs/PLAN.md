@@ -21,7 +21,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 | Phase | Status |
 |---|---|
-| 0 Foundations | In progress. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (Neon preview branching open). Remaining: 0.10 observability and docs, exit gate |
+| 0 Foundations | Exit gate passed 2026-11-01; open carry-overs: Neon preview branching toggle, web coverage in CI. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (Neon preview branching open). 0.10 observability and docs, exit gate |
 | 1 Landing page | Not started |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
@@ -189,19 +189,19 @@ Tests are written first for all logic. The order of items in this plan is not th
 ### 0.10 Observability and docs
 - [x] Sentry in web (server side) and API with PII collection off and `before_send` scrubbing; live preview test showed both events scrubbed (`docs/archive/sentry_checklist.md`)
 - [x] Vercel Web Analytics and Speed Insights (verified on production: both scripts 200, page view recorded, no console errors)
-- [ ] Uptime monitor on `/api/health` and the home page (UptimeRobot free plan) **(Hendrik)**
+- [x] Uptime monitor on `/api/health` and the home page (UptimeRobot free plan)
 - [x] Staging environment: deferred to 1.9 (needs Vercel Pro); previews cover testing until then
 - [x] `docs/threat-model.md` v1 (STRIDE): 32 threats with status, and four known gaps (R-1 to R-4)
 - [x] Isolate preview from production data and credentials (threat model R-1 to R-3) before step 1.3: previews branch from a data-free Neon base or stop branching, previews get their own database roles and passwords, and preview gets its own Upstash database or a key prefix **(Hendrik for the Neon and Upstash dashboards)**
 - [x] `docs/privacy.md` v1 (data inventory, retention, lawful basis, processors, rights); five decisions for Hendrik listed at its end (controller and address, regulator, dump retention, Upstash region and mailbox provider, data processing agreements)
 - [x] Runbooks: `deploy.md`, `incident.md`, `restore-db.md`, `rotate-secrets.md` (the restore runbook has not been rehearsed; the first drill is step 1.9)
-- [x] Nightly `pg_dump` workflow to separate encrypted storage: `backup.yml` dumps Neon `main` as `app_backup`, encrypts with age, uploads to Cloudflare R2 (`wotw-db-backups`, WEUR, 30 day lifecycle); script tested in CI. Manual runs succeed (2026-11-01) and route 2 of `docs/runbooks/restore-db.md` was rehearsed the same day (drill log). Confirm the first scheduled 01:23 UTC run in Actions
+- [x] Nightly `pg_dump` workflow to separate encrypted storage: `backup.yml` dumps Neon `main` as `app_backup`, encrypts with age, uploads to Cloudflare R2 (`wotw-db-backups`, WEUR, 30 day lifecycle); script tested in CI. Manual runs succeed (2026-11-01) and route 2 of `docs/runbooks/restore-db.md` was rehearsed the same day (drill log). The first scheduled 01:23 UTC run succeeded
 
-**Exit gate Phase 0**
-- [ ] Fresh clone to running app using only `make setup && make up`
-- [ ] CI green on `main`; preview deploys work for both projects
-- [ ] Health checks pass end to end through BFF; secrets absent from the repo and client bundle (bundle scan now runs in CI)
-- [ ] ADRs, threat model v1, privacy v1 committed
+**Exit gate Phase 0** (checked 2026-11-01)
+- [x] Fresh clone to running app using only `make setup && make up`: a clean clone starts Postgres 18, Valkey and Mailpit healthy. To run the apps it also needs `pnpm install --frozen-lockfile`, `uv sync --locked` and `make migrate`, once. Test in an empty environment: a shell that already exports `DATABASE_URL`, `SERVICE_TOKEN` and the like silently overrides `.env`
+- [x] CI green on `main` (CI, Security and CodeQL on `72c832c`); preview deploys for both projects pass on every PR
+- [x] Health checks pass end to end through the BFF. Locally `/api/health` returns ok via the API's `/health/ready` (database and Redis), and `/v1/ping` gives 401 without or with a wrong token and 200 with the right one. On production `vercel curl /api/health` returns ok; the production domain still serves the Squarespace parking page until the cutover in 1.9, so production was checked on the Vercel deployment URL. No private keys or secrets in tracked files (the only matches are a dummy test fixture and runbook text), and the client bundle scan passes in CI
+- [x] ADRs 0001 to 0007, threat model v1 and privacy v1 committed (ADR 0008 is written with the 1.3 Kit spike)
 
 ---
 

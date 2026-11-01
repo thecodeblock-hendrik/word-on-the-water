@@ -6,7 +6,7 @@ Development plan and working rules for the **Word on the Water** web application
 
 This file is both the project plan and the instructions for anyone (human or Claude Code) working in the repository. Read it fully before making changes. When the plan and the code disagree, fix one of them in the same pull request.
 
-**Status (updated 2026-10-31):** Phase 0 in progress, steps 0.1 to 0.8 done (repo, ADRs, API, database, email outbox, web shell, OpenAPI types, CI and branch protection); 0.9 Vercel nearly done (projects, Neon, Upstash, env vars, protection and previews working in `fra1`; Neon preview branching open). Next: 0.10 observability and docs. Step-by-step progress lives in [PLAN.md](docs/PLAN.md); this file holds the stack, rules and decisions.
+**Status (updated 2026-11-01):** Phase 0 exit gate passed (carry-overs: Neon preview branching toggle, web coverage in CI); Phase 1 not started. Steps 0.1 to 0.8 done (repo, ADRs, API, database, email outbox, web shell, OpenAPI types, CI and branch protection); 0.9 Vercel nearly done (projects, Neon, Upstash, env vars, protection and previews working in `fra1`; Neon preview branching open). Next: Phase 1, starting with 1.1 (needs the colour scheme decision). Step-by-step progress lives in [PLAN.md](docs/PLAN.md); this file holds the stack, rules and decisions.
 
 ---
 
@@ -413,7 +413,7 @@ Progress is tracked step by step in [PLAN.md](docs/PLAN.md); this section only d
 
 | Phase | Status |
 |---|---|
-| 0 Foundations | In progress: 0.1 to 0.8 done, 0.9 nearly done; 0.10 observability and docs remains |
+| 0 Foundations | Exit gate passed 2026-11-01 (carry-overs: Neon preview branching toggle, web coverage in CI) |
 | 1 Landing page | Not started |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
