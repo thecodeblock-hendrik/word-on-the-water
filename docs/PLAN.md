@@ -200,7 +200,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 **Exit gate Phase 0**
 - [ ] Fresh clone to running app using only `make setup && make up`
 - [ ] CI green on `main`; preview deploys work for both projects
-- [ ] Health checks pass end to end through BFF; secrets absent from the repo and client bundle
+- [ ] Health checks pass end to end through BFF; secrets absent from the repo and client bundle (bundle scan now runs in CI)
 - [ ] ADRs, threat model v1, privacy v1 committed
 
 ---
