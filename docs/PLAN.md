@@ -189,8 +189,8 @@ Tests are written first for all logic. The order of items in this plan is not th
 ### 0.10 Observability and docs
 - [x] Sentry in web (server side) and API with PII collection off and `before_send` scrubbing; live preview test showed both events scrubbed (`docs/archive/sentry_checklist.md`)
 - [ ] Vercel Web Analytics and Speed Insights
-- [ ] Uptime monitor on `/api/health`; log drain configured
-- [ ] Staging environment (custom Vercel environment or `staging` branch with own domain)
+- [ ] Uptime monitor on `/api/health` and the home page (external free service, e.g. Better Stack) **(Hendrik)**
+- [x] Staging environment: deferred to 1.9 (needs Vercel Pro); previews cover testing until then
 - [x] `docs/threat-model.md` v1 (STRIDE): 32 threats with status, and four known gaps (R-1 to R-4)
 - [x] Isolate preview from production data and credentials (threat model R-1 to R-3) before step 1.3: previews branch from a data-free Neon base or stop branching, previews get their own database roles and passwords, and preview gets its own Upstash database or a key prefix **(Hendrik for the Neon and Upstash dashboards)**
 - [x] `docs/privacy.md` v1 (data inventory, retention, lawful basis, processors, rights); five decisions for Hendrik listed at its end (controller and address, regulator, dump retention, Upstash region and mailbox provider, data processing agreements)
@@ -303,6 +303,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Add `wordonthewater.net` to the `wotw-web` Vercel project (apex primary, `www` redirecting to it), add the DNS records Vercel shows for the domain in **Squarespace DNS** (apex A record and `www` CNAME; copy the exact values from the Vercel dashboard), leave the MX records alone, check HTTPS and HSTS; keep `wotw-api` on its protected `vercel.app` URL **(Hendrik)**
 - [ ] Production env vars: `EMAIL_FROM=Word on the Water <hello@wordonthewater.net>`, `PRAYER_INBOX=prayer@wordonthewater.net`, `CONTACT_INBOX=hello@wordonthewater.net`, public site URL `https://wordonthewater.net` for metadata, sitemap and links in email; Preview keeps test inboxes
 - [ ] Upgrade to Vercel Pro; restrict production promotion; audit log on
+- [ ] With Pro: log drain to a log store (Better Stack or Axiom) and a staging environment (custom Vercel environment), deferred from 0.10
 - [ ] Outbox cron to `*/5 * * * *` in `apps/api/vercel.json` and the deploy runbook (only possible on Pro; Hobby fails the deploy) **(Hendrik)**
 - [ ] Vercel Firewall rate-limit rules on form routes
 - [ ] On the root domain `wordonthewater.net` (the `From` addresses are on it): one merged SPF record in Squarespace DNS including Postmark and Kit (edit the current record and keep what Squarespace email forwarding put there, never add a second), DKIM for each, a custom return-path for each, DMARC at `_dmarc.wordonthewater.net` with `p=none` and reports to `hello@wordonthewater.net`
