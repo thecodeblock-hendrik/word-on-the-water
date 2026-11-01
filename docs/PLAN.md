@@ -187,7 +187,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Neon preview branches deleted when a PR closes (`neon-preview-cleanup.yml`, verified on #25): the Free plan allows 10 and previews failed with "Resource provisioning failed" once it was reached
 
 ### 0.10 Observability and docs
-- [ ] Sentry in web and API with `sendDefaultPii: false` and `before_send` scrubbing
+- [x] Sentry in web (server side) and API with PII collection off and `before_send` scrubbing; live preview test showed both events scrubbed (`docs/sentry_checklist.md`)
 - [ ] Vercel Web Analytics and Speed Insights
 - [ ] Uptime monitor on `/api/health`; log drain configured
 - [ ] Staging environment (custom Vercel environment or `staging` branch with own domain)
