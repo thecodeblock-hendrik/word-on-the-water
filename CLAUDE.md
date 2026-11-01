@@ -6,7 +6,7 @@ Development plan and working rules for the **Word on the Water** web application
 
 This file is both the project plan and the instructions for anyone (human or Claude Code) working in the repository. Read it fully before making changes. When the plan and the code disagree, fix one of them in the same pull request.
 
-**Status (updated 2026-10-31):** Phase 0 in progress, steps 0.1 to 0.8 done (repo, ADRs, API, database, email outbox, web shell, OpenAPI types, CI and branch protection); 0.9 Vercel nearly done (projects, Neon, Upstash, env vars, protection and previews working in `fra1`; Neon preview branching open). Next: 0.10 observability and docs. Step-by-step progress lives in [PLAN.md](PLAN.md); this file holds the stack, rules and decisions.
+**Status (updated 2026-10-31):** Phase 0 in progress, steps 0.1 to 0.8 done (repo, ADRs, API, database, email outbox, web shell, OpenAPI types, CI and branch protection); 0.9 Vercel nearly done (projects, Neon, Upstash, env vars, protection and previews working in `fra1`; Neon preview branching open). Next: 0.10 observability and docs. Step-by-step progress lives in [PLAN.md](docs/PLAN.md); this file holds the stack, rules and decisions.
 
 ---
 
@@ -22,7 +22,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 **Out of scope for Phase 1** but designed for: devotional library, teaching series, audio/podcast, public user accounts, admin CMS, search, newsletter sending.
 
-**Mobile strategy (decided, option B in [FLUTTER.md](FLUTTER.md)):** the Next.js site is the mobile experience: mobile-first, fast, and installable as a PWA through `app/manifest.ts`. A native Flutter app for iOS and Android may be added later on the same FastAPI; it is revisited at the Phase 2 gate. Until then, no Flutter work and no changes to the web stack.
+**Mobile strategy (decided, option B in [FLUTTER.md](docs/FLUTTER.md)):** the Next.js site is the mobile experience: mobile-first, fast, and installable as a PWA through `app/manifest.ts`. A native Flutter app for iOS and Android may be added later on the same FastAPI; it is revisited at the Phase 2 gate. Until then, no Flutter work and no changes to the web stack.
 
 **Design source:** `website/landing-page-mockup.html` (published at https://claude.ai/artifact/UYYvSXJkgeofmJ8PchzgWw). The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped. A PDF of the mockup is in `mockup_site.pdf`.
 
@@ -109,7 +109,7 @@ Public read-only content endpoints (devotionals, series) may later be exposed di
 
 ```
 word-on-the-water/                (items marked "planned" do not exist yet)
-├── CLAUDE.md, PLAN.md, README.md, SECURITY.md, FLUTTER.md (future native app assessment)
+├── CLAUDE.md, README.md, SECURITY.md
 ├── docker-compose.yml            ← local Postgres 17, Valkey, Mailpit
 ├── docker/postgres/init.sql      ← extensions and local roles (app_migrator, app_runtime)
 ├── Makefile, pnpm-workspace.yaml, .pre-commit-config.yaml, .env.example
@@ -121,6 +121,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │   ├── dependabot.yml
 │   └── pull_request_template.md
 ├── docs/
+│   ├── PLAN.md, FLUTTER.md, threat_plan.md   ← step plan, native app assessment, threat work plan
 │   ├── adr/                      ← 0001 to 0007
 │   ├── runbooks/                 ← deploy.md; planned: incident, restore-db, rotate-secrets
 │   └── threat-model.md, privacy.md   ← planned (step 0.10)
@@ -357,7 +358,7 @@ Settings via `pydantic-settings`, failing fast at startup if required secrets ar
 | Performance | Lighthouse CI (mobile) | Budgets in §5 |
 | Security | ZAP baseline scan against staging (weekly + pre-release) | No high findings |
 
-Rule: write tests first (red, green, refactor) for all logic; a bug fix comes with a test that fails before the fix. `PLAN.md` has the full testing approach and definition of done.
+Rule: write tests first (red, green, refactor) for all logic; a bug fix comes with a test that fails before the fix. `docs/PLAN.md` has the full testing approach and definition of done.
 
 ---
 
@@ -408,7 +409,7 @@ Two systems, split by purpose:
 
 ## 13. Delivery phases
 
-Progress is tracked step by step in [PLAN.md](PLAN.md); this section only describes scope.
+Progress is tracked step by step in [PLAN.md](docs/PLAN.md); this section only describes scope.
 
 | Phase | Status |
 |---|---|
@@ -426,7 +427,7 @@ All mockup sections as responsive mobile-first components; final colour scheme w
 - **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request; the prayer team receives it; no high security findings.
 
 ### Phase 2 — Devotionals and admin
-Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email as Kit broadcasts created from published devotionals, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](FLUTTER.md), option B) and Web Push for the weekly devotional.
+Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email as Kit broadcasts created from published devotionals, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](docs/FLUTTER.md), option B) and Web Push for the weekly devotional.
 
 ### Phase 3 — Teaching series and audio
 Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals. If the Phase 2 gate chose it, the Flutter app for iOS and Android is built here.
@@ -448,7 +449,7 @@ Optional public accounts (save favourites, reading plans), comments with moderat
 - Run before every PR: `make lint typecheck test` (and `make e2e` for UI changes).
 - **Workflow:** one branch and one PR per plan sub-step (for example `feat/0.9-vercel`), Conventional Commits, one commit per logical chunk, push once per sub-step. Merge with `gh pr merge --squash --admin` only when every check is green.
 - **Branch names of 36 characters or fewer.** A web preview finds its API preview by swapping the project name in its alias, and Vercel truncates aliases over 63 characters with a hash that differs per project, so the swap breaks (the web preview then fails with a message naming the cause). Dependabot branches always exceed this; set `API_BASE_URL` on such a preview if you need it to work.
-- **Tests first** (red, green, refactor), shown failing for the right reason before the code is written. See the testing approach in `PLAN.md`.
+- **Tests first** (red, green, refactor), shown failing for the right reason before the code is written. See the testing approach in `docs/PLAN.md`.
 - Check `git status` and stage named files before committing; never a blanket `git add -A` (it once committed locally installed files to the public repo).
 - Dependabot npm PRs do not update the root `pnpm-lock.yaml`: check out the PR, run `pnpm install`, commit the lockfile and push before merging (see PLAN.md 0.8).
 - Python tooling always through `uv` (`uv run`, `uv add`); no bare `python3` or `pip`. Use the latest stable library APIs. For Next.js, read the bundled docs in `node_modules/next/dist/docs/` first: this is not the Next you may remember (`proxy.ts` replaces `middleware.ts`).
@@ -494,6 +495,6 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 - **Database:** stay with Neon, not Supabase: native Vercel integration, a database branch per preview, and scale to zero on the free tier. Supabase would add an auto-generated REST API to lock down (ADR 0002).
 - **CSP:** nonce-based, so pages render per request. A hash-based CSP with static pages was tried first and failed in a real browser (8 inline hydration scripts blocked). Re-measure LCP on a preview deployment (ADR 0007).
 - **Licensing and visibility:** no license (all rights reserved); repository public.
-- **Testing:** test-first for all logic, with a definition of done per step (`PLAN.md`).
+- **Testing:** test-first for all logic, with a definition of done per step (`docs/PLAN.md`).
 - **Branch protection:** the owner is not enforced, so a solo developer can merge once checks are green.
-- **Mobile strategy:** option B in `FLUTTER.md`. The Next.js site stays the public, SEO-friendly mobile experience and becomes an installable PWA (`app/manifest.ts`) in Phase 1. A Flutter app for iOS and Android, on the same Vercel, Neon and FastAPI, is revisited at the Phase 2 gate. Replacing Next.js with Flutter web was rejected: it cannot meet the SEO, first-load and accessibility budgets for the landing page.
+- **Mobile strategy:** option B in `docs/FLUTTER.md`. The Next.js site stays the public, SEO-friendly mobile experience and becomes an installable PWA (`app/manifest.ts`) in Phase 1. A Flutter app for iOS and Android, on the same Vercel, Neon and FastAPI, is revisited at the Phase 2 gate. Replacing Next.js with Flutter web was rejected: it cannot meet the SEO, first-load and accessibility budgets for the landing page.

@@ -2,7 +2,7 @@
 
 Christian ministry web app publishing devotionals and Bible teaching for men and surfers.
 
-- Plan: [PLAN.md](PLAN.md)
+- Plan: [PLAN.md](docs/PLAN.md)
 - Architecture and rules: [CLAUDE.md](CLAUDE.md)
 
 ## Stack

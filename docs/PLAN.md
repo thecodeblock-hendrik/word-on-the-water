@@ -29,7 +29,7 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 **Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js shell with tokens, fonts, nonce CSP, security headers and a dynamic health route; generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. No product features yet (sign-up, prayer and contact forms, landing sections).
 
-**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
+**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `docs/FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
 
 **Waiting on Hendrik:** Neon preview branching toggle (step 0.9), final colour scheme, prayer-notification default.
 
@@ -352,7 +352,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Failed broadcast creation is visible in the admin UI and retried
 
 ### 2.5 Mobile app decision gate
-- [ ] Revisit the native app (`FLUTTER.md`, option B: keep this Next.js site and add a Flutter app for iOS and Android on the same FastAPI) once devotionals exist **(Hendrik)**
+- [ ] Revisit the native app (`docs/FLUTTER.md`, option B: keep this Next.js site and add a Flutter app for iOS and Android on the same FastAPI) once devotionals exist **(Hendrik)**
 - [ ] Until then, consider Web Push for the weekly devotional (Next PWA guide; iOS only for sites added to the home screen, iOS 16.4+)
 
 **Exit gate Phase 2**
@@ -369,7 +369,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Embedded accessible audio player (keyboard, captions/transcripts where possible)
 - [ ] Podcast RSS feed validated against Apple and Spotify requirements
 - [ ] PWA offline caching of recent devotionals: service worker (`public/sw.js` with `Cache-Control: no-cache` and its own CSP, per the Next PWA guide), update strategy, offline page; evaluate Next's experimental `useOffline`
-- [ ] If the Phase 2 gate chose a Flutter app: build it here (`FLUTTER.md`)
+- [ ] If the Phase 2 gate chose a Flutter app: build it here (`docs/FLUTTER.md`)
 - [ ] Re-run performance budgets with audio pages
 
 **Exit gate Phase 3**
