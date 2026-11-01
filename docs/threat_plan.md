@@ -10,11 +10,11 @@ Order follows the dependency: gaps that must close before real data (section 1),
 
 Deadline: before step 1.3 starts collecting anything.
 
-- [ ] **R-1** Stop preview databases copying production data: branch previews from a data-free base branch, or turn off per-preview Neon branching for the production project. Verify a preview database contains no rows from `main`.
-- [ ] **R-2a** Give preview its own Neon roles and passwords (not copies of production's).
-- [ ] **R-2b** Mark the `NEON_*` variables Sensitive where the integration allows.
-- [ ] **R-2c** Rotate the production Neon credentials after the change (runbook: `docs/runbooks/rotate-secrets.md`).
-- [ ] **R-3** Separate Upstash database for preview, or a key prefix per environment. Verify a preview cannot touch production rate-limit keys.
+- [ ] **R-1** Stop preview databases copying production data: branch previews from a data-free base branch, or turn off per-preview Neon branching for the production project. Verify a preview database contains no rows from `main`. *Applied 2026-11-01 (step 1); tick after the step 5 row count check.*
+- [ ] **R-2a** Give preview its own Neon roles and passwords (not copies of production's). *Applied 2026-11-01 (step 1); tick after the step 5 preview health check.*
+- [x] **R-2b** Mark the `NEON_*` variables Sensitive where the integration allows. *Done 2026-11-01.*
+- [x] **R-2c** Rotate the production Neon credentials after the change (runbook: `docs/runbooks/rotate-secrets.md`). *Done 2026-11-01; production `/api/health` returns ok.*
+- [ ] **R-3** Separate Upstash database for preview, or a key prefix per environment. Verify a preview cannot touch production rate-limit keys. *Applied 2026-11-01 (step 2); tick after the step 5 Upstash check.*
 - [ ] **R-4** Reword CLAUDE.md section 6.6 now so it states the truth, then restore the "previews never get production keys" rule once R-1 to R-3 are done.
 - [ ] **I7** Re-check Deployment Protection on previews and confirm no production secret is visible in Preview scope. Mark I7 Done in the threat model.
 
