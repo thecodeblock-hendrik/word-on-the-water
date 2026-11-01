@@ -191,9 +191,10 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [ ] Vercel Web Analytics and Speed Insights
 - [ ] Uptime monitor on `/api/health`; log drain configured
 - [ ] Staging environment (custom Vercel environment or `staging` branch with own domain)
-- [ ] `docs/threat-model.md` v1 (STRIDE)
-- [ ] `docs/privacy.md` v1 (data inventory, retention, lawful basis)
-- [ ] Runbooks: `deploy.md`, `incident.md`, `restore-db.md`, `rotate-secrets.md`
+- [x] `docs/threat-model.md` v1 (STRIDE): 32 threats with status, and four known gaps (R-1 to R-4)
+- [ ] Isolate preview from production data and credentials (threat model R-1 to R-3) before step 1.3: previews branch from a data-free Neon base or stop branching, previews get their own database roles and passwords, and preview gets its own Upstash database or a key prefix **(Hendrik for the Neon and Upstash dashboards)**
+- [x] `docs/privacy.md` v1 (data inventory, retention, lawful basis, processors, rights); five decisions for Hendrik listed at its end (controller and address, regulator, dump retention, Upstash region and mailbox provider, data processing agreements)
+- [x] Runbooks: `deploy.md`, `incident.md`, `restore-db.md`, `rotate-secrets.md` (the restore runbook has not been rehearsed; the first drill is step 1.9)
 - [ ] Nightly `pg_dump` workflow to separate encrypted storage
 
 **Exit gate Phase 0**
