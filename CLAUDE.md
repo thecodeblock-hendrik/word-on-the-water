@@ -117,7 +117,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 ├── db/neon_roles.sql             ← one-off least-privilege roles on Neon (see docs/runbooks/deploy.md)
 ├── website/landing-page-mockup.html, mockup_site.pdf   ← design reference
 ├── .github/
-│   ├── workflows/ (ci.yml, security.yml, codeql.yml, neon-preview-cleanup.yml; migrate.yml planned)
+│   ├── workflows/ (ci.yml, security.yml, codeql.yml, neon-preview-cleanup.yml, backup.yml; migrate.yml planned)
 │   ├── dependabot.yml
 │   └── pull_request_template.md
 ├── docs/
@@ -268,7 +268,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 
 ### 6.9 Backups and data retention
 
-- Neon point-in-time recovery (≥ 7 days on the paid plan) plus a nightly `pg_dump` from a GitHub Actions schedule to separate storage (e.g. encrypted in Vercel Blob or S3); **restore tested quarterly** (runbook).
+- Neon point-in-time recovery (≥ 7 days on the paid plan) plus a nightly `pg_dump` (`backup.yml`, read-only role `app_backup`) encrypted with age and stored in a private Cloudflare R2 bucket in Western Europe for 30 days; **restore tested quarterly** (`docs/runbooks/restore-db.md`).
 - Retention (proposed): unconfirmed subscribers deleted after 7 days; prayer requests deleted (or anonymised) after 90 days; contact messages after 12 months; audit logs 1 year. Enforced by a daily Vercel Cron job.
 
 ---

@@ -1,6 +1,6 @@
 # Restore the database
 
-Neon hosts the database (`wotw-db`, `aws-eu-central-1`). Two recovery routes: Neon's point-in-time restore (available now) and a restore from a nightly dump (planned, step 0.10). **Neither has been rehearsed yet;** the first drill is part of step 1.9 and the result goes in the table at the end. Menu names below are from Neon's console and may have moved; check them before an emergency.
+Neon hosts the database (`wotw-db`, `aws-eu-central-1`). Two recovery routes: Neon's point-in-time restore and a restore from the nightly encrypted dump in Cloudflare R2. **Neither has been rehearsed yet;** the first drill is part of step 1.9 and the result goes in the table at the end. Menu names below are from Neon's console and may have moved; check them before an emergency.
 
 ## When to restore
 
@@ -21,14 +21,45 @@ Safest order: look first, then decide.
 4. **Restore `main` to that time** (Neon console, `main`, Restore). Neon keeps the pre-restore state as a backup branch; note its name. Connection strings stay the same.
 5. **Verify** (below). Delete the inspection branch and, once sure, the backup branch.
 
-## Route 2: from the nightly dump (planned)
+## Route 2: from the nightly dump
 
-Dumps come from a scheduled GitHub Actions workflow to separate encrypted storage (step 0.10, not built yet; storage and retention are open decisions, see `docs/privacy.md`).
+`.github/workflows/backup.yml` runs every night at 01:23 UTC (and on demand: Actions, Database backup, Run workflow). It dumps Neon `main` as the read-only `app_backup` role (`pg_dump --format=custom --no-owner --no-privileges`), encrypts the dump with age on the runner, and uploads it to the private R2 bucket `wotw-db-backups` (Western Europe) as `nightly/YYYY/MM/wotw-db-<UTC time>.dump.age`. A lifecycle rule deletes each dump 30 days after upload. A failed run shows a red cross in Actions and GitHub emails the owner.
 
-1. Fetch the newest good dump and decrypt it.
-2. Create a scratch Neon branch or a local Postgres 17 with `docker compose up`.
-3. `pg_restore --no-owner --clean --if-exists -d <scratch url> <dump>`; run the checks below on the scratch copy.
-4. Only then load into production, during a quiet period, as the owner role; run the migrations as the deploy runbook describes (as `app_migrator`, direct host) if the dump is older than the deployed schema.
+What you need: the **age backup key** (password manager; without it no dump can be read), access to the Cloudflare dashboard, and `pg_restore` 17 or newer on your Mac (`brew install libpq`; it installs to `$(brew --prefix libpq)/bin`, which is not on the PATH by default).
+
+Use this route when the point-in-time window has passed, or when Neon itself is unavailable.
+
+1. **Download the dump.** Cloudflare dashboard, R2 Object Storage, `wotw-db-backups`, Objects, `nightly/`, the month, then the newest file before the problem started; Download.
+2. **Make a scratch target.** Neon console, Branches, create a branch named `restore-drill` from `main` (the Free plan allows 10 branches; delete it afterwards). Then Databases, add a database `restore_drill` on that branch owned by `neondb_owner`. Copy the branch's **direct** connection string for `restore_drill` (Connect, connection pooling off) and keep it in your shell only:
+
+   ```bash
+   read -rs SCRATCH_URL   # paste the connection string, press Enter; nothing is shown
+   export SCRATCH_URL
+   ```
+
+3. **Decrypt and restore in one pipe**, so the plaintext dump never lands on disk. Copy the whole age backup key from the password manager to the clipboard, then:
+
+   ```bash
+   PG="$(brew --prefix libpq)/bin"
+   pbpaste | age --decrypt --identity - ~/Downloads/wotw-db-<time>.dump.age \
+     | "$PG/pg_restore" --no-owner --no-privileges --exit-on-error --dbname "$SCRATCH_URL"
+   pbcopy < /dev/null     # clear the clipboard
+   ```
+
+4. **Check the copy** (below, "Checks on a restored copy").
+5. **Clean up:** delete the `restore-drill` branch in Neon, delete the downloaded file, `unset SCRATCH_URL`.
+6. **For a real recovery,** only after the checks pass: load into production during a quiet period as the owner role, and run the migrations as the deploy runbook describes (as `app_migrator`, direct host) if the dump is older than the deployed schema. Then follow "After any restore".
+
+### Checks on a restored copy
+
+```bash
+"$PG/psql" "$SCRATCH_URL" -c "select version_num from alembic_version" \
+  -c "select relname, n_live_tup from pg_stat_user_tables order by relname"
+```
+
+- `alembic_version` equals the head the deployed code expects.
+- Every application table is there (`audit_log`, `contact_messages`, `email_outbox`, `prayer_requests`, `subscribers`), with row counts close to production at the time of the dump. `n_live_tup` is an estimate; use `select count(*)` for an exact number.
+- Prayer request bodies are still ciphertext: the dump holds them encrypted, and they are readable only with the application key.
 
 ## After any restore
 
@@ -41,7 +72,7 @@ Dumps come from a scheduled GitHub Actions workflow to separate encrypted storag
 
 ## Drill log
 
-Restore a copy quarterly (Ongoing tasks in PLAN.md): branch at a past time, check the expected rows, delete it.
+Restore a copy quarterly (Ongoing tasks in PLAN.md), alternating the routes: route 1 (branch at a past time, check the expected rows, delete it) and route 2 (the steps above into `restore-drill`).
 
 | Date | Route | Result | Time taken |
 |---|---|---|---|
