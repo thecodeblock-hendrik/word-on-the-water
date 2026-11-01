@@ -75,12 +75,27 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       - run: pnpm install --frozen-lockfile
       - run: pnpm --dir apps/web lint
       - run: pnpm --dir apps/web format:check
       - run: pnpm --dir apps/web typecheck
       - run: pnpm --dir apps/web test
       - run: pnpm --dir apps/web build
+        env:
+          API_BASE_URL: http://localhost:8000
+          SERVICE_TOKEN: build-check-service-token-0123456789
+          API_BYPASS_SECRET: build-check-bypass-0123456789
+          CRON_SECRET: build-check-cron-0123456789
+          SENTRY_DSN: https://abc123@o1.ingest.de.sentry.io/42
+      - name: No secrets in the client bundle
+        run: uv run scripts/check_bundle_secrets.py apps/web/.next/static apps/web/public
+        env:
+          API_BASE_URL: http://localhost:8000
+          SERVICE_TOKEN: build-check-service-token-0123456789
+          API_BYPASS_SECRET: build-check-bypass-0123456789
+          CRON_SECRET: build-check-cron-0123456789
+          SENTRY_DSN: https://abc123@o1.ingest.de.sentry.io/42
 
   types:
     name: Generated API types are current
