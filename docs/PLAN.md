@@ -195,7 +195,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Isolate preview from production data and credentials (threat model R-1 to R-3) before step 1.3: previews branch from a data-free Neon base or stop branching, previews get their own database roles and passwords, and preview gets its own Upstash database or a key prefix **(Hendrik for the Neon and Upstash dashboards)**
 - [x] `docs/privacy.md` v1 (data inventory, retention, lawful basis, processors, rights); five decisions for Hendrik listed at its end (controller and address, regulator, dump retention, Upstash region and mailbox provider, data processing agreements)
 - [x] Runbooks: `deploy.md`, `incident.md`, `restore-db.md`, `rotate-secrets.md` (the restore runbook has not been rehearsed; the first drill is step 1.9)
-- [ ] Nightly `pg_dump` workflow to separate encrypted storage
+- [ ] Nightly `pg_dump` workflow to separate encrypted storage: `backup.yml` dumps Neon `main` as `app_backup`, encrypts with age, uploads to Cloudflare R2 (`wotw-db-backups`, WEUR, 30 day lifecycle); script tested in CI. Tick after the first scheduled run succeeds and route 2 of `docs/runbooks/restore-db.md` has been rehearsed **(Hendrik for the rehearsal: it needs the age private key)**
 
 **Exit gate Phase 0**
 - [ ] Fresh clone to running app using only `make setup && make up`

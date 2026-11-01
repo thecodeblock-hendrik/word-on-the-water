@@ -35,7 +35,7 @@ Enforced by a daily retention job (step 1.7). Prayer and contact rows already ca
 | Audit log | 1 year | Deleted |
 | Rate-limit keys | The limit window (minutes to one hour) | Expire in Redis |
 | Neon point-in-time recovery | At least 7 days on the paid plan | Rolls off |
-| Nightly database dumps | To be decided (see open decisions) | |
+| Nightly database dumps (encrypted) | 30 days from upload | Deleted by the bucket's lifecycle rule |
 
 ## Who else handles the data
 
@@ -46,12 +46,12 @@ Enforced by a daily retention job (step 1.7). Prayer and contact rows already ca
 | Upstash | Hashed rate-limit keys | Region to confirm |
 | Kit | Newsletter subscribers and the emails sent to them | Provider's locations |
 | Postmark | Notification and transactional email in transit | Provider's locations |
-| Cloudflare | Turnstile bot check | Global |
+| Cloudflare | Turnstile bot check; R2 storage of the nightly database dumps, encrypted before upload so Cloudflare cannot read them | Turnstile global; R2 bucket in Western Europe (WEUR) |
 | Sentry | Scrubbed error reports | Provider's locations |
 | Squarespace | DNS, and forwarding of `hello@` and `prayer@` to the owner's own mailbox | Provider's locations |
 | The owner's own mailbox provider | Forwarded notifications, including consented prayer text | To confirm |
 
-Providers outside the EU and South Africa are covered by their standard contractual terms; the policy page names them. A data processing agreement is needed with each provider that holds subscriber or prayer data: Kit, Postmark, Neon, Vercel, Sentry.
+Providers outside the EU and South Africa are covered by their standard contractual terms; the policy page names them. A data processing agreement is needed with each provider that holds subscriber or prayer data: Kit, Postmark, Neon, Vercel, Sentry, Cloudflare (R2 holds the encrypted dumps).
 
 ## Rights and how they are met
 
@@ -68,7 +68,7 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 
 1. **Who is the data controller and what is the legal entity name and address** for the policy and the email footer (also required in newsletters).
 2. **Which regulator and jurisdiction** to name first: where the owner and most readers live.
-3. **How long nightly dumps are kept.** A dump holds deleted-on-request data until it expires, so a short period (for example 30 days) keeps the "deleted within the retention above" promise honest.
+3. ~~How long nightly dumps are kept.~~ Decided: 30 days, enforced by an R2 lifecycle rule. A dump holds deleted-on-request data until it expires, so erased data is gone from backups within 30 days.
 4. **Upstash region** and **which mailbox provider receives the forwards.**
 5. **A data processing agreement** accepted with each provider listed above.
 
