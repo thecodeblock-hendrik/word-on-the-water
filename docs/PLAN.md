@@ -188,8 +188,8 @@ Tests are written first for all logic. The order of items in this plan is not th
 
 ### 0.10 Observability and docs
 - [x] Sentry in web (server side) and API with PII collection off and `before_send` scrubbing; live preview test showed both events scrubbed (`docs/archive/sentry_checklist.md`)
-- [ ] Vercel Web Analytics and Speed Insights
-- [ ] Uptime monitor on `/api/health` and the home page (external free service, e.g. Better Stack) **(Hendrik)**
+- [x] Vercel Web Analytics and Speed Insights (verified on production: both scripts 200, page view recorded, no console errors)
+- [ ] Uptime monitor on `/api/health` and the home page (UptimeRobot free plan) **(Hendrik)**
 - [x] Staging environment: deferred to 1.9 (needs Vercel Pro); previews cover testing until then
 - [x] `docs/threat-model.md` v1 (STRIDE): 32 threats with status, and four known gaps (R-1 to R-4)
 - [x] Isolate preview from production data and credentials (threat model R-1 to R-3) before step 1.3: previews branch from a data-free Neon base or stop branching, previews get their own database roles and passwords, and preview gets its own Upstash database or a key prefix **(Hendrik for the Neon and Upstash dashboards)**
