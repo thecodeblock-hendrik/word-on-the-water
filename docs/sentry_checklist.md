@@ -36,7 +36,7 @@ Mark every variable **Sensitive**.
 
 Run this after the Sentry PR is merged to `main` and production has redeployed.
 
-- [x] Redeploy production for `wotw-api` and `wotw-web` so the new variable is picked up (a variable change only applies to new deployments).
+- [ ] Redeploy production for `wotw-api` and `wotw-web` so the new variable is picked up (a variable change only applies to new deployments).
 - [x] Send one test error from each app (ask Claude for the command or a temporary route; it is removed afterwards).
 - [x] In Sentry, the event appears in the matching project with the environment `production` or `preview`.
 - [x] Open the event and confirm it shows no request body, cookies, query string, email address or user. If anything personal is visible, stop and tell Claude.
