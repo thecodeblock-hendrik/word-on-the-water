@@ -53,12 +53,12 @@ Follow `docs/runbooks/rotate-secrets.md`.
 
 ## Step 5: Verify
 
-- [ ] Push a small change on a branch of 36 characters or fewer to get a preview.
-- [ ] The web preview's `/api/health` returns `{"status":"ok"}`.
-- [ ] In Neon, the preview's branch shows `SELECT count(*) FROM subscribers;` as 0 (or test rows only). (R-1)
-- [ ] In Upstash, preview traffic shows in `wotw-redis-preview` and none in `wotw-redis`. (R-3)
-- [ ] In Vercel **Settings, Deployment Protection**, Preview is on Standard Protection for both projects. (I7)
+- [x] Push a small change on a branch of 36 characters or fewer to get a preview.
+- [x] The web preview's `/api/health` returns `{"status":"ok"}`.
+- [x] In Neon, the preview's branch shows `SELECT count(*) FROM subscribers;` as 0 (or test rows only). (R-1)
+- [x] In Upstash, preview traffic shows in `wotw-redis-preview` and none in `wotw-redis`. (R-3)
+- [x] In Vercel **Settings, Deployment Protection**, Preview is on Standard Protection for both projects. (I7)
 
 ## Afterwards
 
-- [ ] Tell me which steps worked, so it can tick R-1 to R-4 and I7 in `docs/threat_plan.md`, update the Status column in `docs/threat-model.md`, and restore the "previews never get production keys" rule in CLAUDE.md section 6.6.
+- [x] Tell me which steps worked, so it can tick R-1 to R-4 and I7 in `docs/threat_plan.md`, update the Status column in `docs/threat-model.md`, and restore the "previews never get production keys" rule in CLAUDE.md section 6.6.

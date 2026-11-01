@@ -82,7 +82,7 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 | I4 | Stack traces or internals in errors | One error shape; unhandled errors log type and location only, never the message | Done |
 | I5 | API schema and docs exposed | `/docs` and `/openapi.json` off in production | Done |
 | I6 | Data in transit read | HTTPS with HSTS; TLS verify-full to Neon; TLS to Upstash | Done |
-| I7 | Production data exposed through preview deployments | Deployment Protection on previews; separate secrets where possible. **Gap:** see R-1 to R-3 below | Open |
+| I7 | Production data exposed through preview deployments | Deployment Protection on previews; separate secrets where possible. Previews branch from the data-free `preview-base`, with their own roles, passwords and Upstash database (R-1 to R-3, closed 2026-11-01) | Done |
 
 ### Denial of service
 
@@ -105,15 +105,14 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 
 ## Known gaps and decisions needed
 
-These come from the current setup, not from code defects. Resolve them before real personal data exists (the start of Phase 1 step 1.3 at the latest).
+These came from the setup, not from code defects. R-1 to R-4 were closed on 2026-11-01, before real personal data existed; the table is kept as a record.
 
-| ID | Gap | Why it matters | Proposed action |
-|---|---|---|---|
-| R-1 | Neon preview branches are created from `main` and copy its data | Once production holds subscribers or prayer requests, every preview database holds a copy, reachable from preview code | Branch previews from a data-free base branch, or turn off per-preview branching for the production project |
-| R-2 | Preview and production share the role passwords (Neon branches copy roles), and the `NEON_*` variables are not Sensitive | A preview variable shown in the Vercel dashboard or leaked from a build is also a working production credential | Give preview its own roles and passwords, mark the variables Sensitive where the integration allows, rotate after the change |
-| R-3 | Preview and production share one Upstash Redis | A preview can exhaust or pollute production rate limits | A separate Upstash database for preview, or a key prefix per environment |
-| R-4 | CLAUDE.md section 6.6 says previews never get production keys | The statement is not true for R-2 and R-3 | Reword now, restore the rule once R-1 to R-3 are fixed |
-
+| ID | Gap | Why it matters | Action | Status |
+|---|---|---|---|---|
+| R-1 | Neon preview branches are created from `main` and copy its data | Once production holds subscribers or prayer requests, every preview database holds a copy, reachable from preview code | Branch previews from a data-free base branch, or turn off per-preview branching for the production project | Closed 2026-11-01 |
+| R-2 | Preview and production share the role passwords (Neon branches copy roles), and the `NEON_*` variables are not Sensitive | A preview variable shown in the Vercel dashboard or leaked from a build is also a working production credential | Give preview its own roles and passwords, mark the variables Sensitive where the integration allows, rotate after the change | Closed 2026-11-01 |
+| R-3 | Preview and production share one Upstash Redis | A preview can exhaust or pollute production rate limits | A separate Upstash database for preview, or a key prefix per environment | Closed 2026-11-01 |
+| R-4 | CLAUDE.md section 6.6 says previews never get production keys | The statement is not true for R-2 and R-3 | Reword now, restore the rule once R-1 to R-3 are fixed | Closed 2026-11-01 |
 Residual risks accepted for Phase 1: the Hobby plan's limits until launch; DMARC at `p=none` for the first weeks; delivery through the `hello@` and `prayer@` forwards depending on Squarespace forwarding.
 
 ## Out of scope for v1
