@@ -76,9 +76,9 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 
 | ID | Threat | Mitigation | Status |
 |---|---|---|---|
-| I1 | Prayer text leaks through logs, error tracking, analytics or email | Never logged; Sentry `before_send` scrubbing and `sendDefaultPii: false`; notification email carries the text only with consent; encrypted at rest | Planned (0.10, 1.4) |
+| I1 | Prayer text leaks through logs, error tracking, analytics or email | Never logged; Sentry `before_send` scrubbing and `sendDefaultPii: false`; notification email carries the text only with consent; encrypted at rest; a log-capture test (`test_log_privacy.py`) proves no body, email, token or exception text is logged | Partly done (logs and Sentry in 0.10; email and encryption in 1.4) |
 | I2 | Subscriber enumeration through sign-up responses | Identical 202 whether the email is new, pending or confirmed, and whether Kit succeeded | Planned (1.3) |
-| I3 | Secrets reach the repository or the client bundle | gitleaks in pre-commit and CI; `server-only`; only non-secret `NEXT_PUBLIC_*` reach the browser | Done; bundle check at the Phase 0 exit gate |
+| I3 | Secrets reach the repository or the client bundle | gitleaks in pre-commit and CI; `server-only`; only non-secret `NEXT_PUBLIC_*` reach the browser | Done; `scripts/check_bundle_secrets.py` runs in CI after the web build |
 | I4 | Stack traces or internals in errors | One error shape; unhandled errors log type and location only, never the message | Done |
 | I5 | API schema and docs exposed | `/docs` and `/openapi.json` off in production | Done |
 | I6 | Data in transit read | HTTPS with HSTS; TLS verify-full to Neon; TLS to Upstash | Done |
