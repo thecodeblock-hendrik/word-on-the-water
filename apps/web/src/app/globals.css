@@ -15,10 +15,23 @@
   --color-accent-on-deep: var(--accent-on-deep);
   --font-display: var(--font-barlow-condensed), "Arial Narrow", Arial, sans-serif;
   --font-ui: var(--font-barlow), "Helvetica Neue", Arial, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --shadow-menu: 0 12px 24px rgb(0 0 0 / 0.12);
+  --animate-menu-in: menu-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
 }
 
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 html {
+  scroll-padding-top: 5rem;
+  scroll-behavior: smooth;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-ui), sans-serif;
@@ -39,4 +52,22 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Logo colours: set --logo-ring, --logo-wave and --logo-gap on a parent to recolour it. */
+.ring {
+  stroke: var(--logo-ring, var(--ink));
+}
+.cross {
+  fill: var(--logo-ring, var(--ink));
+}
+.wave {
+  stroke: var(--logo-wave, var(--accent));
+}
+.curl {
+  fill: var(--logo-wave, var(--accent));
+}
+.spray,
+.gap {
+  stroke: var(--logo-gap, var(--bg));
 }

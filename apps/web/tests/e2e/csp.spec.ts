@@ -47,7 +47,7 @@ test("every asset loads over the page's own protocol with no failed requests", a
 
   expect(failed).toEqual([]);
   const ctaMinHeight = await page
-    .getByRole("link", { name: "Get the devotional" })
+    .locator("header a[href='/#subscribe']")
     .evaluate((el) => getComputedStyle(el).minHeight);
   expect(ctaMinHeight).toBe("44px"); // proves the stylesheet was applied
 });

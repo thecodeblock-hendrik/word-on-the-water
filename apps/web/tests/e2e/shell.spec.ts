@@ -13,7 +13,7 @@ test("shell renders with landmarks and no horizontal overflow", async ({ page })
 
 test("primary call to action is a comfortable touch target", async ({ page }) => {
   await page.goto("/");
-  const box = await page.getByRole("link", { name: "Get the devotional" }).boundingBox();
+  const box = await page.locator("header a[href='/#subscribe']").boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
 });
 
