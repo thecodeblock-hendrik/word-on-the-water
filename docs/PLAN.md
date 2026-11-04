@@ -224,7 +224,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Start here (gospel in 4 steps; wording to be read by a pastor or elder before launch)
 - [x] Statement of faith (full-statement link appears once a page or URL exists)
 - [x] Founder bio (logo mark fills the photo frame until a photo is added)
-- [ ] Footer with ESV copyright notice per Crossway permissions
+- [x] Footer with ESV copyright notice per Crossway permissions (social and privacy links appear when their addresses exist: privacy in 1.6)
 - [x] Scripture references stored as structured data (`book`, `chapter`, `verses`)
 - [ ] Content in typed TS/MDX; mockup "design notes" and "Ideas for Hendrik" excluded
 - [ ] Images via `next/image` (AVIF/WebP, explicit sizes, lazy below the fold)

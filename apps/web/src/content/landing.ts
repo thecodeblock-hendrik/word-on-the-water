@@ -131,5 +131,32 @@ export const founder = {
   photo: undefined as { src: string; alt: string } | undefined,
 };
 
+export const footer = {
+  groups: [
+    {
+      title: "Read",
+      links: [
+        { label: "Devotionals", href: "/#coming" },
+        { label: "Teaching", href: "/#coming" },
+        { label: "Start here", href: "/#start" },
+      ],
+    },
+    {
+      title: "About",
+      links: [
+        { label: "Our story", href: "/#about" },
+        { label: "Statement of faith", href: "/#believe" },
+        { label: "Prayer", href: "/#contact" },
+      ],
+    },
+  ],
+  /** A social link shows in the footer only once it has an href. */
+  social: [
+    { label: "Instagram", handle: "[@handle]", href: undefined as string | undefined },
+    { label: "YouTube", handle: "[@channel]", href: undefined as string | undefined },
+  ],
+  email: { label: "Email", href: "/#subscribe" } satisfies Link,
+};
+
 /** Everything the landing page says. The placeholder check scans this. */
-export const landing = { hero, about, coming, start, beliefs, founder };
+export const landing = { hero, about, coming, start, beliefs, founder, footer };
