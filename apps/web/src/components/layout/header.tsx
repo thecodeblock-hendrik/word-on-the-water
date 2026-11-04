@@ -33,6 +33,22 @@ export function Header() {
         </Link>
         <MobileMenu />
       </div>
+      <noscript>
+        <nav
+          aria-label="Main"
+          className="flex flex-wrap gap-x-5 border-t border-line pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] font-ui text-[15px] lg:hidden"
+        >
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="inline-flex min-h-11 items-center font-medium text-ink"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      </noscript>
     </header>
   );
 }

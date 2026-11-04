@@ -2,19 +2,32 @@
 
 import Link from "next/link";
 import { Dialog } from "radix-ui";
+import { useSyncExternalStore } from "react";
 
 import { NAV_LINKS } from "@/components/layout/nav-links";
+
+const subscribe = () => () => {};
+
+/** False on the server and during hydration, true afterwards. */
+function useHydrated() {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+}
 
 /**
  * Menu for screens below lg. Non-modal, so the button stays usable and toggles it.
  * Esc, the button or choosing a link closes it, and focus returns to the button.
  */
 export function MobileMenu() {
+  const hydrated = useHydrated();
   return (
     <Dialog.Root modal={false}>
       <Dialog.Trigger
         aria-label="Menu"
-        className="inline-flex size-11 flex-none items-center justify-center rounded-sm border-[1.5px] border-line text-ink lg:hidden"
+        className={`inline-flex size-11 flex-none items-center justify-center rounded-sm border-[1.5px] border-line text-ink lg:hidden ${hydrated ? "" : "invisible"}`}
       >
         <svg viewBox="0 0 20 20" aria-hidden="true" className="size-5">
           <path
