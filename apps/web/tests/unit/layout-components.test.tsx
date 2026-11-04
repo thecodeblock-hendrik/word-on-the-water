@@ -33,3 +33,16 @@ describe("Footer", () => {
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
 });
+
+describe("safe areas", () => {
+  it("header and footer respect the notch and home indicator", () => {
+    const { container: header } = render(<Header />);
+    expect(header.innerHTML).toMatch(/safe-area-inset-top/);
+    expect(header.innerHTML).toMatch(/safe-area-inset-left/);
+    expect(header.innerHTML).toMatch(/safe-area-inset-right/);
+    const { container: footer } = render(<Footer />);
+    expect(footer.innerHTML).toMatch(/safe-area-inset-bottom/);
+    expect(footer.innerHTML).toMatch(/safe-area-inset-left/);
+    expect(footer.innerHTML).toMatch(/safe-area-inset-right/);
+  });
+});

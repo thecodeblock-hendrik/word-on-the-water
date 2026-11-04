@@ -8,7 +8,7 @@ import { buttonClasses } from "@/components/ui/button";
 export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg pt-[env(safe-area-inset-top)]">
-      <div className="mx-auto flex max-w-[1120px] items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] py-3 min-[520px]:gap-5">
+      <div className="mx-auto flex max-w-[1120px] items-center gap-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] py-3 min-[520px]:gap-5">
         <Link
           href="/"
           className="inline-flex min-h-11 items-center gap-2.5 whitespace-nowrap font-display text-[.95rem] font-bold uppercase tracking-[.12em] text-ink min-[420px]:text-[1.1rem]"

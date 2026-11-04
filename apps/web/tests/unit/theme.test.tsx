@@ -73,3 +73,44 @@ describe("ThemeToggle", () => {
     expect(screen.getByRole("button").className).toMatch(/min-w-11/);
   });
 });
+
+describe("theme colours for the browser chrome", () => {
+  it("match the page background tokens in tokens.css", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { THEME_COLORS } = await import("@/lib/theme");
+    const css = readFileSync("src/styles/tokens.css", "utf8");
+    const lightBg = /:root \{[^}]*--bg: (#\w+)/.exec(css)?.[1];
+    const darkBg = /:root\[data-theme="dark"\] \{[^}]*--bg: (#\w+)/.exec(css)?.[1];
+    expect(THEME_COLORS.light).toBe(lightBg);
+    expect(THEME_COLORS.dark).toBe(darkBg);
+  });
+
+  it("follows the device when no theme is chosen", async () => {
+    const { themeColor } = await import("@/lib/theme");
+    expect(themeColor(undefined)).toEqual([
+      { media: "(prefers-color-scheme: light)", color: "#fbf3e8" },
+      { media: "(prefers-color-scheme: dark)", color: "#0f2233" },
+    ]);
+  });
+
+  it("uses one colour when the reader chose a theme", async () => {
+    const { themeColor } = await import("@/lib/theme");
+    expect(themeColor("dark")).toBe("#0f2233");
+    expect(themeColor("light")).toBe("#fbf3e8");
+  });
+});
+
+describe("ThemeToggle and the browser chrome", () => {
+  it("sets every theme-color meta tag to the chosen colour", async () => {
+    document.head.innerHTML =
+      '<meta name="theme-color" content="#fbf3e8" media="(prefers-color-scheme: light)">' +
+      '<meta name="theme-color" content="#0f2233" media="(prefers-color-scheme: dark)">';
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false }) as never;
+    const { ThemeToggle } = await import("@/components/theme-toggle");
+    render(<ThemeToggle saveTheme={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button"));
+    const metas = document.head.querySelectorAll('meta[name="theme-color"]');
+    expect(metas).toHaveLength(2);
+    metas.forEach((meta) => expect(meta).toHaveAttribute("content", "#0f2233"));
+  });
+});

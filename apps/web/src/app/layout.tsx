@@ -8,7 +8,7 @@ import { LogoSprite } from "@/components/logo";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
-import { THEME_COOKIE, parseTheme } from "@/lib/theme";
+import { THEME_COOKIE, parseTheme, themeColor } from "@/lib/theme";
 
 import "./globals.css";
 
@@ -31,11 +31,15 @@ export const metadata: Metadata = {
   description: "Devotionals and Bible teaching for men and surfers.",
 };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  viewportFit: "cover",
-};
+export async function generateViewport(): Promise<Viewport> {
+  const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
+  return {
+    width: "device-width",
+    initialScale: 1,
+    viewportFit: "cover",
+    themeColor: themeColor(theme),
+  };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Reading cookies makes every page render per request, as the nonce CSP requires (ADR 0007).

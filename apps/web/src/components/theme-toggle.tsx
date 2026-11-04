@@ -1,6 +1,6 @@
 "use client";
 
-import type { Theme } from "@/lib/theme";
+import { THEME_COLORS, type Theme } from "@/lib/theme";
 
 function currentTheme(): Theme {
   const chosen = document.documentElement.dataset.theme;
@@ -8,11 +8,19 @@ function currentTheme(): Theme {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+/** Both device-media tags get the chosen colour, so the chosen theme wins over the device. */
+function setBrowserChrome(theme: Theme) {
+  document.head
+    .querySelectorAll('meta[name="theme-color"]')
+    .forEach((meta) => meta.setAttribute("content", THEME_COLORS[theme]));
+}
+
 /** Light/dark switch. Updates the page at once and saves the choice in a cookie. */
 export function ThemeToggle({ saveTheme }: { saveTheme: (theme: Theme) => Promise<void> }) {
   function toggle() {
     const next: Theme = currentTheme() === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
+    setBrowserChrome(next);
     void saveTheme(next);
   }
 
