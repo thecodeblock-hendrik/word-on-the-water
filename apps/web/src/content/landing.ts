@@ -109,5 +109,27 @@ export const start = {
   readOn: "or read the Gospel of Mark, the shortest account of Jesus' life.",
 };
 
+export const beliefs = {
+  eyebrow: "What we believe",
+  heading: "Simple, historic faith",
+  points: [
+    "The Bible is God's Word, true and trustworthy.",
+    "There is one God: Father, Son and Holy Spirit.",
+    "Jesus Christ is fully God and fully man. He died for our sins and rose bodily from the dead.",
+    "We are saved by grace through faith in Christ alone.",
+    "[Your remaining points, or link to your church's statement]",
+  ],
+};
+
+export const founder = {
+  eyebrow: "Who's behind this",
+  heading: "Meet the writer",
+  name: "Hendrik [surname]",
+  bio: "[Where you surf, your family, how you came to faith, in about 80 words.]",
+  church: "Member of [home church, town].",
+  /** Add { src, alt } when a photo is shot; until then the logo mark fills the frame. */
+  photo: undefined as { src: string; alt: string } | undefined,
+};
+
 /** Everything the landing page says. The placeholder check scans this. */
-export const landing = { hero, about, coming, start };
+export const landing = { hero, about, coming, start, beliefs, founder };

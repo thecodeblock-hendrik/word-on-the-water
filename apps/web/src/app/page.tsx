@@ -1,4 +1,5 @@
 import { About } from "@/components/sections/about";
+import { BeliefsFounder } from "@/components/sections/beliefs-founder";
 import { Coming } from "@/components/sections/coming";
 import { Hero } from "@/components/sections/hero";
 import { Start } from "@/components/sections/start";
@@ -11,6 +12,7 @@ export default function Home() {
       <hr className="border-0 border-t border-line" />
       <Coming />
       <Start />
+      <BeliefsFounder />
     </>
   );
 }
