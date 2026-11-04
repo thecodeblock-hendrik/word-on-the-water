@@ -220,7 +220,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 ### 1.2 Page sections (statically generated, Server Components)
 - [x] Hero (Mark 4:41 + logo)
 - [x] About / who it is for (one placeholder paragraph awaits Hendrik's own words)
-- [ ] What's coming (weekly devotional, teaching series, audio) with sample surf report
+- [x] What's coming (weekly devotional, teaching series, audio) with sample surf report (draft copy marked as placeholders)
 - [ ] Start here (gospel in 4 steps)
 - [ ] Statement of faith
 - [ ] Founder bio

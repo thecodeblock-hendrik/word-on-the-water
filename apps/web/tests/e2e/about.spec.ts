@@ -24,5 +24,5 @@ test("the About link lands on the heading, not hidden under the sticky header", 
 
 test("who it is for lists three groups", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("term")).toHaveCount(3);
+  await expect(page.getByLabel("Who this is for").getByRole("term")).toHaveCount(3);
 });

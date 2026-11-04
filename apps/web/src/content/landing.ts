@@ -40,5 +40,44 @@ export const about = {
   ],
 };
 
+export const coming = {
+  eyebrow: "What's coming",
+  heading: "Read it before the paddle out",
+  intro:
+    "Content is on the way. Sign up and the first devotional lands in your inbox on launch day.",
+  offers: [
+    {
+      status: "Launching [month 2027]",
+      title: "Weekly devotional",
+      body: "A five-minute read each [Monday]. One passage, one thought, one question to take into the week.",
+    },
+    {
+      status: "In planning",
+      title: "Bible teaching series",
+      body: "Walk through a book of the Bible over several weeks. A good first series could be [Mark: the One the sea obeys].",
+    },
+    {
+      status: "Later",
+      title: "Audio and video",
+      body: "Short readings recorded at the beach for the drive to the coast. [Podcast or YouTube, decide later]",
+    },
+  ],
+  sample: {
+    eyebrow: "Sample devotional",
+    title: "He brought them to their desired haven",
+    meta: "[Date] · by [Author]",
+    passage: { book: "Psalm", chapter: 107, verses: "23–30" } satisfies Scripture,
+    report: [
+      { term: "Read time", value: "5 min" },
+      { term: "Series", value: "Storm Sayings" },
+      { term: "Take out with you", value: "1 question" },
+    ],
+    paragraphs: [
+      "[Opening paragraph. A short story from the water, then the turn to the passage. About 150 words.]",
+      "[Reflection. What the passage says about God, and what it asks of us this week.]",
+    ],
+  },
+};
+
 /** Everything the landing page says. The placeholder check scans this. */
-export const landing = { hero, about };
+export const landing = { hero, about, coming };
