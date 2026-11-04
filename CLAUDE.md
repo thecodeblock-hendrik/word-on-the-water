@@ -24,7 +24,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 **Mobile strategy (decided, option B in [FLUTTER.md](docs/FLUTTER.md)):** the Next.js site is the mobile experience: mobile-first, fast, and installable as a PWA through `app/manifest.ts`. A native Flutter app for iOS and Android may be added later on the same FastAPI; it is revisited at the Phase 2 gate. Until then, no Flutter work and no changes to the web stack.
 
-**Design source:** `docs/design/landing-page-design-document.pdf` (the specification) and `docs/design/wotw_landing_page.html` (the approved mockup); the older `website/landing-page-mockup.html` is superseded. Where the mockup and the document disagree, the document wins. The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped. A PDF of the mockup is in `mockup_site.pdf`.
+**Design source:** `docs/design/landing-page-design-document.pdf` (the specification) and `docs/design/wotw_landing_page.html` (the approved mockup); the older `website/landing-page-mockup.html` is superseded. Where the mockup and the document disagree, the document wins. The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped.
 
 **Repository:** public at https://github.com/thecodeblock-hendrik/word-on-the-water, no license (all rights reserved). Because it is public: never commit secrets, real prayer requests or subscriber data; gitleaks runs in pre-commit and CI.
 
