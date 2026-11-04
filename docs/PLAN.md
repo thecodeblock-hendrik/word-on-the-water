@@ -17,12 +17,12 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 ---
 
-## Status (updated 2026-10-31)
+## Status (updated 2026-11-04)
 
 | Phase | Status |
 |---|---|
 | 0 Foundations | Exit gate passed 2026-11-01; open carry-overs: Neon preview branching toggle, web coverage in CI. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (Neon preview branching open). 0.10 observability and docs, exit gate |
-| 1 Landing page | Not started |
+| 1 Landing page | In progress. 1.1 design system and layout done (PR #59); 1.2 page sections built (hero, about, what's coming, start here, beliefs and founder, footer), draft copy still marked as placeholders. Next: 1.3 sign-up. The contact section (`#contact`, linked from the header and footer) arrives with 1.4 and 1.5 |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
 | 4 Community | Not started (decision gate) |
@@ -226,9 +226,9 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Founder bio (logo mark fills the photo frame until a photo is added)
 - [x] Footer with ESV copyright notice per Crossway permissions (social and privacy links appear when their addresses exist: privacy in 1.6)
 - [x] Scripture references stored as structured data (`book`, `chapter`, `verses`)
-- [ ] Content in typed TS/MDX; mockup "design notes" and "Ideas for Hendrik" excluded
-- [ ] Images via `next/image` (AVIF/WebP, explicit sizes, lazy below the fold)
-- [ ] Screenshot review at 375, 768, 1280 against `website/landing-page-mockup.html`
+- [x] Content in typed TS (`apps/web/src/content/landing.ts`); mockup "design notes" and "Ideas for Hendrik" excluded. `pnpm check:placeholders` lists leftover [bracketed] draft copy and is a launch gate (1.9)
+- [x] Images via `next/image` (AVIF then WebP, explicit `sizes`, lazy by default). The only image today is the optional founder photo; the logo is inline SVG
+- [x] Screenshot review at 375, 768, 1280 against `docs/design/wotw_landing_page.html` (differences are deliberate: design document over mockup quirks, no dead links)
 
 ### 1.3 Email sign-up (Kit, double opt-in)
 Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer (ADR 0008). Our API validates, defends and forwards.

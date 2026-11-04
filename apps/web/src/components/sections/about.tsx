@@ -3,7 +3,6 @@ import { about } from "@/content/landing";
 
 /** Why the ministry exists, beside who it is for. */
 export function About() {
-  const [lead, ...rest] = about.paragraphs;
   return (
     <section id="about" aria-labelledby="about-h" className="py-[72px]">
       <div className="mx-auto grid max-w-[1120px] items-start gap-8 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] lg:grid-cols-2 lg:gap-14">
@@ -17,10 +16,7 @@ export function About() {
           >
             {about.heading}
           </h2>
-          <p className="font-serif text-[1.25rem] leading-[1.55]">
-            <PlaceholderText>{lead}</PlaceholderText>
-          </p>
-          {rest.map((paragraph) => (
+          {about.paragraphs.map((paragraph) => (
             <p key={paragraph} className="font-serif">
               <PlaceholderText>{paragraph}</PlaceholderText>
             </p>
@@ -30,7 +26,7 @@ export function About() {
           {about.who.map(({ term, description }) => (
             <div
               key={term}
-              className="grid gap-1 border-b border-line py-[18px] sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-4"
+              className="grid gap-1 border-b border-line py-[18px] lg:grid-cols-[120px_minmax(0,1fr)] lg:gap-4"
             >
               <dt className="font-display font-semibold uppercase tracking-[.1em] text-accent-ink">
                 {term}
