@@ -18,6 +18,9 @@ test("the footer toggle switches theme and remembers it after reload", async ({ 
   await expect
     .poll(async () => (await page.context().cookies()).find((c) => c.name === "theme")?.value)
     .toBe("dark");
+  // Over plain http (local and CI) the cookie must not be Secure, or WebKit on Linux drops it.
+  const cookie = (await page.context().cookies()).find((c) => c.name === "theme");
+  expect(cookie?.secure).toBe(false);
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 });

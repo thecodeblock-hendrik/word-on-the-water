@@ -8,7 +8,11 @@ import { THEME_COOKIE, parseTheme } from "@/lib/theme";
 afterEach(cleanup);
 
 const set = vi.fn();
-vi.mock("next/headers", () => ({ cookies: async () => ({ set }) }));
+let forwardedProto: string | null = null;
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ set }),
+  headers: async () => new Headers(forwardedProto ? { "x-forwarded-proto": forwardedProto } : {}),
+}));
 
 describe("parseTheme", () => {
   it("accepts light and dark only", () => {
@@ -20,7 +24,27 @@ describe("parseTheme", () => {
 });
 
 describe("setTheme action", () => {
-  beforeEach(() => set.mockClear());
+  beforeEach(() => {
+    set.mockClear();
+    forwardedProto = null;
+  });
+
+  it("marks the cookie Secure only when the request came over https", async () => {
+    const { setTheme } = await import("@/lib/actions/theme");
+    forwardedProto = "https";
+    await setTheme("dark");
+    expect(set.mock.calls[0][2]).toMatchObject({ secure: true });
+    set.mockClear();
+    forwardedProto = "http";
+    await setTheme("dark");
+    expect(set.mock.calls[0][2]).toMatchObject({ secure: false });
+  });
+
+  it("is not Secure when there is no forwarded protocol, as on local http", async () => {
+    const { setTheme } = await import("@/lib/actions/theme");
+    await setTheme("light");
+    expect(set.mock.calls[0][2]).toMatchObject({ secure: false });
+  });
 
   it("stores a valid theme in a long-lived cookie", async () => {
     const { setTheme } = await import("@/lib/actions/theme");
