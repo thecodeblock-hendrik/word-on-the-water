@@ -221,7 +221,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Hero (Mark 4:41 + logo)
 - [x] About / who it is for (one placeholder paragraph awaits Hendrik's own words)
 - [x] What's coming (weekly devotional, teaching series, audio) with sample surf report (draft copy marked as placeholders)
-- [ ] Start here (gospel in 4 steps)
+- [x] Start here (gospel in 4 steps; wording to be read by a pastor or elder before launch)
 - [ ] Statement of faith
 - [ ] Founder bio
 - [ ] Footer with ESV copyright notice per Crossway permissions

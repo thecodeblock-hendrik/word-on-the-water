@@ -1,6 +1,7 @@
 import { About } from "@/components/sections/about";
 import { Coming } from "@/components/sections/coming";
 import { Hero } from "@/components/sections/hero";
+import { Start } from "@/components/sections/start";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
       <About />
       <hr className="border-0 border-t border-line" />
       <Coming />
+      <Start />
     </>
   );
 }

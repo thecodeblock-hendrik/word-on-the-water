@@ -79,5 +79,35 @@ export const coming = {
   },
 };
 
+export const start = {
+  eyebrow: "New to faith?",
+  heading: "Start here",
+  intro: "The whole Bible points to one story. Here it is in four parts.",
+  steps: [
+    {
+      title: "God made it all",
+      body: "The ocean, the swell, and you. He made us to know Him.",
+      reference: { book: "Genesis", chapter: 1, verses: "1" } satisfies Scripture,
+    },
+    {
+      title: "We went our own way",
+      body: "Every one of us has turned from God. That breaks our relationship with Him.",
+      reference: { book: "Romans", chapter: 3, verses: "23" } satisfies Scripture,
+    },
+    {
+      title: "Jesus came for us",
+      body: "The One who calmed the sea died for our sin and rose again.",
+      reference: { book: "1 Corinthians", chapter: 15, verses: "3–4" } satisfies Scripture,
+    },
+    {
+      title: "Trust Him",
+      body: "Turn to Jesus and trust Him. Forgiveness is a gift, not something we earn.",
+      reference: { book: "Ephesians", chapter: 2, verses: "8–9" } satisfies Scripture,
+    },
+  ],
+  talk: { label: "Talk to someone", href: "/#contact" } satisfies Link,
+  readOn: "or read the Gospel of Mark, the shortest account of Jesus' life.",
+};
+
 /** Everything the landing page says. The placeholder check scans this. */
-export const landing = { hero, about, coming };
+export const landing = { hero, about, coming, start };
