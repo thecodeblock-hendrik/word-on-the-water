@@ -218,14 +218,14 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Tests: theme toggle, menu keyboard and focus behaviour; header without JavaScript shows the links in a noscript nav
 
 ### 1.2 Page sections (statically generated, Server Components)
-- [ ] Hero (Mark 4:41 + logo)
+- [x] Hero (Mark 4:41 + logo)
 - [ ] About / who it is for
 - [ ] What's coming (weekly devotional, teaching series, audio) with sample surf report
 - [ ] Start here (gospel in 4 steps)
 - [ ] Statement of faith
 - [ ] Founder bio
 - [ ] Footer with ESV copyright notice per Crossway permissions
-- [ ] Scripture references stored as structured data (`book`, `chapter`, `verse`)
+- [x] Scripture references stored as structured data (`book`, `chapter`, `verses`)
 - [ ] Content in typed TS/MDX; mockup "design notes" and "Ideas for Hendrik" excluded
 - [ ] Images via `next/image` (AVIF/WebP, explicit sizes, lazy below the fold)
 - [ ] Screenshot review at 375, 768, 1280 against `website/landing-page-mockup.html`
