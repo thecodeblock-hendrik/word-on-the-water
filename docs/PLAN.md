@@ -208,14 +208,14 @@ Tests are written first for all logic. The order of items in this plan is not th
 ## Phase 1 - Landing page (first public release)
 
 ### 1.1 Design system and layout (mobile first, 375px before wider)
-- [ ] Finalise colour scheme and apply to tokens **(Hendrik)**
-- [ ] Light and dark via `prefers-color-scheme` plus cookie-backed toggle (no flash on SSR)
-- [ ] Shared UI primitives: button, input, textarea, checkbox, label, field error (Radix/shadcn style)
-- [ ] Sticky header with single CTA; accessible mobile menu (Radix Dialog)
-- [ ] Touch targets at least 44px; safe-area insets; `prefers-reduced-motion` respected
-- [ ] Browser chrome follows the scheme: `export const viewport` in `layout.tsx` with `themeColor` for light and dark (`prefers-color-scheme` media), values from the tokens; `viewport-fit=cover` so safe-area insets apply on notched phones
-- [ ] Inline SVG logo using `--logo-ring` and `--logo-wave` tokens
-- [ ] Tests: theme toggle, menu keyboard and focus behaviour
+- [x] Finalise colour scheme and apply to tokens: Dawn patrol (light) and Night swell (dark), per `docs/design`
+- [x] Light and dark via `prefers-color-scheme` plus cookie-backed toggle (no flash on SSR)
+- [x] Shared UI primitives: button, input, textarea, checkbox, label, field error (plain styled native elements; Radix arrives with the menu dialog)
+- [x] Sticky header with single CTA; accessible mobile menu (Radix Dialog, non-modal so the button toggles it)
+- [x] Touch targets at least 44px; safe-area insets; `prefers-reduced-motion` respected
+- [x] Browser chrome follows the scheme: `export const viewport` in `layout.tsx` with `themeColor` for light and dark (`prefers-color-scheme` media), values from the tokens; `viewport-fit=cover` so safe-area insets apply on notched phones
+- [x] Inline SVG logo using `--logo-ring` and `--logo-wave` tokens
+- [x] Tests: theme toggle, menu keyboard and focus behaviour; header without JavaScript shows the links in a noscript nav
 
 ### 1.2 Page sections (statically generated, Server Components)
 - [ ] Hero (Mark 4:41 + logo)
