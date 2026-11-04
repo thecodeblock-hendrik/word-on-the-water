@@ -208,7 +208,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 ## Phase 1 - Landing page (first public release)
 
 ### 1.1 Design system and layout (mobile first, 375px before wider)
-- [ ] Finalise colour scheme and apply to tokens **(Hendrik)**
+- [x] Finalise colour scheme and apply to tokens: Dawn patrol (light) and Night swell (dark), per `docs/design`
 - [ ] Light and dark via `prefers-color-scheme` plus cookie-backed toggle (no flash on SSR)
 - [ ] Shared UI primitives: button, input, textarea, checkbox, label, field error (Radix/shadcn style)
 - [ ] Sticky header with single CTA; accessible mobile menu (Radix Dialog)

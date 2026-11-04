@@ -1,16 +1,20 @@
-/* Design tokens from website/landing-page-mockup.html. Only these change with the colour scheme. */
+/*
+ * Design tokens from docs/design (Dawn patrol light, Night swell dark).
+ * Only these change with the colour scheme. A data-theme attribute on <html>
+ * (set from the theme cookie) overrides the device setting.
+ */
 :root {
-  --bg: #f4f1ea;
-  --surface: #fbf9f4;
-  --ink: #13314a;
-  --muted: #4f6272;
-  --line: #d9d3c6;
-  --accent: #2e7275;
-  --accent-ink: #245d60;
-  --deep: #13314a;
-  --on-deep: #f4f1ea;
-  --on-deep-muted: #b9c6cf;
-  --accent-on-deep: #6fb8b4;
+  --bg: #fbf3e8;
+  --surface: #fffaf3;
+  --ink: #2b2d42;
+  --muted: #5c5e70;
+  --line: #e9dccb;
+  --accent: #d9703a;
+  --accent-ink: #a9501f;
+  --deep: #2b2d42;
+  --on-deep: #fbf3e8;
+  --on-deep-muted: #c4c3cf;
+  --accent-on-deep: #f0955f;
   color-scheme: light;
 }
 
