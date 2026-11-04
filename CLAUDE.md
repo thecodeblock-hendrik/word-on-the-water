@@ -6,7 +6,7 @@ Development plan and working rules for the **Word on the Water** web application
 
 This file is both the project plan and the instructions for anyone (human or Claude Code) working in the repository. Read it fully before making changes. When the plan and the code disagree, fix one of them in the same pull request.
 
-**Status (updated 2026-11-01):** Phase 0 exit gate passed (carry-overs: Neon preview branching toggle, web coverage in CI); Phase 1 not started. Steps 0.1 to 0.8 done (repo, ADRs, API, database, email outbox, web shell, OpenAPI types, CI and branch protection); 0.9 Vercel nearly done (projects, Neon, Upstash, env vars, protection and previews working in `fra1`; Neon preview branching open). Next: Phase 1, starting with 1.1 (needs the colour scheme decision). Step-by-step progress lives in [PLAN.md](docs/PLAN.md); this file holds the stack, rules and decisions.
+**Status (updated 2026-11-04):** Phase 0 exit gate passed (carry-overs: Neon preview branching toggle, web coverage in CI). Phase 1 in progress: 1.1 design system done (Dawn patrol light and Night swell dark, theme toggle, UI primitives, header and menu); 1.2 page sections built with draft copy still marked as `[placeholders]`. Next: 1.3 email sign-up. Step-by-step progress lives in [PLAN.md](docs/PLAN.md); this file holds the stack, rules and decisions.
 
 ---
 
@@ -24,7 +24,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 **Mobile strategy (decided, option B in [FLUTTER.md](docs/FLUTTER.md)):** the Next.js site is the mobile experience: mobile-first, fast, and installable as a PWA through `app/manifest.ts`. A native Flutter app for iOS and Android may be added later on the same FastAPI; it is revisited at the Phase 2 gate. Until then, no Flutter work and no changes to the web stack.
 
-**Design source:** `website/landing-page-mockup.html` (published at https://claude.ai/artifact/UYYvSXJkgeofmJ8PchzgWw). The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped. A PDF of the mockup is in `mockup_site.pdf`.
+**Design source:** `docs/design/landing-page-design-document.pdf` (the specification) and `docs/design/wotw_landing_page.html` (the approved mockup); the older `website/landing-page-mockup.html` is superseded. Where the mockup and the document disagree, the document wins. The mockup is the visual reference, not production code. Its "design notes" and "Ideas for Hendrik" sections are not shipped.
 
 **Repository:** public at https://github.com/thecodeblock-hendrik/word-on-the-water, no license (all rights reserved). Because it is public: never commit secrets, real prayer requests or subscriber data; gitleaks runs in pre-commit and CI.
 
@@ -414,7 +414,7 @@ Progress is tracked step by step in [PLAN.md](docs/PLAN.md); this section only d
 | Phase | Status |
 |---|---|
 | 0 Foundations | Exit gate passed 2026-11-01 (carry-overs: Neon preview branching toggle, web coverage in CI) |
-| 1 Landing page | Not started |
+| 1 Landing page | In progress (1.1 done, 1.2 built) |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
 | 4 Community | Not started (decision gate) |

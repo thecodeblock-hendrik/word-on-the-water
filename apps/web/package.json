@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "e2e:fast": "playwright test --project=pixel-7 --project=desktop-chromium"
+    "e2e:fast": "playwright test --project=pixel-7 --project=desktop-chromium",
+    "check:placeholders": "NODE_NO_WARNINGS=1 node scripts/check-placeholders.mts"
   },
   "dependencies": {
     "@next/env": "^16.4.3",

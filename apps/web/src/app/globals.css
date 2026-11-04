@@ -34,9 +34,13 @@ html {
   scroll-behavior: smooth;
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-ui), sans-serif;
+  font-family: var(--font-serif), serif;
   font-size: 100%;
-  line-height: 1.6;
+}
+
+body {
+  font-size: 1.0625rem;
+  line-height: 1.65;
 }
 
 :focus-visible {
