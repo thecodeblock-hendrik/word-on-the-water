@@ -2,11 +2,12 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, Lora } from "next/font/google";
-import { connection } from "next/server";
+import { cookies } from "next/headers";
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { THEME_COOKIE, parseTheme } from "@/lib/theme";
 
 import "./globals.css";
 
@@ -36,10 +37,14 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  // Nonces are per request, so every page must render at request time (ADR 0007).
-  await connection();
+  // Reading cookies makes every page render per request, as the nonce CSP requires (ADR 0007).
+  const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
   return (
-    <html lang="en" className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}>
+    <html
+      lang="en"
+      data-theme={theme}
+      className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}
+    >
       <body className="flex min-h-dvh flex-col">
         <SkipLink />
         <Header />
