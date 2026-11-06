@@ -1,12 +1,48 @@
 import { expect, type Page, test } from "@playwright/test";
 
 const path = "/devotionals/advent-01-more-than-watchmen";
+const week2 = "/devotionals/advent-02-the-long-wait";
+// The test server pretends it is Saturday 12 December 2026 (see playwright.config.ts),
+// so weeks 1 and 2 are published and the card shows the newest, week 2.
 
-test("the landing card opens the full devotional", async ({ page }) => {
+test("the landing card shows the newest published devotional and opens it in full", async ({
+  page,
+}) => {
   await page.goto("/");
+  const card = page.getByRole("region", { name: /devotional preview/i });
+  await expect(card.getByRole("heading", { level: 3, name: "The Long Wait" })).toBeVisible();
   await page.getByRole("link", { name: "Read the full devotional" }).click();
+  await expect(page).toHaveURL(week2);
+  await expect(page.getByRole("heading", { level: 1, name: "The Long Wait" })).toBeVisible();
+});
+
+test("from week 2 the series list goes back to week 1, which opens in full, and forward again", async ({
+  page,
+}) => {
+  await page.goto(week2);
+  const weeks = page.getByRole("navigation", { name: "Advent weeks" });
+  await weeks.getByRole("link", { name: "More Than Watchmen" }).click();
   await expect(page).toHaveURL(path);
   await expect(page.getByRole("heading", { level: 1, name: "More Than Watchmen" })).toBeVisible();
+
+  await page
+    .getByRole("navigation", { name: "Advent weeks" })
+    .getByRole("link", { name: "The Long Wait" })
+    .click();
+  await expect(page).toHaveURL(week2);
+});
+
+test("the Previous card on week 2 opens week 1, and week 3 is shown but not a link", async ({
+  page,
+}) => {
+  await page.goto(week2);
+  const nav = page.getByRole("navigation", { name: "Series" });
+  await expect(nav).toContainText("Next · 19 December");
+  await expect(nav.getByRole("link", { name: /Next/ })).toHaveCount(0);
+  const weeks = page.getByRole("navigation", { name: "Advent weeks" });
+  await expect(weeks.getByRole("link")).toHaveCount(1);
+  await nav.getByRole("link", { name: /Previous/ }).click();
+  await expect(page).toHaveURL(path);
 });
 
 test("the page loads with no CSP violations, failed requests or console errors", async ({

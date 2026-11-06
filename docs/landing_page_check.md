@@ -105,6 +105,8 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 - [x] Light and dark art and verse cards follow the theme
 - [x] No inline styles (CSP), no console errors, e2e on five browser projects
 - [x] Header fits 320 to 414px wide with its right margin intact (it overflowed by 12px at 360 and 375px). Tested at plain window widths, because the iPhone and Pixel e2e profiles widen themselves and cannot show a sideways scroll
+- [x] Series list goes back through published weeks (and forward once published); the landing card follows the calendar; both tested with `DEVOTIONAL_TODAY`
+- [ ] After launch, change the "Launching 5 December 2026" status in What's coming to something that stays true each week **(Hendrik)**
 - [ ] Sign-up form in the closing band (arrives with 1.3; today it is a Subscribe button)
 - [x] On phones the surf report stays above the article and the series list sits below it; on wide screens both stay in the side column
 - [ ] Mark up the page for search (JSON-LD `Article`) with step 1.6
