@@ -75,3 +75,22 @@ body {
 .gap {
   stroke: var(--logo-gap, var(--bg));
 }
+
+/* Show the image made for the current colour scheme. Same rules as tokens.css. */
+.when-dark {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .when-light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .when-dark {
+    display: block;
+  }
+}
+:root[data-theme="dark"] .when-light {
+  display: none;
+}
+:root[data-theme="dark"] .when-dark {
+  display: block;
+}

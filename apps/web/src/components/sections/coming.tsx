@@ -1,14 +1,22 @@
+import Link from "next/link";
+
+import { InlineMarkdown } from "@/components/inline-markdown";
 import { PlaceholderText } from "@/components/placeholder-text";
+import { buttonClasses } from "@/components/ui/button";
 import { coming } from "@/content/landing";
-import { formatReference } from "@/lib/scripture";
+import type { Devotional } from "@/lib/devotionals/parse";
+import { reportRows } from "@/lib/devotionals/report";
+import type { Series } from "@/lib/devotionals/series";
+import { formatDate } from "@/lib/devotionals/format";
 
 const eyebrow = "font-display text-sm font-semibold uppercase tracking-[.18em] text-accent-ink";
 const h3 = "font-display text-[1.35rem] font-semibold uppercase leading-[1.05] tracking-[.05em]";
 
-/** What is on the way, plus a sample devotional so readers can see what they will get. */
-export function Coming() {
-  const { sample } = coming;
-  const report = [{ term: "Passage", value: formatReference(sample.passage) }, ...sample.report];
+/** What is on the way, plus the latest devotional so readers can see what they will get. */
+export function Coming({ devotional, series }: { devotional: Devotional; series: Series }) {
+  const { meta } = devotional;
+  const report = reportRows(devotional, series);
+  const excerpt = devotional.sections[0].markdown.split("\n\n");
   return (
     <section id="coming" aria-labelledby="coming-h" className="py-[72px]">
       <div className="mx-auto max-w-[1120px] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
@@ -43,7 +51,7 @@ export function Coming() {
         </div>
         <div
           role="region"
-          aria-label="Sample devotional preview"
+          aria-label="Devotional preview"
           className="mt-7 grid overflow-hidden rounded-md border border-line bg-surface md:grid-cols-[260px_minmax(0,1fr)]"
         >
           <div className="grid content-start gap-3.5 bg-deep p-6 font-ui text-on-deep">
@@ -63,16 +71,22 @@ export function Coming() {
             </dl>
           </div>
           <div className="grid max-w-[70ch] gap-3.5 p-7">
-            <span className={eyebrow}>{sample.eyebrow}</span>
-            <h3 className={`${h3} text-[1.7rem]`}>{sample.title}</h3>
+            <span className={eyebrow}>Latest devotional</span>
+            <h3 className={`${h3} text-[1.7rem]`}>{meta.title}</h3>
             <span className="font-ui text-[13px] tracking-[.04em] text-muted">
-              <PlaceholderText>{sample.meta}</PlaceholderText>
+              {formatDate(meta.publishAt)} · by {meta.author}
             </span>
-            {sample.paragraphs.map((paragraph) => (
+            {excerpt.map((paragraph) => (
               <p key={paragraph}>
-                <PlaceholderText>{paragraph}</PlaceholderText>
+                <InlineMarkdown>{paragraph}</InlineMarkdown>
               </p>
             ))}
+            <Link
+              href={`/devotionals/${devotional.slug}`}
+              className={`${buttonClasses("primary")} justify-self-start`}
+            >
+              Read the full devotional
+            </Link>
           </div>
         </div>
       </div>

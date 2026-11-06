@@ -15,7 +15,17 @@ loadEnvConfig(
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  images: { formats: ["image/avif", "image/webp"] },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    // Content images are served by src/app/content; no query strings.
+    localPatterns: [{ pathname: "/content/**", search: "" }],
+  },
+  // The loader reads content/ with paths built at run time, so say which routes need it.
+  outputFileTracingIncludes: {
+    "/": ["./content/**/*"],
+    "/devotionals/*": ["./content/**/*"],
+    "/content/**": ["./content/**/*"],
+  },
   turbopack: {
     rules: {
       "*.css": {
