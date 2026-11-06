@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const path = "/devotionals/advent-01-more-than-watchmen";
 
@@ -41,13 +41,29 @@ test("every image that is shown has loaded, one per colour scheme", async ({ pag
   expect(shown.every((width) => width > 0)).toBe(true);
 });
 
-test("a dark scheme shows the night swell images", async ({ browser }) => {
-  const page = await (await browser.newContext({ colorScheme: "dark" })).newPage();
+const shown = (page: Page, scheme: "when-light" | "when-dark") =>
+  page.locator(`[aria-labelledby=h-verse] .${scheme} img`);
+
+test("a visitor's dark theme choice shows the night swell images", async ({ page, baseURL }) => {
+  await page.context().addCookies([{ name: "theme", value: "dark", url: baseURL! }]);
   await page.goto(path);
-  const dark = page.locator("[aria-labelledby=h-verse] .when-dark img");
-  const light = page.locator("[aria-labelledby=h-verse] .when-light img");
-  await expect(dark).toBeVisible();
-  await expect(light).toBeHidden();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(shown(page, "when-dark")).toBeVisible();
+  await expect(shown(page, "when-light")).toBeHidden();
+});
+
+test("a dark device shows the night swell images", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto(path);
+  await expect(shown(page, "when-dark")).toBeVisible();
+  await expect(shown(page, "when-light")).toBeHidden();
+});
+
+test("a light device shows the dawn patrol images", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto(path);
+  await expect(shown(page, "when-light")).toBeVisible();
+  await expect(shown(page, "when-dark")).toBeHidden();
 });
 
 test("the page does not scroll sideways because of its own content", async ({ page }) => {
