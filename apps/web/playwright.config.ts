@@ -13,6 +13,8 @@ export default defineConfig({
     command: `pnpm build && pnpm start -p ${port}`,
     url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env.CI,
+    // Pin the date so the tests do not change when the real calendar moves on.
+    env: { DEVOTIONAL_TODAY: "2026-12-12" },
     timeout: 180_000,
   },
   projects: [

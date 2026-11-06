@@ -11,7 +11,7 @@ export function Hero() {
       className="relative bg-deep text-on-deep [--logo-gap:var(--deep)] [--logo-ring:var(--on-deep)] [--logo-wave:var(--accent-on-deep)]"
     >
       <h1 className="sr-only">Word on the Water</h1>
-      <div className="mx-auto grid max-w-[1120px] items-center gap-7 pb-20 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-11 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] md:gap-12 md:pb-24 md:pt-18">
+      <div className="mx-auto grid max-w-[1120px] items-center gap-7 pb-20 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-8 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] md:gap-12 md:pb-24 md:pt-18">
         <div>
           <p className="font-display text-sm font-semibold uppercase tracking-[.18em] text-accent-on-deep">
             {hero.eyebrow}
@@ -43,7 +43,7 @@ export function Hero() {
             </a>
           </div>
         </div>
-        <div className="order-first w-[150px] md:order-none md:w-full md:max-w-[360px] md:justify-self-center">
+        <div className="hidden md:block md:w-full md:max-w-[360px] md:justify-self-center">
           <Logo
             label="Word on the Water logo: a cross on the horizon inside a breaking wave"
             className="block h-auto w-full"
