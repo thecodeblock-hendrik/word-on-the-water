@@ -55,6 +55,10 @@ test("a visitor's dark theme choice shows the night swell images", async ({ page
 test("a dark device shows the night swell images", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(path);
+  const applied = await page.evaluate(() => matchMedia("(prefers-color-scheme: dark)").matches);
+  // CI's Firefox does not apply the emulated scheme (the page stays light), so there is
+  // nothing to test there. The theme cookie test above covers dark in every browser.
+  test.skip(!applied, "this browser did not apply the emulated dark scheme");
   await expect(shown(page, "when-dark")).toBeVisible();
   await expect(shown(page, "when-light")).toBeHidden();
 });
