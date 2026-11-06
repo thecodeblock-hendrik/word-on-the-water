@@ -21,6 +21,16 @@ export function About() {
               <PlaceholderText>{paragraph}</PlaceholderText>
             </p>
           ))}
+          <p className="font-serif">
+            {about.closing.before}
+            <a
+              href={about.closing.link.href}
+              className="text-accent-ink underline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-accent"
+            >
+              {about.closing.link.label}
+            </a>
+            {about.closing.after}
+          </p>
         </div>
         <dl aria-label="Who this is for" className="grid border-t border-line">
           {about.who.map(({ term, description }) => (

@@ -4,9 +4,14 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { Coming } from "@/components/sections/coming";
 import { coming } from "@/content/landing";
-import { formatReference } from "@/lib/scripture";
+import { formatDate } from "@/lib/devotionals/format";
+import { loadContent } from "@/lib/devotionals/load";
 
 afterEach(cleanup);
+
+const content = loadContent();
+const devotional = content.devotionals.at(-1)!;
+const series = content.series.find((s) => s.slug === devotional.meta.series)!;
 
 describe("coming content", () => {
   it("keeps to the design limits", () => {
@@ -15,8 +20,6 @@ describe("coming content", () => {
       expect(offer.title.length).toBeLessThanOrEqual(28);
       expect(offer.body.length).toBeLessThanOrEqual(140);
     }
-    expect(coming.sample.title.length).toBeLessThanOrEqual(60);
-    for (const row of coming.sample.report) expect(row.value.length).toBeLessThanOrEqual(18);
   });
 
   it("has three offers in order: weekly devotional, teaching series, audio and video", () => {
@@ -27,20 +30,23 @@ describe("coming content", () => {
     ]);
   });
 
-  it("derives the report passage from the structured reference", () => {
-    expect(coming.sample.passage).toEqual({ book: "Psalm", chapter: 107, verses: "23–30" });
+  it("launches on 5 December 2026 and leaves out the undecided details", () => {
+    expect(coming.offers[0].status).toBe("Launching 5 December 2026");
+    expect(coming.offers[0].body).toContain("each Saturday.");
+    expect(coming.offers[1].body).not.toMatch(/Mark|first series/);
+    expect(coming.offers[2].body).not.toMatch(/Podcast|YouTube|decide/);
   });
 });
 
 describe("Coming", () => {
   it("is a section named by its h2", () => {
-    render(<Coming />);
+    render(<Coming devotional={devotional} series={series} />);
     const region = screen.getByRole("region", { name: coming.heading });
     expect(region).toHaveAttribute("id", "coming");
   });
 
   it("shows each offer as an article with an h3 and a status", () => {
-    render(<Coming />);
+    render(<Coming devotional={devotional} series={series} />);
     const articles = screen.getAllByRole("article");
     expect(articles).toHaveLength(3);
     articles.forEach((article, i) => {
@@ -51,25 +57,42 @@ describe("Coming", () => {
     });
   });
 
-  it("shows the sample devotional with a surf report panel", () => {
-    const { container } = render(<Coming />);
-    const sample = screen.getByRole("region", { name: /sample devotional preview/i });
+  it("shows the devotional's title, date, author and the start of the text", () => {
+    render(<Coming devotional={devotional} series={series} />);
+    const preview = screen.getByRole("region", { name: /devotional preview/i });
+    expect(screen.getByText("Latest devotional")).toBeInTheDocument();
     expect(
-      within(sample).getByRole("heading", { level: 3, name: coming.sample.title }),
+      within(preview).getByRole("heading", { level: 3, name: devotional.meta.title }),
     ).toBeInTheDocument();
-    expect(within(sample).getByText("Today's report")).toBeInTheDocument();
-    expect(sample).toHaveTextContent(formatReference(coming.sample.passage));
-    expect(container.querySelector("dl")!.querySelectorAll("dt")).toHaveLength(4);
+    expect(preview).toHaveTextContent(formatDate(devotional.meta.publishAt));
+    expect(preview).toHaveTextContent(`by ${devotional.meta.author}`);
+    const firstParagraph = devotional.sections[0].markdown.split("\n\n")[0];
+    expect(preview).toHaveTextContent(firstParagraph);
   });
 
-  it("does not label the sample as a mockup placeholder", () => {
-    render(<Coming />);
-    expect(screen.getByText("Sample devotional")).toBeInTheDocument();
-    expect(screen.queryByText(/sample devotional · placeholder/i)).not.toBeInTheDocument();
+  it("fills the surf report panel from the devotional", () => {
+    const { container } = render(<Coming devotional={devotional} series={series} />);
+    const terms = [...container.querySelector("dl")!.querySelectorAll("dt")].map(
+      (dt) => dt.textContent,
+    );
+    expect(terms).toEqual(["Passage", "Series", "Read time", "Conditions", "Topics"]);
+    const panel = container.querySelector("dl")!;
+    expect(panel).toHaveTextContent(devotional.meta.passages.join("; "));
+    expect(panel).toHaveTextContent(
+      `${series.title} · ${devotional.meta.seriesNumber}/${series.outline.length}`,
+    );
+    expect(panel).toHaveTextContent(`${devotional.readMinutes} min`);
+    expect(panel).toHaveTextContent(devotional.meta.reportConditions);
   });
 
-  it("shows draft copy as highlighted placeholders", () => {
-    const { container } = render(<Coming />);
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThan(0);
+  it("links to the full devotional", () => {
+    render(<Coming devotional={devotional} series={series} />);
+    const link = screen.getByRole("link", { name: /read the full devotional/i });
+    expect(link).toHaveAttribute("href", `/devotionals/${devotional.slug}`);
+  });
+
+  it("shows no placeholders", () => {
+    const { container } = render(<Coming devotional={devotional} series={series} />);
+    expect(container.querySelectorAll("[data-placeholder]").length).toBe(0);
   });
 });

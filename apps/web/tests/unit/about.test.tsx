@@ -50,8 +50,19 @@ describe("About", () => {
     expect(within(list as HTMLElement).getByText("The curious")).toBeInTheDocument();
   });
 
-  it("shows draft copy as a highlighted placeholder", () => {
+  it("shows three paragraphs and no placeholder", () => {
     const { container } = render(<About />);
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThan(0);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
+    expect(container.querySelectorAll("p.font-serif")).toHaveLength(3);
+    expect(screen.getByText(/Word on the Water is for men who surf/)).toBeInTheDocument();
+  });
+
+  it("links 'paddle out with us' to the sign-up section", () => {
+    render(<About />);
+    const link = screen.getByRole("link", { name: "paddle out with us" });
+    expect(link).toHaveAttribute("href", "/#subscribe");
+    expect(link.closest("p")).toHaveTextContent(
+      "You don't need to have it all figured out, so paddle out with us, one passage at a time.",
+    );
   });
 });
