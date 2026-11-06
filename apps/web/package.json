@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "e2e:fast": "playwright test --project=pixel-7 --project=desktop-chromium",
-    "check:placeholders": "NODE_NO_WARNINGS=1 node scripts/check-placeholders.mts"
+    "check:placeholders": "NODE_NO_WARNINGS=1 node scripts/check-placeholders.mts",
+    "check:devotionals": "NODE_NO_WARNINGS=1 node scripts/check-devotionals.mts"
   },
   "dependencies": {
     "@next/env": "^16.4.3",
@@ -25,6 +26,7 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "server-only": "^0.0.1",
+    "yaml": "^2.9.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {

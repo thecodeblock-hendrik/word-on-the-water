@@ -1,0 +1,9 @@
+# Copy this folder to content/series/<name>, for example wind-and-sea. Folders starting with an underscore are ignored.
+# Also put art-dawn-patrol.png and art-night-swell.png (the series illustration, about 1600x686) in the folder.
+title: Series name
+tagline: A few words under the name
+artAlt: Describe the illustration in one sentence.
+# The planned weeks. Once a week's devotional.md exists, its own title, passage and date are used instead.
+outline:
+  - { number: 1, title: First working title, passage: "Mark 4:35–41", date: 2027-01-09 }
+  - { number: 2, title: Second working title, passage: "Mark 6:45–52", date: 2027-01-16 }
