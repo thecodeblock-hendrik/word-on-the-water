@@ -17,21 +17,21 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 
 ---
 
-## Status (updated 2026-11-04)
+## Status (updated 2026-11-07)
 
 | Phase | Status |
 |---|---|
 | 0 Foundations | Exit gate passed 2026-11-01; open carry-overs: Neon preview branching toggle, web coverage in CI. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (Neon preview branching open). 0.10 observability and docs, exit gate |
-| 1 Landing page | In progress. 1.1 design system and layout done (PR #59); 1.2 page sections built (hero, about, what's coming, start here, beliefs and founder, footer), draft copy still marked as placeholders. Next: 1.3 sign-up. The contact section (`#contact`, linked from the header and footer) arrives with 1.4 and 1.5 |
+| 1 Landing page | In progress. 1.1 design system and layout done (PR #59); 1.2 page sections done with real copy (PRs #60, #66; only two social-handle placeholders remain); the devotional page, series and landing card are built from repo content (PRs #64, #65, step 1.2b). Next: 1.3 sign-up. The contact section (`#contact`, linked from the header and footer) arrives with 1.4 and 1.5 |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
 | 4 Community | Not started (decision gate) |
 
-**Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js shell with tokens, fonts, nonce CSP, security headers and a dynamic health route; generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. No product features yet (sign-up, prayer and contact forms, landing sections).
+**Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js site with tokens, fonts, nonce CSP, security headers, the landing page (hero, about, what's coming, start here, beliefs, writer, footer with the ESV notice), a header with the theme toggle and mobile menu, and devotional pages and a series list built from markdown in `apps/web/content` (two Advent devotionals so far, credited to "H"); generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. Not built yet: sign-up, prayer and contact forms, privacy page, SEO and manifest.
 
-**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `docs/FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; test-first for all logic; branch protection with the owner not enforced.
+**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `docs/FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; the site is free with no donations, so the ESV is used under Crossway's free non-commercial terms; Phase 1 devotionals live in the repo as markdown; Dawn patrol (light) and Night swell (dark) colour schemes; test-first for all logic; branch protection with the owner not enforced.
 
-**Waiting on Hendrik:** Neon preview branching toggle (step 0.9), final colour scheme, prayer-notification default.
+**Waiting on Hendrik:** Neon preview branching toggle (step 0.9), social handles for the footer, a pastor or elder reading "Start here", prayer-notification default.
 
 ---
 
@@ -135,7 +135,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 
 ### 0.6 Web skeleton (`apps/web`)
 - [x] Create Next.js (latest stable, App Router, TypeScript strict), pnpm
-- [x] Tailwind CSS v4 with `src/styles/tokens.css` (mockup tokens, navy/teal/sand default)
+- [x] Tailwind CSS v4 with `src/styles/tokens.css` (mockup tokens; replaced by Dawn patrol and Night swell in step 1.1)
 - [x] Fonts via `next/font`: Barlow Condensed, Barlow, Lora (self-hosted, Latin, `display: swap`)
 - [x] Root layout, skip link, header, footer, `not-found.tsx`, `error.tsx`
 - [x] Static security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, COOP) in `next.config.ts`; `X-Powered-By` removed
@@ -219,16 +219,26 @@ Tests are written first for all logic. The order of items in this plan is not th
 
 ### 1.2 Page sections (statically generated, Server Components)
 - [x] Hero (Mark 4:41 + logo)
-- [x] About / who it is for (one placeholder paragraph awaits Hendrik's own words)
-- [x] What's coming (weekly devotional, teaching series, audio) with sample surf report (draft copy marked as placeholders)
+- [x] About / who it is for (Hendrik's own words; on screens below `lg` the last row's line is the only divider)
+- [x] What's coming (weekly devotional, teaching series, audio) with the latest devotional as the surf report; the weekly card is labelled "Rolling in consistently"
 - [x] Start here (gospel in 4 steps; wording to be read by a pastor or elder before launch)
-- [x] Statement of faith (full-statement link appears once a page or URL exists)
-- [x] Founder bio (logo mark fills the photo frame until a photo is added)
-- [x] Footer with ESV copyright notice per Crossway permissions (social and privacy links appear when their addresses exist: privacy in 1.6)
+- [x] Statement of faith: four points, no placeholder (a full-statement link appears once a page or URL exists)
+- [x] Writer section: `Henno (AKA "H")`, Harvest Christian Church, faith story and a square surfing photo (`public/henno-surfing.jpg`)
+- [x] Footer with the full ESV notice per the Crossway API terms: usage-limit line, Creative Commons and translation sentence, www.esv.org link, "(ESV)" on quotations (social and privacy links appear when their addresses exist: privacy in 1.6)
+- [x] Theme toggle moved to the header: top right from `lg`, a Theme row in the mobile menu below `lg`
 - [x] Scripture references stored as structured data (`book`, `chapter`, `verses`)
 - [x] Content in typed TS (`apps/web/src/content/landing.ts`); mockup "design notes" and "Ideas for Hendrik" excluded. `pnpm check:placeholders` lists leftover [bracketed] draft copy and is a launch gate (1.9)
-- [x] Images via `next/image` (AVIF then WebP, explicit `sizes`, lazy by default). The only image today is the optional founder photo; the logo is inline SVG
+- [x] Images via `next/image` (AVIF then WebP, explicit `sizes`, lazy by default). The writer photo and devotional art go through `ContentImage` (no inline styles, which the nonce CSP blocks); the logo is inline SVG
 - [x] Screenshot review at 375, 768, 1280 against `docs/design/wotw_landing_page.html` (differences are deliberate: design document over mockup quirks, no dead links)
+
+### 1.2b Devotional pages and series (built ahead of the CMS)
+- [x] Devotionals as markdown with front matter in `apps/web/content/devotionals`, series in `content/series`; loader and schema validation (`src/lib/devotionals`); format in `docs/devotional_format.md`
+- [x] Page `/devotionals/<slug>`: crumbs, art, Conditions, Lineup, Word, Paddle Out, Pray, Go Deeper, verse card, series nav, surf report, series list; light and dark art
+- [x] Shown from `publishAt` (UTC) with no redeploy; the landing card follows the calendar; `DEVOTIONAL_TODAY` previews another day
+- [x] `pnpm check:devotionals` validates the files; two Advent devotionals published, credited to "H"
+- [x] Tests: unit for the loader, view and page; e2e on five browser projects with the date pinned
+- [ ] Article JSON-LD, sitemap entries and the devotional archive page (step 1.6 and Phase 2.3)
+- [ ] Sign-up form in the closing band (arrives with 1.3)
 
 ### 1.3 Email sign-up (Kit, double opt-in)
 Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer (ADR 0008). Our API validates, defends and forwards.
@@ -339,9 +349,9 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Contact messages view
 
 ### 2.3 Devotional content
-- [ ] Migrations: `devotionals`, `series`, `scriptures`, `tags`
+- [ ] Decide whether to move devotionals from repo markdown (Phase 1) to `devotionals`, `series`, `scriptures`, `tags` tables with an authoring UI, or keep files and add only search
 - [ ] Authoring UI: draft, preview, schedule, publish (sanitised, never raw HTML from users)
-- [ ] Public archive and detail pages (ISR), 62ch measure, Lora body
+- [ ] Public archive page (the detail page and series list exist from step 1.2b; pages render per request under the nonce CSP, ADR 0007, so revisit ISR), 62ch measure, Lora body
 - [ ] RSS feed, Article JSON-LD, sitemap updates
 - [ ] Basic search with Postgres full-text
 
@@ -407,6 +417,6 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] 5. Auth needs beyond admin
 - [ ] 6. Audience jurisdictions for privacy law
 - [ ] 7. Built-in admin vs headless CMS
-- [ ] 8. Final colour scheme (navy/teal/sand default is applied to the tokens; confirm or change)
-- [ ] 9. Donations timing
+- [x] 8. Colour scheme: Dawn patrol (light) and Night swell (dark), applied to the tokens
+- [x] 9. Donations: none planned; the ESV free terms are non-commercial, so a Crossway license is needed first if that changes
 - [x] 10. GitHub account/org and repo name (public repo `thecodeblock-hendrik/word-on-the-water`, no license)
