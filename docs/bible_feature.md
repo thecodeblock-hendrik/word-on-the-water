@@ -181,9 +181,9 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B1 Book data
 
-- [ ] Test: 66 books, correct chapter counts (Genesis 50, Psalms 150, Revelation 22; single-chapter books Obadiah, Philemon, 2 John, 3 John, Jude)
-- [ ] Add `bible-books.ts` (name, slug, testament, chapters)
-- [ ] Helpers with tests: `findBook(slug)`, `neighbours(book, chapter)` (Gen 1 no previous, Rev 22 no next, crosses books), `parseVerseRange("16-18")` (rejects 0, reversed, beyond the chapter, more than one chapter)
+- [x] Test: 66 books, correct chapter counts (Genesis 50, Psalms 150, Revelation 22; single-chapter books Obadiah, Philemon, 2 John, 3 John, Jude)
+- [x] Add `src/lib/bible/books.ts` (name, slug, testament, chapters)
+- [x] Helpers with tests: `findBook(slug)`, `hasChapter`, `neighbours(book, chapter)` (Gen 1 no previous, Rev 22 no next, crosses books) in `books.ts`, and `parseVerseRange("16-18", lastVerse)` in `range.ts` (rejects 0, reversed, beyond the chapter, lists, whitespace; one chapter only by construction)
 
 ### B2 Import BSB and WEB (spike, then build)
 
