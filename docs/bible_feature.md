@@ -74,8 +74,24 @@ Plan:
 - A build script `pnpm build:bible` parses USFM and writes one JSON file per chapter in a small structure of our own: `{ version, book, chapter, sections: [{ heading?, paragraphs: [{ poetry?: bool, verses: [{ n, text }] }] }] }`. Output goes to `apps/web/content/bibles/<version>/<book>/<chapter>.json`, committed to the repo (public domain, so committing is fine; the 500-verse storage cap applies only to the ESV).
 - The script is a repeatable, tested step. We never edit the words by hand.
 - A spike first (step B2): download both zips, parse one book, check headings, paragraph and poetry markup, footnote markers, and numbering differences between the two (Psalm titles, verse splits). Record findings in this file.
-- Read at request time on the server with `node:fs`, no database needed. Files are traced into the Vercel function via `outputFileTracingIncludes`. Size is roughly 4 to 5 MB of text per version; confirm in the spike.
+- Read at request time on the server with `node:fs`, no database needed. Files are traced into the Vercel function via `outputFileTracingIncludes`. Measured size: about 8.0 MB (BSB) and 7.2 MB (WEB) of JSON, 3.4 MB compressed in git; a chapter file is at most 44 KB (Psalm 119), and the reader reads one chapter at a time.
 - Verse numbering: store the version's own numbering. The book data table (4.6) holds the ESV or KJV-style counts for the picker; per-version counts are read from the imported data, so each version's steppers are exact.
+
+#### Regenerating the data
+
+The generated files are committed, so the app needs no download at build time. To rebuild them (for example after a new BSB printing):
+
+```
+mkdir -p /tmp/bsb /tmp/web && cd /tmp
+curl -sSL -o bsb.zip https://bereanbible.com/bsb_usfm.zip && unzip -q -o bsb.zip -d bsb
+curl -sSL -o web.zip https://eBible.org/Scriptures/engwebp_usfm.zip && unzip -q -o web.zip -d web
+cd apps/web
+pnpm build:bible bsb /tmp/bsb/bsb_usfm      # the BSB files are in a bsb_usfm folder inside the zip
+pnpm build:bible web /tmp/web
+pnpm exec vitest run tests/unit/bible-data.test.ts
+```
+
+The script finds all 66 books before it reads any, checks each against the book table (chapter count, verses present, verse numbers increasing) and replaces the version's folder. Running it twice on the same input gives byte-identical files. Treat the downloaded files as untrusted data: unzip them in their own folder and never run anything from inside them.
 
 ### 3a. Spike findings (2026-11-07)
 
@@ -228,9 +244,10 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 - [x] Spike: download both USFM zips, parse John, report markup and numbering differences in this file; choose the WEB edition (findings in section 3a)
 - [x] Test the parser on small USFM samples (paragraphs, poetry, headings, footnote markers removed, verse numbers, ranges like `\v 3-4`): `src/lib/bible/usfm.ts` and `types.ts`, 23 tests; also run against the real files (see 3a)
-- [ ] Add `pnpm build:bible` writing `content/bibles/<version>/<book>/<chapter>.json`
-- [ ] Test on the output: all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
-- [ ] Commit the generated files; check repository size and function bundle size (`outputFileTracingIncludes`)
+- [x] Add `pnpm build:bible` writing `content/bibles/<version>/<book>/<chapter>.json` (`scripts/build-bible.mts`, with `src/lib/bible/import.ts` and `usfm-codes.ts`; see "Regenerating the data" in section 3)
+- [x] Test on the output (`tests/unit/bible-data.test.ts`): all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
+- [x] Commit the generated files and check the repository size (about 15 MB of JSON, 3.4 MB compressed; largest chapter file 44 KB)
+- [ ] Trace `content/bibles` into the reader's route with `outputFileTracingIncludes` and check the function bundle size (done with the reader route in B4, because the route does not exist yet)
 - [ ] Add `bible-versions.ts` (registry with notice text and `enabled` flags: BSB and WEB on, ESV off)
 
 ### B3 Source interface and local source
