@@ -240,7 +240,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [x] Bibles: BSB first, WEB second, ESV third (2026-11-07)
 - [x] ESV only through the API, called from the Next.js server; no footnotes or cross-references in the first release
 - [ ] Re-read berean.bible/terms.htm and the eBible WEB details page; confirm the notice wording; record the date here
-- [ ] Add the `BIBLE_ENABLED` feature flag (off by default)
+- [x] Add the `BIBLE_ENABLED` feature flag (off by default; `BIBLE_ENABLED=1` shows the pages; set for the e2e server in `playwright.config.ts`, documented in `.env.example` and the README)
 - [ ] Write ADR 0009 "Bible reader: public-domain texts in the repo, ESV from the API" (sources, ESV limits, no donations)
 
 ### B1 Book data
