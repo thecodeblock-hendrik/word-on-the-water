@@ -206,6 +206,7 @@ Best-practice choices:
 - **Disabled state explained.** The ESV card is not hidden: it shows "Coming soon" with `aria-disabled`, so the plan is visible and nothing looks broken.
 - **Keeps your place.** Switching the version keeps book, chapter and verses (URL swap).
 - **Remembered.** The last chosen version is kept in `localStorage` as a convenience (the URL still decides what renders; no cookie banner needed).
+- **Modal dialogs and the CSP:** a modal Radix dialog locks page scrolling by injecting a `<style>` element, which the nonce-based CSP blocks unless it carries the nonce. `CspNonce` (in the root layout) hands the page's script nonce to the library (`get-nonce`), and an e2e test opens the sheet and fails on any CSP violation. Use modal dialogs freely after this; keep the mobile menu non-modal as it is.
 - **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same list as a segmented control or dropdown at the top of the left column.
 
 ### 4.5 Reader

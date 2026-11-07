@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { Reader } from "@/components/bible/reader";
+import { VersionSwitcher } from "@/components/bible/version-switcher";
 import { findBook } from "@/lib/bible/books";
 import { isBibleEnabled } from "@/lib/bible/flag";
 import { getPassage } from "@/lib/bible/get-passage";
@@ -55,6 +56,17 @@ export default async function BibleChapterPage(props: Props) {
   const { passage, version, book, invalidVerses } = await fromProps(props);
   return (
     <div className={`mx-auto max-w-[1080px] ${gutters}`}>
+      <div className="flex items-center justify-end gap-2 border-b border-line py-2">
+        <VersionSwitcher
+          state={{
+            version: version.id,
+            book: book.slug,
+            chapter: passage.chapter,
+            from: passage.range?.from ?? null,
+            to: passage.range?.to ?? null,
+          }}
+        />
+      </div>
       <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
     </div>
   );
