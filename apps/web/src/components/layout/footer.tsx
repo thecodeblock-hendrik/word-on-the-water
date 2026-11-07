@@ -4,7 +4,7 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { footer, hero } from "@/content/landing";
 import { setTheme } from "@/lib/actions/theme";
-import { ESV_NOTICE, formatReference } from "@/lib/scripture";
+import { ESV_LIMITS, ESV_NOTICE, ESV_URL, formatReference } from "@/lib/scripture";
 
 const linkClass = "inline-flex min-h-11 items-center text-on-deep-muted hover:text-on-deep";
 
@@ -30,7 +30,7 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
               <span>Word on the Water</span>
             </Link>
             <p className="max-w-[34ch] font-serif italic text-on-deep">
-              “{hero.verse.text}” {formatReference(hero.verse.reference)}
+              “{hero.verse.text}” {formatReference(hero.verse.reference)} (ESV)
             </p>
           </div>
           {groups.map((group) => (
@@ -54,7 +54,12 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
           ))}
         </div>
         <div className="grid gap-2 border-t border-on-deep/20 pt-5 text-[12.5px] leading-[1.55]">
-          <p>{ESV_NOTICE}</p>
+          <p>
+            {ESV_NOTICE} {ESV_LIMITS}{" "}
+            <a href={ESV_URL} className="underline hover:text-on-deep">
+              www.esv.org
+            </a>
+          </p>
           <div className="flex items-center justify-between gap-4">
             <p>
               © {year} Word on the Water

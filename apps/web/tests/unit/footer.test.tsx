@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { Footer } from "@/components/layout/footer";
 import { footer, hero } from "@/content/landing";
-import { ESV_NOTICE } from "@/lib/scripture";
+import { ESV_LIMITS, ESV_NOTICE } from "@/lib/scripture";
 
 afterEach(cleanup);
 
@@ -13,6 +13,19 @@ describe("Footer", () => {
     render(<Footer year={2026} />);
     const info = screen.getByRole("contentinfo");
     expect(info).toHaveTextContent(ESV_NOTICE);
+  });
+
+  it("carries the ESV usage limit, links to esv.org and labels the footer verse ESV", () => {
+    render(<Footer year={2026} />);
+    const info = screen.getByRole("contentinfo");
+    expect(info).toHaveTextContent(ESV_LIMITS);
+    expect(within(info).getByRole("link", { name: "www.esv.org" })).toHaveAttribute(
+      "href",
+      "https://www.esv.org",
+    );
+    expect(info).toHaveTextContent(
+      `${hero.verse.reference.book} ${hero.verse.reference.chapter}:41 (ESV)`,
+    );
   });
 
   it("carries the brand and the anchor verse with its reference", () => {
