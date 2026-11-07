@@ -26,8 +26,9 @@ const GROUPS = [
   { testament: "new", title: "New Testament" },
 ] as const;
 
-const cell =
-  "inline-flex size-11 items-center justify-center rounded-sm border-[1.5px] border-line bg-surface font-ui text-[16px] font-semibold text-ink hover:border-accent";
+const shape =
+  "inline-flex size-11 items-center justify-center rounded-sm border-[1.5px] font-ui text-[16px] font-semibold";
+const cell = `${shape} border-line bg-surface text-ink hover:border-accent`;
 
 /** One verse cell: chosen verses join into a band, rounded at its ends and at the edges of a row. */
 function verseClasses(n: number, from: number | null, to: number | null) {
@@ -35,8 +36,8 @@ function verseClasses(n: number, from: number | null, to: number | null) {
   const joinedLeft = n > from && n % 7 !== 1;
   const joinedRight = n < to && n % 7 !== 0;
   return [
-    cell,
-    "border-accent-ink bg-accent-ink text-bg hover:border-accent-ink",
+    shape,
+    "border-accent-ink bg-accent-ink text-bg",
     joinedLeft ? "rounded-l-none" : "",
     joinedRight ? "rounded-r-none shadow-[.25rem_0_0_var(--accent-ink)]" : "",
   ].join(" ");
@@ -161,7 +162,7 @@ export function PassagePopover({ state: current }: { state: PickerState }) {
                 onChange={(e) => setQuery(e.target.value)}
                 className="min-h-11 w-full rounded-sm border-[1.5px] border-line bg-surface px-3 font-ui text-[16px] text-ink placeholder:text-muted"
               />
-              <nav aria-label="Books" data-scroll className="min-h-0 flex-1 overflow-y-auto">
+              <nav aria-label="Books" data-scroll className="min-h-0 flex-1 overflow-y-auto pr-2">
                 {GROUPS.map(({ testament, title: group }) => {
                   const books = BOOKS.filter(
                     (b) => b.testament === testament && b.name.toLowerCase().includes(needle),
@@ -184,7 +185,7 @@ export function PassagePopover({ state: current }: { state: PickerState }) {
                           className="flex min-h-11 items-center justify-between gap-2 rounded-sm px-2.5 text-left font-ui text-[16px] font-semibold text-ink hover:bg-surface aria-[current=true]:bg-accent-ink aria-[current=true]:text-bg"
                         >
                           {b.name}
-                          <span aria-hidden="true" className="text-[13px] font-normal opacity-75">
+                          <span aria-hidden="true" className="text-[13px] font-normal">
                             {b.chapters}
                           </span>
                         </button>

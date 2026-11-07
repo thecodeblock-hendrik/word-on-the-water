@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
-import { PassageColumn } from "@/components/bible/passage-column";
 import { ArrowKeys } from "@/components/bible/arrow-keys";
 import { ChapterNav } from "@/components/bible/chapter-nav";
+import { PassagePopover } from "@/components/bible/passage-popover";
 import { PassageSheet } from "@/components/bible/passage-sheet";
 import { Reader } from "@/components/bible/reader";
 import { RememberVersion } from "@/components/bible/remember-version";
@@ -86,16 +86,17 @@ export default async function BibleChapterPage(props: Props) {
         <PassageSheet state={state} />
         <VersionSwitcher state={state} />
       </div>
-      <div className="lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-12 lg:pt-8">
-        {/* Remount for each passage, so the column never holds the verses of the one before. */}
-        <PassageColumn
+      <div className="hidden items-center gap-3 border-b border-line py-3 lg:flex">
+        {/* Remount for each passage, so the picker never holds the choices of the one before. */}
+        <PassagePopover
           key={`${state.version}/${state.book}/${state.chapter}/${state.from}-${state.to}`}
           state={state}
         />
-        <div className="min-w-0">
-          <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
-          <ChapterNav version={version.id} book={book} chapter={passage.chapter} />
-        </div>
+        <VersionSwitcher state={state} />
+      </div>
+      <div className="min-w-0 lg:pt-8">
+        <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
+        <ChapterNav version={version.id} book={book} chapter={passage.chapter} />
       </div>
     </div>
   );
