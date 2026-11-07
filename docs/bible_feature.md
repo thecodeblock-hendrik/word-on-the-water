@@ -248,7 +248,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [x] Test on the output (`tests/unit/bible-data.test.ts`): all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
 - [x] Commit the generated files and check the repository size (about 15 MB of JSON, 3.4 MB compressed; largest chapter file 44 KB)
 - [ ] Trace `content/bibles` into the reader's route with `outputFileTracingIncludes` and check the function bundle size (done with the reader route in B4, because the route does not exist yet)
-- [ ] Add `bible-versions.ts` (registry with notice text and `enabled` flags: BSB and WEB on, ESV off)
+- [x] Add `src/lib/bible/versions.ts` (registry with credit text, source and `enabled` flags: BSB and WEB on, ESV off) with tests
 
 ### B3 Source interface and local source
 
