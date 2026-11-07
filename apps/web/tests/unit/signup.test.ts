@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { clientIpFrom, parseSignup, submitSignup } from "@/lib/signup";
+import { clientIpFrom, parseSignup, submitSignup, valuesOf } from "@/lib/signup";
 
 function form(fields: Record<string, string> = {}): FormData {
   const data = new FormData();
@@ -69,10 +69,13 @@ describe("parseSignup", () => {
     });
   });
 
-  it("does not stop a missing spam-check token here: the API answers and the form asks to retry", () => {
+  it("asks to wait when the spam check has not produced its token yet, without calling the API", () => {
     const data = form();
     data.delete("cf-turnstile-response");
-    expect(parseSignup(data)).toMatchObject({ ok: true, data: { turnstile_token: "" } });
+    expect(parseSignup(data)).toEqual({
+      ok: false,
+      message: "One moment, the spam check is still running. Please try again.",
+    });
   });
 });
 
@@ -107,7 +110,7 @@ describe("submitSignup", () => {
   ])("explains a %i in plain words", async (status, body, message) => {
     const state = await submitSignup(parsed(), undefined, reply(status, body));
     expect(state.status).toBe("error");
-    expect(state).toMatchObject({ message: expect.stringMatching(message) });
+    expect(state).toMatchObject({ message: expect.stringMatching(message), tokenUsed: true });
   });
 
   it("is a calm error when the API cannot be reached, and never shows the address", async () => {
@@ -144,5 +147,14 @@ describe("clientIpFrom", () => {
   it("is undefined when there is no address, or it is not one", () => {
     expect(clientIpFrom(headers({}))).toBeUndefined();
     expect(clientIpFrom(headers({ "x-real-ip": "not an address" }))).toBeUndefined();
+  });
+});
+
+describe("valuesOf", () => {
+  it("gives back what was typed, so a failed sign-up does not wipe the fields", () => {
+    expect(valuesOf(form({ email: " reader@example.com ", first_name: "Ann" }))).toEqual({
+      email: " reader@example.com ",
+      firstName: "Ann",
+    });
   });
 });

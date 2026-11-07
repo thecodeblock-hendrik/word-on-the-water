@@ -4,6 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import DevotionalPage, { generateMetadata } from "@/app/devotionals/[slug]/page";
 
+vi.mock("@/lib/actions/subscribe", () => ({ subscribe: vi.fn() }));
+vi.mock("next/script", () => ({ default: () => null }));
+
 const slug = "advent-01-more-than-watchmen";
 const props = (s: string) => ({ params: Promise.resolve({ slug: s }) });
 
@@ -14,10 +17,12 @@ async function renderPage() {
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date("2026-12-06T08:00:00Z"));
+  vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", "1x00000000000000000000AA");
 });
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  vi.unstubAllEnvs();
 });
 
 describe("devotional page", () => {
@@ -139,9 +144,10 @@ describe("devotional page", () => {
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
-  it("invites readers to subscribe", async () => {
-    await renderPage();
-    expect(screen.getByRole("link", { name: "Subscribe" })).toHaveAttribute("href", "/#subscribe");
+  it("ends with the sign-up form, tagged as coming from the devotional", async () => {
+    const { container } = await renderPage();
+    expect(container.querySelector("#subscribe input[name=email]")).not.toBeNull();
+    expect(container.querySelector("input[name=source]")).toHaveValue("devotional_band");
   });
 
   it("gives an unknown devotional a 404", async () => {
