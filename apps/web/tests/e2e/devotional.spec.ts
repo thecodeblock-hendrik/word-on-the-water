@@ -67,7 +67,12 @@ test("the page loads with no CSP violations, failed requests or console errors",
 test("every image that is shown has loaded, one per colour scheme", async ({ page }) => {
   await page.goto(path);
   await page.locator("[aria-labelledby=h-verse]").scrollIntoViewIfNeeded();
-  await page.waitForLoadState("networkidle");
+  // Not "networkidle": the sign-up widget just below starts talking to Cloudflare as it nears.
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll("figure img, [aria-labelledby=h-verse] img")]
+      .filter((img) => (img as HTMLElement).offsetParent !== null)
+      .every((img) => (img as HTMLImageElement).complete),
+  );
   const shown = await page.evaluate(() =>
     [...document.querySelectorAll("figure img, [aria-labelledby=h-verse] img")]
       .filter((img) => (img as HTMLElement).offsetParent !== null)

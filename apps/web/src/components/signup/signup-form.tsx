@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field-error";
@@ -31,6 +31,20 @@ const label = "block font-ui text-sm font-medium text-on-deep";
 export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Props) {
   const [state, formAction, pending] = useActionState<SignupState, FormData>(subscribe, idleSignup);
   const error = state.status === "error" ? state : undefined;
+  const form = useRef<HTMLFormElement>(null);
+  // Cloudflare's script and its background requests cost every page view, so load them only for
+  // someone who is near the form or uses it (a browser without IntersectionObserver waits for use).
+  const [loadWidget, setLoadWidget] = useState(false);
+
+  useEffect(() => {
+    if (loadWidget || !form.current || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => entry.isIntersecting && setLoadWidget(true),
+      { rootMargin: "400px" },
+    );
+    observer.observe(form.current);
+    return () => observer.disconnect();
+  }, [loadWidget, siteKey]);
 
   useEffect(() => {
     if (state.status === "error" && state.tokenUsed) {
@@ -52,7 +66,7 @@ export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Prop
   }
 
   return (
-    <form action={formAction} className="grid gap-4">
+    <form ref={form} action={formAction} onFocus={() => setLoadWidget(true)} className="grid gap-4">
       <div>
         <label htmlFor="signup-email" className={label}>
           {signup.emailLabel}
@@ -68,7 +82,9 @@ export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Prop
           invalid={!!error?.fieldErrors?.email}
           aria-describedby={error?.fieldErrors?.email ? "signup-email-error" : undefined}
         />
-        <FieldError id="signup-email-error">{error?.fieldErrors?.email}</FieldError>
+        <FieldError id="signup-email-error" tone="on-deep">
+          {error?.fieldErrors?.email}
+        </FieldError>
       </div>
       <div>
         <label htmlFor="signup-name" className={label}>
@@ -82,7 +98,9 @@ export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Prop
           invalid={!!error?.fieldErrors?.firstName}
           aria-describedby={error?.fieldErrors?.firstName ? "signup-name-error" : undefined}
         />
-        <FieldError id="signup-name-error">{error?.fieldErrors?.firstName}</FieldError>
+        <FieldError id="signup-name-error" tone="on-deep">
+          {error?.fieldErrors?.firstName}
+        </FieldError>
       </div>
 
       <div aria-hidden="true" className="absolute -left-[9999px] size-px overflow-hidden">
@@ -101,10 +119,12 @@ export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Prop
         data-appearance="interaction-only"
         data-theme="auto"
       />
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        strategy="afterInteractive"
-      />
+      {loadWidget && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+        />
+      )}
 
       <div role="alert" className="font-ui text-sm text-on-deep empty:hidden">
         {error?.message}

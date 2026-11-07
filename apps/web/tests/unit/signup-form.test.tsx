@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SignupForm } from "@/components/signup/signup-form";
@@ -61,11 +61,17 @@ describe("SignupForm fields", () => {
     expect(hidden("idempotency_key")).toBe(props.idempotencyKey);
   });
 
-  it("shows the Turnstile widget for the site key and loads its script once", () => {
+  it("shows the Turnstile widget for the site key", () => {
     render(<SignupForm {...props} />);
     const widget = document.querySelector(".cf-turnstile");
     expect(widget).toHaveAttribute("data-sitekey", props.siteKey);
     expect(widget).toHaveAttribute("data-appearance", "interaction-only");
+  });
+
+  it("in a browser without IntersectionObserver, waits until a field is used", () => {
+    render(<SignupForm {...props} />);
+    expect(screen.queryByTestId("turnstile-script")).toBeNull();
+    fireEvent.focusIn(screen.getByLabelText(signup.emailLabel));
     expect(screen.getAllByTestId("turnstile-script")).toHaveLength(1);
     expect(screen.getByTestId("turnstile-script").dataset.src).toBe(
       "https://challenges.cloudflare.com/turnstile/v0/api.js",
@@ -163,5 +169,45 @@ describe("SignupForm answers", () => {
     submit();
     await screen.findByText("Enter a valid email address.");
     expect(reset).not.toHaveBeenCalled();
+  });
+});
+
+describe("SignupForm loads Cloudflare's script only when needed", () => {
+  let intersect: (isIntersecting: boolean) => void;
+  const observed = vi.fn();
+
+  beforeEach(() => {
+    observed.mockClear();
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
+          intersect = (isIntersecting) => callback([{ isIntersecting }]);
+        }
+        observe = observed;
+        disconnect = vi.fn();
+      },
+    );
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("does not load it for a visitor who never reaches the form", () => {
+    render(<SignupForm {...props} />);
+    expect(observed).toHaveBeenCalled();
+    expect(screen.queryByTestId("turnstile-script")).toBeNull();
+  });
+
+  it("loads it as the form comes near the screen", () => {
+    render(<SignupForm {...props} />);
+    act(() => intersect(false));
+    expect(screen.queryByTestId("turnstile-script")).toBeNull();
+    act(() => intersect(true));
+    expect(screen.getAllByTestId("turnstile-script")).toHaveLength(1);
+  });
+
+  it("loads it as soon as someone uses a field", () => {
+    render(<SignupForm {...props} />);
+    fireEvent.focusIn(screen.getByLabelText(signup.emailLabel));
+    expect(screen.getAllByTestId("turnstile-script")).toHaveLength(1);
   });
 });
