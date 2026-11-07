@@ -2,8 +2,11 @@ import { Fragment } from "react";
 
 import type { Block, Run } from "@/lib/bible/types";
 
+// A paragraph indents its first line. Poetry and list lines hang: the first line sits at its level
+// and a wrapped line sits 1.5rem further in, so a wrapped line is never mistaken for a new line.
 const INDENT = ["", "pl-6", "pl-12", "pl-[4.5rem]"];
-const indent = (level: number) => INDENT[Math.min(level, INDENT.length - 1)];
+const HANG = ["", "pl-12 -indent-6", "pl-[4.5rem] -indent-6", "pl-24 -indent-6"];
+const level = (steps: string[], n: number) => steps[Math.min(n, steps.length - 1)];
 
 function Runs({ runs }: { runs: Run[] }) {
   return runs.map((run, i) => (
@@ -46,19 +49,19 @@ function Line({ block }: { block: Block }) {
       return <div data-break aria-hidden="true" className="h-4" />;
     case "poetry":
       return (
-        <p className={`mt-0 ${indent(block.indent)}`}>
+        <p className={`mt-0 ${level(HANG, block.indent)}`}>
           <Runs runs={block.runs} />
         </p>
       );
     case "list":
       return (
-        <p className={`mt-1 ${indent(block.indent)}`}>
+        <p className={`mt-1 ${level(HANG, block.indent)}`}>
           <Runs runs={block.runs} />
         </p>
       );
     case "paragraph":
       return (
-        <p className={`mt-4 first:mt-0 ${indent(block.indent)}`}>
+        <p className={`mt-4 first:mt-0 ${level(INDENT, block.indent)}`}>
           <Runs runs={block.runs} />
         </p>
       );

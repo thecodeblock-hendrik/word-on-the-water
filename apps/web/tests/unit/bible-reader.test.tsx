@@ -62,6 +62,14 @@ describe("PassageText", () => {
     expect(container.querySelectorAll("[style]")).toHaveLength(0);
   });
 
+  it("hangs wrapped poetry and list lines so a wrapped line is not mistaken for a new one", () => {
+    render(<PassageText blocks={blocks} />);
+    for (const text of [/A line,/, /an indented line\./, /A list item/]) {
+      expect(screen.getByText(text).closest("p")!.className).toMatch(/(^|\s)-indent-6(\s|$)/);
+    }
+    expect(screen.getByText(/First verse begins/).closest("p")!.className).not.toMatch(/-indent-/);
+  });
+
   it("hides the blank-line break from assistive technology", () => {
     const { container } = render(<PassageText blocks={blocks} />);
     expect(container.querySelector("[data-break]")).toHaveAttribute("aria-hidden", "true");
