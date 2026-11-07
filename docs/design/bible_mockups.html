@@ -73,6 +73,73 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
 .seg .on{background:var(--accent);color:#fff}
 .seg .off{color:var(--muted);text-decoration:none;opacity:.7}
 .arrow-side{display:flex;justify-content:space-between;padding:12px 24px}
+
+/* Desktop selector options (tablet and up) */
+.mk-h{font:700 28px "Barlow Condensed",system-ui;margin:56px 0 4px}
+.mk-lead{color:#5c5e70;margin:0 0 20px;max-width:75ch}
+.rel{position:relative}
+.dim{position:absolute;inset:0;background:rgba(10,24,37,.45)}
+.dim.lite{background:rgba(10,24,37,.28)}
+.pop{position:absolute;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(10,24,37,.35);display:flex;flex-direction:column;overflow:hidden}
+.pop .cols3{display:grid;grid-template-columns:230px 268px 1fr;min-height:0;flex:1}
+.pcol{padding:14px 14px 10px;border-right:1px solid var(--line);min-height:0;overflow:hidden}
+.pcol:last-child{border-right:0}
+.pcol h4{font:700 17px system-ui;margin:0 0 2px}
+.pcol small.cnt{display:block;color:var(--muted);font-size:13px;margin-bottom:10px}
+.find{width:100%;min-height:44px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:0 12px;font:16px system-ui;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.find span{color:var(--muted)}
+.bk{display:flex;flex-direction:column}
+.bk i{font-style:normal;color:var(--muted);font-size:13px;padding:8px 6px 2px}
+.bk div{min-height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-radius:8px;font:600 16px system-ui}
+.bk div.on{background:var(--accent);color:#fff}
+.night .bk div.on{color:#0a1825}
+.bk div small{font-weight:400;font-size:13px;opacity:.75}
+.fade{position:relative}
+.fade:after{content:"";position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(transparent,var(--bg))}
+.cg{display:grid;grid-template-columns:repeat(5,44px);gap:6px}
+.cg span,.vg span{min-height:44px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font:600 16px system-ui}
+.cg .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vg{display:grid;grid-template-columns:repeat(7,44px);gap:6px 4px}
+.vg span{border-radius:10px}
+.vg .b{background:var(--accent);border-color:var(--accent);color:#fff;border-radius:0;box-shadow:4px 0 0 var(--accent);position:relative}
+.night .vg .b{color:#0a1825}
+.vg .b.s{border-radius:10px 0 0 10px}
+.vg .b.e{border-radius:0 10px 10px 0;box-shadow:none}
+.vg .b.s.e{border-radius:10px;box-shadow:none}
+.vgh{display:flex;align-items:center;gap:8px;margin-bottom:12px;font:14px system-ui;color:var(--muted)}
+.vgh .btn{min-height:44px;padding:0 12px}
+.pfoot{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);background:var(--surface)}
+.pfoot .sum{flex:1;font:15px system-ui;color:var(--muted)}.pfoot .sum b{color:var(--ink)}
+.hint{font:13px/1.45 system-ui;color:var(--muted);margin-top:12px;max-width:34ch}
+.pop .seg{margin:0;width:230px;flex:none}
+.phead{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.phead strong{flex:1;font:700 17px system-ui}
+.kbd{display:inline-block;min-width:24px;padding:1px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--surface);font:600 12px system-ui;text-align:center;color:var(--ink)}
+.cmd{left:50%;top:84px;transform:translateX(-50%);width:660px}
+.cmdin{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);font:600 24px "Barlow Condensed",system-ui;letter-spacing:.01em}
+.cmdin .caret{display:inline-block;width:2px;height:26px;background:var(--accent);vertical-align:middle}
+.cmdin .ver{margin-left:auto;font-size:14px}
+.res{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-left:4px solid transparent;min-height:56px}
+.res.on{background:var(--hl);border-left-color:var(--accent)}
+.res b{font:700 17px system-ui;display:block}
+.res small{display:block;color:var(--muted);font-size:13px}
+.res .go{margin-left:auto;align-self:center}
+.prev{font:italic 15px/1.55 Georgia,serif;color:var(--ink);margin-top:4px;max-width:46ch}
+.cmdfoot{display:flex;gap:16px;padding:10px 16px;border-top:1px solid var(--line);background:var(--surface);font:13px system-ui;color:var(--muted);flex-wrap:wrap}
+.tryit{padding:8px 16px 12px;font:13px system-ui;color:var(--muted)}
+.tryit code{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--ink)}
+.strip{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface);align-items:center}
+.strip .c{min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font:600 15px system-ui}
+.strip .c.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vnum{font:700 12px system-ui;color:var(--accent-ink);border:0;background:none;padding:0 5px;margin-right:2px;min-height:24px;vertical-align:super;cursor:pointer}
+.vsel{background:var(--hl);box-shadow:-6px 0 0 var(--hl),6px 0 0 var(--hl);border-left:0}
+.vrail{border-left:4px solid var(--accent);padding-left:14px;margin-left:-18px}
+.float{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:var(--deep);color:var(--on-deep);border-radius:14px;padding:8px 8px 8px 16px;box-shadow:0 14px 40px rgba(10,24,37,.4);font:600 15px system-ui;white-space:nowrap}
+.float .btn{background:transparent;border-color:rgba(255,255,255,.28);color:var(--on-deep);min-height:44px}
+.float .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.mk-t{border-collapse:collapse;width:100%;max-width:1100px;background:#fff;font:14px/1.5 system-ui}
+.mk-t th,.mk-t td{border:1px solid #d9d2c6;padding:8px 10px;text-align:left;vertical-align:top}
+.mk-t th{background:#f3eee6}
 </style>
 </head>
 <body>
@@ -242,5 +309,88 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
   </div>
 </div>
 <p class="lead" style="margin-top:8px"><b>7. Reader, desktop.</b> The picker is a permanent left column with a segmented version control at the top, then book and chapter, so nothing opens in a sheet. Keyboard: left and right arrow keys change chapter. The reading column stays at 62ch.</p>
+
+<h2 class="mk-h" id="options">Desktop and tablet selector: three options</h2>
+<p class="mk-lead">For screens from 768px up. Mobile is not changed here. The problems with mockup 7: the chapter grid scrolls inside a tiny box, the verse picker is two steppers (many clicks to reach verse 16), and a single verse is awkward. All three options below let you choose <b>one verse</b> with one click, or <b>a start and an end verse</b> with two clicks, and all keep a "Whole chapter" choice. Controls stay 44px so they also work on a tablet.</p>
+
+<h3 style="margin:0 0 10px;font:700 18px system-ui">Option A. Three columns in one popover (book, chapter, verses side by side)</h3>
+<div class="desk rel"><div class="top"><span class="logo">WORD ON THE WATER</span><span class="nav"><span>About</span><span>Devotionals</span><span style="color:var(--accent-ink);border-bottom:2px solid var(--accent)">Bible</span><span>Start here</span><span>What we believe</span><span>Prayer</span></span><button class="btn" aria-label="Theme">◐</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read" style="margin:0 auto;width:100%"><h2>John 3:16–18</h2>
+<p><sup>15</sup>that everyone who believes in Him may have eternal life.”</p>
+<p><sup>16</sup>For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish but have eternal life.</p>
+<p><sup>17</sup>For God did not send His Son into the world to condemn the world, but to save the world through Him.</p>
+<p><sup>18</sup>Whoever believes in Him is not condemned, but whoever does not believe has already been condemned…</p></div>
+  <div class="dim"></div>
+  <div class="pop" role="dialog" aria-label="Choose passage" style="left:24px;top:64px;width:880px;height:560px">
+    <div class="phead"><div class="seg" role="radiogroup" aria-label="Bible version"><span class="on">BSB</span><span>WEB</span><span class="off">ESV soon</span></div><strong style="text-align:center;font-weight:600;color:var(--muted)">Pick left to right. Nothing scrolls except the book list.</strong><button class="btn" aria-label="Close">✕</button></div>
+    <div class="cols3">
+      <div class="pcol">
+        <div class="find"><span>⌕</span> Find a book, e.g. jn</div>
+        <div class="bk fade" style="height:380px">
+          <i>Old Testament</i><div>Psalms <small>150</small></div><div>Isaiah <small>66</small></div>
+          <i>New Testament</i><div>Mark <small>16</small></div><div class="on">John <small>21</small></div><div>Acts <small>28</small></div><div>Romans <small>16</small></div>
+        </div>
+      </div>
+      <div class="pcol"><h4>John</h4><small class="cnt">21 chapters</small><div class="cg"><span class="">1</span><span class="">2</span><span class="on">3</span><span class="">4</span><span class="">5</span><span class="">6</span><span class="">7</span><span class="">8</span><span class="">9</span><span class="">10</span><span class="">11</span><span class="">12</span><span class="">13</span><span class="">14</span><span class="">15</span><span class="">16</span><span class="">17</span><span class="">18</span><span class="">19</span><span class="">20</span><span class="">21</span></div>
+        <p class="hint">Long books such as Psalms show their chapters in three tabs (1 to 50, 51 to 100, 101 to 150), so the grid never needs a scroll box.</p></div>
+      <div class="pcol"><h4>John 3</h4><small class="cnt">36 verses</small>
+        <div class="vgh">From <button class="btn">16</button> to <button class="btn">18</button></div>
+        <div class="vg"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span class="b s">16</span><span class="b">17</span><span class="b e">18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span></div>
+        <p class="hint">Click a verse to choose it. Click a second verse to make a range. Click the same verse again to read just that one. The numbers above also type and step with the arrow keys.</p></div>
+    </div>
+    <div class="pfoot"><span class="sum">Reading <b>John 3:16–18</b> in the BSB</span><button class="btn">Whole chapter</button><button class="btn primary">Read</button></div>
+  </div>
+</div>
+<p class="lead" style="margin-top:8px"><b>A. Columns.</b> Everything is visible at once, left to right, so the order is obvious and nothing scrolls except the 66-book list, which you can also filter by typing. Chapters are a plain grid (no scroll box). Verses are a grid where the chosen range joins into one filled band, so a range reads as a range at a glance. Closest to what people already know from Bible apps; the safest option.</p>
+
+<h3 style="margin:36px 0 10px;font:700 18px system-ui">Option B. Type it (command box)</h3>
+<div class="desk rel night"><div class="top"><span class="logo">WORD ON THE WATER</span><span class="nav"><span>About</span><span>Devotionals</span><span style="color:var(--accent-ink);border-bottom:2px solid var(--accent)">Bible</span><span>Start here</span><span>What we believe</span><span>Prayer</span></span><button class="btn" aria-label="Theme">◐</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read" style="margin:0 auto;width:100%"><h2>John 3:16–18</h2>
+<p><sup>15</sup>that everyone who believes in Him may have eternal life.”</p>
+<p><sup>16</sup>For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish but have eternal life.</p>
+<p><sup>17</sup>For God did not send His Son into the world to condemn the world, but to save the world through Him.</p>
+<p><sup>18</sup>Whoever believes in Him is not condemned, but whoever does not believe has already been condemned…</p></div>
+  <div class="dim"></div>
+  <div class="pop cmd" role="dialog" aria-label="Go to passage">
+    <div class="cmdin"><span style="color:var(--muted)">⌕</span><span>john 3:16-18<span class="caret"></span></span><button class="ver" aria-label="Bible version: BSB">BSB <span>▾</span></button></div>
+    <div class="res on"><span style="flex:1"><b>John 3:16–18</b><small>Verses 16 to 18, Berean Standard Bible</small>
+      <span class="prev">“For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish…”</span></span><span class="go kbd">↵</span></div>
+    <div class="res"><span><b>John 3</b><small>Whole chapter, 36 verses</small></span></div>
+    <div class="res"><span><b>John 3:16</b><small>Just this verse</small></span></div>
+    <div class="res"><span><b>John</b><small>Other chapters: 1 to 21</small></span></div>
+    <div class="tryit">Examples: <code>jn 3</code> <code>1 cor 13:4-7</code> <code>ps 23</code> <code>gen 1:1</code></div>
+    <div class="cmdfoot"><span><span class="kbd">↵</span> Read</span><span><span class="kbd">↑</span> <span class="kbd">↓</span> Choose</span><span><span class="kbd">Tab</span> Change Bible</span><span><span class="kbd">Esc</span> Close</span><span style="margin-left:auto">Opens with <span class="kbd">/</span> from any Bible page</span></div>
+  </div>
+</div>
+<p class="lead" style="margin-top:8px"><b>B. Type it (shown in Night swell).</b> One text box. Type "john 3:16-18" or a short form such as "jn 3" and the best match appears with the verse text, so you see you got the right place before you read. Three matches are always offered: the exact range, the whole chapter and a single verse. Fastest for people who know the reference; slower for someone browsing, so the book and chapter list stays one click away from the same box (an empty box shows the books as a list).</p>
+
+<h3 style="margin:36px 0 10px;font:700 18px system-ui">Option C. Choose in the text itself</h3>
+<div class="desk rel"><div class="top"><span class="logo">WORD ON THE WATER</span><span class="nav"><span>About</span><span>Devotionals</span><span style="color:var(--accent-ink);border-bottom:2px solid var(--accent)">Bible</span><span>Start here</span><span>What we believe</span><span>Prayer</span></span><button class="btn" aria-label="Theme">◐</button></div>
+  <div class="ref"><button class="btn" style="flex:none;width:200px">John <span>▾</span></button><span style="flex:1"></span><button class="ver">BSB <span>▾</span></button></div>
+  <div class="strip" role="navigation" aria-label="Chapters of John"><span class="c ">1</span><span class="c ">2</span><span class="c on">3</span><span class="c ">4</span><span class="c ">5</span><span class="c ">6</span><span class="c ">7</span><span class="c ">8</span><span class="c ">9</span><span class="c ">10</span><span class="c ">11</span><span class="c ">12</span><span class="c ">13</span><span class="c ">14</span><span class="c ">15</span><span class="c ">16</span><span class="c ">17</span><span class="c ">18</span><span class="c ">19</span><span class="c ">20</span><span class="c ">21</span></div>
+  <div class="read" style="margin:0 auto;width:100%;padding-bottom:140px">
+    <h2>John 3</h2>
+    <p><button class="vnum">15</button>that everyone who believes in Him may have eternal life.”</p>
+    <div class="vrail"><p style="margin-bottom:6px"><button class="vnum">16</button><span class="vsel">For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish but have eternal life.</span></p>
+    <p style="margin-bottom:6px"><button class="vnum">17</button><span class="vsel">For God did not send His Son into the world to condemn the world, but to save the world through Him.</span></p>
+    <p><button class="vnum">18</button><span class="vsel">Whoever believes in Him is not condemned, but whoever does not believe has already been condemned…</span></p></div>
+  </div>
+  <div class="float" role="toolbar" aria-label="Selected verses"><span>John 3:16–18</span><button class="btn">Copy link</button><button class="btn primary">Show only these</button><button class="btn">Clear</button></div>
+  <div class="legal">Berean Standard Bible (BSB), public domain.</div>
+</div>
+<p class="lead" style="margin-top:8px"><b>C. In the text.</b> There is no picker for verses at all: click a verse number to start, click another to extend (Shift-click works too, and a verse number is a real button so the keyboard works). The chosen verses are tinted with a bar beside them, and a small bar offers "Copy link", "Show only these" and "Clear". "John ▾" opens a short book list; chapters sit in a wrapped strip above the text (long books such as Psalms collapse the strip to "1 to 150" with a button that opens a tabbed grid). Most direct; the most different from what people expect, and it needs a short hint the first time.</p>
+
+<table class="mk-t">
+<tr><th></th><th>A. Columns</th><th>B. Type it</th><th>C. In the text</th></tr>
+<tr><th>Chapter</th><td>Grid, no scroll box</td><td>Typed, or listed</td><td>Strip above the text</td></tr>
+<tr><th>One verse</th><td>One click on the verse</td><td>"john 3:16"</td><td>One click on the number</td></tr>
+<tr><th>Verse range</th><td>Click start, click end</td><td>"john 3:16-18"</td><td>Click start, click end</td></tr>
+<tr><th>Browsing by hand</th><td>Best</td><td>Weakest</td><td>Good</td></tr>
+<tr><th>Knowing the reference</th><td>Several clicks</td><td>Best</td><td>Several clicks</td></tr>
+<tr><th>Build effort</th><td>Medium</td><td>Medium (reference parser)</td><td>Medium (selection plus toolbar)</td></tr>
+<tr><th>Recommendation</th><td>Default picker</td><td>Add as a shortcut on top of A</td><td>Good second step later</td></tr>
+</table>
 </body>
 </html>
