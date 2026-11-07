@@ -54,6 +54,12 @@
             "title": "Source",
             "type": "string"
           },
+          "turnstile_token": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Turnstile Token",
+            "type": "string"
+          },
           "website": {
             "default": "",
             "maxLength": 1000,
@@ -65,7 +71,8 @@
           "email",
           "source",
           "consent_text_version",
-          "rendered_at"
+          "rendered_at",
+          "turnstile_token"
         ],
         "title": "SubscribeRequest",
         "type": "object"
@@ -290,7 +297,7 @@
     },
     "/v1/subscribers": {
       "post": {
-        "description": "Always 202 with the same body, whether the address is new, pending, confirmed or a bot.",
+        "description": "202 with the same body for a new, pending or confirmed address, and for a simple bot.\n\nThe cheap bot checks run first so a bot never costs a Cloudflare call. A token Cloudflare\nrefuses is a 400 (the visitor solves the challenge again); if Cloudflare cannot judge it,\na 503 and nothing is stored, so a sign-up is never accepted unverified.",
         "operationId": "subscribe_v1_subscribers_post",
         "parameters": [
           {

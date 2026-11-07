@@ -9,9 +9,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog.testing import capture_logs
 
+from app.integrations.turnstile import TurnstileUnavailableError
 from app.main import create_app
 from app.models import EmailOutbox, Subscriber
 from app.models.subscriber import SubscriberStatus
+from app.routers.v1 import turnstile_verifier
 from app.schemas.subscribers import SubscribeRequest
 from app.services.subscribers import request_subscription
 
@@ -29,11 +31,32 @@ BODY = {
     "consent_text_version": "v1",
     "website": "",
     "rendered_at": rendered(30),
+    "turnstile_token": "token-from-widget",
 }
 
 
-def post(body: Mapping[str, object] = BODY, headers: Mapping[str, str] = AUTH) -> httpx2.Response:
-    return TestClient(create_app()).post("/v1/subscribers", json=body, headers=headers)
+class FakeTurnstile:
+    """Stands in for Cloudflare: passes, fails or is down, and remembers what it was asked."""
+
+    def __init__(self, outcome: bool | Exception = True) -> None:
+        self.outcome = outcome
+        self.calls: list[tuple[str, str | None]] = []
+
+    async def verify(self, token: str, remote_ip: str | None) -> bool:
+        self.calls.append((token, remote_ip))
+        if isinstance(self.outcome, Exception):
+            raise self.outcome
+        return self.outcome
+
+
+def post(
+    body: Mapping[str, object] = BODY,
+    headers: Mapping[str, str] = AUTH,
+    turnstile: FakeTurnstile | None = None,
+) -> httpx2.Response:
+    app = create_app()
+    app.dependency_overrides[turnstile_verifier] = lambda: turnstile or FakeTurnstile()
+    return TestClient(app).post("/v1/subscribers", json=body, headers=headers)
 
 
 async def jobs(session: AsyncSession) -> list[EmailOutbox]:
@@ -157,12 +180,52 @@ async def test_a_bot_gets_the_normal_answer_and_nothing_is_stored(
 async def test_a_bot_is_logged_with_the_reason_and_without_the_address(
     session: AsyncSession,
 ) -> None:
-    client = TestClient(create_app())  # building the app sets up logging, so do it first
+    app = create_app()  # building the app sets up logging, so do it first
+    app.dependency_overrides[turnstile_verifier] = lambda: FakeTurnstile()
     with capture_logs() as logs:
-        client.post(
+        TestClient(app).post(
             "/v1/subscribers", json={**BODY, "website": "http://spam.example"}, headers=AUTH
         )
 
     entry = next(entry for entry in logs if entry["event"] == "signup_bot_rejected")
     assert entry["reason"] == "honeypot"
     assert "reader@example.com" not in str(logs) and "spam.example" not in str(logs)
+
+
+async def test_the_token_and_the_visitor_ip_go_to_cloudflare(session: AsyncSession) -> None:
+    turnstile = FakeTurnstile()
+
+    post(headers={**AUTH, "X-Client-IP": "203.0.113.9"}, turnstile=turnstile)
+
+    assert turnstile.calls == [("token-from-widget", "203.0.113.9")]
+
+
+async def test_a_token_cloudflare_refuses_is_a_400_and_stores_nothing(
+    session: AsyncSession,
+) -> None:
+    response = post(turnstile=FakeTurnstile(False))
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "turnstile_failed"
+    assert list(await session.scalars(select(Subscriber))) == []
+    assert await jobs(session) == []
+
+
+async def test_when_cloudflare_is_down_it_is_a_503_and_nothing_is_stored(
+    session: AsyncSession,
+) -> None:
+    response = post(turnstile=FakeTurnstile(TurnstileUnavailableError("down")))
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "turnstile_unavailable"
+    assert list(await session.scalars(select(Subscriber))) == []
+
+
+async def test_a_bot_caught_by_the_cheap_checks_never_costs_a_cloudflare_call(
+    session: AsyncSession,
+) -> None:
+    turnstile = FakeTurnstile()
+
+    post({**BODY, "website": "http://spam.example"}, turnstile=turnstile)
+
+    assert turnstile.calls == []

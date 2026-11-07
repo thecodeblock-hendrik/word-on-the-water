@@ -9,6 +9,7 @@ VALID = {
     "source": "landing_hero",
     "consent_text_version": "v1",
     "rendered_at": 1_790_000_000_000,
+    "turnstile_token": "token-from-widget",
 }
 
 
@@ -70,7 +71,9 @@ def test_the_render_time_is_a_whole_number_of_milliseconds(value: object) -> Non
         SubscribeRequest.model_validate({**VALID, "rendered_at": value})
 
 
-@pytest.mark.parametrize("field", ["email", "source", "consent_text_version", "rendered_at"])
+@pytest.mark.parametrize(
+    "field", ["email", "source", "consent_text_version", "rendered_at", "turnstile_token"]
+)
 def test_the_required_fields_cannot_be_left_out(field: str) -> None:
     with pytest.raises(ValidationError):
         SubscribeRequest.model_validate({k: v for k, v in VALID.items() if k != field})
@@ -90,3 +93,11 @@ def test_the_consent_version_is_a_short_label() -> None:
 
 def test_the_answer_is_always_the_same_text() -> None:
     assert SubscribeResponse().model_dump() == {"status": "check_your_inbox"}
+
+
+def test_the_turnstile_token_has_a_length_cap_of_2048() -> None:
+    SubscribeRequest.model_validate({**VALID, "turnstile_token": "t" * 2048})
+    with pytest.raises(ValidationError):
+        SubscribeRequest.model_validate({**VALID, "turnstile_token": "t" * 2049})
+    with pytest.raises(ValidationError):
+        SubscribeRequest.model_validate({**VALID, "turnstile_token": ""})

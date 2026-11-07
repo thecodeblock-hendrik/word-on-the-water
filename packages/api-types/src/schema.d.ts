@@ -86,7 +86,11 @@ export interface paths {
         put?: never;
         /**
          * Subscribe
-         * @description Always 202 with the same body, whether the address is new, pending, confirmed or a bot.
+         * @description 202 with the same body for a new, pending or confirmed address, and for a simple bot.
+         *
+         *     The cheap bot checks run first so a bot never costs a Cloudflare call. A token Cloudflare
+         *     refuses is a 400 (the visitor solves the challenge again); if Cloudflare cannot judge it,
+         *     a 503 and nothing is stored, so a sign-up is never accepted unverified.
          */
         post: operations["subscribe_v1_subscribers_post"];
         delete?: never;
@@ -122,6 +126,8 @@ export interface components {
             rendered_at: number;
             /** Source */
             source: string;
+            /** Turnstile Token */
+            turnstile_token: string;
             /**
              * Website
              * @default

@@ -13,6 +13,7 @@ def request(website: str = "", seconds_ago: float = 10) -> SubscribeRequest:
             "email": "reader@example.com",
             "source": "landing_hero",
             "consent_text_version": "v1",
+            "turnstile_token": "token-from-widget",
             "website": website,
             "rendered_at": NOW_MS - int(seconds_ago * 1000),
         }

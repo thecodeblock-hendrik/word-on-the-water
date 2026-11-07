@@ -20,6 +20,8 @@ class SubscribeRequest(BaseModel):
     website: Annotated[str, Field(max_length=1000)] = ""
     # When the form was rendered (milliseconds since 1970): a form sent too fast is a bot.
     rendered_at: Annotated[int, Field(strict=True, ge=0)]
+    # The Cloudflare Turnstile token from the widget; the server checks it with Cloudflare.
+    turnstile_token: Annotated[str, Field(min_length=1, max_length=2048)]
 
     @field_validator("first_name")
     @classmethod

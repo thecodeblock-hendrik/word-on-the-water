@@ -22,6 +22,9 @@ def test_export_works_in_production_where_docs_are_disabled(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv(
+        "TURNSTILE_SECRET_KEY", "0x4AAAAAAA-not-a-test-key"
+    )  # .env may hold a test key
     assert "/health/live" in json.loads(render_schema())["paths"]
 
 

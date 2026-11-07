@@ -15,6 +15,9 @@ LOCAL_VALUES = {
     "EMAIL_PROVIDER": "smtp",
     "SMTP_HOST": "localhost",
     "SMTP_PORT": "1025",
+    # Cloudflare's test keys: the widget and the check always pass. Never used in production.
+    "TURNSTILE_SECRET_KEY": "1x0000000000000000000000000000000AA",
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
 }
 GENERATED = {"SERVICE_TOKEN", "CRON_SECRET", "IP_HASH_SALT"}
 
