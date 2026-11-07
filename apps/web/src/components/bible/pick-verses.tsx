@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 import { type Book } from "@/lib/bible/books";
 import { lastVerseOf } from "@/lib/bible/counts";
 import { chooseVerses, type PickerState } from "@/lib/bible/picker";
@@ -60,6 +62,8 @@ export function PickVerses({
 }) {
   const last = lastVerseOf(state.version, book, state.chapter);
   const some = state.from !== null && state.to !== null;
+  // The desktop column and the sheet are both mounted; a shared radio name would make them one group.
+  const group = useId();
 
   return (
     <div className="grid gap-4">
@@ -67,7 +71,7 @@ export function PickVerses({
         <label className={choice}>
           <input
             type="radio"
-            name="verses"
+            name={group}
             checked={!some}
             onChange={() => onChange(chooseVerses(state, null, null))}
             className="size-5 accent-accent-ink"
@@ -77,7 +81,7 @@ export function PickVerses({
         <label className={choice}>
           <input
             type="radio"
-            name="verses"
+            name={group}
             checked={some}
             onChange={() => onChange(chooseVerses(state, 1, 1))}
             className="size-5 accent-accent-ink"
