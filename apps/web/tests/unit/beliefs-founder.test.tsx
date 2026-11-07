@@ -15,24 +15,24 @@ describe("beliefs and founder content", () => {
     expect(founder.heading.length).toBeLessThanOrEqual(40);
   });
 
-  it("states the four historic points, then a placeholder for the rest", () => {
-    expect(beliefs.points).toHaveLength(5);
+  it("states the four historic points and no placeholder", () => {
+    expect(beliefs.points).toHaveLength(4);
     expect(beliefs.points[0]).toMatch(/Bible is God's Word/);
-    expect(beliefs.points[4]).toMatch(/^\[.*\]$/);
+    expect(beliefs.points.some((point) => point.startsWith("["))).toBe(false);
   });
 });
 
 describe("Beliefs", () => {
-  it("is anchored as believe with an h2 and a list of five points", () => {
+  it("is anchored as believe with an h2 and a list of four points", () => {
     const { container } = render(<Beliefs />);
     expect(container.querySelector("#believe")).not.toBeNull();
     expect(screen.getByRole("heading", { level: 2, name: beliefs.heading })).toBeInTheDocument();
-    expect(within(screen.getByRole("list")).getAllByRole("listitem")).toHaveLength(5);
+    expect(within(screen.getByRole("list")).getAllByRole("listitem")).toHaveLength(4);
   });
 
-  it("shows the draft point as a highlighted placeholder", () => {
+  it("has no placeholder text", () => {
     const { container } = render(<Beliefs />);
-    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(1);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
   it("has no link to a full statement until one exists", () => {
@@ -56,27 +56,37 @@ describe("Founder", () => {
     expect(screen.getByRole("heading", { level: 2, name: founder.heading })).toBeInTheDocument();
   });
 
-  it("shows the name, bio and church as highlighted draft copy", () => {
+  it("shows the name, the church and the faith story, with no draft text left", () => {
     const { container } = render(<Founder />);
-    expect(container).toHaveTextContent("Hendrik");
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThanOrEqual(3);
+    expect(container).toHaveTextContent('Henno (AKA "H")');
+    expect(container).toHaveTextContent("Harvest Christian Church");
+    expect(container).toHaveTextContent("caught in addiction");
+    expect(container).toHaveTextContent("In 2023 I found Jesus");
+    expect(container).toHaveTextContent(
+      "In 2023 I found Jesus, and He gave me what the waves and the substance abuse could never give: real freedom.",
+    );
+    expect(container).toHaveTextContent(
+      "I created Word on the Water to share the good news of Jesus with anyone who feels empty: He loves you and He is enough.",
+    );
+    expect(container).not.toHaveTextContent("I write Word on the Water");
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
-  it("falls back to the logo mark in a 4:5 frame when there is no photo", () => {
+  it("shows the surfing photo in a square frame wide enough to see the wave", () => {
     render(<Founder />);
     const frame = screen.getByTestId("founder-photo");
-    expect(frame.className).toMatch(/aspect-\[4\/5\]/);
-    expect(frame.querySelector("use")).not.toBeNull();
-    expect(frame.querySelector("img")).toBeNull();
+    expect(frame.className).toMatch(/aspect-square/);
+    const img = within(frame).getByRole("img", { name: /Henno/ });
+    expect(img.getAttribute("src")).toMatch(/henno-surfing/);
+    expect(img).not.toHaveAttribute("style");
+    expect(frame.querySelector("use")).toBeNull();
   });
 
-  it("shows the photo with its alt text when there is one", () => {
-    render(<Founder photo={{ src: "/hendrik.jpg", alt: "Hendrik on his board at dawn" }} />);
+  it("falls back to the logo mark when a photo is not given", () => {
+    render(<Founder photo={null} />);
     const frame = screen.getByTestId("founder-photo");
-    expect(
-      within(frame).getByRole("img", { name: "Hendrik on his board at dawn" }),
-    ).toBeInTheDocument();
-    expect(frame.querySelector("use")).toBeNull();
+    expect(frame.querySelector("use")).not.toBeNull();
+    expect(frame.querySelector("img")).toBeNull();
   });
 });
 

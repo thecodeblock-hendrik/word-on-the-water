@@ -30,8 +30,8 @@ describe("coming content", () => {
     ]);
   });
 
-  it("launches on 5 December 2026 and leaves out the undecided details", () => {
-    expect(coming.offers[0].status).toBe("Launching 5 December 2026");
+  it("rolls in consistently and leaves out the undecided details", () => {
+    expect(coming.offers[0].status).toBe("Rolling in consistently");
     expect(coming.offers[0].body).toContain("each Saturday.");
     expect(coming.offers[1].body).not.toMatch(/Mark|first series/);
     expect(coming.offers[2].body).not.toMatch(/Podcast|YouTube|decide/);
@@ -66,6 +66,8 @@ describe("Coming", () => {
     ).toBeInTheDocument();
     expect(preview).toHaveTextContent(formatDate(devotional.meta.publishAt));
     expect(preview).toHaveTextContent(`by ${devotional.meta.author}`);
+    expect(preview).toHaveTextContent("by H");
+    expect(preview).not.toHaveTextContent("Hendrik");
     const firstParagraph = devotional.sections[0].markdown.split("\n\n")[0];
     expect(preview).toHaveTextContent(firstParagraph);
   });

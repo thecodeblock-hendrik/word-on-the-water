@@ -14,7 +14,7 @@ export default function Home() {
     <>
       <Hero />
       <About />
-      <hr className="border-0 border-t border-line" />
+      <hr className="border-0 border-t border-line max-lg:hidden" />
       <Coming devotional={devotional} series={devotionalSeries} />
       <Start />
       <BeliefsFounder />

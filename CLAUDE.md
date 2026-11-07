@@ -433,7 +433,7 @@ Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with
 Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals. If the Phase 2 gate chose it, the Flutter app for iOS and Android is built here.
 
 ### Phase 4 — Community (only if wanted)
-Optional public accounts (save favourites, reading plans), comments with moderation, giving/donations via a hosted provider (Stripe Checkout; never handle card data ourselves).
+Optional public accounts (save favourites, reading plans), comments with moderation, giving/donations via a hosted provider (Stripe Checkout; never handle card data ourselves). Donations are not planned; if ever added, first obtain the Crossway ESV license, because the free ESV terms cover non-commercial sites only.
 
 ---
 
@@ -485,7 +485,7 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 | 6 | Where are you and your audience based (for privacy law)? | Design to GDPR + POPIA, which covers most jurisdictions |
 | 7 | Content management: write devotionals in a built-in admin, or use a headless CMS? | Built-in admin in Phase 2 |
 | 8 | Which colour scheme from the mockup? | Navy/teal/sand default (applied to the tokens; final choice still open) |
-| 9 | Will there be donations/giving? | Not before Phase 4; hosted checkout only |
+| 9 | Will there be donations/giving? | **Resolved:** no donations. If that changes, get the Crossway ESV license first, then hosted checkout only |
 | 10 | Where should the repository live (GitHub account/org, name)? | **Resolved:** public repo `thecodeblock-hendrik/word-on-the-water`, no license |
 
 ### Decisions made during the build

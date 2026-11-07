@@ -52,7 +52,7 @@ export const coming = {
     "Content is on the way. Sign up and the first devotional lands in your inbox on launch day.",
   offers: [
     {
-      status: "Launching 5 December 2026",
+      status: "Rolling in consistently",
       title: "Weekly devotional",
       body: "A five-minute read each Saturday. One passage, one thought, one question to take into the week.",
     },
@@ -107,18 +107,18 @@ export const beliefs = {
     "There is one God: Father, Son and Holy Spirit.",
     "Jesus Christ is fully God and fully man. He died for our sins and rose bodily from the dead.",
     "We are saved by grace through faith in Christ alone.",
-    "[Your remaining points, or link to your church's statement]",
   ],
 };
 
 export const founder = {
   eyebrow: "Who's behind this",
   heading: "Meet the writer",
-  name: "Hendrik [surname]",
-  bio: "[Where you surf, your family, how you came to faith, in about 80 words.]",
-  church: "Member of [home church, town].",
-  /** Add { src, alt } when a photo is shot; until then the logo mark fills the frame. */
-  photo: undefined as { src: string; alt: string } | undefined,
+  name: 'Henno (AKA "H")',
+  bio: "For most of my life I was caught in addiction. The ocean was my other escape, and surfing was the one place I felt free. But nothing I chased could fill the emptiness. In 2023 I found Jesus, and He gave me what the waves and the substance abuse could never give: real freedom. I created Word on the Water to share the good news of Jesus with anyone who feels empty: He loves you and He is enough.",
+  church: "Member of Harvest Christian Church.",
+  photo: { src: "/henno-surfing.jpg", alt: "Henno riding a wave on his surfboard" } as
+    | { src: string; alt: string }
+    | undefined,
 };
 
 export const footer = {

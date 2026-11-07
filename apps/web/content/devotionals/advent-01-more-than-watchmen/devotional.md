@@ -1,7 +1,7 @@
 ---
 title: More Than Watchmen
 publishAt: 2026-12-05
-author: Hendrik
+author: H
 series: advent
 seriesNumber: 1
 passages: ["Psalm 130:5–6", "Isaiah 9:2"]

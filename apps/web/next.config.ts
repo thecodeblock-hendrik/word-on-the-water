@@ -17,8 +17,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
-    // Content images are served by src/app/content; no query strings.
-    localPatterns: [{ pathname: "/content/**", search: "" }],
+    // Content images are served by src/app/content; the writer's photo lives in public/. No query strings.
+    localPatterns: [
+      { pathname: "/content/**", search: "" },
+      { pathname: "/henno-surfing.jpg", search: "" },
+    ],
   },
   // The loader reads content/ with paths built at run time, so say which routes need it.
   outputFileTracingIncludes: {

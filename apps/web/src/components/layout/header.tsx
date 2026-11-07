@@ -3,7 +3,9 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { NAV_LINKS } from "@/components/layout/nav-links";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonClasses } from "@/components/ui/button";
+import { setTheme } from "@/lib/actions/theme";
 
 export function Header() {
   return (
@@ -34,7 +36,10 @@ export function Header() {
           <span className="hidden min-[520px]:inline">Get the devotional</span>
           <span className="min-[520px]:hidden">Subscribe</span>
         </Link>
-        <MobileMenu />
+        <div className="hidden text-ink lg:block">
+          <ThemeToggle saveTheme={setTheme} />
+        </div>
+        <MobileMenu themeToggle={<ThemeToggle saveTheme={setTheme} />} />
       </div>
       <noscript>
         <nav
