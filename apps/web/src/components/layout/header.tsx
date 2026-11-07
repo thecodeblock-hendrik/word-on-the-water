@@ -27,6 +27,7 @@ export function Header() {
               key={link.label}
               href={link.href}
               match={link.match}
+              prefetch={link.prefetch}
               className="inline-flex min-h-11 items-center font-medium text-ink hover:text-accent-ink"
             >
               {link.label}

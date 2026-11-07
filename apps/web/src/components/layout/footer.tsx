@@ -9,17 +9,20 @@ const linkClass = "inline-flex min-h-11 items-center text-on-deep-muted hover:te
 
 type Props = { year?: number; privacyHref?: string };
 
+type FooterGroup = {
+  title: string;
+  links: readonly { label: string; href: string; prefetch?: boolean }[];
+};
+
 /** Bible goes after Devotionals in the Read group. */
-function withBible<G extends { title: string; links: readonly { label: string; href: string }[] }>(
-  group: G,
-) {
+function withBible(group: FooterGroup): FooterGroup {
   if (group.title !== "Read") return group;
   const at = group.links.findIndex((link) => link.label === "Devotionals") + 1;
   return {
     ...group,
     links: [
       ...group.links.slice(0, at),
-      { label: "Bible", href: "/bible" },
+      { label: "Bible", href: "/bible", prefetch: false },
       ...group.links.slice(at),
     ],
   };
@@ -30,7 +33,7 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
     ...footer.social.flatMap((s) => (s.href ? [{ label: s.label, href: s.href }] : [])),
     footer.email,
   ];
-  const groups = [
+  const groups: FooterGroup[] = [
     ...footer.groups.map((group) => (isBibleEnabled() ? withBible(group) : group)),
     { title: "Follow", links: follow },
   ];
@@ -62,7 +65,7 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
               <ul role="list" className="m-0 grid list-none p-0">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className={linkClass}>
+                    <Link href={link.href} prefetch={link.prefetch} className={linkClass}>
                       {link.label}
                     </Link>
                   </li>

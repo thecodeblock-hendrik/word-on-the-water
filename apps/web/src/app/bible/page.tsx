@@ -1,9 +1,12 @@
+import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { isBibleEnabled } from "@/lib/bible/flag";
-import { DEFAULT_VERSION } from "@/lib/bible/versions";
+import { parseVersion, VERSION_COOKIE } from "@/lib/bible/remember";
 
-export default function BiblePage() {
+/** Opens John 1 in the Bible you read last (the BSB if you have not read one yet). */
+export default async function BiblePage() {
   if (!isBibleEnabled()) notFound();
-  redirect(`/bible/${DEFAULT_VERSION}/john/1`);
+  const version = parseVersion((await cookies()).get(VERSION_COOKIE)?.value);
+  redirect(`/bible/${version}/john/1`);
 }

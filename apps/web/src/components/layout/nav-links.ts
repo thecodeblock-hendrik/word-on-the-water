@@ -3,6 +3,8 @@ export type NavItem = {
   href: string;
   /** A path prefix: the link is marked as the current page on this path and below it. */
   match?: string;
+  /** Set false for a link that redirects, so the browser does not prefetch the redirect. */
+  prefetch?: boolean;
 };
 
 export const NAV_LINKS: readonly NavItem[] = [
@@ -13,7 +15,7 @@ export const NAV_LINKS: readonly NavItem[] = [
   { label: "Prayer", href: "/#contact" },
 ];
 
-const BIBLE_LINK: NavItem = { label: "Bible", href: "/bible", match: "/bible" };
+const BIBLE_LINK: NavItem = { label: "Bible", href: "/bible", match: "/bible", prefetch: false };
 
 /** The section links, with Bible after Devotionals while the Bible reader is on. */
 export function navLinks(bibleEnabled: boolean): readonly NavItem[] {

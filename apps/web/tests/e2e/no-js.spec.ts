@@ -10,7 +10,7 @@ test.describe("without JavaScript", () => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main", exact: true });
     const links = nav.getByRole("link");
-    await expect(links).toHaveCount(5);
+    await expect(links).toHaveCount(6);
     for (const link of await links.all()) {
       await expect(link).toBeVisible();
       expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -27,7 +27,7 @@ test.describe("without JavaScript", () => {
     await page.goto("/");
     await expect(
       page.getByRole("navigation", { name: "Main", exact: true }).getByRole("link"),
-    ).toHaveCount(5);
+    ).toHaveCount(6);
   });
 });
 

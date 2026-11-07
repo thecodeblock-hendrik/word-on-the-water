@@ -58,6 +58,7 @@ export function MobileMenu({
               <NavLink
                 href={link.href}
                 match={link.match}
+                prefetch={link.prefetch}
                 className="border-b border-line py-3.5 font-ui text-[17px] font-medium text-ink aria-[current=page]:border-l-4 aria-[current=page]:border-l-accent aria-[current=page]:bg-surface aria-[current=page]:pl-3"
               >
                 {link.label}

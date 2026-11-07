@@ -5,6 +5,7 @@ import { cache } from "react";
 import { PassageColumn } from "@/components/bible/passage-column";
 import { PassageSheet } from "@/components/bible/passage-sheet";
 import { Reader } from "@/components/bible/reader";
+import { RememberVersion } from "@/components/bible/remember-version";
 import { VersionSwitcher } from "@/components/bible/version-switcher";
 import { findBook } from "@/lib/bible/books";
 import { isBibleEnabled } from "@/lib/bible/flag";
@@ -65,6 +66,7 @@ export default async function BibleChapterPage(props: Props) {
   };
   return (
     <div className={`mx-auto max-w-[1080px] ${gutters}`}>
+      <RememberVersion id={version.id} />
       <div className="flex items-center gap-2 border-b border-line py-2 lg:hidden">
         <PassageSheet state={state} />
         <VersionSwitcher state={state} />
