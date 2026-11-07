@@ -9,7 +9,15 @@ import type { PickerState } from "@/lib/bible/picker";
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
-beforeEach(() => push.mockClear());
+const scrollToCurrent = vi.hoisted(() => vi.fn());
+vi.mock("@/components/bible/scroll-to-current", () => ({ scrollToCurrent }));
+const scrolledTo = () =>
+  scrollToCurrent.mock.calls.map(([el]) => el as HTMLElement | null).filter((el) => el !== null);
+
+beforeEach(() => {
+  push.mockClear();
+  scrollToCurrent.mockClear();
+});
 afterEach(cleanup);
 
 const whole: PickerState = { version: "bsb", book: "john", chapter: 3, from: null, to: null };
@@ -80,22 +88,18 @@ describe("PassageSheet steps", () => {
 });
 
 describe("scrolling to where you are", () => {
-  it("scrolls the current book into view when the Book step opens", async () => {
-    const spy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+  it("centres the current book when the Book step opens", async () => {
     await open();
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect((spy.mock.contexts[0] as HTMLElement).textContent).toContain("John");
-    expect(spy).toHaveBeenCalledWith({ block: "center" });
-    spy.mockRestore();
+    expect(scrolledTo()).toHaveLength(1);
+    expect(scrolledTo()[0].textContent).toContain("John");
   });
 
-  it("scrolls the current chapter into view when the Chapter step opens", async () => {
+  it("centres the current chapter when the Chapter step opens", async () => {
     const { user } = await open({ ...whole, book: "psalms", chapter: 119 });
-    const spy = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+    scrollToCurrent.mockClear();
     await user.click(step(/^3 Chapter/));
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect((spy.mock.contexts[0] as HTMLElement).textContent).toBe("119");
-    spy.mockRestore();
+    expect(scrolledTo()).toHaveLength(1);
+    expect(scrolledTo()[0].textContent).toBe("119");
   });
 });
 

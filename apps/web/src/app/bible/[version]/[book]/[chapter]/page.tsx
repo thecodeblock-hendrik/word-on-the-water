@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { PassageColumn } from "@/components/bible/passage-column";
 import { PassageSheet } from "@/components/bible/passage-sheet";
 import { Reader } from "@/components/bible/reader";
 import { VersionSwitcher } from "@/components/bible/version-switcher";
@@ -68,7 +69,14 @@ export default async function BibleChapterPage(props: Props) {
         <PassageSheet state={state} />
         <VersionSwitcher state={state} />
       </div>
-      <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
+      <div className="lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-12 lg:pt-8">
+        {/* Remount for each passage, so the column never holds the verses of the one before. */}
+        <PassageColumn
+          key={`${state.version}/${state.book}/${state.chapter}/${state.from}-${state.to}`}
+          state={state}
+        />
+        <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
+      </div>
     </div>
   );
 }

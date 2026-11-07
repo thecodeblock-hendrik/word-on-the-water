@@ -142,7 +142,7 @@ export function PassageSheet({ state: current }: { state: PickerState }) {
             </ol>
           </nav>
 
-          <div className="overflow-y-auto p-4">
+          <div data-scroll className="overflow-y-auto p-4">
             {step === "bible" && (
               <>
                 <h2 ref={headingRef} tabIndex={-1} className={heading}>
