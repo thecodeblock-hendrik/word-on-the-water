@@ -62,7 +62,9 @@ describe("Founder", () => {
     expect(container).toHaveTextContent("Harvest Christian Church");
     expect(container).toHaveTextContent("caught in addiction");
     expect(container).toHaveTextContent("In 2023 I found Jesus");
-    expect(container).toHaveTextContent("the waves and the substance abuse never could");
+    expect(container).toHaveTextContent(
+      "In 2023 I found Jesus, and He gave me what the waves and the substance abuse could never give: real freedom.",
+    );
     expect(container).toHaveTextContent(
       "I created Word on the Water to share the good news of Jesus with anyone who feels empty: He loves you and He is enough.",
     );
