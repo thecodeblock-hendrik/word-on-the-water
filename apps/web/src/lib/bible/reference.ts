@@ -15,3 +15,8 @@ export function passageTitle(book: Book, chapter: number, range: VerseRange | nu
     verses: range ? verseLabel(range) : undefined,
   });
 }
+
+/** The address of a whole chapter in one Bible, for example "/bible/bsb/john/3". */
+export function chapterPath(version: string, book: string, chapter: number): string {
+  return `/bible/${version}/${book}/${chapter}`;
+}
