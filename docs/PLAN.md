@@ -22,14 +22,14 @@ Legend: `[ ]` todo, `[x]` done. **(Hendrik)** marks a decision or action needed 
 | Phase | Status |
 |---|---|
 | 0 Foundations | Exit gate passed 2026-11-01; open carry-overs: Neon preview branching toggle, web coverage in CI. Done: 0.1 repo and tooling, 0.2 ADRs, 0.3 API skeleton, 0.4 database, 0.5 email and outbox, 0.6 web skeleton, 0.7 OpenAPI types, 0.8 CI and branch protection; 0.9 Vercel and external services nearly done (Neon preview branching open). 0.10 observability and docs, exit gate |
-| 1 Landing page | In progress. 1.1 design system and layout done (PR #59); 1.2 page sections done with real copy (PRs #60, #66; only two social-handle placeholders remain); the devotional page, series and landing card are built from repo content (PRs #64, #65, step 1.2b). Next: 1.3 sign-up. The contact section (`#contact`, linked from the header and footer) arrives with 1.4 and 1.5 |
+| 1 Landing page | In progress. 1.1 design system and layout done (PR #59); 1.2 page sections done with real copy (PRs #60, #66; only two social-handle placeholders remain); the devotional page, series and landing card are built from repo content (PRs #64, #65, step 1.2b; three Advent devotionals). A Bible reader (BSB and WEB) is built ahead of the plan behind `BIBLE_ENABLED` (see "Bible reader" below). Next: 1.3 sign-up. The contact section (`#contact`, linked from the header and footer) arrives with 1.4 and 1.5 |
 | 2 Devotionals and admin | Not started |
 | 3 Teaching series and audio | Not started |
 | 4 Community | Not started (decision gate) |
 
-**Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js site with tokens, fonts, nonce CSP, security headers, the landing page (hero, about, what's coming, start here, beliefs, writer, footer with the ESV notice), a header with the theme toggle and mobile menu, and devotional pages and a series list built from markdown in `apps/web/content` (two Advent devotionals so far, credited to "H"); generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. Not built yet: sign-up, prayer and contact forms, privacy page, SEO and manifest.
+**Where the code stands:** API with health, readiness, cron drain and a default-deny `/v1` router; five database tables with a reviewed migration; email providers (Postmark, SMTP, console), templates and a retrying outbox; Next.js site with tokens, fonts, nonce CSP, security headers, the landing page (hero, about, what's coming, start here, beliefs, writer, footer with the ESV notice), a header with the theme toggle and mobile menu, and devotional pages and a series list built from markdown in `apps/web/content` (three Advent devotionals so far, credited to "H"); generated TypeScript API types; CI with e2e on six browsers; branch protection on `main`. A Bible reader for the BSB and WEB (public-domain text in `apps/web/content/bibles`) with a columns picker on desktop, a tabbed sheet on phones, previous and next chapter and a remembered version, behind `BIBLE_ENABLED=1` (the ESV waits for Crossway's approval). Not built yet: sign-up, prayer and contact forms, privacy page, SEO and manifest (the PWA steps are in [PWA_checklist.md](PWA_checklist.md)).
 
-**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `docs/FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; the site is free with no donations, so the ESV is used under Crossway's free non-commercial terms; Phase 1 devotionals live in the repo as markdown; Dawn patrol (light) and Night swell (dark) colour schemes; test-first for all logic; branch protection with the owner not enforced.
+**Decisions made so far:** mobile strategy is option B long term (Next.js website as an installable PWA now; a Flutter app for iOS and Android revisited at the Phase 2 gate, see `docs/FLUTTER.md`); Neon over Supabase (ADR 0002); nonce CSP with per-request rendering, hash-based option rejected after a browser test (ADR 0007); no license and a public repo; the site is free with no donations, so the ESV is used under Crossway's free non-commercial terms; Phase 1 devotionals live in the repo as markdown; the Bible reader ships public-domain BSB and WEB from the repo and the ESV from the API later; Dawn patrol (light) and Night swell (dark) colour schemes; test-first for all logic; branch protection with the owner not enforced.
 
 **Waiting on Hendrik:** Neon preview branching toggle (step 0.9), social handles for the footer, a pastor or elder reading "Start here", prayer-notification default.
 
@@ -235,10 +235,20 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Devotionals as markdown with front matter in `apps/web/content/devotionals`, series in `content/series`; loader and schema validation (`src/lib/devotionals`); format in `docs/devotional_format.md`
 - [x] Page `/devotionals/<slug>`: crumbs, art, Conditions, Lineup, Word, Paddle Out, Pray, Go Deeper, verse card, series nav, surf report, series list; light and dark art
 - [x] Shown from `publishAt` (UTC) with no redeploy; the landing card follows the calendar; `DEVOTIONAL_TODAY` previews another day
-- [x] `pnpm check:devotionals` validates the files; two Advent devotionals published, credited to "H"
+- [x] `pnpm check:devotionals` validates the files; three Advent devotionals published (5, 12 and 19 December 2026), credited to "H"
 - [x] Tests: unit for the loader, view and page; e2e on five browser projects with the date pinned
 - [ ] Article JSON-LD, sitemap entries and the devotional archive page (step 1.6 and Phase 2.3)
 - [ ] Sign-up form in the closing band (arrives with 1.3)
+
+### 1.2c Bible reader (built ahead of the plan, behind `BIBLE_ENABLED`)
+Its own plan and checklist live in [bible_feature.md](bible_feature.md) (steps B0 to B9). Summary of where it stands:
+- [x] B1 book data, B2 BSB and WEB import (about 15 MB of chapter JSON, `pnpm build:bible`), B3 passage source, B4 reader pages, B5 pickers, B6 previous and next chapter (PRs #71 to #75)
+- [x] Picker redesign: columns popover from `lg` (books with a filter, chapters in pages of 25, a verse grid where one click is one verse and a second click a range) and a tabbed bottom sheet below `lg` (Book, Chapter, Verses tabs showing the current choice); chosen from three mockups each in `design/bible_mockups.html`
+- [x] Fixed on the way: two mounted pickers shared one radio group name, so choosing in one unchecked the other (each picker now has its own name)
+- [x] `DEV_ORIGINS` in `.env` lets a phone on the same Wi-Fi open `pnpm dev`
+- [ ] B7 ESV source: blocked until Crossway approves the API application (applied 2026-11-07)
+- [ ] B8 compliance gate and B9 docs and launch (turn `BIBLE_ENABLED` on in Production)
+- [ ] Possible later: a type-it search box as a shortcut on top of the pickers (mockups B and M3), swipe between chapters
 
 ### 1.3 Email sign-up (Kit, double opt-in)
 Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer (ADR 0008). Our API validates, defends and forwards.
@@ -283,7 +293,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Real addresses on the page in place of the mockup placeholders: `prayer@wordonthewater.net` for prayer, `hello@wordonthewater.net` for contact and the footer
 - [ ] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization`
 - [ ] `sitemap.ts` and `robots.ts`
-- [ ] Installable, app-like experience with `app/manifest.ts` (`MetadataRoute.Manifest`, see `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`): `name`, `short_name` ("Word on the Water" / "WotW"), `description`, `id` and `start_url` `/`, `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang: "en"`, `categories`, `background_color` and `theme_color` from the tokens
+- [ ] Installable, app-like experience (step-by-step in [PWA_checklist.md](PWA_checklist.md)) with `app/manifest.ts` (`MetadataRoute.Manifest`, see `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`): `name`, `short_name` ("Word on the Water" / "WotW"), `description`, `id` and `start_url` `/`, `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang: "en"`, `categories`, `background_color` and `theme_color` from the tokens
 - [ ] Icons: 192 and 512 px PNG (`purpose: "any"`), 512 px maskable with the logo inside the safe zone, `app/icon.svg` favicon and `app/apple-icon.png` (180 px) for iOS home screens; generated from the inline SVG logo
 - [ ] Manifest `shortcuts` to the sections people return to ("Start here", "Prayer request") and `screenshots` (narrow, 375 px) for the richer install sheet on Android
 - [ ] iOS: `metadata.appleWebApp` (`capable`, `title`, `statusBarStyle`) so the home-screen launch looks native

@@ -9,7 +9,7 @@ Christian ministry web app publishing devotionals and Bible teaching for men and
 
 ## Status
 
-Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress: the landing page with its real copy, light and dark themes, and the devotional pages (two Advent devotionals) are built. Sign-up, prayer and contact forms, the privacy page and SEO come next, so the site is not public yet.
+Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress: the landing page with its real copy, light and dark themes, the devotional pages (three Advent devotionals) and a Bible reader (BSB and WEB, behind a flag) are built. Sign-up, prayer and contact forms, the privacy page and SEO come next, so the site is not public yet.
 
 ## Stack
 
@@ -53,4 +53,4 @@ make types       # regenerate API types
 make down        # stop services
 ```
 
-In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, and `DEVOTIONAL_TODAY=2026-12-12 pnpm dev` previews a future day. `BIBLE_ENABLED=1 pnpm dev` shows the Bible reader at `/bible` (hidden by default; plan in [docs/bible_feature.md](docs/bible_feature.md)).
+In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, and `DEVOTIONAL_TODAY=2026-12-12 pnpm dev` previews a future day. `BIBLE_ENABLED=1 pnpm dev` shows the Bible reader at `/bible` (hidden by default; plan in [docs/bible_feature.md](docs/bible_feature.md)), and `pnpm build:bible` regenerates its data. To try the site on a phone on the same Wi-Fi, put your computer's address in `DEV_ORIGINS` in the root `.env` and open `http://<address>:3000`. The step-by-step plan for making the site installable on a phone is in [docs/PWA_checklist.md](docs/PWA_checklist.md).

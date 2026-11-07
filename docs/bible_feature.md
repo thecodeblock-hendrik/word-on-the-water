@@ -10,7 +10,7 @@ Bibles, in the order we build them:
 
 BSB and WEB do not depend on the ESV approval, so the reader ships first with those two. The ESV appears in the version picker as "Coming soon" until its key is live.
 
-Mockups: [design/bible_mockups.html](design/bible_mockups.html) (mobile light and dark, version picker, picker steps, quick switch, open mobile menu, desktop). Open it in a browser.
+Mockups: [design/bible_mockups.html](design/bible_mockups.html) (mobile light and dark, version picker, quick switch, open mobile menu, and the picker options: three for desktop and three for phones; the chosen ones, desktop option A and phone option M1, are built). Mockups 4, 5 and 7 are the earlier picker designs and are superseded. Open it in a browser.
 
 Sources read 2026-11-07: api.esv.org (terms and docs), crossway.org/permissions, berean.bible (downloads, licensing, terms), ebible.org/web and its details page, github.com/seven1m/open-bibles. Terms can change: re-read the relevant terms before building each source and before launch.
 
@@ -207,7 +207,7 @@ Best-practice choices:
 - **Keeps your place.** Switching the version keeps book, chapter and verses (URL swap).
 - **Remembered.** The last Bible you read is kept in a first-party preference cookie (`bible-version`), so `/bible` opens in it. The URL still decides what renders; the cookie only chooses where `/bible` goes. It is a functional preference like the theme cookie, not tracking.
 - **Modal dialogs and the CSP:** a modal Radix dialog locks page scrolling by injecting a `<style>` element, which the nonce-based CSP blocks unless it carries the nonce. `CspNonce` (in the root layout) hands the page's script nonce to the library (`get-nonce`), and an e2e test opens the sheet and fails on any CSP violation. Use modal dialogs freely after this; keep the mobile menu non-modal as it is.
-- **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same list as a segmented control or dropdown at the top of the left column.
+- **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same segmented control at the top of the columns popover.
 
 ### 4.5 Reader
 
@@ -219,10 +219,11 @@ A static table `bible-books.ts`: 66 books with display name, slug, testament and
 
 ### 4.7 Picker
 
-- Mobile: one full-screen sheet (Radix Dialog), four steps as tabs: Bible, Book, Chapter, Verses. Done steps show a tick and can be tapped to go back. "Read" is always at the top right.
-- Desktop: permanent left column.
-- Verses use two numeric steppers, not free typing. Empty means the whole chapter.
-- 44px minimum targets, focus trap, Escape closes, `aria-live` announces the new reference.
+- Phone (below 1024px): a bottom sheet (Radix Dialog) with Book, Chapter and Verses tabs that show the current choice (John, 3, 16–18). Choosing a book or chapter moves to the next tab; any tab can be tapped. The Bible is a segmented control in the header. Whole chapter and Read sit in a footer in thumb reach.
+- Desktop (from 1024px): a passage button above the text opens a three-column popover: books (with a filter, no counts), chapters, verses.
+- Chapters come in pages of 25 for long books (Psalms has six). Verses are a grid: one click chooses a verse, a second click makes a range, the same verse twice keeps just that verse, and the chosen verses join into one band. Nothing chosen means the whole chapter (the Whole chapter button is marked while it applies).
+- Nothing applies until Read, and unfinished choices are dropped when the picker closes.
+- 44px minimum targets, focus trap, Escape closes, `aria-live` announces the next action. Every mounted picker needs its own radio group name.
 
 ### 4.8 Previous and next
 
