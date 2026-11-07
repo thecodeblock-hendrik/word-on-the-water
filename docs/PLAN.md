@@ -275,7 +275,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
   - [x] Mobile first at 375px, from the existing section components and tokens; no sign-up form on it
   - [x] Kept out of search results (`robots: noindex`); the sitemap does not exist yet (step 1.6), so leave `/thank-you` out of it when it does; covered by the e2e specs on all projects
   - [ ] Set the redirect URLs in the Kit form (test form on the test site first, the production form on `https://wordonthewater.net/thank-you` at launch) **(Hendrik)** and verify by signing up with a real test address end to end: sign-up lands on `/thank-you`, the confirmation email arrives, confirming lands on `/thank-you` again
-- [ ] Tests: happy path, validation, enumeration safety, rate limit, bot rejection, Kit down then retried, webhook signature valid, invalid, expired and replayed
+- [x] Tests: happy path, validation, enumeration safety, rate limit, bot rejection, Kit down then retried, webhook signature valid, invalid, expired and replayed (`tests/integration/test_subscribers.py`, `test_kit_job.py`, `test_kit_webhook_route.py`, `tests/test_kit_webhook.py` with Kit's own reference code as the oracle; the 1.3 API has 340 tests, 100% on its services)
 - [x] Threat model updated (new third party holding subscriber email, new inbound webhook): K1 to K4, S3, R2, I2, D1, D3, T1 and the boundary table
 
 ### 1.4 Prayer request form
