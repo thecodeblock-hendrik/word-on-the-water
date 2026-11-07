@@ -1,6 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+// The chip lives in the bar below 1024px; the desktop column has its own version control.
+test.skip(({ viewport }) => (viewport?.width ?? 0) >= 1024, "the desktop column replaces the chip");
+
 const page16 = "/bible/bsb/john/3?v=16-18";
 const chip = (page: import("@playwright/test").Page) =>
   page.getByRole("button", { name: "Bible version: BSB. Change" });
@@ -97,4 +100,22 @@ test("opening the sheet causes no CSP violation and no serious axe problem, in l
     await page.keyboard.press("Escape");
   }
   expect(violations).toEqual([]);
+});
+
+test.describe("tablet width on a desktop browser", () => {
+  test.skip(({ isMobile }) => isMobile, "phones are covered above");
+  test.use({ viewport: { width: 800, height: 900 } });
+
+  test("the chip opens a centred card, and choosing the WEB keeps the passage", async ({
+    page,
+  }) => {
+    await page.goto(page16);
+    await chip(page).click();
+    const sheet = page.getByRole("dialog", { name: "Choose Bible" });
+    const box = await sheet.boundingBox();
+    expect(box!.width).toBeLessThan(800);
+    expect(box!.y).toBeGreaterThan(0);
+    await sheet.getByRole("radio", { name: /World English Bible/ }).click();
+    await expect(page).toHaveURL("/bible/web/john/3?v=16-18");
+  });
 });
