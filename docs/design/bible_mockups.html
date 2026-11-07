@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bible feature mockups</title>
+<style>
+:root{--bg:#fbf3e8;--surface:#fffaf3;--ink:#2b2d42;--muted:#5c5e70;--line:#e9dccb;--accent:#d9703a;--accent-ink:#a9501f;--deep:#2b2d42;--on-deep:#fbf3e8;--hl:#f7dfc9}
+.night{--bg:#0f2233;--surface:#152c40;--ink:#f4f1ea;--muted:#a9b7c2;--line:#28425a;--accent:#4fa9a6;--accent-ink:#6fc0bc;--deep:#0a1825;--on-deep:#f4f1ea;--hl:#1d4a58}
+*{box-sizing:border-box}
+body{margin:0;background:#e7e2da;font:16px/1.5 system-ui,sans-serif;color:#2b2d42;padding:24px 16px 64px}
+h1{font-size:22px;margin:0 0 4px}.lead{color:#5c5e70;margin:0 0 24px;max-width:70ch}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width:375px}
+.phone{width:375px;height:760px;background:var(--bg);color:var(--ink);border-radius:28px;border:8px solid #111;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.desk{width:1100px;max-width:100%;height:640px;background:var(--bg);color:var(--ink);border:1px solid #bbb;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg)}
+.logo{font:700 18px "Barlow Condensed",system-ui;letter-spacing:.02em;flex:1}
+.btn{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:0 14px;font:600 16px system-ui;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.night .btn.primary{color:#0a1825}
+.ref{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface)}
+.ref .btn{flex:1;justify-content:space-between;font-size:17px}
+.chip{font-size:12px;font-weight:700;letter-spacing:.06em;border:1px solid var(--line);border-radius:99px;padding:2px 8px;color:var(--muted)}
+.read{flex:1;overflow:auto;padding:20px 20px 24px;font:19px/1.75 Georgia,serif;max-width:62ch}
+.read h2{font:700 28px "Barlow Condensed",system-ui;margin:0 0 2px}
+.read h3{font:700 15px system-ui;margin:20px 0 6px;color:var(--accent-ink);text-transform:none}
+.read p{margin:0 0 12px}
+.read sup{font:700 11px system-ui;color:var(--accent-ink);margin-right:3px;vertical-align:super}
+.sel{background:var(--hl);border-radius:3px}
+.range{font:14px system-ui;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.range a{color:var(--accent-ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
+.legal{font:12px/1.5 system-ui;color:var(--muted);border-top:1px solid var(--line);padding:10px 20px}
+.legal a{color:var(--accent-ink)}
+.bar{display:flex;gap:8px;padding:8px 12px calc(8px + 6px);border-top:1px solid var(--line);background:var(--surface)}
+.bar .btn{flex:1;font-size:15px}
+.sheet{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column}
+.sheet header{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);gap:8px}
+.sheet header strong{flex:1;font-size:17px}
+.steps{display:flex;border-bottom:1px solid var(--line)}
+.steps span{flex:1;text-align:center;padding:12px 0;font:600 14px system-ui;color:var(--muted);border-bottom:3px solid transparent;min-height:44px}
+.steps .on{color:var(--ink);border-color:var(--accent)}
+.steps .done{color:var(--accent-ink)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 12px;overflow:auto}
+.grid .btn{padding:0}
+.grid .on{background:var(--accent);border-color:var(--accent);color:#fff}
+.night .grid .on{color:#0a1825}
+.list{overflow:auto;padding:4px 0}
+.list div{padding:0 16px;min-height:48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font-weight:600}
+.list small{color:var(--muted);font-weight:400}
+.sub{padding:12px 16px 4px;font:700 12px system-ui;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.card{margin:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.side{width:300px;border-right:1px solid var(--line);overflow:auto;background:var(--surface)}
+.main{flex:1;overflow:auto;display:flex;flex-direction:column}
+.cols{display:flex;flex:1;min-height:0}
+.nav{display:flex;gap:18px;font:600 15px system-ui}
+.chapters{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:6px 16px 16px}
+.chapters span{min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;font-weight:600;background:var(--bg)}
+.chapters .on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.arrow-side{display:flex;justify-content:space-between;padding:12px 24px}
+</style>
+</head>
+<body>
+<h1>Bible feature mockups</h1>
+<p class="lead">Tokens match the site (Dawn patrol and Night swell). Mobile is drawn at 375px first. Controls are at least 44px. The ESV link and notice are on every reader screen. These are visual references, not production code. Spec: docs/bible_feature.md.</p>
+
+<div class="row">
+
+<figure>
+<div class="phone">
+  <div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref">
+    <button class="btn">John 3 <span class="chip">ESV</span> <span>▾</span></button>
+  </div>
+  <div class="read">
+    <h2>John 3</h2>
+    <div class="range"><span>Tap a verse number to select a range</span></div>
+    <h3>You Must Be Born Again</h3>
+    <p><sup>1</sup>Now there was a man of the Pharisees named Nicodemus, a ruler of the Jews. <sup>2</sup>This man came to Jesus by night and said to him, “Rabbi, we know that you are a teacher come from God…”</p>
+    <p><sup>16</sup>“For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life. (ESV)</p>
+  </div>
+  <div class="legal">Scripture quotations are from the ESV® Bible, © 2001 by Crossway. <a href="#">www.esv.org</a></div>
+  <div class="bar"><button class="btn" aria-label="Previous chapter">← John 2</button><button class="btn primary" aria-label="Next chapter">John 4 →</button></div>
+</div>
+<figcaption><b>1. Reader, mobile.</b> One tap on the reference opens the picker. Previous and next chapter sit at the bottom, in thumb reach, with the target named. Swipe left and right does the same (and the buttons stay for accessibility).</figcaption>
+</figure>
+
+<figure>
+<div class="phone">
+  <div class="top"><span class="logo">WORD ON THE WATER</span></div>
+  <div class="sheet" style="top:57px">
+    <header><button class="btn" aria-label="Close">✕</button><strong>Choose passage</strong><button class="btn primary">Read</button></header>
+    <div class="steps"><span class="done">1 Bible ✓</span><span class="on">2 Book</span><span>3 Chapter</span><span>4 Verses</span></div>
+    <div class="card" style="margin:12px">ESV · English Standard Version <small style="color:var(--muted)"><br>More Bibles may be added later.</small></div>
+    <div class="sub">Old Testament</div>
+    <div class="list">
+      <div>Genesis <small>50</small></div><div>Exodus <small>40</small></div><div>Psalms <small>150</small></div>
+    </div>
+    <div class="sub">New Testament</div>
+    <div class="list">
+      <div>Matthew <small>28</small></div><div>Mark <small>16</small></div><div style="background:var(--hl)">John <small>21</small></div><div>Acts <small>28</small></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>2. Picker, step 2 (book).</b> A single full-screen sheet with four steps: Bible, Book, Chapter, Verses. Steps already chosen show a tick and can be tapped to go back. Books are grouped Old and New Testament, with a chapter count. Only the ESV is offered today, so step 1 is pre-selected and collapsed.</figcaption>
+</figure>
+
+<figure>
+<div class="phone">
+  <div class="top"><span class="logo">WORD ON THE WATER</span></div>
+  <div class="sheet" style="top:57px">
+    <header><button class="btn" aria-label="Close">✕</button><strong>John</strong><button class="btn primary">Read</button></header>
+    <div class="steps"><span class="done">1 Bible ✓</span><span class="done">2 Book ✓</span><span class="on">3 Chapter</span><span>4 Verses</span></div>
+    <div class="grid">
+      <button class="btn">1</button><button class="btn">2</button><button class="btn on">3</button><button class="btn">4</button><button class="btn">5</button>
+      <button class="btn">6</button><button class="btn">7</button><button class="btn">8</button><button class="btn">9</button><button class="btn">10</button>
+      <button class="btn">11</button><button class="btn">12</button><button class="btn">13</button><button class="btn">14</button><button class="btn">15</button>
+      <button class="btn">16</button><button class="btn">17</button><button class="btn">18</button><button class="btn">19</button><button class="btn">20</button>
+      <button class="btn">21</button>
+    </div>
+    <div class="card"><b>Verses (optional)</b><br><span style="color:var(--muted);font-size:14px">Leave empty to read the whole chapter, or pick a range.</span>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:10px"><button class="btn">16</button><span>to</span><button class="btn">18</button></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>3. Picker, steps 3 and 4.</b> Chapters are a 5-column grid of 44px buttons. Verses are optional: a from/to pair of steppers, so a range needs no typing. "Read" is always visible at the top right.</figcaption>
+</figure>
+
+<figure>
+<div class="phone night">
+  <div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span class="chip">ESV</span> <span>▾</span></button></div>
+  <div class="read">
+    <h2>John 3:16–18</h2>
+    <div class="range"><span>Verses 16 to 18</span><a href="#">Show full chapter</a></div>
+    <p class="sel"><sup>16</sup>“For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.</p>
+    <p class="sel"><sup>17</sup>For God did not send his Son into the world to condemn the world, but in order that the world might be saved through him.</p>
+    <p class="sel"><sup>18</sup>Whoever believes in him is not condemned…” (ESV)</p>
+  </div>
+  <div class="legal">Scripture quotations are from the ESV® Bible, © 2001 by Crossway. <a href="#">www.esv.org</a></div>
+  <div class="bar"><button class="btn">← John 2</button><button class="btn primary">John 4 →</button></div>
+</div>
+<figcaption><b>4. Verse range, dark theme.</b> The heading shows the exact range and a one-tap "Show full chapter". Selected verses are tinted, never colour alone: the heading also states the range. Omitted text is marked with an ellipsis, as the ESV terms require.</figcaption>
+</figure>
+
+</div>
+
+<h1 style="margin-top:40px">Desktop</h1>
+<div class="desk">
+  <div class="top"><span class="logo">WORD ON THE WATER</span>
+    <span class="nav"><span>About</span><span>Devotionals</span><span style="color:var(--accent-ink)">Bible</span><span>Prayer</span></span>
+    <button class="btn" aria-label="Theme">◐</button></div>
+  <div class="cols">
+    <aside class="side">
+      <div class="card" style="margin:12px 16px">Bible: <b>ESV</b> <span class="chip">English Standard Version</span></div>
+      <div class="sub">Old Testament</div>
+      <div class="list"><div>Genesis <small>50</small></div><div>Psalms <small>150</small></div><div>Isaiah <small>66</small></div></div>
+      <div class="sub">New Testament</div>
+      <div class="list"><div>Matthew <small>28</small></div><div style="background:var(--hl)">John <small>21</small></div><div>Acts <small>28</small></div></div>
+      <div class="sub">Chapter</div>
+      <div class="chapters"><span>1</span><span>2</span><span class="on">3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+    </aside>
+    <div class="main">
+      <div class="ref" style="justify-content:space-between"><b style="font-size:18px">John 3 <span class="chip">ESV</span></b>
+        <span style="display:flex;gap:8px;align-items:center;font-size:14px">Verses <button class="btn">1</button> to <button class="btn">36</button><button class="btn">Go</button></span></div>
+      <div class="read" style="margin:0 auto;width:100%">
+        <h3>You Must Be Born Again</h3>
+        <p><sup>1</sup>Now there was a man of the Pharisees named Nicodemus, a ruler of the Jews. <sup>2</sup>This man came to Jesus by night and said to him, “Rabbi, we know that you are a teacher come from God…”</p>
+        <p><sup>16</sup>“For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life. (ESV)</p>
+      </div>
+      <div class="arrow-side"><button class="btn">← John 2</button><button class="btn primary">John 4 →</button></div>
+      <div class="legal">Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway… Users may not copy or download more than 500 verses of the ESV Bible or more than one half of any book of the ESV Bible. <a href="#">www.esv.org</a></div>
+    </div>
+  </div>
+</div>
+<p class="lead" style="margin-top:8px"><b>5. Reader, desktop.</b> The picker is a permanent left column (book, then chapter), so nothing opens in a sheet. Keyboard: left and right arrow keys change chapter. The reading column stays at 62ch.</p>
+</body>
+</html>
