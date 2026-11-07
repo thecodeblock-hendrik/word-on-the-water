@@ -252,8 +252,8 @@ Its own plan and checklist live in [bible_feature.md](bible_feature.md) (steps B
 
 ### 1.3 Email sign-up (Kit, double opt-in)
 Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer (ADR 0008). Our API validates, defends and forwards.
-- [ ] Kit setup **(Hendrik)**: create the sign-up form in Kit with double opt-in on, sender `hello@wordonthewater.net`, a confirmation email and a redirect to our thank-you page on `https://wordonthewater.net`; note the form id; create an API key in Kit developer settings
-- [ ] Spike first: against a Kit test form, prove which calls trigger the double opt-in confirmation email (create subscriber, then add to form by id or by email) and what state the subscriber has until confirmed; record the result in ADR 0008
+- [x] Kit setup **(Hendrik)**: create the sign-up form in Kit with double opt-in on, sender `hello@wordonthewater.net`, a confirmation email and a redirect to our `/thank-you` page on `https://wordonthewater.net` (the page is built in this step, below; leave the redirect pointing at the test site until it exists); note the form id; create an API key in Kit developer settings
+- [x] Spike first (done 2026-11-07, result in [ADR 0008](adr/0008-kit-subscriptions.md): create the subscriber with `state: "inactive"`, then add it to the form by id; Kit sends the confirmation and the state becomes `active` on confirmation): against a Kit test form, prove which calls trigger the double opt-in confirmation email (create subscriber, then add to form by id or by email) and what state the subscriber has until confirmed; record the result in ADR 0008
 - [ ] `integrations/kit/`: small async client (httpx) for `https://api.kit.com/v4` with `X-Kit-Api-Key`; create subscriber, add to form, find by email, unsubscribe; backoff on 429 (120 requests per minute per key); tested against a fake Kit server, never real Kit in CI
 - [ ] API: Pydantic schema (`extra="forbid"`, name <= 80, email <= 254)
 - [ ] `POST /v1/subscribers`: always 202 with identical body (no enumeration across new, pending, confirmed)
@@ -266,7 +266,13 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] `POST /v1/webhooks/kit`: verify `X-Kit-Signature` (`t=...,v1=...`, HMAC-SHA256 over `{t}.{raw body}`, constant-time compare, 5 minute tolerance, any matching `v1` accepted), dedupe on event id, update `subscribers.status` from `subscriber.activated`, `subscriber.unsubscribed`, `subscriber.bounced`, `subscriber.complained`
 - [ ] Webhook endpoint registered in Kit (`POST /v4/webhook_endpoints`, secret stored as `KIT_WEBHOOK_SECRET`); decide how Kit reaches the protected API project (Vercel protection bypass in the URL, or a route on the web project) and record it in ADR 0008
 - [ ] Web: `react-hook-form` + Zod, Server Action with progressive enhancement, visible labels, correct `type/inputmode/autocomplete`, errors in `aria-live`
-- [ ] Pages: "check your inbox" and a branded thank-you page after Kit confirmation; confirmation and unsubscribe pages themselves are Kit-hosted
+- [ ] "Check your inbox" message shown in the sign-up form itself after a successful submit (same text whether the email is new, pending or already confirmed); the confirmation and unsubscribe pages themselves are Kit-hosted
+- [ ] **Thank-you page `/thank-you`** (Kit sends new subscribers there after they sign up and again after they confirm; today `/thank-you` does not exist, so Kit's redirect lands on "Page not found" on the test site). Build it before the Kit form's redirect is set and before the test site is used for a real sign-up:
+  - [ ] Tests first: the page returns 200, has one `h1`, a link back to the home page and to the latest devotional, `noindex` metadata, no personal data in the URL or the page, light and dark, axe clean, and works with JavaScript off
+  - [ ] One page serves both visits, with copy that is right for each: after sign-up "Check your inbox and tap the link to confirm"; after confirmation "You are in". If Kit can send a different redirect URL for each step, use `/thank-you?step=confirmed` for the second (confirm this in the Kit spike and record it in ADR 0008); otherwise keep the wording neutral and true for both
+  - [ ] Mobile first at 375px, from the existing section components and tokens; no sign-up form on it
+  - [ ] Add it to the CSP and `robots` checks (not in the sitemap), and to the e2e navigation test on all six projects
+  - [ ] Set the redirect URLs in the Kit form (test form on the test site first, the production form on `https://wordonthewater.net/thank-you` at launch) **(Hendrik)** and verify by signing up with a real test address end to end: sign-up lands on `/thank-you`, the confirmation email arrives, confirming lands on `/thank-you` again
 - [ ] Tests: happy path, validation, enumeration safety, rate limit, bot rejection, Kit down then retried, webhook signature valid, invalid, expired and replayed
 - [ ] Threat model updated (new third party holding subscriber email, new inbound webhook)
 

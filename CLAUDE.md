@@ -124,7 +124,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │   ├── PLAN.md, FLUTTER.md, threat_plan.md   ← step plan, native app assessment, threat work plan
 │   ├── bible_feature.md, PWA_checklist.md, devotional_format.md, landing_page_check.md   ← Bible reader plan, PWA steps, devotional file format, landing page UI checklist
 │   ├── design/                   ← landing page document and mockup, bible_mockups.html (reader, picker options)
-│   ├── adr/                      ← 0001 to 0007
+│   ├── adr/                      ← 0001 to 0008
 │   ├── runbooks/                 ← deploy.md; planned: incident, restore-db, rotate-secrets
 │   └── threat-model.md, privacy.md   ← planned (step 0.10)
 ├── apps/
@@ -399,7 +399,7 @@ Two systems, split by purpose:
 | Subscriber-facing | **Kit** | Double opt-in confirmation, welcome, weekly devotional broadcasts. Kit adds the unsubscribe link and legal address |
 | Transactional | **Postmark** via `EmailProvider` and the outbox | Prayer-team notification, contact notification, prayer-request received (to requester, optional) |
 
-- **Kit integration:** API v4 at `https://api.kit.com/v4`, `X-Kit-Api-Key` header (an API key is right for automating our own account; OAuth is only needed for multi-account apps and bulk endpoints). Sign-up: create subscriber (`POST /subscribers`, an upsert), then add to the double opt-in form; unsubscribe: `POST /subscribers/{id}/unsubscribe`. Webhooks via `POST /webhook_endpoints` with events `subscriber.activated`, `subscriber.unsubscribed`, `subscriber.bounced`, `subscriber.complained`. Broadcasts (Phase 2): `POST /broadcasts` as a draft, then scheduled with `send_at`. Details and open points are in ADR 0008.
+- **Kit integration:** API v4 at `https://api.kit.com/v4`, `X-Kit-Api-Key` header (an API key is right for automating our own account; OAuth is only needed for multi-account apps and bulk endpoints). Sign-up: create the subscriber as `state: "inactive"` (`POST /subscribers`, an upsert; the default `active` would skip double opt-in), then add it to the double opt-in form by id, and Kit sends the confirmation (proven in the 1.3 spike); unsubscribe: `POST /subscribers/{id}/unsubscribe`. Webhooks via `POST /webhook_endpoints` with events `subscriber.activated`, `subscriber.unsubscribed`, `subscriber.bounced`, `subscriber.complained`. Broadcasts (Phase 2): `POST /broadcasts` as a draft, then scheduled with `send_at`. Details and open points are in ADR 0008.
 - **Kit is the list's source of truth.** Our `subscribers` table is a mirror for status, consent evidence and retention. If the two disagree, Kit wins.
 - Kit failures never lose a sign-up: the call runs from the outbox with retries.
 - **Domain and addresses.** The domain is `wordonthewater.net`. Two mailboxes are registered:
