@@ -384,7 +384,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 - [ ] Public accounts: Argon2id or passkeys only, breached-password check, lockout/backoff, email verification
 - [ ] Favourites and reading plans
 - [ ] Comments with moderation queue and abuse reporting
-- [ ] Giving via hosted provider (Stripe Checkout); no card data touches our systems
+- [ ] Giving via hosted provider (Stripe Checkout); no card data touches our systems. Not planned: needs the Crossway ESV license first
 - [ ] Privacy doc, threat model and retention rules updated before each feature ships
 
 ---
