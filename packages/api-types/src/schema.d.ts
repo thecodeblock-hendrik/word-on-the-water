@@ -75,6 +75,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/subscribers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Subscribe
+         * @description Always 202 with the same body, whether the address is new, pending or confirmed.
+         */
+        post: operations["subscribe_v1_subscribers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -83,6 +103,35 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * SubscribeRequest
+         * @description A sign-up. Strict: unknown fields are an error and every length is capped.
+         */
+        SubscribeRequest: {
+            /** Consent Text Version */
+            consent_text_version: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name?: string | null;
+            /** Source */
+            source: string;
+        };
+        /**
+         * SubscribeResponse
+         * @description One answer for a new, a pending and a confirmed address, so nobody can probe the list.
+         */
+        SubscribeResponse: {
+            /**
+             * Status
+             * @default check_your_inbox
+             * @constant
+             */
+            status: "check_your_inbox";
         };
         /** ValidationError */
         ValidationError: {
@@ -203,6 +252,41 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subscribe_v1_subscribers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscribeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscribeResponse"];
                 };
             };
             /** @description Validation Error */

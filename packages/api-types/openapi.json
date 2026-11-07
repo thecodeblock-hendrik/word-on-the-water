@@ -14,6 +14,63 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "SubscribeRequest": {
+        "additionalProperties": false,
+        "description": "A sign-up. Strict: unknown fields are an error and every length is capped.",
+        "properties": {
+          "consent_text_version": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Consent Text Version",
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "source": {
+            "maxLength": 40,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_]+$",
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "source",
+          "consent_text_version"
+        ],
+        "title": "SubscribeRequest",
+        "type": "object"
+      },
+      "SubscribeResponse": {
+        "description": "One answer for a new, a pending and a confirmed address, so nobody can probe the list.",
+        "properties": {
+          "status": {
+            "const": "check_your_inbox",
+            "default": "check_your_inbox",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "SubscribeResponse",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -214,6 +271,66 @@
           }
         },
         "summary": "Ping",
+        "tags": [
+          "v1"
+        ]
+      }
+    },
+    "/v1/subscribers": {
+      "post": {
+        "description": "Always 202 with the same body, whether the address is new, pending or confirmed.",
+        "operationId": "subscribe_v1_subscribers_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscribeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Subscribe",
         "tags": [
           "v1"
         ]
