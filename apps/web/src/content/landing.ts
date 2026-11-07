@@ -149,4 +149,28 @@ export const footer = {
 };
 
 /** Everything the landing page says. The placeholder check scans this. */
-export const landing = { hero, about, coming, start, beliefs, founder, footer };
+/** The sign-up form, which sits in the closing band of the landing page and the devotional pages. */
+export const signup = {
+  heading: "One devotional. Every Saturday at dawn.",
+  lede: "The full devotional lands in your inbox. Free, and you can unsubscribe anytime.",
+  emailLabel: "Email",
+  nameLabel: "First name (optional)",
+  button: "Subscribe",
+  consent:
+    "By subscribing you agree to receive one email a week from Word on the Water. Unsubscribe anytime.",
+  success: {
+    heading: "Check your inbox",
+    body: "We sent you a link to confirm your email. If it does not arrive in a few minutes, look in your spam folder.",
+  },
+  noScript:
+    "Signing up needs JavaScript for the spam check. Email hello@wordonthewater.net and we will add you.",
+  unavailable: "Sign-up is not available yet. Please check back soon.",
+};
+
+/** Where Kit sends a subscriber after they confirm their email. */
+export const thankYou = {
+  heading: "You're in",
+  body: "Your email is confirmed. The weekly devotional lands in your inbox every Saturday at dawn. Read the latest one while you wait.",
+};
+
+export const landing = { hero, about, coming, start, beliefs, founder, footer, signup, thankYou };

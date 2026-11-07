@@ -74,7 +74,7 @@ export default async function DevotionalPage({ params }: Props) {
           </div>
         </div>
       </div>
-      <SubscribeBand />
+      <SubscribeBand source="devotional_band" />
     </>
   );
 }

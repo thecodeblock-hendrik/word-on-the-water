@@ -10,12 +10,18 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from app.core.errors import error_response
 
 MAX_BODY_BYTES = 16 * 1024
+# Kit sends up to 100 events in one delivery (it splits one before about 512 KB).
+BODY_LIMITS = {"/v1/webhooks/kit": 1_000_000}
+
+
+def body_limit(scope: Scope) -> int:
+    return BODY_LIMITS.get(scope.get("path", ""), MAX_BODY_BYTES)
 
 
 class BodyLimitMiddleware:
-    """Reject bodies over MAX_BODY_BYTES, counting the bytes actually received.
+    """Reject bodies over the route's limit (16 KB unless listed), counting the bytes received.
 
-    The body is read up front (at most MAX_BODY_BYTES) and replayed to the app, so
+    The body is read up front (at most the limit) and replayed to the app, so
     the limit holds even for chunked requests and routes that never read the body.
     """
 
@@ -29,7 +35,7 @@ class BodyLimitMiddleware:
         rejection = self._check_header(scope)
         buffered: list[Message] = []
         if rejection is None:
-            rejection = await self._buffer_body(receive, buffered)
+            rejection = await self._buffer_body(receive, buffered, body_limit(scope))
         if rejection is not None:
             await rejection(scope, receive, send)
             return
@@ -48,12 +54,14 @@ class BodyLimitMiddleware:
             return None
         if not value.isdigit():
             return error_response(400, "bad_request", "Invalid Content-Length.")
-        if int(value) > MAX_BODY_BYTES:
+        if int(value) > body_limit(scope):
             return error_response(413, "payload_too_large", "Request body too large.")
         return None
 
     @staticmethod
-    async def _buffer_body(receive: Receive, buffered: list[Message]) -> Response | None:
+    async def _buffer_body(
+        receive: Receive, buffered: list[Message], limit: int
+    ) -> Response | None:
         total = 0
         while True:
             message = await receive()
@@ -61,7 +69,7 @@ class BodyLimitMiddleware:
             if message["type"] != "http.request":
                 return None
             total += len(message.get("body", b""))
-            if total > MAX_BODY_BYTES:
+            if total > limit:
                 return error_response(413, "payload_too_large", "Request body too large.")
             if not message.get("more_body", False):
                 return None

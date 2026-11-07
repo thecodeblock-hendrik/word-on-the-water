@@ -26,7 +26,11 @@ test:
 	cd apps/api && uv run pytest
 	pnpm --dir apps/web test
 
-.PHONY: migrate
+.PHONY: migrate kit-webhook
+
+# Register the Kit webhook for a public https address and save its secret in .env (not printed).
+kit-webhook:
+	cd apps/api && uv run --env-file ../../.env python -m app.integrations.kit.webhook_endpoint $(URL)
 
 migrate:
 	cd apps/api && uv run --env-file ../../.env alembic upgrade head

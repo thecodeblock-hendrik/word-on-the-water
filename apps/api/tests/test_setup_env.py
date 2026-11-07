@@ -11,6 +11,8 @@ CRON_SECRET=
 IP_HASH_SALT=
 SMTP_PORT=
 POSTMARK_SERVER_TOKEN=
+TURNSTILE_SECRET_KEY=
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
 """
 
 
@@ -30,6 +32,12 @@ def test_fills_local_values_and_generates_distinct_secrets(tmp_path: Path) -> No
     secrets = [env["SERVICE_TOKEN"], env["CRON_SECRET"], env["IP_HASH_SALT"]]
     assert all(len(s) >= 32 for s in secrets)
     assert len(set(secrets)) == 3
+
+
+def test_local_runs_get_cloudflares_always_pass_turnstile_test_keys(tmp_path: Path) -> None:
+    env = run(tmp_path)
+    assert env["TURNSTILE_SECRET_KEY"] == "1x0000000000000000000000000000000AA"
+    assert env["NEXT_PUBLIC_TURNSTILE_SITE_KEY"] == "1x00000000000000000000AA"
 
 
 def test_leaves_unknown_keys_blank_and_keeps_comments(tmp_path: Path) -> None:

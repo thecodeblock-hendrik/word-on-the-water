@@ -88,6 +88,17 @@ describe("Checkbox", () => {
 });
 
 describe("FieldError", () => {
+  it("has a tone with enough contrast on the dark band", () => {
+    render(
+      <FieldError id="on-deep-error" tone="on-deep">
+        Enter a valid email address.
+      </FieldError>,
+    );
+    expect(screen.getByText("Enter a valid email address.").className).toContain(
+      "text-accent-on-deep",
+    );
+  });
+
   it("renders the message with the id used by aria-describedby", () => {
     render(<FieldError id="email-error">Enter an email address like name@example.com</FieldError>);
     const error = screen.getByText(/enter an email address/i);

@@ -1,6 +1,7 @@
 import { About } from "@/components/sections/about";
 import { BeliefsFounder } from "@/components/sections/beliefs-founder";
 import { Coming } from "@/components/sections/coming";
+import { SubscribeBand } from "@/components/devotional/subscribe-band";
 import { Hero } from "@/components/sections/hero";
 import { Start } from "@/components/sections/start";
 import { today } from "@/lib/devotionals/format";
@@ -18,6 +19,7 @@ export default function Home() {
       <Coming devotional={devotional} series={devotionalSeries} />
       <Start />
       <BeliefsFounder />
+      <SubscribeBand source="landing_closing" />
     </>
   );
 }

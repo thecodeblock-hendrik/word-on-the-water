@@ -64,3 +64,33 @@ def test_redis_url_falls_back_to_upstash(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.delenv("REDIS_URL")
     monkeypatch.setenv("UPSTASH_REDIS_URL", "rediss://default:t@x.upstash.io:6379")
     assert Settings(_env_file=None).redis_url.get_secret_value().startswith("rediss://")
+
+
+def test_the_turnstile_secret_is_optional_so_a_deployment_without_it_still_starts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("TURNSTILE_SECRET_KEY", raising=False)
+    assert Settings(_env_file=None).turnstile_secret_key is None
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "1x0000000000000000000000000000000AA",
+        "2x0000000000000000000000000000000AA",
+        "3x0000000000000000000000000000000AA",
+    ],
+)
+def test_production_refuses_cloudflares_test_secrets(
+    monkeypatch: pytest.MonkeyPatch, key: str
+) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("TURNSTILE_SECRET_KEY", key)
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
+
+
+def test_other_environments_may_use_the_test_secret(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "preview")
+    monkeypatch.setenv("TURNSTILE_SECRET_KEY", "1x0000000000000000000000000000000AA")
+    assert Settings(_env_file=None).turnstile_secret_key is not None

@@ -14,6 +14,82 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "SubscribeRequest": {
+        "additionalProperties": false,
+        "description": "A sign-up. Strict: unknown fields are an error and every length is capped.",
+        "properties": {
+          "consent_text_version": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Consent Text Version",
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "rendered_at": {
+            "minimum": 0.0,
+            "title": "Rendered At",
+            "type": "integer"
+          },
+          "source": {
+            "maxLength": 40,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_]+$",
+            "title": "Source",
+            "type": "string"
+          },
+          "turnstile_token": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Turnstile Token",
+            "type": "string"
+          },
+          "website": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "source",
+          "consent_text_version",
+          "rendered_at",
+          "turnstile_token"
+        ],
+        "title": "SubscribeRequest",
+        "type": "object"
+      },
+      "SubscribeResponse": {
+        "description": "One answer for a new, a pending and a confirmed address, so nobody can probe the list.",
+        "properties": {
+          "status": {
+            "const": "check_your_inbox",
+            "default": "check_your_inbox",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "SubscribeResponse",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -216,6 +292,139 @@
         "summary": "Ping",
         "tags": [
           "v1"
+        ]
+      }
+    },
+    "/v1/subscribers": {
+      "post": {
+        "description": "202 with the same body for a new, pending or confirmed address, and for a simple bot.\n\nA repeat of a request that already worked (same Idempotency-Key and address) returns the same\nanswer without doing anything, so it costs no Turnstile token and no allowance. Otherwise: the\nrate limits, then the cheap bot checks (a bot never costs a Cloudflare call), then Turnstile.\nA token Cloudflare refuses is a 400; if it cannot judge it, a 503 and nothing is stored, so a\nsign-up is never accepted unchecked. A failed attempt gives its key back for the retry.",
+        "operationId": "subscribe_v1_subscribers_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 8,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscribeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Subscribe",
+        "tags": [
+          "v1"
+        ]
+      }
+    },
+    "/v1/webhooks/kit": {
+      "post": {
+        "description": "Apply Kit's subscriber events. Answers 2xx once every event is handled, else Kit retries.\n\nChecked in order: a secret is configured (503), the signature over the raw bytes is valid and\nrecent (401), the body is a delivery (400). The body-limit middleware allows up to 1 MB here.\nEach event is applied once: its id is claimed first, and given back if applying it fails, so\na retry is not mistaken for a duplicate.",
+        "operationId": "kit_webhook_v1_webhooks_kit_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-kit-signature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Kit-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Kit Webhook V1 Webhooks Kit Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Kit Webhook",
+        "tags": [
+          "webhooks"
         ]
       }
     }

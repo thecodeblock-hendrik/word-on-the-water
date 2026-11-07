@@ -75,6 +75,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/subscribers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Subscribe
+         * @description 202 with the same body for a new, pending or confirmed address, and for a simple bot.
+         *
+         *     A repeat of a request that already worked (same Idempotency-Key and address) returns the same
+         *     answer without doing anything, so it costs no Turnstile token and no allowance. Otherwise: the
+         *     rate limits, then the cheap bot checks (a bot never costs a Cloudflare call), then Turnstile.
+         *     A token Cloudflare refuses is a 400; if it cannot judge it, a 503 and nothing is stored, so a
+         *     sign-up is never accepted unchecked. A failed attempt gives its key back for the retry.
+         */
+        post: operations["subscribe_v1_subscribers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhooks/kit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Kit Webhook
+         * @description Apply Kit's subscriber events. Answers 2xx once every event is handled, else Kit retries.
+         *
+         *     Checked in order: a secret is configured (503), the signature over the raw bytes is valid and
+         *     recent (401), the body is a delivery (400). The body-limit middleware allows up to 1 MB here.
+         *     Each event is applied once: its id is claimed first, and given back if applying it fails, so
+         *     a retry is not mistaken for a duplicate.
+         */
+        post: operations["kit_webhook_v1_webhooks_kit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -83,6 +134,44 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * SubscribeRequest
+         * @description A sign-up. Strict: unknown fields are an error and every length is capped.
+         */
+        SubscribeRequest: {
+            /** Consent Text Version */
+            consent_text_version: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name?: string | null;
+            /** Rendered At */
+            rendered_at: number;
+            /** Source */
+            source: string;
+            /** Turnstile Token */
+            turnstile_token: string;
+            /**
+             * Website
+             * @default
+             */
+            website: string;
+        };
+        /**
+         * SubscribeResponse
+         * @description One answer for a new, a pending and a confirmed address, so nobody can probe the list.
+         */
+        SubscribeResponse: {
+            /**
+             * Status
+             * @default check_your_inbox
+             * @constant
+             */
+            status: "check_your_inbox";
         };
         /** ValidationError */
         ValidationError: {
@@ -202,6 +291,75 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subscribe_v1_subscribers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscribeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscribeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    kit_webhook_v1_webhooks_kit_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-kit-signature"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
                     };
                 };
             };

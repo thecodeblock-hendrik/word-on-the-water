@@ -8,6 +8,7 @@ from pydantic import AliasChoices, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+TEST_PREFIXES = {"1x", "2x", "3x"}
 
 
 class Settings(BaseSettings):
@@ -24,6 +25,12 @@ class Settings(BaseSettings):
     service_token: SecretStr
     cron_secret: SecretStr
     ip_hash_salt: SecretStr
+    signup_min_seconds: float = 3.0
+    turnstile_secret_key: SecretStr | None = None
+    kit_api_key: SecretStr | None = None
+    kit_form_id: int | None = None
+    kit_webhook_secret: SecretStr | None = None
+    site_url: str = "https://wordonthewater.net"
     email_provider: Literal["smtp", "postmark", "console"] = "smtp"
     email_from: str = "Word on the Water <hello@example.invalid>"
     smtp_host: str = "localhost"
@@ -51,6 +58,14 @@ class Settings(BaseSettings):
                 f"postgresql+asyncpg://app_migrator:{password}@{unpooled}/{db}"
             )
         return data
+
+    @model_validator(mode="after")
+    def no_test_turnstile_secret_in_production(self) -> "Settings":
+        """Cloudflare's test secrets always pass or always fail, so they must never go live."""
+        key = self.turnstile_secret_key
+        if self.environment == "production" and key and key.get_secret_value()[:2] in TEST_PREFIXES:
+            raise ValueError("TURNSTILE_SECRET_KEY is a Cloudflare test secret")
+        return self
 
     @property
     def docs_enabled(self) -> bool:

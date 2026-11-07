@@ -18,7 +18,7 @@ Designed to comply with the **GDPR** and **POPIA** by default: collect the minim
 | Page analytics and Core Web Vitals | Understand reading and speed | Vercel Web Analytics and Speed Insights: cookieless, no personal profile | Legitimate interest; no consent banner is needed because nothing is stored on the device |
 | Theme preference (light or dark) | Show the chosen theme without a flash | One first-party cookie on the visitor's device (planned, step 1.1) | Strictly necessary for a feature the visitor asked for |
 | Last Bible read (BSB or WEB) | Open the Bible reader in the Bible you used last | One first-party cookie (`bible-version`, a year, no personal data) | Strictly necessary for a feature the visitor asked for |
-| Bot check result | Block automated submissions | Cloudflare Turnstile, called from the form (planned) | Legitimate interest in security |
+| Bot check result | Block automated submissions | Cloudflare Turnstile, loaded only when a visitor reaches or uses the sign-up form (not on every page view); Cloudflare receives the visitor's IP address and browser signals to judge the check | Legitimate interest in security |
 | Error reports | Fix faults | Sentry with `sendDefaultPii: false` and scrubbing (planned, step 0.10) | Legitimate interest; no personal data is sent |
 
 No data about children is sought and the site is not aimed at them. No advertising or tracking cookies are used.

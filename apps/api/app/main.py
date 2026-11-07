@@ -8,7 +8,7 @@ from app.core.logging import configure_logging
 from app.core.middleware import register_middleware
 from app.core.observability import init_sentry
 from app.core.security import require_service_token
-from app.routers import cron, health, v1
+from app.routers import cron, health, v1, webhooks
 
 
 def create_app() -> FastAPI:
@@ -26,6 +26,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(cron.router)
     app.include_router(v1.router, prefix="/v1", dependencies=[Depends(require_service_token)])
+    app.include_router(webhooks.router)  # signed by the provider, so no service token
     return app
 
 

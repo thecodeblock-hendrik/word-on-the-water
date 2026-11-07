@@ -22,11 +22,11 @@ GitHub Actions ──(7)──> Vercel (Git integration), Neon (preview cleanup)
 
 | Boundary | Crossing | Control at the boundary |
 |---|---|---|
-| 1 | Internet to web | HTTPS, HSTS, Vercel Firewall, nonce CSP, Turnstile on forms (planned) |
+| 1 | Internet to web | HTTPS, HSTS, Vercel Firewall, nonce CSP, Turnstile on the sign-up form (Done; contact and prayer forms Planned) |
 | 2 | Web to API | Service token, Deployment Protection with bypass secret; the browser never calls the API |
 | 3 | API to Neon and Upstash | TLS (verify-full to Neon), least-privilege role, secrets in Vercel |
 | 4 | API to third parties | HTTPS with provider tokens; minimum data sent |
-| 5 | Kit to API | Webhook signature (planned, step 1.3) |
+| 5 | Kit to API | Webhook signature over the raw body, 5 minute window, event-id dedupe, 1 MB body cap (Done, step 1.3) |
 | 6 | Vercel Cron to API | `CRON_SECRET` bearer |
 | 7 | CI and Git to hosting | Branch protection, least-privilege workflows, pinned actions |
 
@@ -51,7 +51,7 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 |---|---|---|---|
 | S1 | A caller pretends to be the web app and calls the API directly | Default-deny `/v1` router behind the service token, compared in constant time as bytes; API project behind Deployment Protection | Done |
 | S2 | A caller forges `X-Client-IP` to dodge or poison rate limits | Trusted only after the service token check; missing or malformed values fall back to the proxy address and log `client_ip_fallback`; IPv6 limited per /64 | Done |
-| S3 | A forged Kit webhook changes subscriber status | Verify the signature over the raw body, answer fast, idempotent handlers | Planned (1.3) |
+| S3 | A forged Kit webhook changes subscriber status | HMAC-SHA256 over `{t}.{raw body}` with the endpoint secret, constant-time compare, 5 minute tolerance, any matching `v1` (rotation); 401 with one generic code; the route has no service token and a test proves every other `/v1` route does | Done (key format to confirm with a real delivery) |
 | S4 | A forged cron call triggers the outbox | `CRON_SECRET` bearer | Done |
 | S5 | Someone sends mail that looks like ours | SPF, DKIM, DMARC on the root domain, starting `p=none` | Planned (1.9) |
 
@@ -59,7 +59,7 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 
 | ID | Threat | Mitigation | Status |
 |---|---|---|---|
-| T1 | Oversized or malformed requests | 16 KB body limit counted on bytes received (also chunked); Pydantic `extra="forbid"` with length limits on every endpoint | Limit Done; schemas Planned (1.3 to 1.5) |
+| T1 | Oversized or malformed requests | 16 KB body limit counted on bytes received (also chunked), 1 MB only for the Kit webhook; Pydantic `extra="forbid"` with length limits on every endpoint | Limit Done; sign-up schema Done; contact and prayer Planned (1.4, 1.5) |
 | T2 | SQL injection | SQLAlchemy bound parameters only | Done |
 | T3 | Script injection (XSS) | Per-request nonce CSP, `frame-ancestors 'none'`, no user content rendered as HTML | Done |
 | T4 | Tampered dependency or workflow | Lockfiles, Dependabot, pip-audit, pnpm audit, OSV-Scanner, CodeQL, gitleaks, Bandit, actions pinned to SHAs | Done |
@@ -70,27 +70,36 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 | ID | Threat | Mitigation | Status |
 |---|---|---|---|
 | R1 | No record of who viewed or changed a prayer request | `audit_log` table exists; writes arrive with the admin UI. Request IDs tie logs to responses today | Partial; Planned (Phase 2) |
-| R2 | Webhook replay or duplicate delivery | Dedupe on event id, idempotent handlers | Planned (1.3) |
+| R2 | Webhook replay or duplicate delivery | The 5 minute window rejects a captured delivery replayed later; each event id is claimed in Redis (given back if handling fails, so Kit's retry works); status updates are idempotent | Done |
 
 ### Information disclosure
 
 | ID | Threat | Mitigation | Status |
 |---|---|---|---|
 | I1 | Prayer text leaks through logs, error tracking, analytics or email | Never logged; Sentry `before_send` scrubbing and `sendDefaultPii: false`; notification email carries the text only with consent; encrypted at rest; a log-capture test (`test_log_privacy.py`) proves no body, email, token or exception text is logged | Partly done (logs and Sentry in 0.10; email and encryption in 1.4) |
-| I2 | Subscriber enumeration through sign-up responses | Identical 202 whether the email is new, pending or confirmed, and whether Kit succeeded | Planned (1.3) |
+| I2 | Subscriber enumeration through sign-up responses | Identical 202 whether the email is new, pending, confirmed, unsubscribed, bounced or a caught bot; the Kit call runs after the response so timing does not differ; the per-email limit answers every address alike | Done |
 | I3 | Secrets reach the repository or the client bundle | gitleaks in pre-commit and CI; `server-only`; only non-secret `NEXT_PUBLIC_*` reach the browser | Done; `scripts/check_bundle_secrets.py` runs in CI after the web build |
 | I4 | Stack traces or internals in errors | One error shape; unhandled errors log type and location only, never the message | Done |
 | I5 | API schema and docs exposed | `/docs` and `/openapi.json` off in production | Done |
 | I6 | Data in transit read | HTTPS with HSTS; TLS verify-full to Neon; TLS to Upstash | Done |
 | I7 | Production data exposed through preview deployments | Deployment Protection on previews; separate secrets where possible. Previews branch from the data-free `preview-base`, with their own roles, passwords and Upstash database (R-1 to R-3, closed 2026-11-01) | Done |
 
+### New in step 1.3
+
+| ID | Threat | Mitigation | Status |
+|---|---|---|---|
+| K1 | Kit holds subscriber emails (a new third party with personal data) | Data minimised to email, first name and the consent referrer; Kit is the processor, deletable in both places; the API key is a Sensitive variable on the API project only, a separate test form or account outside Production | Done in code; Vercel variables Planned (1.9) |
+| K2 | The Kit API key or webhook secret leaks | Never logged or in an error message; the webhook secret is written to `.env` by the registration tool and never printed; gitleaks; `server-only` | Done |
+| K3 | A bot gets a sign-up through without a real check | Turnstile token verified server-side on every sign-up; if Cloudflare cannot judge it, 503 and nothing stored; production refuses Cloudflare's always-pass test secrets | Done |
+| K4 | A confirmation link is used to confirm someone else | Kit issues and expires the confirmation; we hold no tokens | Done (by design, ADR 0008) |
+
 ### Denial of service
 
 | ID | Threat | Mitigation | Status |
 |---|---|---|---|
-| D1 | Form flooding | Redis sliding-window limiter (atomic, rejected hits do not extend the window), Turnstile, honeypot, Vercel Firewall rules | Limiter Done; wiring Planned (1.3 to 1.5, 1.9) |
+| D1 | Form flooding | Redis sliding-window limiter (atomic, rejected hits do not extend the window), Turnstile, honeypot and minimum time, Idempotency-Key, Vercel Firewall rules | Sign-up Done; contact and prayer Planned (1.4, 1.5); Firewall rules Planned (1.9) |
 | D2 | Redis outage or slowness | Read and connect timeouts of 2 s; rate-limited routes fail closed (500) so forms never accept unlimited requests | Done, accepted |
-| D3 | Sign-up used to spam third parties | Double opt-in, per-IP and per-email limits, Turnstile | Planned (1.3) |
+| D3 | Sign-up used to spam third parties | Double opt-in (Kit sends the confirmation), 5 an hour per address and 3 an hour per email, Turnstile | Done |
 | D4 | The deployment pipeline is blocked (observed: Hobby quota refused deployments) | `docs/**` branches do not deploy; Pro before launch | Mitigated; Planned (1.9) |
 | D5 | One outbox send stalls the cron run | Per-send cap of 8 s inside a 20 s budget under a 30 s function limit | Done |
 

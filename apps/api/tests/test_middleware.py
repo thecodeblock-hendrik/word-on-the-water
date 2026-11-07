@@ -61,3 +61,15 @@ def test_500_has_request_id_and_no_store(capsys: pytest.CaptureFixture[str]) -> 
     response = TestClient(app, raise_server_exceptions=False).get("/boom")
     assert response.status_code == 500
     assert_standard_headers(response, logged=capsys.readouterr().out)
+
+
+def test_the_kit_webhook_may_send_more_than_the_general_limit_but_not_a_megabyte(
+    client: TestClient,
+) -> None:
+    """Only that path is larger; an unsigned call is a 401 or 503, never a 413, up to 1 MB."""
+    under = client.post("/v1/webhooks/kit", content=b"x" * (200 * 1024))
+    over = client.post("/v1/webhooks/kit", content=b"x" * 1_100_000)
+    other = client.post("/v1/ping", content=b"x" * (20 * 1024))
+    assert under.status_code != 413
+    assert over.status_code == 413
+    assert other.status_code == 413
