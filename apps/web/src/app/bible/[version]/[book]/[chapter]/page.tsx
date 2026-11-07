@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { PassageSheet } from "@/components/bible/passage-sheet";
 import { Reader } from "@/components/bible/reader";
 import { VersionSwitcher } from "@/components/bible/version-switcher";
 import { findBook } from "@/lib/bible/books";
@@ -54,18 +55,18 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function BibleChapterPage(props: Props) {
   const { passage, version, book, invalidVerses } = await fromProps(props);
+  const state = {
+    version: version.id,
+    book: book.slug,
+    chapter: passage.chapter,
+    from: passage.range?.from ?? null,
+    to: passage.range?.to ?? null,
+  };
   return (
     <div className={`mx-auto max-w-[1080px] ${gutters}`}>
-      <div className="flex items-center justify-end gap-2 border-b border-line py-2">
-        <VersionSwitcher
-          state={{
-            version: version.id,
-            book: book.slug,
-            chapter: passage.chapter,
-            from: passage.range?.from ?? null,
-            to: passage.range?.to ?? null,
-          }}
-        />
+      <div className="flex items-center gap-2 border-b border-line py-2 lg:hidden">
+        <PassageSheet state={state} />
+        <VersionSwitcher state={state} />
       </div>
       <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
     </div>
