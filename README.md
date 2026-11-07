@@ -4,17 +4,18 @@ Christian ministry web app publishing devotionals and Bible teaching for men and
 
 - Plan and progress: [PLAN.md](docs/PLAN.md)
 - Architecture and rules: [CLAUDE.md](CLAUDE.md)
+- Adding a devotional: [devotional format](docs/devotional_format.md). Landing page checklist: [landing_page_check.md](docs/landing_page_check.md)
 - Decisions: [docs/adr](docs/adr). Security: [threat model](docs/threat-model.md), [privacy](docs/privacy.md), [SECURITY.md](SECURITY.md). Operations: [docs/runbooks](docs/runbooks)
 
 ## Status
 
-Phase 0 (foundations) is nearly complete: monorepo, API, database, email outbox, web shell with nonce CSP, generated API types, CI with branch protection, Vercel deployments, Sentry and analytics. Remaining: uptime monitor and nightly database dump. Phase 1 (the public landing page, sign-up and prayer forms) has not started, so there are no user-facing features yet.
+Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress: the landing page with its real copy, light and dark themes, and the devotional pages (two Advent devotionals) are built. Sign-up, prayer and contact forms, the privacy page and SEO come next, so the site is not public yet.
 
 ## Stack
 
 - Web: Next.js 16, TypeScript, Tailwind CSS v4 (`apps/web`)
 - API: FastAPI on Python 3.13, SQLAlchemy and Alembic (`apps/api`)
-- Data: PostgreSQL 17 (Neon), Redis (Upstash)
+- Data: PostgreSQL 18 (Neon), Redis (Upstash)
 - Email: Kit for subscriptions, Postmark for transactional mail
 - Hosting: Vercel (two projects, region `fra1`)
 
@@ -51,3 +52,5 @@ make e2e         # playwright, all browsers
 make types       # regenerate API types
 make down        # stop services
 ```
+
+In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, and `DEVOTIONAL_TODAY=2026-12-12 pnpm dev` previews a future day.

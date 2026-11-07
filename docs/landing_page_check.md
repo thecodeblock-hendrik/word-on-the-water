@@ -1,6 +1,6 @@
 # Landing page: outstanding UI checklist
 
-Status as of 2026-11-06. Covers only what a visitor sees and uses. Backend, email and launch operations stay in [PLAN.md](PLAN.md); the step numbers below point there.
+Status as of 2026-11-07. Covers only what a visitor sees and uses. Backend, email and launch operations stay in [PLAN.md](PLAN.md); the step numbers below point there.
 
 Legend: `[ ]` todo, `[x]` done. **(Hendrik)** needs content or a decision from the owner.
 
@@ -16,22 +16,25 @@ Work top to bottom. Build and screenshot at 375px before wider widths.
 - [x] Inline SVG logo, safe-area insets, reduced motion, 44px touch targets (1.1)
 - [x] Sections: hero, about, what's coming with sample surf report, start here, statement of faith, founder, footer with ESV notice (1.2)
 - [x] Screenshot review at 375, 768 and 1280 against the mockup (1.2)
+- [x] Theme toggle in the header: top right from `lg`, a Theme row in the mobile menu below `lg`
+- [x] Writer section with Henno's story, church and a square surfing photo; statement of faith with four points
+- [x] ESV notice per the Crossway API terms (usage-limit line, esv.org link, "(ESV)" on quotations)
 
 ---
 
 ## B. Real content to replace placeholders **(Hendrik)**
 
-`pnpm check:placeholders` (in `apps/web`) currently reports 6 leftovers. It must report none before launch (gate in 1.9). All text lives in `apps/web/src/content/landing.ts`.
+`pnpm check:placeholders` (in `apps/web`) currently reports 2 leftovers (the footer social handles). It must report none before launch (gate in 1.9). All text lives in `apps/web/src/content/landing.ts`.
 
 - [x] About: two new paragraphs and the "paddle out with us" link to `#subscribe` (from `about.md`)
-- [x] What's coming: launch date set to 5 December 2026
+- [x] What's coming: the weekly card is labelled "Rolling in consistently" (the 5 December 2026 launch date was removed)
 - [x] What's coming: publish day set to Saturday
 - [x] What's coming: first series sentence removed (decide later)
 - [x] What's coming: audio format sentence removed (decide later)
 - [x] Sample surf report replaced by the real first devotional, read from `content/devotionals` (see `docs/devotional_format.md`)
-- [ ] Statement of faith: remaining points, or a link to your church's statement (`beliefs.points.4`)
-- [ ] Founder: surname, bio (about 80 words), home church and town
-- [ ] Founder photo (optional): add it so the logo mark stops filling the frame
+- [x] Statement of faith: four points, placeholder removed (optional later: add a point on the Holy Spirit or Jesus' return, or link a full statement)
+- [x] Founder: `Henno (AKA "H")`, faith story (about 80 words), Harvest Christian Church
+- [x] Founder photo: surfing photo in a square frame, served without inline styles (CSP)
 - [ ] Footer: social handles for each channel (`footer.social.*`); channels without an address stay hidden
 - [ ] Start here (the gospel in 4 steps): read by a pastor or elder before launch
 - [ ] Final check that the copy reads without any `[brackets]` visible on the live page
@@ -93,7 +96,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 ## G. Privacy page and trust (PLAN 1.6, UI part)
 
 - [ ] Privacy policy page that matches `docs/privacy.md` **(Hendrik: review)**
-- [ ] ESV copyright notice re-checked against Crossway's terms after the final copy is in
+- [x] ESV copyright notice re-checked against the Crossway API terms (2026-11-07); re-check if the copy or scripture use grows (500 verses or half a book per page, non-commercial only)
 - [ ] `security.txt` served at `/.well-known/security.txt`
 
 ---
@@ -107,7 +110,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 - [x] Header fits 320 to 414px wide with its right margin intact (it overflowed by 12px at 360 and 375px). Tested at plain window widths, because the iPhone and Pixel e2e profiles widen themselves and cannot show a sideways scroll
 - [x] Hero: the big logo is hidden below 768px, because the menu bar already shows it, and the verse text sits just under the menu bar. From 768px the logo stays in the right column
 - [x] Series list goes back through published weeks (and forward once published); the landing card follows the calendar; both tested with `DEVOTIONAL_TODAY`
-- [ ] After launch, change the "Launching 5 December 2026" status in What's coming to something that stays true each week **(Hendrik)**
+- [x] The What's coming status no longer carries a date: it reads "Rolling in consistently"
 - [ ] Sign-up form in the closing band (arrives with 1.3; today it is a Subscribe button)
 - [x] On phones the surf report stays above the article and the series list sits below it; on wide screens both stay in the side column
 - [ ] Mark up the page for search (JSON-LD `Article`) with step 1.6
@@ -143,7 +146,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 
 - [ ] `@axe-core/playwright` on every page, zero serious or critical (PLAN 1.8)
 - [ ] One `h1`, logical heading order, landmarks present
-- [ ] Keyboard-only pass: menu, theme toggle, all three forms, skip link
+- [ ] Keyboard-only pass: menu, theme toggle (header from `lg`, menu row below), all three forms, skip link
 - [ ] Visible focus on every interactive element in both themes
 - [ ] Form errors reachable by screen reader and focus moves to the first error
 - [ ] VoiceOver (iOS) pass and TalkBack (Android) pass

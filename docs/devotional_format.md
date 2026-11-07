@@ -46,7 +46,7 @@ A header block between `---` lines, then these sections in this order. Go Deeper
 |---|---|
 | `title` | 2 to 60 characters |
 | `publishAt` | `YYYY-MM-DD`. Shown on the site from this day |
-| `author` | Writer's name |
+| `author` | Writer's name as shown in the byline: use `H` |
 | `series`, `seriesNumber` | The series folder name and the week, for example `advent` and `1`. A number may be used once per series and must be in that series' outline. "1 of 5" is worked out from the outline |
 | `passages` | Main passages, shown in the surf report panel |
 | `summary` | Up to 200 characters. Email preview text and search description |
