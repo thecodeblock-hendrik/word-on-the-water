@@ -17,6 +17,8 @@ const devotionalFiles = ["./content/devotionals/**/*", "./content/series/**/*"];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Hostnames besides localhost that may use the dev server, e.g. a phone on the same Wi-Fi.
+  allowedDevOrigins: (process.env.DEV_ORIGINS ?? "").split(",").filter(Boolean),
   images: {
     formats: ["image/avif", "image/webp"],
     // Content images are served by src/app/content; the writer's photo lives in public/. No query strings.
