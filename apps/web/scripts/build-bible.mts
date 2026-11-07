@@ -1,7 +1,7 @@
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
-import { importVersion } from "../src/lib/bible/import.ts";
+import { importVersion, verseCounts } from "../src/lib/bible/import.ts";
 
 const [version, source] = process.argv.slice(2);
 if (!version || !/^[a-z]+$/.test(version) || !source) {
@@ -25,6 +25,7 @@ try {
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, `${JSON.stringify(data)}\n`);
   }
+  writeFileSync(join(output, version, "counts.json"), `${JSON.stringify(verseCounts(chapters))}\n`);
   console.log(`${version}: wrote ${chapters.length} chapters to content/bibles/${version}`);
 } catch (error) {
   console.error((error as Error).message);

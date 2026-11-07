@@ -22,6 +22,7 @@
     "@sentry/node": "^11.10.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "get-nonce": "^1.0.1",
     "next": "16.4.4",
     "radix-ui": "^1.8.1",
     "react": "19.3.1",

@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, Lora } from "next/font/google";
 import { cookies } from "next/headers";
 
+import { CspNonce } from "@/components/csp-nonce";
 import { LogoSprite } from "@/components/logo";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -51,6 +52,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}
     >
       <body className="flex min-h-dvh flex-col">
+        <CspNonce />
         <LogoSprite />
         <SkipLink />
         <Header />

@@ -91,7 +91,7 @@ pnpm build:bible web /tmp/web
 pnpm exec vitest run tests/unit/bible-data.test.ts
 ```
 
-The script finds all 66 books before it reads any, checks each against the book table (chapter count, verses present, verse numbers increasing) and replaces the version's folder. Running it twice on the same input gives byte-identical files. Treat the downloaded files as untrusted data: unzip them in their own folder and never run anything from inside them.
+The script finds all 66 books before it reads any, checks each against the book table (chapter count, verses present, verse numbers increasing) and replaces the version's folder. It also writes `counts.json` (the last verse of every chapter, for the pickers). Running it twice on the same input gives byte-identical files. Treat the downloaded files as untrusted data: unzip them in their own folder and never run anything from inside them.
 
 ### 3a. Spike findings (2026-11-07)
 
@@ -205,7 +205,8 @@ Best-practice choices:
 - **Plain language.** "Berean Standard Bible (BSB), modern English, easy to read", "World English Bible (WEB), modern English, classic style", "English Standard Version (ESV), coming soon".
 - **Disabled state explained.** The ESV card is not hidden: it shows "Coming soon" with `aria-disabled`, so the plan is visible and nothing looks broken.
 - **Keeps your place.** Switching the version keeps book, chapter and verses (URL swap).
-- **Remembered.** The last chosen version is kept in `localStorage` as a convenience (the URL still decides what renders; no cookie banner needed).
+- **Remembered.** The last Bible you read is kept in a first-party preference cookie (`bible-version`), so `/bible` opens in it. The URL still decides what renders; the cookie only chooses where `/bible` goes. It is a functional preference like the theme cookie, not tracking.
+- **Modal dialogs and the CSP:** a modal Radix dialog locks page scrolling by injecting a `<style>` element, which the nonce-based CSP blocks unless it carries the nonce. `CspNonce` (in the root layout) hands the page's script nonce to the library (`get-nonce`), and an e2e test opens the sheet and fails on any CSP violation. Use modal dialogs freely after this; keep the mobile menu non-modal as it is.
 - **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same list as a segmented control or dropdown at the top of the left column.
 
 ### 4.5 Reader
@@ -276,13 +277,13 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B5 Pickers (version, book, chapter, verses)
 
-- [ ] Unit tests: steps and their order; picking a version keeps the passage; picking a book resets the chapter; chapter grid has the right count; steppers stay in range; the disabled ESV card cannot be chosen; "Read" navigates to the right URL
-- [ ] Build the version picker (radio cards, step 1) and the quick-switch sheet from the header chip
-- [ ] Build the book, chapter and verse steps (mobile sheet, desktop column)
-- [ ] E2E on iPhone SE, iPhone 13, Pixel 7: open, choose WEB, John, chapter 3, verses 16 to 18, read; targets at least 44px; focus trap and Escape work; switching version keeps the passage
-- [ ] Remember the last version in `localStorage` (page works without it)
-- [ ] Add "Bible" to `NAV_LINKS` after "Devotionals" (shared by the desktop header and the mobile menu, see mockup 8) and the footer; mark it `aria-current="page"` on `/bible/...` (with a non-colour cue); update the nav tests
-- [ ] E2E: the header does not wrap at 1024px and 1100px with six links, the theme toggle and the CTA; if it does, shorten "What we believe" or move Bible beside the CTA
+- [x] Unit tests for the pure picker logic (`src/lib/bible/picker.ts`, `tests/unit/bible-picker.test.ts`): steps and their order; picking a version keeps the passage; picking a book resets the chapter; chapter grid has the right count; steppers stay in range (using each version's own last verse); the disabled ESV cannot be chosen; "Read" gives the right address. The pickers read last verses from `content/bibles/<version>/counts.json` (3.6 KB, no text, written by `pnpm build:bible`), so the browser never loads chapter text
+- [x] Build the version picker (radio cards, step 1 of the sheet) and the quick-switch sheet from the chip beside the passage button (`version-list.tsx`, `version-switcher.tsx`); on desktop a segmented control at the top of the column
+- [x] Build the book, chapter and verse steps: a full-screen sheet below 1024px (`passage-sheet.tsx` with `pick-book`, `pick-chapter`, `pick-verses`; opens on Book with the current book centred) and a permanent column from 1024px (`passage-column.tsx`: books and chapters are plain links, the books and chapters scroll in their own regions, Verses folds away until used)
+- [x] E2E on iPhone SE, iPhone 13, Pixel 7 (and desktop browsers at 800px and 1280px): open, choose WEB, John, chapter 3, verses 16 to 18, read; every control at least 44px in every step; focus trap and Escape work; switching version keeps the passage; no CSP violation and no serious axe problem on any step in light and dark (`bible-picker.spec.ts`, `bible-version.spec.ts`, `bible-column.spec.ts`)
+- [x] Remember the last version (page works without it). Done with a first-party preference cookie (`bible-version`, Lax, one year, Secure over https, like the theme cookie) instead of `localStorage`, so `/bible` opens in your last Bible on the server with no flash and no JavaScript. The reader writes it from the browser (no request); only an enabled version is ever accepted, so a forged value opens the BSB
+- [x] Add "Bible" after "Devotionals" in the desktop header, the mobile menu (mockup 8) and the footer's Read group, shown only while `BIBLE_ENABLED=1` (`navLinks()`, `NavLink`); `aria-current="page"` on `/bible/...` with an underline and heavier weight (and a bar and tint in the mobile menu), not colour alone; nav tests updated
+- [x] E2E: the header does not wrap at 1024px, 1100px and 1280px with six links, the theme toggle and the CTA (no change to the header needed); the menu entry and footer link work on phones (`tests/e2e/bible-nav.spec.ts`)
 
 ### B6 Previous and next
 

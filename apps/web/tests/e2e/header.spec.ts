@@ -21,7 +21,7 @@ test("menu opens, closes with Escape and returns focus", async ({ page }) => {
   const button = page.getByRole("button", { name: "Menu" });
   await button.click();
   await expect(button).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByTestId("mobile-menu").getByRole("link")).toHaveCount(5);
+  await expect(page.getByTestId("mobile-menu").getByRole("link")).toHaveCount(6);
   await page.keyboard.press("Escape");
   await expect(page.getByTestId("mobile-menu")).toBeHidden();
   await expect(button).toBeFocused();

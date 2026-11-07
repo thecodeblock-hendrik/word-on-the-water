@@ -164,3 +164,57 @@ test.describe("accessibility", () => {
     });
   }
 });
+
+test.describe("remembering the Bible you read last", () => {
+  test("/bible opens John 1 in the version you read last", async ({ page, context }) => {
+    const remembered = async () =>
+      (await context.cookies()).find((c) => c.name === "bible-version")?.value;
+    await page.goto("/bible/web/romans/8");
+    await expect(page.getByRole("heading", { level: 1, name: "Romans 8" })).toBeVisible();
+    await expect.poll(remembered).toBe("web");
+    await page.goto("/bible");
+    await expect(page).toHaveURL("/bible/web/john/1");
+    await page.goto("/bible/bsb/mark/1");
+    await expect.poll(remembered).toBe("bsb");
+    await page.goto("/bible");
+    await expect(page).toHaveURL("/bible/bsb/john/1");
+  });
+
+  test("a first visit, an unavailable version or a forged value opens the BSB", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await page.goto("/bible");
+    await expect(page).toHaveURL("/bible/bsb/john/1");
+    for (const value of ["esv", "kjv", "..%2F..%2Fweb", "web%3Bpath"]) {
+      await context.addCookies([{ name: "bible-version", value, url: baseURL! }]);
+      await page.goto("/bible");
+      await expect(page, value).toHaveURL("/bible/bsb/john/1");
+    }
+  });
+
+  test("the cookie is a plain first-party preference: Lax, a year, not readable by other sites", async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/bible/web/john/3");
+    await expect
+      .poll(async () => (await context.cookies()).find((c) => c.name === "bible-version")?.value)
+      .toBe("web");
+    const cookie = (await context.cookies()).find((c) => c.name === "bible-version")!;
+    expect(cookie.sameSite).toBe("Lax");
+    expect(cookie.path).toBe("/");
+    const days = (cookie.expires - Date.now() / 1000) / 86400;
+    expect(days).toBeGreaterThan(360);
+    expect(days).toBeLessThanOrEqual(366);
+  });
+
+  test("the pages still read fine with no cookie at all", async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ baseURL });
+    const page = await context.newPage();
+    await page.goto("/bible/web/john/3");
+    await expect(page.getByRole("heading", { level: 1, name: "John 3" })).toBeVisible();
+    await context.close();
+  });
+});
