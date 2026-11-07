@@ -101,9 +101,9 @@ This value is built into the site when it is built. A deployment made before you
 
 The sign-up form needs these to reach the API. Check that they exist; add only what is missing.
 
-- [ ] `SERVICE_TOKEN` exists for Production and Preview (Sensitive), with the same value as the API project's `SERVICE_TOKEN` for that environment
+- [ ] `SERVICE_TOKEN` exists in **both** projects for Production and Preview (Sensitive). This is not a Kit key: it is the password the website's server uses to call our own API (`Authorization: Bearer <SERVICE_TOKEN>`), and the API refuses calls without it. The two projects must hold the same value for the same environment, or every sign-up fails with "Sign-up is not available right now". You cannot read a Sensitive value, so just check that the name exists in both. If it is missing or you are unsure, set one new random value in both projects for that environment
 - [ ] `API_BASE_URL` exists for Production, pointing at the API project's production address (Previews work out their own API address, so no value is needed there)
-- [ ] `API_BYPASS_SECRET` exists if the API project is behind Deployment Protection (it is the API project's protection-bypass secret)
+- [ ] `API_BYPASS_SECRET` exists if the API project is behind Deployment Protection (it is the API project's protection-bypass secret, so the website's server is let through)
 
 ---
 
