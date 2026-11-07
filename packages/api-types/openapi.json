@@ -373,6 +373,60 @@
           "v1"
         ]
       }
+    },
+    "/v1/webhooks/kit": {
+      "post": {
+        "description": "Apply Kit's subscriber events. Answers 2xx once every event is handled, else Kit retries.\n\nChecked in order: a secret is configured (503), the signature over the raw bytes is valid and\nrecent (401), the body is a delivery (400). The body-limit middleware allows up to 1 MB here.\nEach event is applied once: its id is claimed first, and given back if applying it fails, so\na retry is not mistaken for a duplicate.",
+        "operationId": "kit_webhook_v1_webhooks_kit_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-kit-signature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Kit-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Kit Webhook V1 Webhooks Kit Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Kit Webhook",
+        "tags": [
+          "webhooks"
+        ]
+      }
     }
   }
 }

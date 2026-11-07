@@ -18,7 +18,12 @@ describe("generated API types", () => {
 
   it("know which paths exist", () => {
     expectTypeOf<keyof paths>().toEqualTypeOf<
-      "/cron/drain-outbox" | "/health/live" | "/health/ready" | "/v1/ping" | "/v1/subscribers"
+      | "/cron/drain-outbox"
+      | "/health/live"
+      | "/health/ready"
+      | "/v1/ping"
+      | "/v1/subscribers"
+      | "/v1/webhooks/kit"
     >();
   });
 });

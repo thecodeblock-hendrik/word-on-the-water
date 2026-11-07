@@ -27,7 +27,9 @@ Config: `KIT_API_KEY` and `KIT_FORM_ID` (Sensitive on the API project; the test 
 - Whether a subscriber created as `active` and then added to the form also gets the confirmation email was not established (and is not needed).
 - A person who unsubscribed and signs up again: Kit says re-subscribing needs explicit permission. The sign-up form is that permission, but how Kit treats a `cancelled` subscriber added to a form is to be tested in step 1.3.
 - The immediate attempt after the request runs in a FastAPI background task (so the answer's timing does not reveal whether an address is new). Whether Vercel lets it finish after the response is sent is to be proven on a preview deployment; the outbox cron is the fallback either way.
-- Webhook delivery to the protected API project, and broadcasts: proven in their own steps.
+- Webhook (built 2026-11-07, from Kit's docs; not yet seen with a real delivery): `POST /v1/webhooks/kit` checks `X-Kit-Signature` (`t=<unix>,v1=<hex>`, HMAC-SHA256 of `{t}.{raw body}`, key = the whole `whsec_...` secret as UTF-8, 5 minute tolerance, any matching `v1` during rotation), dedupes on each event's `id`, and answers 2xx only when every event is handled (Kit retries 8 times over about 41 hours; 410 stops it). The key format is inferred from Kit's example code: confirm it with the first real delivery. Subscribed events: `subscriber.activated`, `.unsubscribed`, `.bounced`, `.complained` (plain strings in the `events` array). Kit shows the secret only when the endpoint is created or rotated.
+- How Kit reaches the protected API project is undecided: a Vercel protection-bypass value in the registered URL, or a route on the web project that forwards the raw body. The signature protects either way.
+- Broadcasts: proven in their own step.
 
 ## Consequences
 - A Kit outage never loses a sign-up: both calls run from the outbox with retries; a repeat of either is harmless.

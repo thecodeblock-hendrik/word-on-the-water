@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     turnstile_secret_key: SecretStr | None = None
     kit_api_key: SecretStr | None = None
     kit_form_id: int | None = None
+    kit_webhook_secret: SecretStr | None = None
     site_url: str = "https://wordonthewater.net"
     email_provider: Literal["smtp", "postmark", "console"] = "smtp"
     email_from: str = "Word on the Water <hello@example.invalid>"
