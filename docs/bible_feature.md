@@ -68,7 +68,7 @@ Both are available as USFM zips. Neither site offers verse-per-row JSON or CSV, 
 | | BSB | WEB |
 |---|---|---|
 | Files | `https://bereanbible.com/bsb_usfm.zip` (also USX, USJ and plain text) | `https://eBible.org/Scriptures/eng-web_usfm.zip` (also USFX and HTML) |
-| Edition | BSB, "Current, updated to 3rd Printing" | Pick the 66-book "Update" edition (US spelling, uses LORD for God's name). The "Classic" default uses "Yahweh". Decision in step B2 |
+| Edition | BSB, "Current, updated to 3rd Printing" | The 66-book "Update" edition (US spelling, LORD for God's name), file `engwebp_usfm.zip`; decided in the B2 spike |
 
 Plan:
 - A build script `pnpm build:bible` parses USFM and writes one JSON file per chapter in a small structure of our own: `{ version, book, chapter, sections: [{ heading?, paragraphs: [{ poetry?: bool, verses: [{ n, text }] }] }] }`. Output goes to `apps/web/content/bibles/<version>/<book>/<chapter>.json`, committed to the repo (public domain, so committing is fine; the 500-verse storage cap applies only to the ESV).
@@ -76,6 +76,42 @@ Plan:
 - A spike first (step B2): download both zips, parse one book, check headings, paragraph and poetry markup, footnote markers, and numbering differences between the two (Psalm titles, verse splits). Record findings in this file.
 - Read at request time on the server with `node:fs`, no database needed. Files are traced into the Vercel function via `outputFileTracingIncludes`. Size is roughly 4 to 5 MB of text per version; confirm in the spike.
 - Verse numbering: store the version's own numbering. The book data table (4.6) holds the ESV or KJV-style counts for the picker; per-version counts are read from the imported data, so each version's steppers are exact.
+
+### 3a. Spike findings (2026-11-07)
+
+Files downloaded to a scratch folder (not the repo) and analysed with a throwaway script.
+
+**Edition chosen:** WEB Update, 66 books, US spelling, God's name as "LORD": `https://eBible.org/Scriptures/engwebp_usfm.zip` (the "Classic" zip uses "Yahweh" and adds the Deuterocanon). BSB: `https://bereanbible.com/bsb_usfm.zip`. The WEB zip is about 21 MB unzipped because every word carries a Strong's number; our JSON drops those.
+
+**Structure matches our book table.** Both versions have exactly 1,189 chapters and the same chapter count in every one of the 66 books.
+
+**Markup to handle.**
+
+| | BSB | WEB |
+|---|---|---|
+| Section headings | `\s1`, `\s2`, `\ms` (about 3,000) | None. WEB pages have no section headings |
+| Cross-reference line under a heading | `\r` (1,325): skip | none |
+| Paragraphs | `\p`, `\pmo`, `\pc`, `\b` (blank line) | `\p`, `\m`, `\mi`, `\pi1`, `\nb`, `\b` |
+| Poetry | `\q1`, `\q2`, `\qr` (right-aligned), `\qa` (Psalm 119 acrostic letters as a heading) | `\q1`, `\q2`, `\qs` Selah |
+| Lists | `\li1`, `\li2` | `\li1` |
+| Psalm titles | `\d` | `\d` |
+| Speaker labels | none | `\sp` (Song of Solomon) |
+| Footnotes | `\f + ... \f*` | same, with nested `\+wh ... \+wh*` |
+| Words | plain | `\w word|strong="G1234"\w*`: keep the word, drop the number |
+
+Footnotes, cross-references and Strong's numbers are removed in the first release (the spec already leaves footnotes off). The words are never changed.
+
+**Numbering differences between BSB and WEB.**
+- Psalm titles are unnumbered in both versions, so psalm verse numbers agree. The BSB file puts a `\v 1` marker inside the `\d` title line, so the importer treats `\d` as a title block and starts verse 1 after it (tested on Psalms 3 and 51).
+- Verses present in the WEB and missing in the BSB (the BSB leaves them to footnotes): Matthew 17:21, 18:11, 23:14; Mark 7:16, 9:44, 9:46, 11:26, 15:28; Luke 17:36, 23:17; Acts 8:37, 15:34, 24:7, 28:29; John 5:4. So verse numbers are not always contiguous: the importer must not assume they are, and the picker's last verse comes from the data, not from counting.
+- Romans: the WEB places the closing doxology at 14:24-26 (BSB 16:25-27). Romans 14 has 26 verses in the WEB and 23 in the BSB; Romans 16 has 25 in the WEB and 27 in the BSB. When switching version on these chapters, a range that does not exist in the other version falls back to the whole chapter, as already planned.
+- No other chapter differs in its last verse.
+
+**Rules that follow for the importer and the reader.**
+- Verse numbers ascend within a chapter but may skip; a verse range shows only the verses that exist; if none of the requested verses exist, show the whole chapter with a short note.
+- Verse ranges in the source (`\v 3-4`) are kept as a combined verse labelled "3-4".
+- `\qa` lines (Hebrew letters in Psalm 119) are kept as small headings, because they are part of the printed text.
+- The front matter (`00-FRT...`) and non-canonical books in the zip are ignored; only the 66 books are read.
 
 ---
 
@@ -187,7 +223,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B2 Import BSB and WEB (spike, then build)
 
-- [ ] Spike: download both USFM zips, parse John, report markup and numbering differences in this file; choose the WEB edition
+- [x] Spike: download both USFM zips, parse John, report markup and numbering differences in this file; choose the WEB edition (findings in section 3a)
 - [ ] Test the parser on small USFM samples (paragraphs, poetry, headings, footnote markers removed, verse numbers, ranges like `\v 3-4`)
 - [ ] Add `pnpm build:bible` writing `content/bibles/<version>/<book>/<chapter>.json`
 - [ ] Test on the output: all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
@@ -288,6 +324,6 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 Decided (2026-11-07): file name `bible_feature.md`; BSB first, WEB second, ESV third; the ESV call runs in the Next.js server; no footnotes or cross-references in the first release; buttons first, swipe as optional polish; a version picker is required.
 
 Open (defaults apply unless you say otherwise):
-1. WEB edition: default the 66-book "Update" edition with US spelling (LORD for God's name). Say if you prefer the "Classic" (Yahweh) or the British edition.
+1. WEB edition: decided in the B2 spike: the 66-book "Update" edition (US spelling, LORD). Say if you prefer the "Classic" (Yahweh) or the British edition.
 2. Parallel view: not in the first release.
 3. Whether to ask Crossway directly (licensing@crossway.org) about showing the ESV beside other versions. Not needed to proceed, but it would remove the one grey area (how the 500-verse and 25% limits count on a multi-version page).
