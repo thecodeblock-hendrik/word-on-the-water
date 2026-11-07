@@ -153,14 +153,18 @@ test.describe("on a desktop (1024px and wider)", () => {
     await expect(page).toHaveURL("/bible/bsb/genesis/1");
   });
 
-  test("a focused radio keeps its arrow key: the Bible switch changes the Bible, not the chapter", async ({
+  test("a focused radio keeps its arrow key: the picker\'s Bible switch moves its choice, not the chapter", async ({
     page,
   }) => {
     await page.goto(john3);
-    const column = page.getByRole("complementary", { name: "Choose passage" });
-    await column.getByRole("radio", { name: "BSB" }).focus();
+    await page.getByRole("button", { name: /Change passage/ }).click();
+    await page
+      .getByRole("dialog", { name: "Choose passage" })
+      .getByRole("radio", { name: "BSB" })
+      .focus();
     await page.keyboard.press("ArrowRight");
-    await expect(page).toHaveURL(john3.replace("bsb", "web"));
+    await expect(page.getByRole("radio", { name: "WEB" })).toBeChecked();
+    await expect(page).toHaveURL(john3);
   });
 });
 

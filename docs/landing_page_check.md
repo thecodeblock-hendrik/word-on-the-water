@@ -1,6 +1,6 @@
 # Landing page: outstanding UI checklist
 
-Status as of 2026-11-07. Covers only what a visitor sees and uses. Backend, email and launch operations stay in [PLAN.md](PLAN.md); the step numbers below point there.
+Status as of 2026-11-07. The Bible reader, its pickers and the PWA steps have their own lists: [bible_feature.md](bible_feature.md) and [PWA_checklist.md](PWA_checklist.md). Covers only what a visitor sees and uses. Backend, email and launch operations stay in [PLAN.md](PLAN.md); the step numbers below point there.
 
 Legend: `[ ]` todo, `[x]` done. **(Hendrik)** needs content or a decision from the owner.
 

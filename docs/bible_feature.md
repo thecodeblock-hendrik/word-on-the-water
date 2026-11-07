@@ -10,7 +10,7 @@ Bibles, in the order we build them:
 
 BSB and WEB do not depend on the ESV approval, so the reader ships first with those two. The ESV appears in the version picker as "Coming soon" until its key is live.
 
-Mockups: [design/bible_mockups.html](design/bible_mockups.html) (mobile light and dark, version picker, picker steps, quick switch, open mobile menu, desktop). Open it in a browser.
+Mockups: [design/bible_mockups.html](design/bible_mockups.html) (mobile light and dark, version picker, quick switch, open mobile menu, and the picker options: three for desktop and three for phones; the chosen ones, desktop option A and phone option M1, are built). Mockups 4, 5 and 7 are the earlier picker designs and are superseded. Open it in a browser.
 
 Sources read 2026-11-07: api.esv.org (terms and docs), crossway.org/permissions, berean.bible (downloads, licensing, terms), ebible.org/web and its details page, github.com/seven1m/open-bibles. Terms can change: re-read the relevant terms before building each source and before launch.
 
@@ -25,7 +25,7 @@ The site stays free ([site-is-free decision in CLAUDE.md](../CLAUDE.md)).
 | Choose a Bible | Version picker: BSB, WEB, ESV (coming soon). Step 1 of the picker, plus a one-tap version chip in the reader header that opens a quick-switch sheet |
 | Choose book, chapter, verses | Picker steps 2 to 4. Verses are optional (empty = whole chapter) |
 | Mobile | Previous and next chapter buttons at the bottom, in thumb reach, naming the target ("← John 2", "John 4 →"). Optional swipe |
-| Desktop | Permanent left column picker with a version control at the top; left and right arrow keys change chapter |
+| Desktop (from 1024px) | A passage button above the text opens a three-column picker (books, chapters, verses) with a version control at the top; click a verse, then a second for a range; left and right arrow keys change chapter |
 | Simple | One page, one URL per passage, no accounts, no search in the first release. One version at a time (no parallel view in the first release) |
 
 URLs (shareable, no JavaScript needed to read):
@@ -207,7 +207,7 @@ Best-practice choices:
 - **Keeps your place.** Switching the version keeps book, chapter and verses (URL swap).
 - **Remembered.** The last Bible you read is kept in a first-party preference cookie (`bible-version`), so `/bible` opens in it. The URL still decides what renders; the cookie only chooses where `/bible` goes. It is a functional preference like the theme cookie, not tracking.
 - **Modal dialogs and the CSP:** a modal Radix dialog locks page scrolling by injecting a `<style>` element, which the nonce-based CSP blocks unless it carries the nonce. `CspNonce` (in the root layout) hands the page's script nonce to the library (`get-nonce`), and an e2e test opens the sheet and fails on any CSP violation. Use modal dialogs freely after this; keep the mobile menu non-modal as it is.
-- **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same list as a segmented control or dropdown at the top of the left column.
+- **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same segmented control at the top of the columns popover.
 
 ### 4.5 Reader
 
@@ -219,10 +219,11 @@ A static table `bible-books.ts`: 66 books with display name, slug, testament and
 
 ### 4.7 Picker
 
-- Mobile: one full-screen sheet (Radix Dialog), four steps as tabs: Bible, Book, Chapter, Verses. Done steps show a tick and can be tapped to go back. "Read" is always at the top right.
-- Desktop: permanent left column.
-- Verses use two numeric steppers, not free typing. Empty means the whole chapter.
-- 44px minimum targets, focus trap, Escape closes, `aria-live` announces the new reference.
+- Phone (below 1024px): a bottom sheet (Radix Dialog) with Book, Chapter and Verses tabs that show the current choice (John, 3, 16–18). Choosing a book or chapter moves to the next tab; any tab can be tapped. The Bible is a segmented control in the header. Whole chapter and Read sit in a footer in thumb reach.
+- Desktop (from 1024px): a passage button above the text opens a three-column popover: books (with a filter, no counts), chapters, verses.
+- Chapters come in pages of 25 for long books (Psalms has six). Verses are a grid: one click chooses a verse, a second click makes a range, the same verse twice keeps just that verse, and the chosen verses join into one band. Nothing chosen means the whole chapter (the Whole chapter button is marked while it applies).
+- Nothing applies until Read, and unfinished choices are dropped when the picker closes.
+- 44px minimum targets, focus trap, Escape closes, `aria-live` announces the next action. Every mounted picker needs its own radio group name.
 
 ### 4.8 Previous and next
 
@@ -279,8 +280,10 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 - [x] Unit tests for the pure picker logic (`src/lib/bible/picker.ts`, `tests/unit/bible-picker.test.ts`): steps and their order; picking a version keeps the passage; picking a book resets the chapter; chapter grid has the right count; steppers stay in range (using each version's own last verse); the disabled ESV cannot be chosen; "Read" gives the right address. The pickers read last verses from `content/bibles/<version>/counts.json` (3.6 KB, no text, written by `pnpm build:bible`), so the browser never loads chapter text
 - [x] Build the version picker (radio cards, step 1 of the sheet) and the quick-switch sheet from the chip beside the passage button (`version-list.tsx`, `version-switcher.tsx`); on desktop a segmented control at the top of the column
-- [x] Build the book, chapter and verse steps: a full-screen sheet below 1024px (`passage-sheet.tsx` with `pick-book`, `pick-chapter`, `pick-verses`; opens on Book with the current book centred) and a permanent column from 1024px (`passage-column.tsx`: books and chapters are plain links, the books and chapters scroll in their own regions, Verses folds away until used)
-- [x] E2E on iPhone SE, iPhone 13, Pixel 7 (and desktop browsers at 800px and 1280px): open, choose WEB, John, chapter 3, verses 16 to 18, read; every control at least 44px in every step; focus trap and Escape work; switching version keeps the passage; no CSP violation and no serious axe problem on any step in light and dark (`bible-picker.spec.ts`, `bible-version.spec.ts`, `bible-column.spec.ts`)
+- [x] Build the book, chapter and verse steps: a full-screen sheet below 1024px (`passage-sheet.tsx` with `pick-book`, `pick-chapter`, `pick-verses`; opens on Book with the current book centred) and a permanent column from 1024px (replaced by the columns popover, `passage-popover.tsx`, see the next item)
+- [x] Replace the desktop left column with the columns popover (option A in `docs/design/bible_mockups.html`): one passage button opens books (with a filter), chapters (pages of 25 for long books) and a verse grid side by side; one click is one verse, a second click a range, Whole chapter clears; nothing applies until Read; each verse picker has its own radio group name (two mounted pickers shared one and unchecked each other)
+- [x] Replace the four-step phone sheet with the tabbed sheet (option M1 in `docs/design/bible_mockups.html`): a bottom sheet with Book, Chapter and Verses tabs that show the current choice (John, 3, 16–18), the same book filter, chapter pages of 25 and verse band as the desktop popover, the Bible as a segmented control in the header, and Whole chapter and Read in a footer in thumb reach (`passage-sheet.tsx`; shared parts in `picker-parts.tsx` and `use-passage-picker.ts`)
+- [x] E2E on iPhone SE, iPhone 13, Pixel 7 (and desktop browsers at 800px and 1280px): open, choose WEB, John, chapter 3, verses 16 to 18, read; every control at least 44px in every step; focus trap and Escape work; switching version keeps the passage; no CSP violation and no serious axe problem on any step in light and dark (`bible-picker.spec.ts`, `bible-version.spec.ts`, `bible-popover.spec.ts`)
 - [x] Remember the last version (page works without it). Done with a first-party preference cookie (`bible-version`, Lax, one year, Secure over https, like the theme cookie) instead of `localStorage`, so `/bible` opens in your last Bible on the server with no flash and no JavaScript. The reader writes it from the browser (no request); only an enabled version is ever accepted, so a forged value opens the BSB
 - [x] Add "Bible" after "Devotionals" in the desktop header, the mobile menu (mockup 8) and the footer's Read group, shown only while `BIBLE_ENABLED=1` (`navLinks()`, `NavLink`); `aria-current="page"` on `/bible/...` with an underline and heavier weight (and a bar and tint in the mobile menu), not colour alone; nav tests updated
 - [x] E2E: the header does not wrap at 1024px, 1100px and 1280px with six links, the theme toggle and the CTA (no change to the header needed); the menu entry and footer link work on phones (`tests/e2e/bible-nav.spec.ts`)

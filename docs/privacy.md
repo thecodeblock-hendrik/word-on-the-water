@@ -17,6 +17,7 @@ Designed to comply with the **GDPR** and **POPIA** by default: collect the minim
 | Request logs: path, status, request ID, timing | Run and debug the service | Vercel logs (short built-in retention) and later a log drain | Legitimate interest in security and operation. Bodies, emails and prayer text are never logged |
 | Page analytics and Core Web Vitals | Understand reading and speed | Vercel Web Analytics and Speed Insights: cookieless, no personal profile | Legitimate interest; no consent banner is needed because nothing is stored on the device |
 | Theme preference (light or dark) | Show the chosen theme without a flash | One first-party cookie on the visitor's device (planned, step 1.1) | Strictly necessary for a feature the visitor asked for |
+| Last Bible read (BSB or WEB) | Open the Bible reader in the Bible you used last | One first-party cookie (`bible-version`, a year, no personal data) | Strictly necessary for a feature the visitor asked for |
 | Bot check result | Block automated submissions | Cloudflare Turnstile, called from the form (planned) | Legitimate interest in security |
 | Error reports | Fix faults | Sentry with `sendDefaultPii: false` and scrubbing (planned, step 0.10) | Legitimate interest; no personal data is sent |
 
