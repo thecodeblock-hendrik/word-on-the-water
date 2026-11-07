@@ -10,6 +10,7 @@ const { devotionals } = loadContent();
 const bySeriesNumber = (n: number) => devotionals.find((d) => d.meta.seriesNumber === n)!;
 const one = bySeriesNumber(1);
 const two = bySeriesNumber(2);
+const three = bySeriesNumber(3);
 
 const on = (day: string) => {
   vi.useFakeTimers({ toFake: ["Date"] });
@@ -31,7 +32,9 @@ describe("the landing card follows the calendar", () => {
     ["on launch day", "2026-12-05", one],
     ["the day before week 2", "2026-12-11", one],
     ["on the day week 2 is published", "2026-12-12", two],
-    ["after week 2", "2027-01-01", two],
+    ["the day before week 3", "2026-12-18", two],
+    ["on the day week 3 is published", "2026-12-19", three],
+    ["after week 3", "2027-01-01", three],
   ])("%s (%s) shows the right devotional", (_label, day, expected) => {
     on(day);
     render(<Home />);
