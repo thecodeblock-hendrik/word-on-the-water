@@ -52,7 +52,7 @@ export const coming = {
     "Content is on the way. Sign up and the first devotional lands in your inbox on launch day.",
   offers: [
     {
-      status: "Launching 5 December 2026",
+      status: "Rolling in consistently",
       title: "Weekly devotional",
       body: "A five-minute read each Saturday. One passage, one thought, one question to take into the week.",
     },
