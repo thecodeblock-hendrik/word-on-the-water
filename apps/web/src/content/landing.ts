@@ -113,9 +113,9 @@ export const beliefs = {
 export const founder = {
   eyebrow: "Who's behind this",
   heading: "Meet the writer",
-  name: "Henno",
-  bio: "I spent most of my life using drugs, and I have always loved the ocean. Both were my escape from life's problems. Something was missing, and I tried to fill it with surfing and drugs, yet I stayed empty. In 2023 I found Jesus, and the emptiness finally went. I write Word on the Water because I want everyone to know how much He loves us.",
-  church: "Member of [home church, town].",
+  name: 'Henno (AKA "H")',
+  bio: "I spent most of my life using drugs, and I have always loved the ocean. Both were my escape from life's problems. Something was missing, and I tried to fill it with surfing and drugs, yet I stayed empty. In 2023 I found Jesus, and the emptiness finally went. I created Word on the Water to share the good news of Jesus, and how much He loves us.",
+  church: "Member of Harvest Christian Church.",
   photo: { src: "/henno-surfing.jpg", alt: "Henno riding a wave on his surfboard" } as
     | { src: string; alt: string }
     | undefined,

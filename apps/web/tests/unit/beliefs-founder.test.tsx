@@ -56,13 +56,13 @@ describe("Founder", () => {
     expect(screen.getByRole("heading", { level: 2, name: founder.heading })).toBeInTheDocument();
   });
 
-  it("shows the name and the faith story, with only the church still a draft", () => {
+  it("shows the name, the church and the faith story, with no draft text left", () => {
     const { container } = render(<Founder />);
-    expect(container).toHaveTextContent("Henno");
+    expect(container).toHaveTextContent('Henno (AKA "H")');
+    expect(container).toHaveTextContent("Harvest Christian Church");
     expect(container).toHaveTextContent("I found Jesus");
-    const drafts = container.querySelectorAll("[data-placeholder]");
-    expect(drafts).toHaveLength(1);
-    expect(drafts[0]).toHaveTextContent(/home church/);
+    expect(container).not.toHaveTextContent("I write Word on the Water");
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
   it("shows the surfing photo in a square frame wide enough to see the wave", () => {
