@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Dialog } from "radix-ui";
 import { useSyncExternalStore, type ReactNode } from "react";
 
-import { NAV_LINKS } from "@/components/layout/nav-links";
+import { NavLink } from "@/components/layout/nav-link";
+import type { NavItem } from "@/components/layout/nav-links";
 
 const subscribe = () => () => {};
 
@@ -22,7 +22,13 @@ function useHydrated() {
  * Esc, the button or choosing a link closes it, and focus returns to the button.
  * The theme toggle sits at the foot of the panel, because the header bar has no room for it here.
  */
-export function MobileMenu({ themeToggle }: { themeToggle: ReactNode }) {
+export function MobileMenu({
+  links,
+  themeToggle,
+}: {
+  links: readonly NavItem[];
+  themeToggle: ReactNode;
+}) {
   const hydrated = useHydrated();
   return (
     <Dialog.Root modal={false}>
@@ -47,14 +53,15 @@ export function MobileMenu({ themeToggle }: { themeToggle: ReactNode }) {
       >
         <Dialog.Title className="sr-only">Menu</Dialog.Title>
         <nav aria-label="Main menu" className="grid">
-          {NAV_LINKS.map((link) => (
-            <Dialog.Close key={link.href} asChild>
-              <Link
+          {links.map((link) => (
+            <Dialog.Close key={link.label} asChild>
+              <NavLink
                 href={link.href}
-                className="border-b border-line py-3.5 font-ui text-[17px] font-medium text-ink"
+                match={link.match}
+                className="border-b border-line py-3.5 font-ui text-[17px] font-medium text-ink aria-[current=page]:border-l-4 aria-[current=page]:border-l-accent aria-[current=page]:bg-surface aria-[current=page]:pl-3"
               >
                 {link.label}
-              </Link>
+              </NavLink>
             </Dialog.Close>
           ))}
         </nav>

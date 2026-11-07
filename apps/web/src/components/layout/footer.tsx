@@ -2,18 +2,38 @@ import Link from "next/link";
 
 import { Logo } from "@/components/logo";
 import { footer, hero } from "@/content/landing";
+import { isBibleEnabled } from "@/lib/bible/flag";
 import { ESV_LIMITS, ESV_NOTICE, ESV_URL, formatReference } from "@/lib/scripture";
 
 const linkClass = "inline-flex min-h-11 items-center text-on-deep-muted hover:text-on-deep";
 
 type Props = { year?: number; privacyHref?: string };
 
+/** Bible goes after Devotionals in the Read group. */
+function withBible<G extends { title: string; links: readonly { label: string; href: string }[] }>(
+  group: G,
+) {
+  if (group.title !== "Read") return group;
+  const at = group.links.findIndex((link) => link.label === "Devotionals") + 1;
+  return {
+    ...group,
+    links: [
+      ...group.links.slice(0, at),
+      { label: "Bible", href: "/bible" },
+      ...group.links.slice(at),
+    ],
+  };
+}
+
 export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) {
   const follow = [
     ...footer.social.flatMap((s) => (s.href ? [{ label: s.label, href: s.href }] : [])),
     footer.email,
   ];
-  const groups = [...footer.groups, { title: "Follow", links: follow }];
+  const groups = [
+    ...footer.groups.map((group) => (isBibleEnabled() ? withBible(group) : group)),
+    { title: "Follow", links: follow },
+  ];
 
   return (
     <footer className="bg-deep pb-[env(safe-area-inset-bottom)] font-ui text-sm text-on-deep-muted [--logo-gap:var(--deep)] [--logo-ring:var(--on-deep)] [--logo-wave:var(--accent-on-deep)]">

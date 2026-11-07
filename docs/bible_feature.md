@@ -281,8 +281,8 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [ ] Build the book, chapter and verse steps (mobile sheet, desktop column)
 - [ ] E2E on iPhone SE, iPhone 13, Pixel 7: open, choose WEB, John, chapter 3, verses 16 to 18, read; targets at least 44px; focus trap and Escape work; switching version keeps the passage
 - [ ] Remember the last version in `localStorage` (page works without it)
-- [ ] Add "Bible" to `NAV_LINKS` after "Devotionals" (shared by the desktop header and the mobile menu, see mockup 8) and the footer; mark it `aria-current="page"` on `/bible/...` (with a non-colour cue); update the nav tests
-- [ ] E2E: the header does not wrap at 1024px and 1100px with six links, the theme toggle and the CTA; if it does, shorten "What we believe" or move Bible beside the CTA
+- [x] Add "Bible" after "Devotionals" in the desktop header, the mobile menu (mockup 8) and the footer's Read group, shown only while `BIBLE_ENABLED=1` (`navLinks()`, `NavLink`); `aria-current="page"` on `/bible/...` with an underline and heavier weight (and a bar and tint in the mobile menu), not colour alone; nav tests updated
+- [x] E2E: the header does not wrap at 1024px, 1100px and 1280px with six links, the theme toggle and the CTA (no change to the header needed); the menu entry and footer link work on phones (`tests/e2e/bible-nav.spec.ts`)
 
 ### B6 Previous and next
 

@@ -2,12 +2,15 @@ import Link from "next/link";
 
 import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/layout/mobile-menu";
-import { NAV_LINKS } from "@/components/layout/nav-links";
+import { NavLink } from "@/components/layout/nav-link";
+import { navLinks } from "@/components/layout/nav-links";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonClasses } from "@/components/ui/button";
 import { setTheme } from "@/lib/actions/theme";
+import { isBibleEnabled } from "@/lib/bible/flag";
 
 export function Header() {
+  const links = navLinks(isBibleEnabled());
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg pt-[env(safe-area-inset-top)]">
       <div className="mx-auto flex max-w-[1120px] items-center gap-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] py-3 min-[420px]:gap-3 min-[520px]:gap-5">
@@ -19,14 +22,15 @@ export function Header() {
           <span className="max-[374px]:sr-only">Word on the Water</span>
         </Link>
         <nav aria-label="Main" className="ml-auto hidden gap-[22px] font-ui text-[15px] lg:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
+          {links.map((link) => (
+            <NavLink
+              key={link.label}
               href={link.href}
+              match={link.match}
               className="inline-flex min-h-11 items-center font-medium text-ink hover:text-accent-ink"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
         <Link
@@ -39,16 +43,16 @@ export function Header() {
         <div className="hidden text-ink lg:block">
           <ThemeToggle saveTheme={setTheme} />
         </div>
-        <MobileMenu themeToggle={<ThemeToggle saveTheme={setTheme} />} />
+        <MobileMenu links={links} themeToggle={<ThemeToggle saveTheme={setTheme} />} />
       </div>
       <noscript>
         <nav
           aria-label="Main"
           className="flex flex-wrap gap-x-5 border-t border-line pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] font-ui text-[15px] lg:hidden"
         >
-          {NAV_LINKS.map((link) => (
+          {links.map((link) => (
             <Link
-              key={link.href}
+              key={link.label}
               href={link.href}
               className="inline-flex min-h-11 items-center font-medium text-ink"
             >
