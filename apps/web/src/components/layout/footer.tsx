@@ -1,9 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/logo";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { footer, hero } from "@/content/landing";
-import { setTheme } from "@/lib/actions/theme";
 import { ESV_LIMITS, ESV_NOTICE, ESV_URL, formatReference } from "@/lib/scripture";
 
 const linkClass = "inline-flex min-h-11 items-center text-on-deep-muted hover:text-on-deep";
@@ -55,11 +53,14 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
         </div>
         <div className="grid gap-2 border-t border-on-deep/20 pt-5 text-[12.5px] leading-[1.55]">
           <p>
-            {ESV_NOTICE} {ESV_LIMITS}{" "}
-            <a href={ESV_URL} className="underline hover:text-on-deep">
-              www.esv.org
-            </a>
+            {ESV_NOTICE} {ESV_LIMITS}
           </p>
+          <a
+            href={ESV_URL}
+            className="inline-flex min-h-11 items-center justify-self-start underline hover:text-on-deep"
+          >
+            www.esv.org
+          </a>
           <div className="flex items-center justify-between gap-4">
             <p>
               © {year} Word on the Water
@@ -72,7 +73,6 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
                 </>
               ) : null}
             </p>
-            <ThemeToggle saveTheme={setTheme} />
           </div>
         </div>
       </div>

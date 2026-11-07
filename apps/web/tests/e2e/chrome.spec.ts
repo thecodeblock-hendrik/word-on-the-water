@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { themeToggle } from "./theme-helpers";
+
 test("viewport covers the notch and theme-color follows the device by default", async ({
   request,
 }) => {
@@ -22,7 +24,7 @@ test("a chosen theme sets a single theme-color", async ({ request }) => {
 test("toggling updates the browser chrome colour at once", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
-  await page.getByRole("button", { name: /switch between/i }).click();
+  await (await themeToggle(page)).click();
   const colors = await page
     .locator('meta[name="theme-color"]')
     .evaluateAll((els) => els.map((el) => el.getAttribute("content")));

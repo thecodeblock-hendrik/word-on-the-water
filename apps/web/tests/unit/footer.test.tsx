@@ -86,11 +86,11 @@ describe("Footer", () => {
     );
   });
 
-  it("keeps the theme toggle", () => {
+  it("no longer holds the theme toggle, which moved to the header", () => {
     render(<Footer year={2026} />);
     expect(
-      screen.getByRole("button", { name: /switch between light and dark/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: /switch between light and dark/i }),
+    ).not.toBeInTheDocument();
   });
 });
 

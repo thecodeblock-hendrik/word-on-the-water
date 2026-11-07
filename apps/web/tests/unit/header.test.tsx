@@ -28,6 +28,26 @@ describe("Header", () => {
   });
 });
 
+describe("theme toggle", () => {
+  const name = /switch between light and dark/i;
+
+  it("sits in the header bar, after the call to action", () => {
+    render(<Header />);
+    const banner = screen.getByRole("banner");
+    const toggle = within(banner).getByRole("button", { name });
+    const cta = within(banner).getByRole("link", { name: /get the devotional/i });
+    expect(cta.compareDocumentPosition(toggle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("is shown only from lg in the bar, and has a second copy in the open menu", async () => {
+    render(<Header />);
+    const [barToggle] = screen.getAllByRole("button", { name });
+    expect(barToggle.parentElement?.className).toMatch(/\bhidden\b.*\blg:block\b/);
+    await userEvent.setup().click(screen.getByRole("button", { name: /menu/i }));
+    expect(within(screen.getByTestId("mobile-menu")).getByRole("button", { name })).toBeVisible();
+  });
+});
+
 describe("mobile menu", () => {
   async function setup() {
     render(<Header />);

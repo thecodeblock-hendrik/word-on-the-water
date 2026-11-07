@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Dialog } from "radix-ui";
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 
 import { NAV_LINKS } from "@/components/layout/nav-links";
 
@@ -20,8 +20,9 @@ function useHydrated() {
 /**
  * Menu for screens below lg. Non-modal, so the button stays usable and toggles it.
  * Esc, the button or choosing a link closes it, and focus returns to the button.
+ * The theme toggle sits at the foot of the panel, because the header bar has no room for it here.
  */
-export function MobileMenu() {
+export function MobileMenu({ themeToggle }: { themeToggle: ReactNode }) {
   const hydrated = useHydrated();
   return (
     <Dialog.Root modal={false}>
@@ -57,6 +58,10 @@ export function MobileMenu() {
             </Dialog.Close>
           ))}
         </nav>
+        <div className="flex items-center justify-between pt-3 font-ui text-[17px] font-medium text-ink">
+          <span>Theme</span>
+          {themeToggle}
+        </div>
       </Dialog.Content>
     </Dialog.Root>
   );
