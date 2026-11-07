@@ -1,3 +1,5 @@
+import type { VerseRange } from "./range.ts";
+
 /** Shapes shared by the importer, the local source and the reader. Scripture text only ever lives inside Run.text. */
 
 /** A stretch of text that belongs to one verse. `start` is true where the verse number is shown. */
@@ -29,3 +31,22 @@ export type Chapter = { chapter: number; blocks: Block[] };
 
 /** One chapter as stored in content/bibles/<version>/<book>/<chapter>.json. */
 export type ChapterData = { version: string; book: string; chapter: number; blocks: Block[] };
+
+/** What the reader shows: one chapter, or some verses of it. */
+export type Passage = {
+  version: string;
+  book: string;
+  chapter: number;
+  /** The verses shown, or null when the whole chapter is shown. */
+  range: VerseRange | null;
+  /** The verses asked for when this version does not have them and the whole chapter is shown instead. */
+  fallback: VerseRange | null;
+  /** The last verse of the whole chapter in this version. */
+  lastVerse: number;
+  blocks: Block[];
+};
+
+/** Where chapters come from: our generated files, or later the ESV API. */
+export interface BibleSource {
+  getChapter(version: string, book: string, chapter: number): Promise<ChapterData>;
+}
