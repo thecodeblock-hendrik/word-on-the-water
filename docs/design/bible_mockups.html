@@ -140,6 +140,51 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
 .mk-t{border-collapse:collapse;width:100%;max-width:1100px;background:#fff;font:14px/1.5 system-ui}
 .mk-t th,.mk-t td{border:1px solid #d9d2c6;padding:8px 10px;text-align:left;vertical-align:top}
 .mk-t th{background:#f3eee6}
+
+/* Mobile selector options */
+.mp-sheet{position:absolute;left:0;right:0;bottom:0;top:52px;background:var(--bg);color:var(--ink);border-radius:20px 20px 0 0;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(10,24,37,.3);overflow:hidden}
+.mp-head{display:flex;align-items:center;gap:8px;padding:2px 12px 8px}
+.mp-head strong{flex:1;font:700 17px system-ui}
+.mp-tabs{display:flex;border-bottom:1px solid var(--line)}
+.mp-tabs button{flex:1;min-height:56px;border:0;border-bottom:3px solid transparent;background:none;color:var(--ink);padding:6px 4px;font:700 17px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.mp-tabs button small{font:400 12px system-ui;color:var(--muted)}
+.mp-tabs button.on{border-color:var(--accent)}
+.mp-body{flex:1;min-height:0;overflow:hidden;padding:12px 16px 0}
+.mp-foot{border-top:1px solid var(--line);background:var(--surface);padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px}
+.mp-foot .sum{font:14px system-ui;color:var(--muted)}.mp-foot .sum b{color:var(--ink)}
+.mp-foot .acts{display:flex;gap:8px}.mp-foot .btn{flex:none;padding:0 18px;white-space:nowrap}.mp-foot .btn.primary{flex:1}
+.mp-find{width:100%;min-height:48px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:0 14px;font:17px system-ui;display:flex;align-items:center;gap:8px;color:var(--muted);margin-bottom:4px}
+.mp-books{display:flex;flex-direction:column}
+.mp-books i{font-style:normal;color:var(--muted);font-size:13px;padding:10px 4px 2px}
+.mp-books div{min-height:48px;display:flex;align-items:center;padding:0 12px;border-radius:10px;font:600 17px system-ui}
+.mp-books div.on{background:var(--accent);color:#fff}
+.night .mp-books div.on{color:#0a1825}
+.mp-cg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.mp-cg span{min-height:48px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font:600 17px system-ui}
+.mp-cg .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mp-vg{display:grid;grid-template-columns:repeat(7,1fr);gap:6px 4px}
+.mp-vg span{min-height:44px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font:600 16px system-ui}
+.mp-vg .b{background:var(--accent);border-color:var(--accent);color:#fff;border-radius:0;box-shadow:4px 0 0 var(--accent)}
+.night .mp-vg .b{color:#0a1825}
+.mp-vg .b.s{border-radius:10px 0 0 10px}.mp-vg .b.e{border-radius:0 10px 10px 0;box-shadow:none}.mp-vg .b.s.e{border-radius:10px}
+.mp-note{font:13px/1.45 system-ui;color:var(--muted);margin:10px 0 0}
+.mp-pg{display:flex;gap:6px;margin-bottom:10px}
+.mp-pg span{min-height:44px;padding:0 12px;display:flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;font:600 14px system-ui}
+.mp-pg .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mp-row{border:1.5px solid var(--line);border-radius:14px;background:var(--surface);margin-bottom:10px;overflow:hidden}
+.mp-row.open{border-color:var(--accent)}
+.mp-rh{min-height:60px;display:flex;align-items:center;gap:10px;padding:0 14px}
+.mp-rh small{color:var(--muted);font:14px system-ui;width:64px}
+.mp-rh b{flex:1;font:700 18px system-ui}
+.mp-rh span{color:var(--muted)}
+.mp-rb{padding:4px 14px 14px;border-top:1px solid var(--line);background:var(--bg)}
+.mp-keys{background:#d1d5db;padding:8px 4px 20px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.night .mp-keys{background:#26323d}
+.mp-keys div{display:flex;gap:5px}
+.mp-keys span{width:32px;height:42px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font:22px system-ui;color:#111;box-shadow:0 1px 0 rgba(0,0,0,.3)}
+.night .mp-keys span{background:#4a5560;color:#fff}
+.mp-recent{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--line);font:600 17px system-ui}
+.mp-recent small{margin-left:auto;color:var(--muted);font-weight:400;font-size:13px}
 </style>
 </head>
 <body>
@@ -391,6 +436,83 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
 <tr><th>Knowing the reference</th><td>Several clicks</td><td>Best</td><td>Several clicks</td></tr>
 <tr><th>Build effort</th><td>Medium</td><td>Medium (reference parser)</td><td>Medium (selection plus toolbar)</td></tr>
 <tr><th>Recommendation</th><td>Default picker</td><td>Add as a shortcut on top of A</td><td>Good second step later</td></tr>
+</table>
+
+<h2 class="mk-h" id="mobile-options">Mobile selector: three options</h2>
+<p class="mk-lead">For phones, below 1024px (tablets use these too). Same ideas as the desktop picker you chose: books with a filter and no counts, a chapter grid, a verse grid where the chosen verses join into one band, one tap for a verse and a second tap for a range, a Whole chapter button, and nothing applied until Read. Everything is thumb reach: the action bar is at the bottom and every control is at least 44px. These replace mockups 4 and 5 (the four-step full-screen sheet). The quick Bible switch (mockup 3) stays as the version chip.</p>
+<div class="row"><figure><div class="phone"><div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3:16–18</h2><p><sup>16</sup>For God so loved the world that He gave His one and only Son…</p></div>
+  <div class="scrim"></div>
+  <div class="mp-sheet" role="dialog" aria-label="Choose passage"><div class="grab"></div>
+    <div class="mp-head"><strong>Choose passage</strong><button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button><button class="btn" aria-label="Close">✕</button></div><div class="mp-tabs" role="tablist"><button role="tab" class="on"><small>Book</small>John</button><button role="tab" class=""><small>Chapter</small>3</button><button role="tab" class=""><small>Verses</small>16–18</button></div>
+    <div class="mp-body"><div class="mp-find">⌕ Find a book</div>
+      <div class="mp-books"><i>New Testament</i><div>Matthew</div><div>Mark</div><div>Luke</div><div class="on">John</div><div>Acts</div><div>Romans</div><div>1 Corinthians</div></div></div><div class="mp-foot"><span class="sum">Reading <b>John 3:16–18</b> in the BSB</span><div class="acts"><button class="btn">Whole chapter</button><button class="btn primary">Read</button></div></div></div></div>
+<figcaption><b>M1a. Tabs that show your choice: Book.</b> One bottom sheet. The three tabs are Book, Chapter and Verses, and each tab shows what is chosen now (John, 3, 16–18), so there is no step counter to read. Choosing a book moves to Chapter and choosing a chapter moves to Verses, and any tab can be tapped back. The book list has a filter and no chapter counts.</figcaption></figure><figure><div class="phone"><div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3:16–18</h2><p><sup>16</sup>For God so loved the world that He gave His one and only Son…</p></div>
+  <div class="scrim"></div>
+  <div class="mp-sheet" role="dialog" aria-label="Choose passage"><div class="grab"></div>
+    <div class="mp-head"><strong>Choose passage</strong><button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button><button class="btn" aria-label="Close">✕</button></div><div class="mp-tabs" role="tablist"><button role="tab" class=""><small>Book</small>John</button><button role="tab" class=""><small>Chapter</small>3</button><button role="tab" class="on"><small>Verses</small>16–18</button></div>
+    <div class="mp-body"><div class="mp-vg"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span class="b s">16</span><span class="b">17</span><span class="b e">18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span></div><p class="mp-note">Tap a verse, then tap a second verse to read a range. Tap the same verse again to read just that one.</p></div><div class="mp-foot"><span class="sum">Reading <b>John 3:16–18</b> in the BSB</span><div class="acts"><button class="btn">Whole chapter</button><button class="btn primary">Read</button></div></div></div></div>
+<figcaption><b>M1b. Verses tab.</b> The same verse grid and joined band as the desktop picker: 7 columns of 44px buttons for 36 verses, with no scrolling for most chapters (a long chapter such as Psalm 119 scrolls inside the tab only). The footer always shows what will open, with Whole chapter and Read within thumb reach. Chapters use a 5-column grid; long books show pages of 25 (1 to 25, 26 to 50) as tabs above the grid.</figcaption></figure></div>
+<div class="row" style="margin-top:32px"><figure><div class="phone night"><div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3:16–18</h2><p><sup>16</sup>For God so loved the world that He gave His one and only Son…</p></div>
+  <div class="scrim"></div>
+  <div class="mp-sheet" role="dialog" aria-label="Choose passage"><div class="grab"></div>
+    <div class="mp-head"><strong>Choose passage</strong><button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button><button class="btn" aria-label="Close">✕</button></div>
+    <div class="mp-body" style="padding-top:4px">
+      <div class="mp-row "><div class="mp-rh"><small>Book</small><b>John</b><span>▾</span></div></div><div class="mp-row "><div class="mp-rh"><small>Chapter</small><b>3</b><span>▾</span></div></div>
+      <div class="mp-row open"><div class="mp-rh"><small>Verses</small><b>16 to 18</b><span>▴</span></div><div class=mp-rb><div class="mp-vg" style="margin-top:10px"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span class="b s">16</span><span class="b">17</span><span class="b e">18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span></div><p class="mp-note">Tap a verse, then a second verse for a range.</p></div></div>
+    </div><div class="mp-foot"><span class="sum">Reading <b>John 3:16–18</b> in the BSB</span><div class="acts"><button class="btn">Whole chapter</button><button class="btn primary">Read</button></div></div></div></div>
+<figcaption><b>M2a. Stacked rows (shown in Night swell): Verses open.</b> Book, Chapter and Verses are three rows, each showing its current value. Tapping a row opens it in place and closes the others, so the whole choice is always visible and nothing is hidden behind a tab. Good when people change just one part, for example the verses only.</figcaption></figure><figure><div class="phone night"><div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3:16–18</h2><p><sup>16</sup>For God so loved the world that He gave His one and only Son…</p></div>
+  <div class="scrim"></div>
+  <div class="mp-sheet" role="dialog" aria-label="Choose passage"><div class="grab"></div>
+    <div class="mp-head"><strong>Choose passage</strong><button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button><button class="btn" aria-label="Close">✕</button></div>
+    <div class="mp-body" style="padding-top:4px">
+      <div class="mp-row open"><div class="mp-rh"><small>Book</small><b>John</b><span>▴</span></div><div class=mp-rb><div class="mp-find" style="margin-top:10px">⌕ Find a book</div><div class="mp-books" style="max-height:290px;overflow:hidden"><div>Luke</div><div class="on">John</div><div>Acts</div><div>Romans</div><div>1 Corinthians</div></div></div></div>
+      <div class="mp-row "><div class="mp-rh"><small>Chapter</small><b>3</b><span>▾</span></div></div><div class="mp-row "><div class="mp-rh"><small>Verses</small><b>16 to 18</b><span>▾</span></div></div>
+    </div><div class="mp-foot"><span class="sum">Reading <b>John 3:16–18</b> in the BSB</span><div class="acts"><button class="btn">Whole chapter</button><button class="btn primary">Read</button></div></div></div></div>
+<figcaption><b>M2b. Book row open.</b> The book list scrolls inside its row only. Choosing a book closes the row and opens Chapter next, so a full new choice is still three taps plus Read.</figcaption></figure></div>
+<div class="row" style="margin-top:32px"><figure><div class="phone"><div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3:16–18</h2><p><sup>16</sup>For God so loved the world that He gave His one and only Son…</p></div>
+  <div class="scrim"></div>
+  <div class="mp-sheet" role="dialog" aria-label="Go to passage"><div class="grab"></div>
+    <div class="mp-head"><strong>Go to passage</strong><button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button><button class="btn" aria-label="Close">✕</button></div>
+    <div class="mp-body" style="padding-top:2px">
+      <div class="mp-find" style="color:var(--ink);border-color:var(--accent);font:600 20px system-ui">⌕ john 3:16-18<span style="display:inline-block;width:2px;height:22px;background:var(--accent)"></span></div>
+      <div class="res on" style="margin:0 -16px"><span style="flex:1"><b>John 3:16–18</b><small>Verses 16 to 18</small><span class="prev" style="font-size:14px">“For God so loved the world that He gave His one and only Son…”</span></span></div>
+      <div class="res" style="margin:0 -16px"><span><b>John 3</b><small>Whole chapter, 36 verses</small></span></div>
+      <div class="res" style="margin:0 -16px"><span><b>John 3:16</b><small>Just this verse</small></span></div>
+    </div>
+    <div class="mp-keys"><div><span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span></div><div><span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span></div><div><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span></div></div></div></div>
+<figcaption><b>M3a. Type it, with the keyboard open.</b> The sheet is search first. Typing "john 3:16-18" or "jn 3" shows the best match with its verse text, then the whole chapter and a single verse. The list shrinks to fit above the keyboard and Return reads the top match. Fast for people who know the reference.</figcaption></figure><figure><div class="phone"><div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3:16–18</h2><p><sup>16</sup>For God so loved the world that He gave His one and only Son…</p></div>
+  <div class="scrim"></div>
+  <div class="mp-sheet" role="dialog" aria-label="Go to passage"><div class="grab"></div>
+    <div class="mp-head"><strong>Go to passage</strong><button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button><button class="btn" aria-label="Close">✕</button></div>
+    <div class="mp-body" style="padding-top:2px">
+      <div class="mp-find">⌕ Type a passage, e.g. jn 3:16</div>
+      <div class="mp-recent"><span>John 3:16–18</span><small>Reading now</small></div>
+      <div class="mp-recent"><span>Psalms 23</span></div>
+      <div class="mp-recent"><span>Romans 8:28–30</span></div>
+      <div class="mp-recent"><span>Mark 4:35–41</span></div>
+      <div style="padding:16px 0"><button class="btn" style="width:100%">Browse books, chapters and verses</button></div>
+    </div></div></div>
+<figcaption><b>M3b. Type it, empty.</b> Before typing, the sheet shows the last four passages read on this device (never sent anywhere) and one "Browse" button that opens the tabbed picker (M1) for people who do not know the reference.</figcaption></figure></div>
+<table class="mk-t" style="margin-top:32px">
+<tr><th></th><th>M1. Tabs showing your choice</th><th>M2. Stacked rows</th><th>M3. Type it</th></tr>
+<tr><th>Closest to desktop</th><td>Yes (same order, one column at a time)</td><td>Partly</td><td>Same idea as desktop option B</td></tr>
+<tr><th>Seeing the whole choice</th><td>Tab labels show all three values</td><td>Best: all three rows always visible</td><td>Result card shows it</td></tr>
+<tr><th>Changing only the verses</th><td>Tap Verses</td><td>Tap Verses row</td><td>Retype</td></tr>
+<tr><th>Browsing by hand</th><td>Good</td><td>Good (one open row at a time)</td><td>Weak, needs Browse button</td></tr>
+<tr><th>Knowing the reference</th><td>Three taps</td><td>Three taps</td><td>Best</td></tr>
+<tr><th>Recommendation</th><td>Default picker</td><td>Alternative</td><td>Add as a shortcut on top of M1</td></tr>
 </table>
 </body>
 </html>
