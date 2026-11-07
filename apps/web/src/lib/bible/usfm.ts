@@ -1,4 +1,4 @@
-import type { Block, Chapter, TextBlock } from "./types";
+import type { Block, Chapter, TextBlock } from "./types.ts";
 
 /**
  * Reads one book of USFM (the format of the BSB and WEB downloads) into chapters of blocks.

@@ -26,3 +26,6 @@ export type Block =
   | { kind: "break" };
 
 export type Chapter = { chapter: number; blocks: Block[] };
+
+/** One chapter as stored in content/bibles/<version>/<book>/<chapter>.json. */
+export type ChapterData = { version: string; book: string; chapter: number; blocks: Block[] };
