@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { findBook } from "@/lib/bible/books";
-import { passageTitle, verseLabel } from "@/lib/bible/reference";
+import { chapterPath, passageTitle, verseLabel } from "@/lib/bible/reference";
 
 const john = findBook("john")!;
 
@@ -24,5 +24,12 @@ describe("passageTitle", () => {
 
   it("keeps the name of numbered books", () => {
     expect(passageTitle(findBook("1-john")!, 4, null)).toBe("1 John 4");
+  });
+});
+
+describe("chapterPath", () => {
+  it("is the address of a whole chapter in one Bible", () => {
+    expect(chapterPath("bsb", "john", 3)).toBe("/bible/bsb/john/3");
+    expect(chapterPath("web", "1-john", 4)).toBe("/bible/web/1-john/4");
   });
 });

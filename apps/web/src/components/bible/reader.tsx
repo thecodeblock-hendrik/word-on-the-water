@@ -25,7 +25,7 @@ export function Reader({ passage, version, book, invalidVerses = false }: Props)
   return (
     <article
       aria-labelledby="passage-title"
-      className="mx-auto grid max-w-[62ch] gap-6 pb-16 pt-8 lg:pt-0"
+      className="mx-auto grid max-w-[62ch] gap-6 pb-8 pt-8 lg:pt-0"
     >
       <header className="grid gap-3">
         <p className="font-display text-[.88rem] font-semibold uppercase tracking-[.18em] text-accent-ink">
