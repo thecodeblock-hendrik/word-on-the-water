@@ -1,4 +1,3 @@
-import { PlaceholderText } from "@/components/placeholder-text";
 import { beliefs } from "@/content/landing";
 
 /** Short statement of faith. Pass fullStatementHref once a full statement exists. */
@@ -17,7 +16,7 @@ export function Beliefs({ fullStatementHref }: { fullStatementHref?: string }) {
             key={point}
             className="relative pl-[22px] before:absolute before:left-0 before:top-[.75em] before:h-0.5 before:w-2.5 before:bg-accent"
           >
-            <PlaceholderText>{point}</PlaceholderText>
+            {point}
           </li>
         ))}
       </ul>

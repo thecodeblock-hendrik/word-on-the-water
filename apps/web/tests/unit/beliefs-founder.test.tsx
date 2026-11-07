@@ -15,24 +15,24 @@ describe("beliefs and founder content", () => {
     expect(founder.heading.length).toBeLessThanOrEqual(40);
   });
 
-  it("states the four historic points, then a placeholder for the rest", () => {
-    expect(beliefs.points).toHaveLength(5);
+  it("states the four historic points and no placeholder", () => {
+    expect(beliefs.points).toHaveLength(4);
     expect(beliefs.points[0]).toMatch(/Bible is God's Word/);
-    expect(beliefs.points[4]).toMatch(/^\[.*\]$/);
+    expect(beliefs.points.some((point) => point.startsWith("["))).toBe(false);
   });
 });
 
 describe("Beliefs", () => {
-  it("is anchored as believe with an h2 and a list of five points", () => {
+  it("is anchored as believe with an h2 and a list of four points", () => {
     const { container } = render(<Beliefs />);
     expect(container.querySelector("#believe")).not.toBeNull();
     expect(screen.getByRole("heading", { level: 2, name: beliefs.heading })).toBeInTheDocument();
-    expect(within(screen.getByRole("list")).getAllByRole("listitem")).toHaveLength(5);
+    expect(within(screen.getByRole("list")).getAllByRole("listitem")).toHaveLength(4);
   });
 
-  it("shows the draft point as a highlighted placeholder", () => {
+  it("has no placeholder text", () => {
     const { container } = render(<Beliefs />);
-    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(1);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
   it("has no link to a full statement until one exists", () => {

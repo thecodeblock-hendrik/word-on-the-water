@@ -107,7 +107,6 @@ export const beliefs = {
     "There is one God: Father, Son and Holy Spirit.",
     "Jesus Christ is fully God and fully man. He died for our sins and rose bodily from the dead.",
     "We are saved by grace through faith in Christ alone.",
-    "[Your remaining points, or link to your church's statement]",
   ],
 };
 
