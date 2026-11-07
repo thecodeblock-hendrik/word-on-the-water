@@ -182,12 +182,9 @@ export function PassagePopover({ state: current }: { state: PickerState }) {
                             setAnchor(null);
                             setPage(null);
                           }}
-                          className="flex min-h-11 items-center justify-between gap-2 rounded-sm px-2.5 text-left font-ui text-[16px] font-semibold text-ink hover:bg-surface aria-[current=true]:bg-accent-ink aria-[current=true]:text-bg"
+                          className="flex min-h-11 items-center gap-2 rounded-sm px-2.5 text-left font-ui text-[16px] font-semibold text-ink hover:bg-surface aria-[current=true]:bg-accent-ink aria-[current=true]:text-bg"
                         >
                           {b.name}
-                          <span aria-hidden="true" className="text-[13px] font-normal">
-                            {b.chapters}
-                          </span>
                         </button>
                       ))}
                     </div>
