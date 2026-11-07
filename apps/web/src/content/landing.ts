@@ -149,4 +149,10 @@ export const footer = {
 };
 
 /** Everything the landing page says. The placeholder check scans this. */
-export const landing = { hero, about, coming, start, beliefs, founder, footer };
+/** Where Kit sends a subscriber after they confirm their email. */
+export const thankYou = {
+  heading: "You're in",
+  body: "Your email is confirmed. The weekly devotional lands in your inbox every Saturday at dawn. Read the latest one while you wait.",
+};
+
+export const landing = { hero, about, coming, start, beliefs, founder, footer, thankYou };
