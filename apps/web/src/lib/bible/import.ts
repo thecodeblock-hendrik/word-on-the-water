@@ -1,6 +1,6 @@
 import { BOOKS, type Book } from "./books.ts";
 import type { ChapterData } from "./types.ts";
-import { parseUsfm, verseNumbers } from "./usfm.ts";
+import { lastVerse, parseUsfm, verseNumbers } from "./usfm.ts";
 import { USFM_CODES } from "./usfm-codes.ts";
 
 export type ChapterFile = {
@@ -57,4 +57,11 @@ export function importVersion(
 ): ChapterFile[] {
   const located = BOOKS.map((book, i) => ({ book, file: findBookFile(files, USFM_CODES[i]) }));
   return located.flatMap(({ book, file }) => importBook(version, book, read(file)));
+}
+
+/** The last verse of every chapter of every book, in book order: what the pickers need, with no text. */
+export function verseCounts(files: readonly ChapterFile[]): number[][] {
+  return BOOKS.map((book) =>
+    files.filter(({ data }) => data.book === book.slug).map(({ data }) => lastVerse(data)),
+  );
 }

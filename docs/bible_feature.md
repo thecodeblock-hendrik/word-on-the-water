@@ -91,7 +91,7 @@ pnpm build:bible web /tmp/web
 pnpm exec vitest run tests/unit/bible-data.test.ts
 ```
 
-The script finds all 66 books before it reads any, checks each against the book table (chapter count, verses present, verse numbers increasing) and replaces the version's folder. Running it twice on the same input gives byte-identical files. Treat the downloaded files as untrusted data: unzip them in their own folder and never run anything from inside them.
+The script finds all 66 books before it reads any, checks each against the book table (chapter count, verses present, verse numbers increasing) and replaces the version's folder. It also writes `counts.json` (the last verse of every chapter, for the pickers). Running it twice on the same input gives byte-identical files. Treat the downloaded files as untrusted data: unzip them in their own folder and never run anything from inside them.
 
 ### 3a. Spike findings (2026-11-07)
 
@@ -276,7 +276,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B5 Pickers (version, book, chapter, verses)
 
-- [ ] Unit tests: steps and their order; picking a version keeps the passage; picking a book resets the chapter; chapter grid has the right count; steppers stay in range; the disabled ESV card cannot be chosen; "Read" navigates to the right URL
+- [x] Unit tests for the pure picker logic (`src/lib/bible/picker.ts`, `tests/unit/bible-picker.test.ts`): steps and their order; picking a version keeps the passage; picking a book resets the chapter; chapter grid has the right count; steppers stay in range (using each version's own last verse); the disabled ESV cannot be chosen; "Read" gives the right address. The pickers read last verses from `content/bibles/<version>/counts.json` (3.6 KB, no text, written by `pnpm build:bible`), so the browser never loads chapter text
 - [ ] Build the version picker (radio cards, step 1) and the quick-switch sheet from the header chip
 - [ ] Build the book, chapter and verse steps (mobile sheet, desktop column)
 - [ ] E2E on iPhone SE, iPhone 13, Pixel 7: open, choose WEB, John, chapter 3, verses 16 to 18, read; targets at least 44px; focus trap and Escape work; switching version keeps the passage

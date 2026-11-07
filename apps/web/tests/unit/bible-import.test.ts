@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { BOOKS, findBook } from "@/lib/bible/books";
-import { findBookFile, importBook, importVersion } from "@/lib/bible/import";
+import { findBookFile, importBook, importVersion, verseCounts } from "@/lib/bible/import";
 import { USFM_CODES } from "@/lib/bible/usfm-codes";
 
 describe("USFM_CODES", () => {
@@ -111,5 +111,24 @@ describe("importVersion", () => {
 
   it("fails clearly when a book file is missing", () => {
     expect(() => importVersion("bsb", ["GEN.usfm"], () => "\\c 1\n\\p \\v 1 x\n")).toThrow(/EXO/);
+  });
+});
+
+describe("verseCounts", () => {
+  it("lists the last verse of every chapter of every book, in book order", () => {
+    const sources = new Map<string, string>();
+    for (const [i, book] of BOOKS.entries()) {
+      const chapters = Array.from(
+        { length: book.chapters },
+        (_, c) => `\\c ${c + 1}\n\\p \\v 1 One. \\v ${c + 2} Last.\n`,
+      ).join("");
+      sources.set(`${USFM_CODES[i]}.usfm`, chapters);
+    }
+    const counts = verseCounts(importVersion("bsb", [...sources.keys()], (n) => sources.get(n)!));
+    expect(counts).toHaveLength(66);
+    expect(counts[0]).toHaveLength(50);
+    expect(counts[0].slice(0, 3)).toEqual([2, 3, 4]);
+    expect(counts[18]).toHaveLength(150);
+    expect(counts[65]).toHaveLength(22);
   });
 });

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { BOOKS } from "@/lib/bible/books";
+import { BOOKS, findBook } from "@/lib/bible/books";
 import type { ChapterData } from "@/lib/bible/types";
 import { verseNumbers } from "@/lib/bible/usfm";
 
@@ -95,5 +95,45 @@ describe("known differences between the two versions", () => {
   it("puts the Romans doxology in different places", () => {
     expect(verseNumbers(read("web", "romans", 14)).at(-1)).toBe(26);
     expect(verseNumbers(read("bsb", "romans", 14)).at(-1)).toBe(23);
+  });
+});
+
+describe.each(["bsb", "web"])("generated %s verse counts", (version) => {
+  const counts: number[][] = JSON.parse(readFileSync(join(ROOT, version, "counts.json"), "utf8"));
+  const last = (slug: string, chapter: number) =>
+    counts[BOOKS.indexOf(findBook(slug)!)][chapter - 1];
+
+  it("has one list per book with one number per chapter", () => {
+    expect(counts).toHaveLength(66);
+    for (const [i, book] of BOOKS.entries())
+      expect(counts[i], book.name).toHaveLength(book.chapters);
+  });
+
+  it("agrees with the last verse of every chapter file", () => {
+    for (const [i, book] of BOOKS.entries()) {
+      for (let chapter = 1; chapter <= book.chapters; chapter++) {
+        expect(
+          verseNumbers(read(version, book.slug, chapter)).at(-1),
+          `${book.name} ${chapter}`,
+        ).toBe(counts[i][chapter - 1]);
+      }
+    }
+  });
+
+  it("knows well-known chapters", () => {
+    expect(last("john", 3)).toBe(36);
+    expect(last("psalms", 119)).toBe(176);
+    expect(last("genesis", 1)).toBe(31);
+  });
+});
+
+describe("verse counts differ where the versions differ", () => {
+  it("has the Romans doxology in different places", () => {
+    const rom = (v: string) =>
+      (JSON.parse(readFileSync(join(ROOT, v, "counts.json"), "utf8")) as number[][])[
+        BOOKS.indexOf(findBook("romans")!)
+      ];
+    expect(rom("web")[13]).toBe(26);
+    expect(rom("bsb")[13]).toBe(23);
   });
 });
