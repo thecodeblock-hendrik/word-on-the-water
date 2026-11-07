@@ -45,6 +45,32 @@ export function chooseVerses(
   return { ...state, from: start, to: Math.min(Math.max(to, start), last) };
 }
 
+/**
+ * One click on a verse chooses it and waits for an end (the anchor); a second click makes the range
+ * with it, and the same verse twice keeps just that verse. A click with no anchor starts again.
+ */
+export function pickVerse(
+  state: PickerState,
+  anchor: number | null,
+  verse: number,
+): { state: PickerState; anchor: number | null } {
+  if (anchor === null) return { state: chooseVerses(state, verse, verse), anchor: verse };
+  return {
+    state: chooseVerses(state, Math.min(anchor, verse), Math.max(anchor, verse)),
+    anchor: null,
+  };
+}
+
+const PAGE = 25;
+
+/** A long book's chapters in pages of 25 for the picker's tabs; a short book is one page. */
+export function chapterPages(book: Book): { first: number; last: number }[] {
+  return Array.from({ length: Math.ceil(book.chapters / PAGE) }, (_, i) => ({
+    first: i * PAGE + 1,
+    last: Math.min((i + 1) * PAGE, book.chapters),
+  }));
+}
+
 /** The address of the passage the picker has chosen. */
 export function readHref({ version, book, chapter, from, to }: PickerState): string {
   const path = `/bible/${version}/${book}/${chapter}`;

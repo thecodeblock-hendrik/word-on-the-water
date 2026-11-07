@@ -8,6 +8,8 @@ import {
   chooseChapter,
   chooseVerses,
   chooseVersion,
+  chapterPages,
+  pickVerse,
   readHref,
   STEPS,
   type PickerState,
@@ -125,5 +127,56 @@ describe("readHref", () => {
     expect(readHref({ version: "web", book: "1-john", chapter: 4, from: null, to: null })).toBe(
       "/bible/web/1-john/4",
     );
+  });
+});
+
+describe("pickVerse", () => {
+  const whole: PickerState = { ...start, from: null, to: null };
+
+  it("the first click chooses one verse and waits for an end", () => {
+    expect(pickVerse(whole, null, 16)).toEqual({
+      state: { ...whole, from: 16, to: 16 },
+      anchor: 16,
+    });
+  });
+
+  it("a second click after it makes a range, whichever way round", () => {
+    const first = pickVerse(whole, null, 16);
+    expect(pickVerse(first.state, first.anchor, 18)).toEqual({
+      state: { ...whole, from: 16, to: 18 },
+      anchor: null,
+    });
+    expect(pickVerse(first.state, first.anchor, 14)).toEqual({
+      state: { ...whole, from: 14, to: 16 },
+      anchor: null,
+    });
+  });
+
+  it("clicking the same verse again keeps just that verse", () => {
+    const first = pickVerse(whole, null, 16);
+    expect(pickVerse(first.state, first.anchor, 16)).toEqual({
+      state: { ...whole, from: 16, to: 16 },
+      anchor: null,
+    });
+  });
+
+  it("a click after a finished range starts a new choice", () => {
+    expect(pickVerse(start, null, 30)).toEqual({
+      state: { ...start, from: 30, to: 30 },
+      anchor: 30,
+    });
+  });
+});
+
+describe("chapterPages", () => {
+  it("keeps a short book in one page and splits a long one into pages of 25", () => {
+    expect(chapterPages(findBook("john")!)).toEqual([{ first: 1, last: 21 }]);
+    expect(chapterPages(findBook("genesis")!)).toEqual([
+      { first: 1, last: 25 },
+      { first: 26, last: 50 },
+    ]);
+    expect(chapterPages(findBook("psalms")!).map((p) => p.last)).toEqual([
+      25, 50, 75, 100, 125, 150,
+    ]);
   });
 });
