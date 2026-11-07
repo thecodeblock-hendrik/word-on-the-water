@@ -29,7 +29,7 @@ describe("devotional page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("More Than Watchmen");
     expect(screen.getByText("Advent · 1 of 5", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText(/Every dawn patrol starts in the dark/)).toBeInTheDocument();
-    expect(screen.getByText("By Hendrik")).toBeInTheDocument();
+    expect(screen.getByText("By H")).toBeInTheDocument();
     expect(screen.getByText("Saturday 5 December 2026")).toBeInTheDocument();
     expect(screen.getByText("3 min read")).toBeInTheDocument();
   });

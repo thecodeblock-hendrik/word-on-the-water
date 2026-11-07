@@ -1,7 +1,7 @@
 ---
 title: The Long Wait
 publishAt: 2026-12-12
-author: Hendrik
+author: H
 series: advent
 seriesNumber: 2
 passages: ["Luke 1:5–25"]

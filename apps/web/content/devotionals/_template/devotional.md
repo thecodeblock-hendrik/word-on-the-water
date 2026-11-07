@@ -5,7 +5,7 @@
 # Check your work with: pnpm check:devotionals (in apps/web).
 title: Two to six words
 publishAt: 2026-12-12 # YYYY-MM-DD. The devotional appears on the site from this day.
-author: Hendrik
+author: H
 series: advent
 seriesNumber: 2 # 1 for the first in the series
 passages: ["Luke 1:5–25"] # main passages, shown in the surf report panel

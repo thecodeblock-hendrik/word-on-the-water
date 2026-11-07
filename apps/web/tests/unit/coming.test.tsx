@@ -66,6 +66,8 @@ describe("Coming", () => {
     ).toBeInTheDocument();
     expect(preview).toHaveTextContent(formatDate(devotional.meta.publishAt));
     expect(preview).toHaveTextContent(`by ${devotional.meta.author}`);
+    expect(preview).toHaveTextContent("by H");
+    expect(preview).not.toHaveTextContent("Hendrik");
     const firstParagraph = devotional.sections[0].markdown.split("\n\n")[0];
     expect(preview).toHaveTextContent(firstParagraph);
   });
