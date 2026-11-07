@@ -4,79 +4,78 @@ import { useRouter } from "next/navigation";
 import { Dialog } from "radix-ui";
 import { useEffect, useRef, useState } from "react";
 
-import { PickBook } from "@/components/bible/pick-book";
-import { PickChapter } from "@/components/bible/pick-chapter";
-import { PickVerses } from "@/components/bible/pick-verses";
-import { VersionList } from "@/components/bible/version-list";
+import {
+  BookList,
+  ChapterGrid,
+  VerseGrid,
+  verseHint,
+  VersionSegments,
+} from "@/components/bible/picker-parts";
+import { usePassagePicker } from "@/components/bible/use-passage-picker";
 import { buttonClasses } from "@/components/ui/button";
 import { findBook } from "@/lib/bible/books";
-import {
-  chooseBook,
-  chooseChapter,
-  chooseVersion,
-  type PickerState,
-  readHref,
-  type Step,
-  STEPS,
-} from "@/lib/bible/picker";
+import type { PickerState } from "@/lib/bible/picker";
 import { passageTitle } from "@/lib/bible/reference";
-import { VERSIONS } from "@/lib/bible/versions";
+import { findVersion } from "@/lib/bible/versions";
 
-const LABELS: Record<Step, string> = {
-  bible: "Bible",
-  book: "Book",
-  chapter: "Chapter",
-  verses: "Verses",
-};
+type Tab = "book" | "chapter" | "verses";
+const TABS: { id: Tab; label: string }[] = [
+  { id: "book", label: "Book" },
+  { id: "chapter", label: "Chapter" },
+  { id: "verses", label: "Verses" },
+];
 
-const heading =
-  "mb-4 font-display text-[1.3rem] font-semibold uppercase tracking-[.06em] text-ink outline-none";
+const verseValue = (from: number | null, to: number | null) =>
+  from === null || to === null ? "All" : from === to ? `${from}` : `${from}–${to}`;
 
 /**
- * Full-screen picker for phones and tablets: Bible, Book, Chapter, Verses. Each choice moves on to
- * the next step; any step can be revisited; Read opens the passage. Unfinished choices are dropped
- * when it closes.
+ * The picker below lg: a bottom sheet with Book, Chapter and Verses tabs that show what is chosen.
+ * Choosing a book or chapter moves to the next tab; any tab can be tapped. Nothing changes until
+ * Read, and unfinished choices are dropped when it closes.
  */
 export function PassageSheet({ state: current }: { state: PickerState }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<Step>("book");
-  const [state, setState] = useState(current);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const [tab, setTab] = useState<Tab>("book");
+  const picker = usePassagePicker(current);
+  const tabButtons = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
   const moved = useRef(false);
-
-  // After a step change (not on opening) put focus on the new heading, so a screen reader says where it is.
-  useEffect(() => {
-    if (moved.current) headingRef.current?.focus();
-  }, [step]);
-
-  const book = findBook(state.book)!;
-  const shown = findBook(current.book)!;
+  const { state, book } = picker;
   const title = passageTitle(
-    shown,
+    findBook(current.book)!,
     current.chapter,
     current.from === null || current.to === null ? null : { from: current.from, to: current.to },
   );
 
+  // After a tab change (not on opening) focus the new tab, so a screen reader says where it is.
+  useEffect(() => {
+    if (moved.current) tabButtons.current[tab]?.focus();
+  }, [tab]);
+
+  function go(next: Tab) {
+    moved.current = true;
+    setTab(next);
+  }
+
   function onOpenChange(next: boolean) {
     setOpen(next);
     if (next) {
-      setState(current);
-      setStep("book");
+      picker.reset();
+      setTab("book");
       moved.current = false;
     }
   }
 
-  function next(to: Step, update: PickerState) {
-    moved.current = true;
-    setState(update);
-    setStep(to);
-  }
-
   function read() {
     setOpen(false);
-    router.push(readHref(state));
+    router.push(picker.href);
   }
+
+  const values: Record<Tab, string> = {
+    book: book.name,
+    chapter: `${state.chapter}`,
+    verses: verseValue(state.from, state.to),
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -90,11 +89,22 @@ export function PassageSheet({ state: current }: { state: PickerState }) {
         </svg>
       </Dialog.Trigger>
       <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-deep/60" />
         <Dialog.Content
           aria-describedby={undefined}
-          className="fixed inset-0 z-50 grid grid-rows-[auto_auto_minmax(0,1fr)] bg-bg pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] md:left-1/2 md:right-auto md:w-[34rem] md:-translate-x-1/2 md:border-x md:border-line"
+          className="fixed inset-x-0 bottom-0 top-[max(2.5rem,env(safe-area-inset-top))] z-50 flex flex-col overflow-hidden rounded-t-2xl bg-bg shadow-menu md:left-1/2 md:right-auto md:w-[34rem] md:-translate-x-1/2 md:border-x md:border-line"
         >
-          <div className="flex items-center gap-3 border-b border-line px-4 py-2">
+          <div
+            aria-hidden="true"
+            className="mx-auto mt-2 h-1.5 w-10 flex-none rounded-full bg-line"
+          />
+          <div className="flex items-center gap-3 px-3 pb-2 pt-1">
+            <Dialog.Title className="sr-only">Choose passage</Dialog.Title>
+            <VersionSegments
+              value={state.version}
+              onChange={picker.chooseVersion}
+              className="flex-1"
+            />
             <Dialog.Close
               aria-label="Close"
               className="inline-flex size-11 flex-none items-center justify-center rounded-sm border-[1.5px] border-line text-ink"
@@ -108,84 +118,87 @@ export function PassageSheet({ state: current }: { state: PickerState }) {
                 />
               </svg>
             </Dialog.Close>
-            <Dialog.Title className="flex-1 font-ui text-[17px] font-semibold text-ink">
-              Choose passage
-            </Dialog.Title>
-            <button type="button" onClick={read} className={buttonClasses("primary")}>
-              Read
-            </button>
           </div>
 
-          <nav aria-label="Steps" className="border-b border-line">
-            <ol className="m-0 flex list-none p-0">
-              {STEPS.map((s, i) => (
-                <li key={s} className="flex-1">
-                  <button
-                    type="button"
-                    aria-current={s === step ? "step" : undefined}
-                    onClick={() => {
-                      moved.current = true;
-                      setStep(s);
-                    }}
-                    className="min-h-11 w-full border-b-[3px] border-transparent px-1 font-ui text-[14px] font-semibold text-muted aria-[current=step]:border-accent aria-[current=step]:text-ink"
-                  >
-                    {i + 1} {LABELS[s]}
-                    {i < STEPS.indexOf(step) && (
-                      <span aria-hidden="true" className="text-accent-ink">
-                        {" "}
-                        ✓
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <div role="tablist" aria-label="Passage" className="flex border-b border-line">
+            {TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                ref={(el) => {
+                  tabButtons.current[id] = el;
+                }}
+                type="button"
+                role="tab"
+                aria-selected={tab === id}
+                onClick={() => go(id)}
+                className="flex min-h-14 flex-1 flex-col items-center justify-center border-b-[3px] border-transparent px-1 font-ui text-[17px] font-bold text-ink aria-selected:border-accent"
+              >
+                <span className="text-xs font-normal text-muted">{label}</span>{" "}
+                <span className="max-w-full truncate">{values[id]}</span>
+              </button>
+            ))}
+          </div>
 
-          <div data-scroll className="overflow-y-auto p-4">
-            {step === "bible" && (
+          <div role="tabpanel" className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-3">
+            {tab === "book" && (
+              <BookList
+                fluid
+                value={state.book}
+                query={picker.query}
+                onQuery={picker.setQuery}
+                onChoose={(slug) => {
+                  picker.chooseBook(slug);
+                  go("chapter");
+                }}
+              />
+            )}
+            {tab === "chapter" && (
+              <ChapterGrid
+                fluid
+                value={state.chapter}
+                pages={picker.pages}
+                pageIndex={picker.pageIndex}
+                onPage={picker.setPage}
+                onChoose={(chapter) => {
+                  picker.chooseChapter(chapter);
+                  go("verses");
+                }}
+              />
+            )}
+            {tab === "verses" && (
               <>
-                <h2 ref={headingRef} tabIndex={-1} className={heading}>
-                  Choose a Bible
-                </h2>
-                <VersionList
-                  versions={VERSIONS}
-                  value={state.version}
-                  onChange={(id) => next("book", chooseVersion(state, id))}
+                <VerseGrid
+                  fluid
+                  last={picker.lastVerse}
+                  from={state.from}
+                  to={state.to}
+                  onPick={picker.clickVerse}
                 />
+                <p aria-live="polite" className="mb-3 mt-3 font-ui text-[13px] text-muted">
+                  {verseHint(picker.anchor, "Tap")}
+                </p>
               </>
             )}
-            {step === "book" && (
-              <>
-                <h2 ref={headingRef} tabIndex={-1} className={heading}>
-                  Choose a book
-                </h2>
-                <PickBook
-                  value={state.book}
-                  onChange={(slug) => next("chapter", chooseBook(state, slug))}
-                />
-              </>
-            )}
-            {step === "chapter" && (
-              <>
-                <h2 ref={headingRef} tabIndex={-1} className={heading}>
-                  Choose a chapter in {book.name}
-                </h2>
-                <PickChapter
-                  book={book}
-                  value={state.chapter}
-                  onChange={(chapter) => next("verses", chooseChapter(state, chapter))}
-                />
-              </>
-            )}
-            {step === "verses" && (
-              <>
-                <h2 ref={headingRef} tabIndex={-1} className={heading}>
-                  Choose verses
-                </h2>
-                <PickVerses book={book} state={state} onChange={setState} />
-              </>
-            )}
+          </div>
+
+          <div className="grid gap-2 border-t border-line bg-surface px-3 pb-[max(.875rem,env(safe-area-inset-bottom))] pt-2.5">
+            <output className="font-ui text-[14px] text-muted">
+              Reading <b className="font-semibold text-ink">{picker.title}</b> in the{" "}
+              {findVersion(state.version)?.short}
+            </output>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                aria-pressed={state.from === null}
+                onClick={picker.wholeChapter}
+                className="min-h-11 whitespace-nowrap rounded-sm border-[1.5px] border-line bg-bg px-4 font-ui text-[15px] font-semibold text-ink aria-pressed:border-ink"
+              >
+                Whole chapter
+              </button>
+              <button type="button" onClick={read} className={`${buttonClasses("primary")} flex-1`}>
+                Read
+              </button>
+            </div>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

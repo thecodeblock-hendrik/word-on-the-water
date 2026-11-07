@@ -4,67 +4,77 @@ import { expect, type Page, test } from "@playwright/test";
 const start = "/bible/bsb/john/3";
 const trigger = (page: Page, name: RegExp = /Change passage/) => page.getByRole("button", { name });
 
-async function pickLabelled(page: Page, name: string) {
-  await page.getByRole("button", { name, exact: true }).click();
-}
-
 test.describe("passage sheet (below 1024px)", () => {
   test.skip(
     ({ viewport }) => (viewport?.width ?? 0) >= 1024,
-    "the desktop column replaces the sheet",
+    "the desktop popover replaces the sheet",
   );
 
-  test("opens on the Book step with four steps", async ({ page }) => {
-    await page.goto(start);
+  test("opens on the Book tab, and the tabs show the current choice", async ({ page }) => {
+    await page.goto(`${start}?v=16-18`);
     await trigger(page).click();
     const sheet = page.getByRole("dialog", { name: "Choose passage" });
     await expect(sheet).toBeVisible();
-    await expect(sheet.getByRole("heading", { level: 2, name: "Choose a book" })).toBeVisible();
-    await expect(sheet.getByRole("navigation", { name: "Steps" }).getByRole("button")).toHaveCount(
-      4,
+    await expect(sheet.getByRole("tab", { name: "Book John" })).toHaveAttribute(
+      "aria-selected",
+      "true",
     );
+    await expect(sheet.getByRole("tab", { name: "Chapter 3" })).toBeVisible();
+    await expect(sheet.getByRole("tab", { name: "Verses 16–18" })).toBeVisible();
   });
 
-  test("choose WEB, John, chapter 3, verses 16 to 18, then Read", async ({ page }) => {
+  test("choose WEB, Romans, chapter 8, verses 28 to 30, then Read", async ({ page }) => {
     await page.goto("/bible/bsb/genesis/1");
     await trigger(page).click();
     const sheet = page.getByRole("dialog", { name: "Choose passage" });
 
-    await sheet.getByRole("button", { name: /^1 Bible/ }).click();
-    await sheet.getByRole("radio", { name: /World English Bible/ }).click();
-    await expect(sheet.getByRole("heading", { name: "Choose a book" })).toBeVisible();
-
-    await sheet.getByRole("button", { name: "John", exact: true }).click();
-    await expect(sheet.getByRole("heading", { name: "Choose a chapter in John" })).toBeVisible();
-    await sheet.getByRole("button", { name: "3", exact: true }).click();
-
-    await expect(sheet.getByRole("heading", { name: "Choose verses" })).toBeVisible();
-    await sheet.getByRole("radio", { name: /Some verses/ }).click();
-    const first = sheet.getByRole("group", { name: "First verse" });
-    const last = sheet.getByRole("group", { name: "Last verse" });
-    for (let i = 0; i < 15; i++)
-      await first.getByRole("button", { name: "Increase first verse" }).click();
-    for (let i = 0; i < 2; i++)
-      await last.getByRole("button", { name: "Increase last verse" }).click();
-    await expect(first.getByRole("status")).toHaveText("16");
-    await expect(last.getByRole("status")).toHaveText("18");
+    await sheet.getByRole("radio", { name: "WEB" }).check({ force: true });
+    await sheet.getByRole("button", { name: "Romans", exact: true }).click();
+    await expect(sheet.getByRole("tab", { name: "Chapter 1" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await sheet.getByRole("button", { name: "Chapter 8" }).click();
+    await expect(sheet.getByRole("tab", { name: /^Verses/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await sheet.getByRole("button", { name: "Verse 28" }).click();
+    await sheet.getByRole("button", { name: "Verse 30" }).click();
+    await expect(sheet.getByRole("tab", { name: "Verses 28–30" })).toBeVisible();
 
     await sheet.getByRole("button", { name: "Read" }).click();
-    await expect(page).toHaveURL("/bible/web/john/3?v=16-18");
-    await expect(page.getByRole("heading", { level: 1, name: "John 3:16–18" })).toBeVisible();
-    await expect(page.getByText("his only born Son")).toBeVisible();
+    await expect(page).toHaveURL("/bible/web/romans/8?v=28-30");
+    await expect(page.getByRole("heading", { level: 1, name: "Romans 8:28–30" })).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(trigger(page, /Change passage: John 3:16–18/)).toBeVisible();
   });
 
-  test("a whole chapter in another book: Psalms, chapter 119", async ({ page }) => {
+  test("one verse, and the whole chapter after choosing verses", async ({ page }) => {
     await page.goto(start);
     await trigger(page).click();
-    await pickLabelled(page, "Psalms");
-    await page.getByRole("button", { name: "119", exact: true }).click();
-    await page.getByRole("button", { name: "Read" }).click();
+    const sheet = page.getByRole("dialog");
+    await sheet.getByRole("tab", { name: /^Verses/ }).click();
+    await sheet.getByRole("button", { name: "Verse 16" }).click();
+    await sheet.getByRole("button", { name: "Verse 16" }).click();
+    await sheet.getByRole("button", { name: "Read" }).click();
+    await expect(page).toHaveURL(`${start}?v=16`);
+    await trigger(page).click();
+    await sheet.getByRole("button", { name: "Whole chapter" }).click();
+    await sheet.getByRole("button", { name: "Read" }).click();
+    await expect(page).toHaveURL(start);
+  });
+
+  test("a long book: Psalms 119 through the page tabs", async ({ page }) => {
+    await page.goto(start);
+    await trigger(page).click();
+    const sheet = page.getByRole("dialog");
+    await sheet.getByRole("searchbox", { name: "Find a book" }).fill("psa");
+    await sheet.getByRole("button", { name: "Psalms", exact: true }).click();
+    await sheet.getByRole("tab", { name: "101 to 125" }).click();
+    await sheet.getByRole("button", { name: "Chapter 119" }).click();
+    await sheet.getByRole("button", { name: "Whole chapter" }).click();
+    await sheet.getByRole("button", { name: "Read" }).click();
     await expect(page).toHaveURL("/bible/bsb/psalms/119");
-    await expect(page.getByRole("heading", { level: 1, name: "Psalms 119" })).toBeVisible();
   });
 
   test("Escape closes the sheet, changes nothing and returns focus to the trigger", async ({
@@ -72,7 +82,7 @@ test.describe("passage sheet (below 1024px)", () => {
   }) => {
     await page.goto(start);
     await trigger(page).click();
-    await pickLabelled(page, "Romans");
+    await page.getByRole("dialog").getByRole("button", { name: "Romans", exact: true }).click();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page).toHaveURL(start);
@@ -89,45 +99,46 @@ test.describe("passage sheet (below 1024px)", () => {
     }
   });
 
-  test("every control in every step is at least 44px", async ({ page }) => {
-    await page.goto(start);
+  test("every control in every tab is at least 44px and the footer stays in view", async ({
+    page,
+  }) => {
+    await page.goto(`${start}?v=16-18`);
     await trigger(page).click();
     const sheet = page.getByRole("dialog");
     const tooSmall = async () => {
-      const sizes = await sheet.locator("button:visible, label:visible").evaluateAll((els) =>
-        els.map((el) => ({
-          name: el.textContent?.trim().slice(0, 20),
-          h: el.getBoundingClientRect().height,
-        })),
-      );
+      const sizes = await sheet
+        .locator("button:visible, label:visible, input[type=search]:visible")
+        .evaluateAll((els) =>
+          els.map((el) => ({
+            name: el.textContent?.trim().slice(0, 20),
+            h: el.getBoundingClientRect().height,
+          })),
+        );
       expect(sizes.length, "checked some controls").toBeGreaterThan(3);
       return sizes.filter(({ h }) => h < 43.5).map(({ name }) => name);
     };
-    expect(await tooSmall(), "book step").toEqual([]);
-    await sheet.getByRole("button", { name: /^3 Chapter/ }).click();
-    expect(await tooSmall(), "chapter step").toEqual([]);
-    await sheet.getByRole("button", { name: /^4 Verses/ }).click();
-    await sheet.getByRole("radio", { name: /Some verses/ }).click();
-    expect(await tooSmall(), "verses step").toEqual([]);
-    await sheet.getByRole("button", { name: /^1 Bible/ }).click();
-    expect(await tooSmall(), "bible step").toEqual([]);
+    for (const tab of [/^Book/, /^Chapter/, /^Verses/]) {
+      await sheet.getByRole("tab", { name: tab }).click();
+      expect(await tooSmall(), String(tab)).toEqual([]);
+      await expect(sheet.getByRole("button", { name: "Read" })).toBeInViewport();
+    }
   });
 
-  test("no sideways scrolling in any step, even the 150-chapter Psalms grid", async ({ page }) => {
-    await page.goto(start);
+  test("no sideways scrolling in any tab, even for Psalm 119", async ({ page }) => {
+    await page.goto("/bible/bsb/psalms/119?v=1-3");
     await trigger(page).click();
     const sheet = page.getByRole("dialog");
-    const overflow = () =>
-      sheet.evaluate((el) => {
-        const panel = el.querySelector(".overflow-y-auto") ?? el;
+    for (const tab of [/^Book/, /^Chapter/, /^Verses/]) {
+      await sheet.getByRole("tab", { name: tab }).click();
+      const overflow = await sheet.evaluate((el) => {
+        const panel = el.querySelector("[role=tabpanel]") ?? el;
         return Math.max(el.scrollWidth - el.clientWidth, panel.scrollWidth - panel.clientWidth);
       });
-    expect(await overflow()).toBeLessThanOrEqual(0);
-    await sheet.getByRole("button", { name: "Psalms", exact: true }).click();
-    expect(await overflow()).toBeLessThanOrEqual(0);
+      expect(overflow, String(tab)).toBeLessThanOrEqual(0);
+    }
   });
 
-  test("no CSP violation and no serious axe problem on any step, in light and dark", async ({
+  test("no CSP violation and no serious axe problem on any tab, in light and dark", async ({
     page,
   }) => {
     const violations: string[] = [];
@@ -139,14 +150,14 @@ test.describe("passage sheet (below 1024px)", () => {
       await page.goto(`${start}?v=16-18`);
       await trigger(page).click();
       const sheet = page.getByRole("dialog");
-      for (const step of [/^1 Bible/, /^2 Book/, /^3 Chapter/, /^4 Verses/]) {
-        await sheet.getByRole("button", { name: step }).click();
+      for (const tab of [/^Book/, /^Chapter/, /^Verses/]) {
+        await sheet.getByRole("tab", { name: tab }).click();
         const { violations: found } = await new AxeBuilder({ page }).analyze();
         expect(
           found
             .filter((v) => v.impact === "serious" || v.impact === "critical")
             .map((v) => `${v.id} ${v.nodes[0]?.target}`),
-          `${scheme} ${step}`,
+          `${scheme} ${tab}`,
         ).toEqual([]);
       }
       await page.keyboard.press("Escape");
@@ -166,9 +177,10 @@ test.describe("tablet width on a desktop browser", () => {
     await expect(sheet).toBeVisible();
     const box = await sheet.boundingBox();
     expect(box!.width).toBeLessThan(800);
-    await pickLabelled(page, "Romans");
-    await page.getByRole("button", { name: "14", exact: true }).click();
-    await page.getByRole("button", { name: "Read" }).click();
+    await sheet.getByRole("button", { name: "Romans", exact: true }).click();
+    await sheet.getByRole("button", { name: "Chapter 14" }).click();
+    await sheet.getByRole("button", { name: "Whole chapter" }).click();
+    await sheet.getByRole("button", { name: "Read" }).click();
     await expect(page).toHaveURL("/bible/bsb/romans/14");
   });
 });

@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { findBook } from "@/lib/bible/books";
 import { lastVerseOf } from "@/lib/bible/counts";
 import {
-  chapterNumbers,
   chooseBook,
   chooseChapter,
   chooseVerses,
@@ -11,7 +10,6 @@ import {
   chapterPages,
   pickVerse,
   readHref,
-  STEPS,
   type PickerState,
 } from "@/lib/bible/picker";
 
@@ -31,21 +29,6 @@ describe("lastVerseOf", () => {
     expect(lastVerseOf("esv", john, 3)).toBe(36);
     expect(lastVerseOf("bsb", john, 99)).toBe(0);
     expect(lastVerseOf("bsb", john, 0)).toBe(0);
-  });
-});
-
-describe("STEPS", () => {
-  it("are Bible, Book, Chapter, Verses in that order", () => {
-    expect(STEPS).toEqual(["bible", "book", "chapter", "verses"]);
-  });
-});
-
-describe("chapterNumbers", () => {
-  it("has one number per chapter of the book", () => {
-    expect(chapterNumbers(findBook("john")!)).toHaveLength(21);
-    expect(chapterNumbers(findBook("john")!).slice(0, 3)).toEqual([1, 2, 3]);
-    expect(chapterNumbers(findBook("psalms")!)).toHaveLength(150);
-    expect(chapterNumbers(findBook("jude")!)).toEqual([1]);
   });
 });
 

@@ -2,10 +2,6 @@ import { type Book, findBook, hasChapter } from "./books.ts";
 import { lastVerseOf } from "./counts.ts";
 import { findVersion } from "./versions.ts";
 
-/** The order of the steps in the picker. */
-export const STEPS = ["bible", "book", "chapter", "verses"] as const;
-export type Step = (typeof STEPS)[number];
-
 export type PickerState = {
   version: string;
   book: string;
@@ -14,9 +10,6 @@ export type PickerState = {
   from: number | null;
   to: number | null;
 };
-
-export const chapterNumbers = (book: Book): number[] =>
-  Array.from({ length: book.chapters }, (_, i) => i + 1);
 
 /** Changing the Bible keeps the passage. Unknown and disabled versions are ignored. */
 export function chooseVersion(state: PickerState, id: string): PickerState {
