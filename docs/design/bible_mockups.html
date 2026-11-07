@@ -53,10 +53,25 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
 .side{width:300px;border-right:1px solid var(--line);overflow:auto;background:var(--surface)}
 .main{flex:1;overflow:auto;display:flex;flex-direction:column}
 .cols{display:flex;flex:1;min-height:0}
-.nav{display:flex;gap:18px;font:600 15px system-ui}
+.nav{display:flex;gap:14px;font-size:14px;font:600 15px system-ui}
 .chapters{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:6px 16px 16px}
 .chapters span{min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;font-weight:600;background:var(--bg)}
 .chapters .on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ver{min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:0 12px;font:700 15px system-ui;display:inline-flex;align-items:center;gap:6px}
+.opt{display:flex;gap:12px;align-items:flex-start;margin:10px 12px;padding:14px;border:2px solid var(--line);border-radius:12px;background:var(--surface);min-height:64px}
+.opt .dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);margin-top:2px}
+.opt.on{border-color:var(--accent);background:var(--hl)}
+.opt.on .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.opt.off{opacity:.65;border-style:dashed}
+.opt b{display:block;font-size:17px}.opt small{display:block;color:var(--muted);font-size:14px;line-height:1.4}
+.opt .tag{margin-left:auto;font:700 12px system-ui;border:1px solid var(--line);border-radius:99px;padding:2px 8px;color:var(--muted);white-space:nowrap}
+.scrim{position:absolute;inset:0;background:rgba(10,24,37,.55)}
+.bsheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:20px 20px 0 0;padding:8px 0 20px;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 8px}
+.seg{display:flex;margin:12px 16px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+.seg span{flex:1;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;font:700 14px system-ui}
+.seg .on{background:var(--accent);color:#fff}
+.seg .off{color:var(--muted);text-decoration:none;opacity:.7}
 .arrow-side{display:flex;justify-content:space-between;padding:12px 24px}
 </style>
 </head>
@@ -70,19 +85,55 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
 <div class="phone">
   <div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
   <div class="ref">
-    <button class="btn">John 3 <span class="chip">ESV</span> <span>▾</span></button>
+    <button class="btn">John 3 <span>▾</span></button>
+    <button class="ver" aria-label="Bible version: BSB. Change">BSB <span>▾</span></button>
   </div>
   <div class="read">
     <h2>John 3</h2>
-    <div class="range"><span>Tap a verse number to select a range</span></div>
     <h3>You Must Be Born Again</h3>
-    <p><sup>1</sup>Now there was a man of the Pharisees named Nicodemus, a ruler of the Jews. <sup>2</sup>This man came to Jesus by night and said to him, “Rabbi, we know that you are a teacher come from God…”</p>
-    <p><sup>16</sup>“For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life. (ESV)</p>
+    <p><sup>1</sup>Now there was a Pharisee, a man named Nicodemus, who was a ruler of the Jews. <sup>2</sup>He came to Jesus at night and said, “Rabbi, we know that You are a teacher come from God…”</p>
+    <p><sup>16</sup>For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish but have eternal life.</p>
   </div>
-  <div class="legal">Scripture quotations are from the ESV® Bible, © 2001 by Crossway. <a href="#">www.esv.org</a></div>
+  <div class="legal">Berean Standard Bible (BSB), public domain.</div>
   <div class="bar"><button class="btn" aria-label="Previous chapter">← John 2</button><button class="btn primary" aria-label="Next chapter">John 4 →</button></div>
 </div>
-<figcaption><b>1. Reader, mobile.</b> One tap on the reference opens the picker. Previous and next chapter sit at the bottom, in thumb reach, with the target named. Swipe left and right does the same (and the buttons stay for accessibility).</figcaption>
+<figcaption><b>1. Reader, mobile (BSB).</b> Two controls under the header: the reference (opens the picker) and the version chip (opens the quick-switch sheet, mockup 3). Text shown is illustrative. Previous and next chapter sit at the bottom, in thumb reach, with the target named. Swipe left and right does the same (and the buttons stay for accessibility).</figcaption>
+</figure>
+
+<figure>
+<div class="phone">
+  <div class="top"><span class="logo">WORD ON THE WATER</span></div>
+  <div class="sheet" style="top:57px">
+    <header><button class="btn" aria-label="Close">✕</button><strong>Choose passage</strong><button class="btn primary">Read</button></header>
+    <div class="steps"><span class="on">1 Bible</span><span>2 Book</span><span>3 Chapter</span><span>4 Verses</span></div>
+    <div role="radiogroup" aria-label="Bible version">
+      <div class="opt on" role="radio" aria-checked="true"><span class="dot"></span><span><b>Berean Standard Bible (BSB)</b><small>Modern English, easy to read. Public domain.</small></span><span class="tag">Selected</span></div>
+      <div class="opt" role="radio" aria-checked="false"><span class="dot"></span><span><b>World English Bible (WEB)</b><small>Modern English, classic style. Public domain.</small></span></div>
+      <div class="opt off" role="radio" aria-checked="false" aria-disabled="true"><span class="dot"></span><span><b>English Standard Version (ESV)</b><small>Not available yet. We are waiting for approval.</small></span><span class="tag">Coming soon</span></div>
+    </div>
+    <p style="margin:12px 16px;font-size:13px;color:var(--muted)">Your place is kept when you change Bible.</p>
+  </div>
+</div>
+<figcaption><b>2. Version picker (step 1).</b> Large radio cards, one selected, with a name, a plain-language line and the licence. The selected card has a filled dot and a "Selected" tag, so it never relies on colour alone. The ESV stays visible but disabled with "Coming soon" until it is approved.</figcaption>
+</figure>
+
+<figure>
+<div class="phone">
+  <div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
+  <div class="ref"><button class="btn">John 3 <span>▾</span></button><button class="ver">BSB <span>▾</span></button></div>
+  <div class="read"><h2>John 3</h2><p><sup>1</sup>Now there was a Pharisee, a man named Nicodemus, who was a ruler of the Jews.</p></div>
+  <div class="scrim"></div>
+  <div class="bsheet" role="dialog" aria-label="Choose Bible">
+    <div class="grab"></div>
+    <div style="display:flex;align-items:center;padding:0 12px"><strong style="flex:1;font-size:17px">Choose Bible</strong><button class="btn" aria-label="Close">✕</button></div>
+    <div role="radiogroup" aria-label="Bible version">
+      <div class="opt on" role="radio" aria-checked="true" style="min-height:56px"><span class="dot"></span><span><b>BSB</b><small>Berean Standard Bible</small></span><span class="tag">Selected</span></div>
+      <div class="opt" role="radio" aria-checked="false" style="min-height:56px"><span class="dot"></span><span><b>WEB</b><small>World English Bible</small></span></div>
+      <div class="opt off" role="radio" aria-checked="false" aria-disabled="true" style="min-height:56px"><span class="dot"></span><span><b>ESV</b><small>English Standard Version</small></span><span class="tag">Coming soon</span></div>
+    </div>
+  </div>
+</div>
+<figcaption><b>3. Quick switch (mobile bottom sheet).</b> Opened by the version chip. It sits at the bottom, in thumb reach, with a drag handle, a close button, a dimmed background, Escape to close and focus kept inside. Choosing a version reloads the same passage in that version.</figcaption>
 </figure>
 
 <figure>
@@ -91,7 +142,7 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
   <div class="sheet" style="top:57px">
     <header><button class="btn" aria-label="Close">✕</button><strong>Choose passage</strong><button class="btn primary">Read</button></header>
     <div class="steps"><span class="done">1 Bible ✓</span><span class="on">2 Book</span><span>3 Chapter</span><span>4 Verses</span></div>
-    <div class="card" style="margin:12px">ESV · English Standard Version <small style="color:var(--muted)"><br>More Bibles may be added later.</small></div>
+    <div class="card" style="margin:12px">Bible: <b>BSB</b> <small style="color:var(--muted)">· Berean Standard Bible</small></div>
     <div class="sub">Old Testament</div>
     <div class="list">
       <div>Genesis <small>50</small></div><div>Exodus <small>40</small></div><div>Psalms <small>150</small></div>
@@ -102,7 +153,7 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
     </div>
   </div>
 </div>
-<figcaption><b>2. Picker, step 2 (book).</b> A single full-screen sheet with four steps: Bible, Book, Chapter, Verses. Steps already chosen show a tick and can be tapped to go back. Books are grouped Old and New Testament, with a chapter count. Only the ESV is offered today, so step 1 is pre-selected and collapsed.</figcaption>
+<figcaption><b>4. Picker, step 2 (book).</b> A single full-screen sheet with four steps: Bible, Book, Chapter, Verses. Steps already chosen show a tick and can be tapped to go back. Books are grouped Old and New Testament, with a chapter count. The chosen Bible shows as a tick in step 1.</figcaption>
 </figure>
 
 <figure>
@@ -123,13 +174,13 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
     </div>
   </div>
 </div>
-<figcaption><b>3. Picker, steps 3 and 4.</b> Chapters are a 5-column grid of 44px buttons. Verses are optional: a from/to pair of steppers, so a range needs no typing. "Read" is always visible at the top right.</figcaption>
+<figcaption><b>5. Picker, steps 3 and 4.</b> Chapters are a 5-column grid of 44px buttons. Verses are optional: a from/to pair of steppers, so a range needs no typing. "Read" is always visible at the top right.</figcaption>
 </figure>
 
 <figure>
 <div class="phone night">
   <div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Menu">☰</button></div>
-  <div class="ref"><button class="btn">John 3:16–18 <span class="chip">ESV</span> <span>▾</span></button></div>
+  <div class="ref"><button class="btn">John 3:16–18 <span>▾</span></button><button class="ver">ESV <span>▾</span></button></div>
   <div class="read">
     <h2>John 3:16–18</h2>
     <div class="range"><span>Verses 16 to 18</span><a href="#">Show full chapter</a></div>
@@ -140,7 +191,23 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
   <div class="legal">Scripture quotations are from the ESV® Bible, © 2001 by Crossway. <a href="#">www.esv.org</a></div>
   <div class="bar"><button class="btn">← John 2</button><button class="btn primary">John 4 →</button></div>
 </div>
-<figcaption><b>4. Verse range, dark theme.</b> The heading shows the exact range and a one-tap "Show full chapter". Selected verses are tinted, never colour alone: the heading also states the range. Omitted text is marked with an ellipsis, as the ESV terms require.</figcaption>
+<figcaption><b>6. Verse range, dark theme (ESV, once approved).</b> The heading shows the exact range and a one-tap "Show full chapter". Selected verses are tinted, never colour alone: the heading also states the range. Omitted text is marked with an ellipsis, as the ESV terms require.</figcaption>
+</figure>
+
+<figure>
+<div class="phone">
+  <div class="top"><span class="logo">WORD ON THE WATER</span><button class="btn" aria-label="Close menu">✕</button></div>
+  <div class="sheet" style="top:57px">
+    <div class="list" style="padding-top:8px">
+      <div>About</div><div>Devotionals</div>
+      <div style="background:var(--hl);border-left:4px solid var(--accent)" aria-current="page">Bible <small style="color:var(--accent-ink);font-weight:700">Current page</small></div>
+      <div>Start here</div><div>What we believe</div><div>Prayer</div>
+    </div>
+    <div style="padding:16px"><button class="btn primary" style="width:100%">Get the devotional</button></div>
+    <div class="list"><div style="border-top:1px solid var(--line)">Theme <button class="btn" aria-label="Theme">◐ Light</button></div></div>
+  </div>
+</div>
+<figcaption><b>8. Mobile menu, open.</b> Bible sits after Devotionals. The current page has a tinted row, a left bar and the words "Current page" (set with <code>aria-current</code>), so it never relies on colour alone. The Get the devotional button and the Theme row keep their current places.</figcaption>
 </figure>
 
 </div>
@@ -148,11 +215,12 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
 <h1 style="margin-top:40px">Desktop</h1>
 <div class="desk">
   <div class="top"><span class="logo">WORD ON THE WATER</span>
-    <span class="nav"><span>About</span><span>Devotionals</span><span style="color:var(--accent-ink)">Bible</span><span>Prayer</span></span>
+    <span class="nav"><span>About</span><span>Devotionals</span><span style="color:var(--accent-ink);border-bottom:2px solid var(--accent)" aria-current="page">Bible</span><span>Start here</span><span>What we believe</span><span>Prayer</span></span>
     <button class="btn" aria-label="Theme">◐</button></div>
   <div class="cols">
     <aside class="side">
-      <div class="card" style="margin:12px 16px">Bible: <b>ESV</b> <span class="chip">English Standard Version</span></div>
+      <div class="sub">Bible</div>
+      <div class="seg" role="radiogroup" aria-label="Bible version"><span class="on" role="radio" aria-checked="true">BSB</span><span role="radio" aria-checked="false">WEB</span><span class="off" role="radio" aria-checked="false" aria-disabled="true">ESV soon</span></div>
       <div class="sub">Old Testament</div>
       <div class="list"><div>Genesis <small>50</small></div><div>Psalms <small>150</small></div><div>Isaiah <small>66</small></div></div>
       <div class="sub">New Testament</div>
@@ -161,18 +229,18 @@ figure{margin:0}figcaption{font-size:13px;color:#5c5e70;margin-top:8px;max-width
       <div class="chapters"><span>1</span><span>2</span><span class="on">3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
     </aside>
     <div class="main">
-      <div class="ref" style="justify-content:space-between"><b style="font-size:18px">John 3 <span class="chip">ESV</span></b>
+      <div class="ref" style="justify-content:space-between"><b style="font-size:18px">John 3 <span class="chip">BSB</span></b>
         <span style="display:flex;gap:8px;align-items:center;font-size:14px">Verses <button class="btn">1</button> to <button class="btn">36</button><button class="btn">Go</button></span></div>
       <div class="read" style="margin:0 auto;width:100%">
         <h3>You Must Be Born Again</h3>
-        <p><sup>1</sup>Now there was a man of the Pharisees named Nicodemus, a ruler of the Jews. <sup>2</sup>This man came to Jesus by night and said to him, “Rabbi, we know that you are a teacher come from God…”</p>
-        <p><sup>16</sup>“For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life. (ESV)</p>
+        <p><sup>1</sup>Now there was a Pharisee, a man named Nicodemus, who was a ruler of the Jews. <sup>2</sup>He came to Jesus at night and said, “Rabbi, we know that You are a teacher come from God…”</p>
+        <p><sup>16</sup>For God so loved the world that He gave His one and only Son, that everyone who believes in Him shall not perish but have eternal life.</p>
       </div>
       <div class="arrow-side"><button class="btn">← John 2</button><button class="btn primary">John 4 →</button></div>
-      <div class="legal">Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway… Users may not copy or download more than 500 verses of the ESV Bible or more than one half of any book of the ESV Bible. <a href="#">www.esv.org</a></div>
+      <div class="legal">Berean Standard Bible (BSB), public domain. On ESV pages this line is replaced by the full ESV notice and the www.esv.org link.</div>
     </div>
   </div>
 </div>
-<p class="lead" style="margin-top:8px"><b>5. Reader, desktop.</b> The picker is a permanent left column (book, then chapter), so nothing opens in a sheet. Keyboard: left and right arrow keys change chapter. The reading column stays at 62ch.</p>
+<p class="lead" style="margin-top:8px"><b>7. Reader, desktop.</b> The picker is a permanent left column with a segmented version control at the top, then book and chapter, so nothing opens in a sheet. Keyboard: left and right arrow keys change chapter. The reading column stays at 62ch.</p>
 </body>
 </html>

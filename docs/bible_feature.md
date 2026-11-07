@@ -1,12 +1,20 @@
 # Bible feature (read the Bible on the site)
 
-Plan for a simple in-site Bible reader: pick a Bible, a book, a chapter and optionally verses; previous and next chapter buttons on mobile. Text comes from the ESV API (Crossway) under its free terms.
+Plan for a simple in-site Bible reader: pick a Bible version, a book, a chapter and optionally verses; previous and next chapter buttons on mobile; a version picker.
 
-Mockups: [design/bible_mockups.html](design/bible_mockups.html) (mobile light and dark, picker steps, desktop). Open it in a browser.
+Bibles, in the order we build them:
 
-Sources: https://api.esv.org/ (terms), `/docs/`, `/docs/passage-text/`, `/docs/passage-html/`, `/docs/passage-search/`, `/docs/passage-audio/`. Read 2026-11-07. Crossway can change its terms: re-read the terms page before building and before launch.
+1. **BSB** (Berean Standard Bible): first and default. Public domain, stored on our side.
+2. **WEB** (World English Bible): second. Public domain, stored on our side.
+3. **ESV**: third, from the ESV API (Crossway) under its free terms. Waits for Crossway's approval of our API application (applied 2026-11-07).
 
-Status: blocked until Crossway approves the API application (applied 2026-11-07, approval pending). Do not start B1 or later until the key is issued. The mockups and this plan can still be reviewed. Fits Phase 1 after 1.3 (email sign-up) or as its own step; the site stays free ([site-is-free decision in CLAUDE.md](../CLAUDE.md)).
+BSB and WEB do not depend on the ESV approval, so the reader ships first with those two. The ESV appears in the version picker as "Coming soon" until its key is live.
+
+Mockups: [design/bible_mockups.html](design/bible_mockups.html) (mobile light and dark, version picker, picker steps, quick switch, open mobile menu, desktop). Open it in a browser.
+
+Sources read 2026-11-07: api.esv.org (terms and docs), crossway.org/permissions, berean.bible (downloads, licensing, terms), ebible.org/web and its details page, github.com/seven1m/open-bibles. Terms can change: re-read the relevant terms before building each source and before launch.
+
+The site stays free ([site-is-free decision in CLAUDE.md](../CLAUDE.md)).
 
 ---
 
@@ -14,239 +22,272 @@ Status: blocked until Crossway approves the API application (applied 2026-11-07,
 
 | Need | Answer |
 |---|---|
-| Choose a Bible | Picker step 1. Only the ESV today (the only one we hold terms for). The step exists so other Bibles can be added later without a redesign |
+| Choose a Bible | Version picker: BSB, WEB, ESV (coming soon). Step 1 of the picker, plus a one-tap version chip in the reader header that opens a quick-switch sheet |
 | Choose book, chapter, verses | Picker steps 2 to 4. Verses are optional (empty = whole chapter) |
 | Mobile | Previous and next chapter buttons at the bottom, in thumb reach, naming the target ("← John 2", "John 4 →"). Optional swipe |
-| Desktop | Permanent left column picker; left and right arrow keys change chapter |
-| Simple | One page, one URL per passage, no accounts, no search in the first release |
+| Desktop | Permanent left column picker with a version control at the top; left and right arrow keys change chapter |
+| Simple | One page, one URL per passage, no accounts, no search in the first release. One version at a time (no parallel view in the first release) |
 
 URLs (shareable, no JavaScript needed to read):
 
 ```
-/bible                      -> redirects to /bible/esv/john/1
-/bible/esv/john/3           whole chapter
-/bible/esv/john/3?v=16-18   verse range (one chapter only)
+/bible                          -> redirects to /bible/bsb/john/1
+/bible/bsb/john/3               whole chapter, BSB
+/bible/web/john/3?v=16-18       verse range (one chapter only), WEB
+/bible/esv/john/3               ESV (404 until the ESV is enabled)
 ```
+
+Changing the version keeps the book, chapter and verses: the link only swaps the version in the URL. If a verse does not exist in the other version (numbering differences), show the whole chapter.
 
 ---
 
-## 2. What the ESV API gives us
+## 2. The Bibles and their rules
 
-Base: `https://api.esv.org/v3/passage/`. Auth on every request: header `Authorization: Token <API_KEY>`. All endpoints take `q` (the passage).
+| | BSB | WEB | ESV |
+|---|---|---|---|
+| Licence | Public domain (CC0), dedicated 30 April 2023 | Public domain | Crossway free terms, non-commercial, API key |
+| Source | Our files (USFM from bereanbible.com) | Our files (USFM from eBible.org) | `api.esv.org` at request time |
+| Limits | None | None | 500 verses or half a book per page, API rate limits, 500-verse storage cap |
+| Notice | Suggested, not required: "The Holy Bible, Berean Standard Bible, BSB is produced in cooperation with Bible Hub, Discovery Bible, OpenBible.com, and the Berean Bible Translation Committee. This text of God's Word has been dedicated to the public domain." Verify the wording against berean.bible/terms.htm before use | None required. Say "World English Bible (WEB), public domain" | Full Crossway notice plus "(ESV)" per quotation and a link to www.esv.org (already in the footer) |
+| Name rule | Do not call a modified text "Berean". We do not modify it | "World English Bible" is a trademark of eBible.org: if we change the words, we may not call it the WEB. We do not modify the words | "ESV" and "English Standard Version" are Crossway trademarks |
+| Status | Build now | Build now | Blocked on API approval |
 
-| Endpoint | Use | Notes |
-|---|---|---|
-| `text/` | Plain text | JSON; verse numbers in square brackets |
-| `html/` | HTML | JSON; we use this one (see 4.2) |
-| `search/` | Word search | `q`, `page-size` (default 20, max 100), `page`. Returns `reference` and `content` per hit. Later |
-| `audio/` | MP3 | Redirects to an MP3 (follow redirects). Only `q`. Later; terms for audio are not stated, ask Crossway first |
-
-Passage query forms: `John 3`, `John 3:16-18`, `jn3.16`, `Genesis 1-3`, `43003016`, `01001001-01011032`, several with `;` or `,`.
-
-Response (both text and html):
-
-```
-{ "query", "canonical", "parsed": [[43003016, 43003018]],
-  "passage_meta": [{ "canonical", "chapter_start": [first, last verse id],
-                     "chapter_end": [first, last verse id],
-                     "prev_verse", "next_verse",
-                     "prev_chapter": [first, last], "next_chapter": [first, last] }],
-  "passages": ["..."] }
-```
-
-Verse ids are `BBCCCVVV` (book 43 = John, chapter 003, verse 016 is `43003016`). `prev_chapter` and `next_chapter` give the neighbouring chapter's first and last verse id, which is how the arrows can be checked against the API.
-
-Useful options on `html/` (default in brackets): `include-passage-references` (true), `include-verse-numbers` (true), `include-first-verse-numbers` (true), `include-headings` (true), `include-subheadings` (true), `include-footnotes` (true), `include-footnote-body` (true), `include-crossrefs` (false), `include-audio-link` (true), `include-short-copyright` (true), `include-copyright` (false, exclusive with the short one), `include-chapter-numbers` (true), `include-book-titles` (false), `include-verse-anchors` (false), `wrapping-div` (false), `div-classes` ("passage"), `paragraph-tag` ("p"), `include-surrounding-chapters` (false), `include-css-link` and `inline-styles` (false).
-
-HTML output (from the docs' example): `h2.extra_text` with the reference, `p` with `b.verse-num` (id like `v43011035-1`), poetry as indented lines, and a closing `(<a class="copyright" href="http://www.esv.org">ESV</a>)`.
-
-Not documented anywhere I could read: error codes and bodies, response size cap. Treat any non-200 as "unavailable" (see step 4).
+Showing other Bibles next to the ESV: none of the ESV pages I read (api.esv.org, crossway.org/permissions, esv.org terms and translation page) restrict other translations on the same site, page or app. The permissions page even gives notice wording for pages that quote several translations ("Unless otherwise indicated, all Scripture quotations are from the ESV..." or "Scripture quotations marked (ESV) are from..."). So a version picker is allowed on the face of the published terms. Points to keep in mind:
+- The ESV rules (limits, caching, notice) apply only to ESV pages. BSB and WEB pages are not limited by them.
+- The ESV pages do not say whether other translations on the same page count towards the 500-verse and 25% limits. That is why the first release shows one version per page. A parallel view (two versions side by side) needs a check with Crossway first.
+- The ESV is non-commercial only. That is already how the site works.
+- Because the footer carries the full ESV notice on every page, no extra notice is needed on BSB and WEB pages for compliance. We still show a short "Berean Standard Bible, public domain" credit line there, because it is clearer to readers.
+- This is my reading of the published text, not legal advice. If anything is unclear, ask Crossway (licensing@crossway.org).
 
 ---
 
-## 3. Rules we must follow (free terms)
+## 3. Public-domain data (BSB and WEB)
 
-The plan in section 5 turns each rule into a step and a test; section 6 is the per-PR check.
+Both are available as USFM zips. Neither site offers verse-per-row JSON or CSV, so we convert once, ourselves.
 
-| # | Rule (from api.esv.org terms) | What it means here |
+| | BSB | WEB |
 |---|---|---|
-| R1 | Non-commercial only: no charge for any part of the site, and no donations, advertising or sponsorship | Already true. Do not add any of these near the reader. Any change needs a Crossway license first |
-| R2 | At most 500 verses, or half a book (whichever is less), per query | We request one chapter at most. The longest chapter, Psalm 119, is 176 verses. Single and double-chapter books are exempt but we do not need that |
-| R3 | At most 500 verses or half a book on any page | One chapter or range per page. No "read the whole book" page, no multi-chapter ranges |
-| R4 | You may cache or store at most 500 verses locally; Crossway asks you to clear caches regularly | Cache only a small in-memory set (section 4.3). Never write ESV text to the database, the repo, a Next.js data cache on disk, Redis or a CDN |
-| R5 | Rate limits: 5,000 queries per day, 1,000 per hour, 60 per minute; beyond that the app is throttled | Small cache, a global budget counter and a friendly fallback (steps 4.4 and 4.5) |
-| R6 | Each quotation includes "ESV"; each page using the text links to www.esv.org; include the copyright notice sent with the text | Keep `include-short-copyright` on (adds "(ESV)"). The footer on every page carries the full notice and the esv.org link (already built) |
-| R7 | Do not alter the text. Headings, footnotes, cross-references and verse numbers may be omitted. Omitted parts of verses are marked with an ellipsis | We never edit words. Verse ranges show whole verses only. Our tooling only wraps and removes markup |
-| R8 | Never sell, share or publish the API key | Key only in a server-only module and a Sensitive Vercel variable. Never `NEXT_PUBLIC_`, never committed, never in a client bundle |
-| R9 | Users may not copy or download more than 500 verses or half a book | No "download", "print book" or "copy chapter" feature. Do not add bulk export |
-| R10 | The ESV text may not be quoted in a Creative Commons licensed publication and may not be translated | The repo has no license; do not add a CC license to pages that carry the ESV. No translation features |
-| R11 | Use must be consistent with historic Christian doctrine and the statement of faith; no illegal or immoral content on the site | Met by our statement of faith. Keep the Bible pages free of unrelated content |
-| R12 | Crossway may cancel access at any time; no uptime guarantee | The page degrades to a link to the passage on www.esv.org, never a blank page |
-| R13 | Licenses go to organisations, not individuals. Needed for uses beyond these terms | If we want offline use, a native app with a full Bible, other limits, or monetisation, apply at https://crosswaygnp.formstack.com/forms/esv_digital_licensing_proposal first |
+| Files | `https://bereanbible.com/bsb_usfm.zip` (also USX, USJ and plain text) | `https://eBible.org/Scriptures/eng-web_usfm.zip` (also USFX and HTML) |
+| Edition | BSB, "Current, updated to 3rd Printing" | Pick the 66-book "Update" edition (US spelling, uses LORD for God's name). The "Classic" default uses "Yahweh". Decision in step B2 |
 
-Also: the free terms cover personal, church and ministry use. Keep the footer notice exactly as in `apps/web/src/lib/scripture.ts`.
+Plan:
+- A build script `pnpm build:bible` parses USFM and writes one JSON file per chapter in a small structure of our own: `{ version, book, chapter, sections: [{ heading?, paragraphs: [{ poetry?: bool, verses: [{ n, text }] }] }] }`. Output goes to `apps/web/content/bibles/<version>/<book>/<chapter>.json`, committed to the repo (public domain, so committing is fine; the 500-verse storage cap applies only to the ESV).
+- The script is a repeatable, tested step. We never edit the words by hand.
+- A spike first (step B2): download both zips, parse one book, check headings, paragraph and poetry markup, footnote markers, and numbering differences between the two (Psalm titles, verse splits). Record findings in this file.
+- Read at request time on the server with `node:fs`, no database needed. Files are traced into the Vercel function via `outputFileTracingIncludes`. Size is roughly 4 to 5 MB of text per version; confirm in the spike.
+- Verse numbering: store the version's own numbering. The book data table (4.6) holds the ESV or KJV-style counts for the picker; per-version counts are read from the imported data, so each version's steppers are exact.
 
 ---
 
 ## 4. Design decisions
 
-### 4.1 Where the code runs
+### 4.1 One interface, three sources
 
-Next.js server calls the ESV API directly from a server-only module (`apps/web/src/lib/esv/`). The browser never sees the key and the API has no personal data to protect, so FastAPI is not involved (the BFF rule in CLAUDE.md is about our own API; there is nothing to store). Recommended for simplicity. The alternative, routing through FastAPI to reuse its Redis rate limiter, is listed in the open questions.
+```
+BibleSource.getPassage({ version, book, chapter, verses? }) -> Passage
+```
 
-### 4.2 HTML or text
+- `LocalSource` (BSB, WEB): reads the imported JSON.
+- `EsvSource` (ESV): calls the ESV API, sanitises, caches (section 5, step B7).
+- A version registry (`bible-versions.ts`): id, name, short name, source, notice, `enabled` flag. The ESV entry is `enabled: false` until step B7 is done and the key is live. The picker shows disabled versions as "Coming soon".
 
-Use `html/` and sanitise on the server. Reason: poetry, paragraphs, headings and verse ids come ready, so there is no custom parser for the text format. Request options: headings and verse numbers on; footnotes, cross-references and the audio link off (simple; omission is allowed by R7); short copyright on; `wrapping-div` on with class `passage`. Run the result through an allow-list sanitiser (tags `h2 h3 h4 p span b i sup br div a`, attributes `class id`, `href` only to `www.esv.org`), then render. Style with our own CSS using tokens (no `inline-styles`, because the CSP forbids inline styles).
+The reader renders one `Passage` shape regardless of source, so the UI has no ESV special cases except the notice.
 
-Each verse needs a tap target of at least 44px for selecting a range (optional step 5): the server wraps each verse in a `span` with a `data-verse` attribute while it already has the HTML.
+### 4.2 Where the ESV code runs
 
-### 4.3 Caching (R4)
+Next.js server directly, in an isolated `lib/esv/` module. It is a read-only third-party API with a server-held key and no visitor data, so a FastAPI hop adds a failure point and no security. If a native app is built (Phase 2 gate), move the ESV client behind FastAPI then.
 
-- In-memory LRU in the server module only. Cap: 400 verses in total (under the 500 limit), time to live 1 hour (so updates arrive), evicted by oldest use.
-- `fetch(..., { cache: "no-store" })` so the Next.js Data Cache never writes ESV text to disk.
-- No `Cache-Control: public` on pages that embed the text (pages are per request already, see ADR 0007).
-- Static data that is not ESV text is fine to store: the list of 66 books, names, slugs, chapter counts, verse counts per chapter.
+### 4.3 ESV details (applies to step B7 only)
 
-### 4.4 Rate limits (R5)
+Base `https://api.esv.org/v3/passage/`, header `Authorization: Token <API_KEY>`.
 
-- Global counters (not text) per minute, hour and day, kept in Upstash Redis. At 80% of any limit, serve only cached passages; at 100% show the fallback.
-- A Vercel Firewall rate-limit rule on `/bible/*` per IP so one visitor or bot cannot use the daily budget.
-- On a non-200 from the ESV or a refused call, show the fallback (4.5).
+| Endpoint | Use |
+|---|---|
+| `html/` | The one we use. JSON; `passages[0]` is HTML with `h2`, `p`, `b.verse-num` (id like `v43011035-1`), poetry, and a closing `(ESV)` link |
+| `text/` | Plain text; not used |
+| `search/` | Later: `q`, `page-size` (default 20, max 100), `page` |
+| `audio/` | Later: redirect to MP3; audio terms not stated, ask Crossway |
 
-### 4.5 Fallback (R12)
+Options: headings, subheadings and verse numbers on; footnotes, cross-references and the audio link off; `include-short-copyright` on (adds "(ESV)"); `wrapping-div` on. Response also has `canonical`, `parsed`, and `passage_meta` (`chapter_start`, `chapter_end`, `prev_chapter`, `next_chapter` as verse-id ranges; ids are `BBCCCVVV`). Error codes and body shapes are not documented: treat any non-200 as unavailable.
 
-"The ESV text is not available right now. Read John 3 on esv.org" linking to `https://www.esv.org/John+3/`. Same page layout, no blank state.
+Convert the sanitised HTML into our `Passage` shape so the reader renders it like the other two. Sanitise with an allow-list (tags `h2 h3 h4 p span b i sup br div a`, attributes `class id`, `href` only to `www.esv.org`); no `inline-styles` (the CSP forbids inline styles). Text is unaltered.
 
-### 4.6 Navigation data
+ESV rules (R-numbers are used in the plan below):
 
-A static table `bible-books.ts`: for each of the 66 books, the display name, URL slug, testament, chapter count, and verse count per chapter. The verse counts come from a public-domain source (for example the KJV versification), then a script spot-checks every chapter against `passage_meta.chapter_end` from the ESV and lists differences. Previous and next chapter come from this table (Genesis 1 has no previous, Revelation 22 has no next; the button is disabled). Never from scraping.
+| # | Rule |
+|---|---|
+| R1 | Non-commercial only: no charge, donations, advertising or sponsorship. A change needs a Crossway license first |
+| R2 | At most 500 verses or half a book (whichever is less) per query and per page: one chapter at most (Psalm 119 is 176 verses) |
+| R3 | Store or cache at most 500 verses locally; clear caches regularly. Cache in memory only (400 verses total, 1 hour), `fetch` with `cache: "no-store"`, never in the database, repo, Redis, disk or CDN |
+| R4 | Rate limits: 5,000 queries a day, 1,000 an hour, 60 a minute; beyond that the app is throttled |
+| R5 | Each quotation includes "ESV"; each page links to www.esv.org; the standard notice is on the site (the footer has it) |
+| R6 | Do not alter the words. Headings, footnotes, cross-references and verse numbers may be omitted. Omissions inside a verse are marked with an ellipsis |
+| R7 | Never publish the API key: server-only module, Sensitive Vercel variable, never `NEXT_PUBLIC_` |
+| R8 | No download or bulk copy feature (users may not copy more than 500 verses or half a book) |
+| R9 | No Creative Commons licence on pages carrying the ESV; no translation of the ESV |
+| R10 | Use consistent with historic Christian doctrine; nothing illegal or immoral on the site |
+| R11 | Crossway can cancel access and gives no uptime guarantee: the page degrades to a link to the passage on esv.org |
+| R12 | Licenses go to organisations. Offline use, a native app with the full text, or other limits need a license (https://crosswaygnp.formstack.com/forms/esv_digital_licensing_proposal) |
 
-### 4.7 Picker (see mockups 2 and 3)
+Rate protection: global counters (not text) per minute, hour and day in Upstash Redis; at 80% serve only cached passages; at 100% show the fallback. A Vercel Firewall rate-limit rule on `/bible/esv/*` per IP.
 
-- Mobile: one full-screen sheet (Radix Dialog), four steps shown as tabs: Bible, Book, Chapter, Verses. Done steps show a tick and can be tapped to go back. "Read" is always at the top right.
-- Desktop: permanent left column with the book list and chapter grid; verse from/to steppers above the text.
+Fallback: "The ESV text is not available right now. Read John 3 on esv.org", linking to `https://www.esv.org/John+3/`.
+
+### 4.4 Version picker (see mockups)
+
+Best-practice choices:
+- **Two places, one source of truth.** Step 1 of the picker lists the versions as large radio cards (name, one-line description, licence note). A chip in the reader header (`BSB ▾`) opens a quick-switch sheet for changing version without walking through the steps. Both use the same component.
+- **Radio semantics.** `role="radiogroup"`, one selected, arrow keys move, the selected card has a tick and a heading, not colour alone.
+- **Plain language.** "Berean Standard Bible (BSB), modern English, easy to read", "World English Bible (WEB), modern English, classic style", "English Standard Version (ESV), coming soon".
+- **Disabled state explained.** The ESV card is not hidden: it shows "Coming soon" with `aria-disabled`, so the plan is visible and nothing looks broken.
+- **Keeps your place.** Switching the version keeps book, chapter and verses (URL swap).
+- **Remembered.** The last chosen version is kept in `localStorage` as a convenience (the URL still decides what renders; no cookie banner needed).
+- **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same list as a segmented control or dropdown at the top of the left column.
+
+### 4.5 Reader
+
+Server component, per request (nonce CSP, ADR 0007). Lora body at 62ch, verse numbers as superscripts, headings in tokens, light and dark. 44px minimum targets, 8px gaps. Title `John 3 (BSB)`. A short credit line under the text: BSB or WEB credit, or the ESV notice (the footer carries the full ESV notice).
+
+### 4.6 Navigation data (no scripture text)
+
+A static table `bible-books.ts`: 66 books with display name, slug, testament and chapter count. Previous and next chapter come from it (Genesis 1 has no previous, Revelation 22 no next; the button is disabled). Verse counts per chapter come from the imported BSB and WEB data, and for the ESV from `passage_meta.chapter_end` once a chapter is fetched (a static fallback table from the KJV versification feeds the stepper before the first fetch).
+
+### 4.7 Picker
+
+- Mobile: one full-screen sheet (Radix Dialog), four steps as tabs: Bible, Book, Chapter, Verses. Done steps show a tick and can be tapped to go back. "Read" is always at the top right.
+- Desktop: permanent left column.
 - Verses use two numeric steppers, not free typing. Empty means the whole chapter.
-- 44px minimum targets, 8px gaps, labelled buttons, focus kept inside the sheet, closes on Escape, announces the new reference with `aria-live`.
-- Last position remembered in `localStorage` as a convenience only (the page works without it).
+- 44px minimum targets, focus trap, Escape closes, `aria-live` announces the new reference.
 
 ### 4.8 Previous and next
 
-- Bottom bar on mobile with two full-height buttons ("← John 2", "John 4 →"); they are links to the neighbouring chapter URL, so they work without JavaScript.
-- Desktop: the same links under the text, plus the left and right arrow keys (not while an input has focus).
-- Swipe left and right is optional polish: ignore horizontal swipes that start within 24px of the screen edge (iOS back gesture) and while text is being selected. The buttons stay either way.
+- Mobile bottom bar with two full-height buttons that are links to the neighbouring chapter URL (they work without JavaScript).
+- Desktop: links under the text and the left and right arrow keys (not while an input has focus).
+- Swipe is optional polish: ignore horizontal swipes starting within 24px of the screen edge (iOS back gesture) and while text is being selected.
 
 ---
 
 ## 5. Step-by-step plan
 
-One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](PLAN.md). Branch names of 36 characters or fewer. Tick a box when done and verified.
+One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](PLAN.md). Branch names of 36 characters or fewer. Tick a box when done and verified. Steps B0 to B6 and B8 to B9 need no ESV key; B7 does.
 
-### B0 Decisions and access
+### B0 Decisions
 
-- [ ] Crossway approves the API application and issues the key (applied; waiting). Everything after B0 waits for this
-- [ ] Re-read https://api.esv.org/ terms; note the date in this file
-- [ ] Create the ESV account and an API application at api.esv.org (needs a sign-in; Hendrik does this)
-- [ ] Decide the open questions in section 7
-- [ ] Add `ESV_API_KEY` as a Sensitive variable in Vercel (web project, Production and Preview), and to the local `.env` (not committed); add the name to `.env.example`; extend `src/lib/env.ts` (Zod) to require it only when the Bible feature is on
-- [ ] Write ADR 0009 "Bible text from the ESV API" (free terms, caching limit, no donations)
-- [ ] Add `BIBLE_ENABLED` feature flag (off by default)
+- [x] Bibles: BSB first, WEB second, ESV third (2026-11-07)
+- [x] ESV only through the API, called from the Next.js server; no footnotes or cross-references in the first release
+- [ ] Re-read berean.bible/terms.htm and the eBible WEB details page; confirm the notice wording; record the date here
+- [ ] Add the `BIBLE_ENABLED` feature flag (off by default)
+- [ ] Write ADR 0009 "Bible reader: public-domain texts in the repo, ESV from the API" (sources, ESV limits, no donations)
 
-### B1 Book data (no ESV text)
+### B1 Book data
 
-- [ ] Test: 66 books, correct chapter counts (Genesis 50, Psalms 150, Revelation 22, single-chapter books Obadiah, Philemon, 2 John, 3 John, Jude)
-- [ ] Add `bible-books.ts` (name, slug, testament, chapters, verses per chapter)
-- [ ] Helpers with tests: `findBook(slug)`, `neighbours(book, chapter)` (Gen 1 has no previous, Rev 22 no next, crosses books), `parseVerseRange("16-18")` (rejects 0, reversed, beyond the chapter, more than one chapter)
-- [ ] Script `pnpm check:bible-data` compares verse counts with the ESV `passage_meta` (run by hand, not in CI, so it costs no quota in CI); record any differences
+- [ ] Test: 66 books, correct chapter counts (Genesis 50, Psalms 150, Revelation 22; single-chapter books Obadiah, Philemon, 2 John, 3 John, Jude)
+- [ ] Add `bible-books.ts` (name, slug, testament, chapters)
+- [ ] Helpers with tests: `findBook(slug)`, `neighbours(book, chapter)` (Gen 1 no previous, Rev 22 no next, crosses books), `parseVerseRange("16-18")` (rejects 0, reversed, beyond the chapter, more than one chapter)
 
-### B2 ESV client (server-only)
+### B2 Import BSB and WEB (spike, then build)
 
-- [ ] Test with a fake server (never call the real API in tests): sends `Authorization: Token ...`, builds the query, maps response fields
-- [ ] Add `src/lib/esv/client.ts` with `import "server-only"`: `getPassage(book, chapter, verses?)` using `html/` and the options from 4.2, `cache: "no-store"`, timeout of 5 seconds
-- [ ] Refuse any request over one chapter (R2, R3) with a test
-- [ ] Test that the key never appears in logs or errors
-- [ ] Sanitiser with tests: strips `script`, event attributes, `style`, unknown tags, links not to esv.org; keeps headings, verse numbers, poetry and the "(ESV)" mark; text content is byte-for-byte unchanged (R7)
-- [ ] Wrap each verse in `span[data-verse]` (test with Psalm 23 and a poetry chapter)
+- [ ] Spike: download both USFM zips, parse John, report markup and numbering differences in this file; choose the WEB edition
+- [ ] Test the parser on small USFM samples (paragraphs, poetry, headings, footnote markers removed, verse numbers, ranges like `\v 3-4`)
+- [ ] Add `pnpm build:bible` writing `content/bibles/<version>/<book>/<chapter>.json`
+- [ ] Test on the output: all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
+- [ ] Commit the generated files; check repository size and function bundle size (`outputFileTracingIncludes`)
+- [ ] Add `bible-versions.ts` (registry with notice text and `enabled` flags: BSB and WEB on, ESV off)
 
-### B3 Cache and limits
+### B3 Source interface and local source
 
-- [ ] Test the LRU: never holds more than 400 verses, evicts oldest, expires after 1 hour
-- [ ] Add the in-memory cache (4.3)
-- [ ] Test the budget counters (60 per minute, 1,000 per hour, 5,000 per day) with a fake Redis; at 80% only cached passages are served
-- [ ] Add the counters (Upstash) and the fallback
-- [ ] Test: non-200, timeout and over-budget all return the fallback state, never throw
-- [ ] Vercel Firewall rate-limit rule on `/bible/*` (document the dashboard steps in the runbook; Hendrik applies it)
+- [ ] Test: `getPassage` returns the right verses for a chapter and for a range; a range outside the chapter is rejected; unknown version or book gives not found
+- [ ] Add `BibleSource` and `LocalSource` (server-only, reads the JSON)
+- [ ] Missing verse in another version falls back to the whole chapter (test)
 
 ### B4 Reader page
 
-- [ ] E2E (all projects): `/bible/esv/john/3` shows "John 3", verse 16, "(ESV)", and the footer notice and www.esv.org link; axe has no serious or critical issues
-- [ ] E2E: `/bible/esv/john/3?v=16-18` shows only 16 to 18 with the range in the heading and a "Show full chapter" link
-- [ ] E2E: bad input (`/bible/esv/nobook/1`, `john/99`, `?v=20-10`) gives 404 or a clear message, never a crash
+- [ ] E2E (all projects): `/bible/bsb/john/3` shows "John 3", verse 16, the BSB credit and the footer notice; axe has no serious or critical issues
+- [ ] E2E: `?v=16-18` shows only those verses with the range in the heading and a "Show full chapter" link
+- [ ] E2E: bad input (`/bible/bsb/nobook/1`, `john/99`, `?v=20-10`, `/bible/esv/john/3` while disabled) gives 404 or a clear message, never a crash
 - [ ] E2E: CSP holds (no inline style, no console violations)
-- [ ] Build `app/bible/[translation]/[book]/[chapter]/page.tsx` (server component) with `generateMetadata` (title "John 3 (ESV)", canonical URL); `/bible` redirects to `/bible/esv/john/1`
-- [ ] Reader typography: Lora body, 62ch measure, verse numbers as superscript, headings styled with tokens; light and dark checked at 375px first
-- [ ] Fallback component (4.5)
-- [ ] Footer notice visible on the page without scrolling past other content (the shared footer)
+- [ ] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL); `/bible` redirects to `/bible/bsb/john/1`
+- [ ] Typography per 4.5; screenshot at 375px first, then wider; light and dark
 
-### B5 Picker
+### B5 Pickers (version, book, chapter, verses)
 
-- [ ] Unit tests: steps and their order; picking a book resets the chapter; chapter grid has the right count; verse steppers stay in range; "Read" navigates to the right URL
-- [ ] Build the picker (mobile sheet, desktop column) per 4.7
-- [ ] E2E on iPhone SE, iPhone 13, Pixel 7: open, choose John, chapter 3, verses 16 to 18, read; targets at least 44px; focus trap and Escape work
-- [ ] Add "Bible" to `NAV_LINKS` (header and mobile menu) and the footer; update the nav tests
+- [ ] Unit tests: steps and their order; picking a version keeps the passage; picking a book resets the chapter; chapter grid has the right count; steppers stay in range; the disabled ESV card cannot be chosen; "Read" navigates to the right URL
+- [ ] Build the version picker (radio cards, step 1) and the quick-switch sheet from the header chip
+- [ ] Build the book, chapter and verse steps (mobile sheet, desktop column)
+- [ ] E2E on iPhone SE, iPhone 13, Pixel 7: open, choose WEB, John, chapter 3, verses 16 to 18, read; targets at least 44px; focus trap and Escape work; switching version keeps the passage
+- [ ] Remember the last version in `localStorage` (page works without it)
+- [ ] Add "Bible" to `NAV_LINKS` after "Devotionals" (shared by the desktop header and the mobile menu, see mockup 8) and the footer; mark it `aria-current="page"` on `/bible/...` (with a non-colour cue); update the nav tests
+- [ ] E2E: the header does not wrap at 1024px and 1100px with six links, the theme toggle and the CTA; if it does, shorten "What we believe" or move Bible beside the CTA
 
 ### B6 Previous and next
 
-- [ ] Unit tests for the neighbour links (including crossing from Malachi 4 to Matthew 1, and the disabled ends)
-- [ ] Bottom bar buttons on mobile, links under the text on desktop
-- [ ] E2E: on a phone viewport, tapping "John 4 →" opens John 4; on Genesis 1 the previous button is disabled
+- [ ] Unit tests for neighbour links (Malachi 4 to Matthew 1; disabled ends)
+- [ ] Mobile bottom bar, desktop links under the text
+- [ ] E2E: on a phone, tapping "John 4 →" opens John 4; on Genesis 1 the previous button is disabled
 - [ ] Arrow keys on desktop (E2E), ignored while typing in an input
 - [ ] Optional swipe (4.8), only if it tests cleanly on iOS Safari and Android Chrome
 
-### B7 Compliance gate (before it goes public)
+### B7 ESV source (blocked until Crossway approves the application)
 
-- [ ] Test: every Bible page contains "(ESV)", the esv.org link and the full notice
-- [ ] Test: no page can request more than one chapter; Psalm 119 renders in full
-- [ ] Test: nothing under `apps/web/content`, the database, `.next/cache` or any file contains ESV text produced by the feature (run the app, open 20 chapters, search the disk for a verse)
+- [ ] Crossway approves the API application and issues the key
+- [ ] Re-read https://api.esv.org/ terms; note the date; check any conditions in the approval email
+- [ ] Add `ESV_API_KEY` as a Sensitive Vercel variable (Production and Preview), to the local `.env` and to `.env.example`; require it in `src/lib/env.ts` only when the ESV is enabled
+- [ ] Test with a fake server (never call the real API in tests): sends `Authorization: Token ...`, builds the query, maps the response
+- [ ] `EsvSource` with `import "server-only"`, `cache: "no-store"`, 5 second timeout; refuses any request over one chapter (R2)
+- [ ] Test the key never appears in logs or errors
+- [ ] Sanitiser and HTML-to-`Passage` conversion with tests: strips `script`, event attributes, `style`, unknown tags and links not to esv.org; keeps headings, verse numbers, poetry and the "(ESV)" mark; words unchanged (R6)
+- [ ] In-memory LRU: never over 400 verses, evicts oldest, expires after 1 hour (test)
+- [ ] Budget counters (60 per minute, 1,000 per hour, 5,000 per day) with a fake Redis; at 80% only cached passages; fallback when over budget or on any non-200 or timeout, never a thrown error (tests)
+- [ ] Vercel Firewall rate-limit rule on `/bible/esv/*` (Hendrik applies it; add the steps to the runbook)
+- [ ] Footer notice and esv.org link visible on ESV pages; the "(ESV)" label present
+- [ ] Switch `enabled: true` for the ESV in the registry; E2E for an ESV chapter and the fallback
+
+### B8 Compliance gate (before it goes public)
+
+- [ ] Test: every ESV page contains "(ESV)", the esv.org link and the full notice
+- [ ] Test: no page can request more than one chapter; Psalm 119 renders in full in all three versions
+- [ ] Test: no ESV text on disk or in a data store (open 20 ESV chapters, search the repo, `.next/cache` and the database for a verse)
 - [ ] Test: the bundle and page source do not contain `ESV_API_KEY` or its value
-- [ ] Test: no `Cache-Control: public` on the Bible pages
-- [ ] Manual: read the terms again; confirm still no donations, ads or sponsorship anywhere on the site
+- [ ] Test: no `Cache-Control: public` on ESV pages
+- [ ] Manual: confirm still no donations, ads or sponsorship anywhere on the site; read the ESV terms again
 - [ ] `pnpm check:placeholders` and `check:devotionals` still pass
-- [ ] Add the Bible pages to `sitemap` only if the metadata step (1.6) is done; otherwise skip
 
-### B8 Docs and launch
+### B9 Docs and launch
 
-- [ ] Update PLAN.md (new step), CLAUDE.md (§4 layout, §9 scripture copyright, decisions), README
-- [ ] Update `docs/privacy.md` (the ESV API receives the passage requested but no visitor data: server-to-server, no IP forwarded) and `docs/threat-model.md` (new outbound call; key handling; HTML sanitiser)
-- [ ] Mobile screenshots at 375px in the PR; Lighthouse mobile budgets still met (LCP under 2.0 s, JS under 100 KB on the landing page; the reader is a server component with only the picker as client JS)
-- [ ] Turn `BIBLE_ENABLED` on in Production; watch the daily query count for a week
+- [ ] Update PLAN.md (new step), CLAUDE.md (§4 layout, §9 scripture copyright, decisions) and README
+- [ ] Update `docs/privacy.md` (the ESV API receives the passage requested, no visitor data) and `docs/threat-model.md` (new outbound call, key handling, HTML sanitiser)
+- [ ] Mobile screenshots at 375px in the PR; Lighthouse mobile budgets still met (JS under 100 KB on the landing page; the reader is a server component with only the pickers as client JS)
+- [ ] Launch BSB and WEB first (`BIBLE_ENABLED` on in Production); turn the ESV on when B7 is done; watch the daily ESV query count for a week
 
 ### Later (not in the first release)
 
 - [ ] Verse tap-to-select and a "Share this verse" link (reuses `verse-share.tsx`; share the URL plus the reference, never a long quote)
-- [ ] Word search with `search/` (page size 20, quotes for exact phrases); results show reference and snippet and link into the reader
-- [ ] Audio via `audio/` or the HTML audio link: ask Crossway first, because the audio terms are not stated on the pages read
-- [ ] More Bibles (public domain: BSB, WEB), each with its own notice, behind the same picker step 1
-- [ ] Offline reading or a native app: needs a Crossway license (R13)
+- [ ] Word search: local index for BSB and WEB; `search/` for the ESV
+- [ ] Audio via the ESV `audio/` endpoint: ask Crossway first
+- [ ] Parallel view (two versions side by side): check the ESV limits with Crossway first
+- [ ] Other public-domain versions (KJV, ASV, Darby) through the same importer
+- [ ] Offline reading or a native app: the ESV part needs a Crossway license (R12); BSB and WEB do not
 
 ---
 
 ## 6. Compliance quick check (for every PR that touches the reader)
 
-1. Does any page show more than one chapter or 500 verses? It must not.
-2. Is ESV text stored anywhere beyond the 400-verse memory cache? It must not be.
-3. Is "(ESV)" in every quotation, and the esv.org link plus the full notice on the page?
-4. Is the text unaltered (only whole verses, ellipsis for omissions)?
-5. Is the key server-only?
+1. ESV: does any page show more than one chapter or 500 verses? It must not.
+2. ESV: is any ESV text stored beyond the 400-verse memory cache? It must not be.
+3. ESV: "(ESV)" in every quotation, and the esv.org link plus the full notice on the page?
+4. Is the text of every version unaltered (only whole verses, ellipsis for omissions)?
+5. Is the ESV key server-only?
 6. Is there anything paid, donated or advertised on the site?
 7. Is there a download or bulk copy feature? There must not be.
+8. Is any modified text still called "Berean" or "World English Bible"? It must not be.
 
 ---
 
-## 7. Decisions (answered 2026-11-07)
+## 7. Decisions and open items
 
-1. **File name:** `docs/bible_feature.md`.
-2. **Bibles:** ESV only. The picker keeps the Bible step so others can be added later.
-3. **Where the call runs:** Next.js server directly, in an isolated `lib/esv/` module. It is a read-only third-party API with a server-held key and no visitor data, so an extra FastAPI hop adds a failure point and no security. If a native app is built (Phase 2 gate), move the client behind FastAPI then.
-4. **Footnotes and cross-references:** off in the first release.
-5. **Swipe:** buttons first, swipe only as optional polish.
-6. **Gate:** nothing is built until the ESV API application is approved and the key is issued. B0 first item below.
+Decided (2026-11-07): file name `bible_feature.md`; BSB first, WEB second, ESV third; the ESV call runs in the Next.js server; no footnotes or cross-references in the first release; buttons first, swipe as optional polish; a version picker is required.
+
+Open (defaults apply unless you say otherwise):
+1. WEB edition: default the 66-book "Update" edition with US spelling (LORD for God's name). Say if you prefer the "Classic" (Yahweh) or the British edition.
+2. Parallel view: not in the first release.
+3. Whether to ask Crossway directly (licensing@crossway.org) about showing the ESV beside other versions. Not needed to proceed, but it would remove the one grey area (how the 500-verse and 25% limits count on a multi-version page).
