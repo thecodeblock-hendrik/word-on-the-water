@@ -29,6 +29,12 @@ describe("createApiClient", () => {
     expect(lastCall().headers.get("x-client-ip")).toBe("203.0.113.9");
   });
 
+  it("sends the idempotency key when given", async () => {
+    const { apiFetch, lastCall } = setup();
+    await apiFetch("/v1/subscribers", { method: "POST", idempotencyKey: "same-form-twice" });
+    expect(lastCall().headers.get("idempotency-key")).toBe("same-form-twice");
+  });
+
   it("sends JSON bodies with the right content type", async () => {
     const { apiFetch, lastCall } = setup();
     await apiFetch("/v1/subscribers", { method: "POST", body: { email: "a@example.com" } });

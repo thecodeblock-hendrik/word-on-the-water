@@ -9,6 +9,8 @@ export type ApiOptions = {
   body?: unknown;
   /** The visitor's IP, forwarded so the API can rate limit the right person. */
   clientIp?: string;
+  /** Sent as Idempotency-Key: a repeat of a request that already worked does nothing. */
+  idempotencyKey?: string;
 };
 
 /** Builds a server-side client for the FastAPI service (the browser never calls it directly). */
@@ -16,6 +18,7 @@ export function createApiClient(env: Env, fetchImpl: typeof fetch = fetch) {
   return function apiFetch(path: string, options: ApiOptions = {}): Promise<Response> {
     const headers = new Headers({ Authorization: `Bearer ${env.SERVICE_TOKEN}` });
     if (options.clientIp) headers.set("X-Client-IP", options.clientIp);
+    if (options.idempotencyKey) headers.set("Idempotency-Key", options.idempotencyKey);
     if (env.API_BYPASS_SECRET) {
       headers.set("x-vercel-protection-bypass", env.API_BYPASS_SECRET);
     }
