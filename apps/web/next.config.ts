@@ -13,6 +13,8 @@ loadEnvConfig(
   true,
 );
 
+const devotionalFiles = ["./content/devotionals/**/*", "./content/series/**/*"];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
@@ -25,9 +27,11 @@ const nextConfig: NextConfig = {
   },
   // The loader reads content/ with paths built at run time, so say which routes need it.
   outputFileTracingIncludes: {
-    "/": ["./content/**/*"],
-    "/devotionals/*": ["./content/**/*"],
-    "/content/**": ["./content/**/*"],
+    "/": devotionalFiles,
+    "/devotionals/*": devotionalFiles,
+    "/content/**": devotionalFiles,
+    // The Bible reader reads its chapter files the same way; keep them out of every other route.
+    "/bible/**": ["./content/bibles/**/*"],
   },
   turbopack: {
     rules: {

@@ -53,4 +53,4 @@ make types       # regenerate API types
 make down        # stop services
 ```
 
-In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, and `DEVOTIONAL_TODAY=2026-12-12 pnpm dev` previews a future day.
+In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, and `DEVOTIONAL_TODAY=2026-12-12 pnpm dev` previews a future day. `BIBLE_ENABLED=1 pnpm dev` shows the Bible reader at `/bible` (hidden by default; plan in [docs/bible_feature.md](docs/bible_feature.md)).

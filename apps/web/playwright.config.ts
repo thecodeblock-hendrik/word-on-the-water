@@ -14,7 +14,7 @@ export default defineConfig({
     url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env.CI,
     // Pin the date so the tests do not change when the real calendar moves on.
-    env: { DEVOTIONAL_TODAY: "2026-12-12" },
+    env: { DEVOTIONAL_TODAY: "2026-12-12", BIBLE_ENABLED: "1" },
     timeout: 180_000,
   },
   projects: [

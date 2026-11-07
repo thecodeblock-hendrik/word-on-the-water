@@ -18,12 +18,21 @@ describe("next.config local images", () => {
 });
 
 describe("next.config file tracing", () => {
-  it("ships the content folder with the routes that read it, and nothing wider", () => {
-    const includes = nextConfig.outputFileTracingIncludes;
-    expect(includes).toEqual({
-      "/": ["./content/**/*"],
-      "/devotionals/*": ["./content/**/*"],
-      "/content/**": ["./content/**/*"],
+  const articles = ["./content/devotionals/**/*", "./content/series/**/*"];
+
+  it("ships each route only the content it reads", () => {
+    expect(nextConfig.outputFileTracingIncludes).toEqual({
+      "/": articles,
+      "/devotionals/*": articles,
+      "/content/**": articles,
+      "/bible/**": ["./content/bibles/**/*"],
     });
+  });
+
+  it("keeps the 15 MB of Bible text out of every route except the reader", () => {
+    for (const [route, files] of Object.entries(nextConfig.outputFileTracingIncludes ?? {})) {
+      const includesBibles = files.some((f) => f.includes("bibles") || f === "./content/**/*");
+      expect(includesBibles, route).toBe(route === "/bible/**");
+    }
   });
 });
