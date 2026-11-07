@@ -63,11 +63,13 @@ test("on a tablet (768px) the labels still sit above their text", async ({ page 
   expect(detail.y).toBeGreaterThan(term.y);
 });
 
-test("below lg the last who-it-is-for row has no bottom line above the section divider", async ({
+test("below lg the full-width divider is hidden so the last row line is the only one", async ({
   page,
 }) => {
-  test.skip(page.viewportSize()!.width >= 1024, "side by side from lg");
   await page.goto("/");
   const last = page.locator("#about dl > div").last();
-  await expect(last).toHaveCSS("border-bottom-width", "0px");
+  const divider = page.locator("#about + hr");
+  await expect(last).toHaveCSS("border-bottom-width", "1px");
+  if (page.viewportSize()!.width < 1024) await expect(divider).toBeHidden();
+  else await expect(divider).toBeVisible();
 });
