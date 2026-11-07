@@ -63,7 +63,7 @@ describe("Founder", () => {
     expect(container).toHaveTextContent("caught in addiction");
     expect(container).toHaveTextContent("In 2023 I found Jesus");
     expect(container).toHaveTextContent(
-      "I created Word on the Water to share the good news of Jesus with anyone who feels empty: He loves you and there is hope.",
+      "I created Word on the Water to share the good news of Jesus with anyone who feels empty: He loves you and He is enough.",
     );
     expect(container).not.toHaveTextContent("I write Word on the Water");
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
