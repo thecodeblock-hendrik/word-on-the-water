@@ -297,9 +297,28 @@
     },
     "/v1/subscribers": {
       "post": {
-        "description": "202 with the same body for a new, pending or confirmed address, and for a simple bot.\n\nThe cheap bot checks run first so a bot never costs a Cloudflare call. A token Cloudflare\nrefuses is a 400 (the visitor solves the challenge again); if Cloudflare cannot judge it,\na 503 and nothing is stored, so a sign-up is never accepted unverified.",
+        "description": "202 with the same body for a new, pending or confirmed address, and for a simple bot.\n\nA repeat of a request that already worked (same Idempotency-Key and address) returns the same\nanswer without doing anything, so it costs no Turnstile token and no allowance. Otherwise: the\nrate limits, then the cheap bot checks (a bot never costs a Cloudflare call), then Turnstile.\nA token Cloudflare refuses is a 400; if it cannot judge it, a 503 and nothing is stored, so a\nsign-up is never accepted unchecked. A failed attempt gives its key back for the retry.",
         "operationId": "subscribe_v1_subscribers_post",
         "parameters": [
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 8,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
           {
             "in": "header",
             "name": "authorization",

@@ -49,14 +49,19 @@ class FakeTurnstile:
         return self.outcome
 
 
+pytestmark = pytest.mark.usefixtures("fresh_limits")
+
+
 def post(
     body: Mapping[str, object] = BODY,
     headers: Mapping[str, str] = AUTH,
     turnstile: FakeTurnstile | None = None,
+    ip: str = "203.0.113.1",
 ) -> httpx2.Response:
     app = create_app()
     app.dependency_overrides[turnstile_verifier] = lambda: turnstile or FakeTurnstile()
-    return TestClient(app).post("/v1/subscribers", json=body, headers=headers)
+    sent = {"X-Client-IP": ip, **headers}
+    return TestClient(app).post("/v1/subscribers", json=body, headers=sent)
 
 
 async def jobs(session: AsyncSession) -> list[EmailOutbox]:
@@ -229,3 +234,88 @@ async def test_a_bot_caught_by_the_cheap_checks_never_costs_a_cloudflare_call(
     post({**BODY, "website": "http://spam.example"}, turnstile=turnstile)
 
     assert turnstile.calls == []
+
+
+def other_person(n: int) -> dict[str, object]:
+    return {**BODY, "email": f"reader{n}@example.com"}
+
+
+async def test_the_sixth_sign_up_in_an_hour_from_one_address_is_a_429(
+    session: AsyncSession,
+) -> None:
+    for n in range(5):
+        assert post(other_person(n)).status_code == 202
+
+    response = post(other_person(5))
+
+    assert response.status_code == 429
+    assert response.json()["error"]["code"] == "rate_limited"
+    assert response.headers["Retry-After"] == "3600"
+    assert len(list(await session.scalars(select(Subscriber)))) == 5
+
+
+async def test_another_address_has_its_own_allowance() -> None:
+    for n in range(5):
+        post(other_person(n))
+
+    assert post(other_person(9), ip="203.0.113.77").status_code == 202
+
+
+async def test_one_email_cannot_be_asked_for_more_than_three_times_an_hour(
+    session: AsyncSession,
+) -> None:
+    for n in range(3):
+        assert post(ip=f"203.0.113.{10 + n}").status_code == 202
+
+    response = post(ip="203.0.113.99")
+
+    assert response.status_code == 429
+    assert len(await jobs(session)) == 3  # a fourth confirmation email is never queued
+
+
+async def test_a_bot_in_a_flood_is_stopped_by_the_limit_too(session: AsyncSession) -> None:
+    for n in range(5):
+        post({**other_person(n), "website": "x"})
+
+    assert post(other_person(6)).status_code == 429
+
+
+KEY = {"Idempotency-Key": "11111111-2222-3333-4444-555555555555"}
+
+
+async def test_a_repeated_post_with_the_same_key_does_the_work_once(session: AsyncSession) -> None:
+    turnstile = FakeTurnstile()
+
+    first = post(headers={**AUTH, **KEY}, turnstile=turnstile)
+    second = post(headers={**AUTH, **KEY}, turnstile=turnstile)
+
+    assert (first.status_code, first.json()) == (second.status_code, second.json())
+    assert len(turnstile.calls) == 1
+    assert len(await jobs(session)) == 1
+
+
+async def test_repeats_with_the_same_key_do_not_use_up_the_allowance() -> None:
+    for _ in range(8):
+        post(headers={**AUTH, **KEY})
+
+    assert post(other_person(1)).status_code == 202
+
+
+async def test_the_same_key_for_another_address_is_a_new_sign_up(session: AsyncSession) -> None:
+    post(headers={**AUTH, **KEY})
+    post(other_person(1), headers={**AUTH, **KEY})
+
+    assert len(list(await session.scalars(select(Subscriber)))) == 2
+
+
+async def test_a_failed_attempt_does_not_use_up_its_key(session: AsyncSession) -> None:
+    refused = post(headers={**AUTH, **KEY}, turnstile=FakeTurnstile(False))
+    retried = post(headers={**AUTH, **KEY}, turnstile=FakeTurnstile(True))
+
+    assert (refused.status_code, retried.status_code) == (400, 202)
+    assert len(await jobs(session)) == 1
+
+
+@pytest.mark.parametrize("key", ["short", "has spaces in it!!", "x" * 129])
+async def test_a_malformed_key_is_a_422(key: str) -> None:
+    assert post(headers={**AUTH, "Idempotency-Key": key}).status_code == 422

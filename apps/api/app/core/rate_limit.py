@@ -102,3 +102,10 @@ async def get_redis(settings: Annotated[Settings, Depends(get_settings)]) -> Asy
         yield redis
     finally:
         await redis.aclose()
+
+
+def get_rate_limiter(
+    redis: Annotated[Redis, Depends(get_redis)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> RateLimiter:
+    return RateLimiter(redis, settings.ip_hash_salt.get_secret_value())

@@ -340,7 +340,7 @@ Phase 1 endpoints:
 
 Settings via `pydantic-settings`, failing fast at startup if required secrets are missing. Blank environment values count as unset.
 
-**Implemented so far:** `GET /health/live`, `GET /health/ready` (database and Redis), `GET /v1/ping` (service token required; stands in for the default-deny `/v1` router) and `GET /cron/drain-outbox` (`CRON_SECRET`). Of the Phase 1 endpoints in the table above, `POST /v1/subscribers` exists (step 1.3: checks the honeypot, the minimum time and Turnstile, stores the pending subscriber and queues the Kit call; rate limits, the outbox job and the webhook are still to come); the rest arrive in steps 1.3 to 1.5.
+**Implemented so far:** `GET /health/live`, `GET /health/ready` (database and Redis), `GET /v1/ping` (service token required; stands in for the default-deny `/v1` router) and `GET /cron/drain-outbox` (`CRON_SECRET`). Of the Phase 1 endpoints in the table above, `POST /v1/subscribers` exists (step 1.3: rate limits it (5 an hour per address, 3 per email), honours an `Idempotency-Key`, checks the honeypot, the minimum time and Turnstile, stores the pending subscriber and queues the Kit call; the outbox job and the webhook are still to come); the rest arrive in steps 1.3 to 1.5.
 
 ---
 

@@ -3,6 +3,7 @@
 from collections.abc import AsyncIterator
 
 import pytest
+from redis.asyncio import Redis
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -36,3 +37,14 @@ async def session(local_services: None) -> AsyncIterator[AsyncSession]:
         await db.execute(delete(Subscriber))
         await db.commit()
     await engine.dispose()
+
+
+@pytest.fixture
+async def fresh_limits(local_services: None) -> AsyncIterator[None]:
+    """Forget rate-limit and idempotency keys, so tests do not count against each other."""
+    redis = Redis.from_url(REDIS_URL)
+    for pattern in ("rl:*", "idem:*"):
+        async for key in redis.scan_iter(pattern):
+            await redis.delete(key)
+    yield
+    await redis.aclose()

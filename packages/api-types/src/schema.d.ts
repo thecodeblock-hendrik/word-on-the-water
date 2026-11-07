@@ -88,9 +88,11 @@ export interface paths {
          * Subscribe
          * @description 202 with the same body for a new, pending or confirmed address, and for a simple bot.
          *
-         *     The cheap bot checks run first so a bot never costs a Cloudflare call. A token Cloudflare
-         *     refuses is a 400 (the visitor solves the challenge again); if Cloudflare cannot judge it,
-         *     a 503 and nothing is stored, so a sign-up is never accepted unverified.
+         *     A repeat of a request that already worked (same Idempotency-Key and address) returns the same
+         *     answer without doing anything, so it costs no Turnstile token and no allowance. Otherwise: the
+         *     rate limits, then the cheap bot checks (a bot never costs a Cloudflare call), then Turnstile.
+         *     A token Cloudflare refuses is a 400; if it cannot judge it, a 503 and nothing is stored, so a
+         *     sign-up is never accepted unchecked. A failed attempt gives its key back for the retry.
          */
         post: operations["subscribe_v1_subscribers_post"];
         delete?: never;
@@ -282,6 +284,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
+                "idempotency-key"?: string | null;
                 authorization?: string | null;
             };
             path?: never;
