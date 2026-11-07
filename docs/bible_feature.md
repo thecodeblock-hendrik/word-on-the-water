@@ -148,6 +148,15 @@ BibleSource.getPassage({ version, book, chapter, verses? }) -> Passage
 
 The reader renders one `Passage` shape regardless of source, so the UI has no ESV special cases except the notice.
 
+As built in B3, a source returns one whole chapter (`getChapter(version, book, chapter)`), and a shared function, `selectVerses`, picks the verses. The ESV source (B7) will therefore convert the API's HTML into the same chapter shape and reuse the same picker.
+
+Verse rules (`selectVerses`):
+- Malformed input (`0`, `5-3`, `1,3`, words, blanks, spaces, more than three digits) is `invalid-range` (the page shows a clear message or 404).
+- A well-formed range that runs past the end is clamped to the last verse (`5-40` in a 6-verse chapter shows 5 to 6).
+- A well-formed range with none of its verses in this version (the chapter is shorter, or the verse is skipped, like Matthew 17:21 in the BSB) shows the whole chapter and reports the request in `fallback`, so the page can say "Verses 24-26 are not in this Bible".
+- If only some verses in the range exist (Matthew 17:20-22 in the BSB) the ones that exist are shown.
+- A heading, Psalm title or label is kept when the block it introduces starts inside the range; a blank-line break is kept only between two kept blocks.
+
 ### 4.2 Where the ESV code runs
 
 Next.js server directly, in an isolated `lib/esv/` module. It is a read-only third-party API with a server-held key and no visitor data, so a FastAPI hop adds a failure point and no security. If a native app is built (Phase 2 gate), move the ESV client behind FastAPI then.
@@ -252,9 +261,9 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B3 Source interface and local source
 
-- [ ] Test: `getPassage` returns the right verses for a chapter and for a range; a range outside the chapter is rejected; unknown version or book gives not found
-- [ ] Add `BibleSource` and `LocalSource` (server-only, reads the JSON)
-- [ ] Missing verse in another version falls back to the whole chapter (test)
+- [x] Test: `getPassage` returns the right verses for a chapter and for a range; malformed verses are rejected (`invalid-range`); unknown or disabled versions, unknown books and chapters out of range give `not-found`; no path can be steered outside the data folder (`tests/unit/bible-source.test.ts`, `bible-passage.test.ts`)
+- [x] Add `BibleSource` (in `types.ts`), `localSource()` (`local-source.ts`, server-only, reads the JSON) and `getPassage()` (`get-passage.ts`); the pure verse picker is `selectVerses()` in `passage.ts`
+- [x] Missing verse in another version falls back to the whole chapter (test: Romans 14:24-26 in the BSB, Matthew 17:21 in the BSB)
 
 ### B4 Reader page
 
