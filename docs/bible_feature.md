@@ -228,7 +228,7 @@ A static table `bible-books.ts`: 66 books with display name, slug, testament and
 
 - Mobile bottom bar with two full-height buttons that are links to the neighbouring chapter URL (they work without JavaScript).
 - Desktop: links under the text and the left and right arrow keys (not while an input has focus).
-- Swipe is optional polish: ignore horizontal swipes starting within 24px of the screen edge (iOS back gesture) and while text is being selected.
+- Swipe is optional polish and is not built (see B6): ignore horizontal swipes starting within 24px of the screen edge (iOS back gesture) and while text is being selected.
 
 ---
 
@@ -287,11 +287,11 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B6 Previous and next
 
-- [ ] Unit tests for neighbour links (Malachi 4 to Matthew 1; disabled ends)
-- [ ] Mobile bottom bar, desktop links under the text
-- [ ] E2E: on a phone, tapping "John 4 →" opens John 4; on Genesis 1 the previous button is disabled
-- [ ] Arrow keys on desktop (E2E), ignored while typing in an input
-- [ ] Optional swipe (4.8), only if it tests cleanly on iOS Safari and Android Chrome
+- [x] Unit tests for the neighbour links (`chapter-nav.tsx`, `tests/unit/bible-chapter-nav.test.tsx`): Malachi 4 to Matthew 1 and back, the Testament boundary, Genesis 50 to Exodus 1, "2 John 1", disabled ends at Genesis 1 and Revelation 22, the chosen Bible kept and a verse range dropped, explicit "Previous chapter: John 2" names, tall targets. The pure neighbour logic was tested in B1
+- [x] Mobile bottom bar (sticky to the bottom of the screen, two full-height buttons, Next filled as in the mockup, rests above the footer so it never covers it), desktop links under the text (`lg:static`). Plain links, so they work without JavaScript. `rel="prev"` and `rel="next"` are in the page head
+- [x] E2E (`tests/e2e/bible-chapters.spec.ts`): on phones the bar is pinned with two buttons of at least 44px, tapping "John 4" opens John 4 (from a verse range too: the whole chapter), the bar rests above the footer and hides no text, on Genesis 1 the previous button is disabled and on Revelation 22 the next one, Malachi 4 and Matthew 1 connect, and the buttons work with JavaScript off
+- [x] Arrow keys (`arrow-keys.tsx`, unit and E2E): left and right open the previous and next chapter. They are ignored with Alt, Ctrl, Cmd or Shift (Alt+Left is the browser's Back), when another handler already used the key, in text fields, selects, radios, sliders, menus and open dialogs, so a focused radio in the Bible switch keeps its arrow key (tested) and the passage sheet is left alone (tested)
+- [ ] Optional swipe (4.8): not built. The spec allows it only if it tests cleanly on iOS Safari and Android Chrome, and it cannot be verified on real devices here. The bottom buttons already put both directions in thumb reach, and a horizontal swipe risks clashing with the iOS back gesture and text selection. Revisit with real-device testing if readers ask for it
 
 ### B7 ESV source (blocked until Crossway approves the application)
 

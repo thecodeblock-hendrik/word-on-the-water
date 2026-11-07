@@ -218,3 +218,28 @@ test.describe("remembering the Bible you read last", () => {
     await context.close();
   });
 });
+
+test("the reader pages log no console errors, which would include a hydration mismatch", async ({
+  page,
+}) => {
+  const problems: string[] = [];
+  // /_vercel/* is served by the Vercel platform only, so it is a 404 under a local server.
+  const local = (url: string) => url.includes("/_vercel/");
+  page.on("console", (m) => {
+    const isProblem = m.type() === "error" || m.text().includes("Content Security Policy");
+    if (isProblem && !local(m.location().url) && !local(m.text())) problems.push(m.text());
+  });
+  page.on("pageerror", (error) => problems.push(error.message));
+
+  for (const path of [
+    "/bible/bsb/john/3",
+    "/bible/bsb/john/3?v=16-18",
+    "/bible/web/psalms/23",
+    "/bible/bsb/romans/14?v=24-26",
+    "/bible/bsb/john/3?v=nonsense",
+  ]) {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+  }
+  expect(problems).toEqual([]);
+});
