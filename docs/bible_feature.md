@@ -256,7 +256,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [x] Add `pnpm build:bible` writing `content/bibles/<version>/<book>/<chapter>.json` (`scripts/build-bible.mts`, with `src/lib/bible/import.ts` and `usfm-codes.ts`; see "Regenerating the data" in section 3)
 - [x] Test on the output (`tests/unit/bible-data.test.ts`): all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
 - [x] Commit the generated files and check the repository size (about 15 MB of JSON, 3.4 MB compressed; largest chapter file 44 KB)
-- [ ] Trace `content/bibles` into the reader's route with `outputFileTracingIncludes` and check the function bundle size (done with the reader route in B4, because the route does not exist yet)
+- [x] Trace `content/bibles` into the reader's route with `outputFileTracingIncludes` and check the function bundle size. Found and fixed on the way: the devotional loader's `process.cwd()/content` path made every route that reads devotionals ship the whole `content/` folder, so the landing page would have shipped 15 MB of Bible text. Now only `/bible/**` ships `content/bibles` (2,378 files); `/`, `/devotionals/*` and `/content/**` ship none (checked in the build's `.nft.json` files)
 - [x] Add `src/lib/bible/versions.ts` (registry with credit text, source and `enabled` flags: BSB and WEB on, ESV off) with tests
 
 ### B3 Source interface and local source
@@ -267,12 +267,12 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B4 Reader page
 
-- [ ] E2E (all projects): `/bible/bsb/john/3` shows "John 3", verse 16, the BSB credit and the footer notice; axe has no serious or critical issues
-- [ ] E2E: `?v=16-18` shows only those verses with the range in the heading and a "Show full chapter" link
-- [ ] E2E: bad input (`/bible/bsb/nobook/1`, `john/99`, `?v=20-10`, `/bible/esv/john/3` while disabled) gives 404 or a clear message, never a crash
-- [ ] E2E: CSP holds (no inline style, no console violations)
-- [ ] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL); `/bible` redirects to `/bible/bsb/john/1`
-- [ ] Typography per 4.5; screenshot at 375px first, then wider; light and dark
+- [x] E2E (all projects): `/bible/bsb/john/3` shows "John 3", verse 16, the BSB credit and the footer notice; axe has no serious or critical issues in light and dark (`tests/e2e/bible.spec.ts`, which also proves the axe helper catches a real violation)
+- [x] E2E: `?v=16-18` shows only those verses with the range in the heading and a "Show full chapter" link (44px tall)
+- [x] E2E: bad input gives 404 or a clear message, never a crash. Unknown book, chapter out of range, `03`, `1.5`, `abc`, the disabled ESV and unknown versions return 404; a verse range that cannot be read (`20-10`, `abc`, `0`, `1,2`, a repeated `?v=`) shows the whole chapter with a note instead
+- [x] E2E: CSP holds (no inline style, no console violations, every inline script has the nonce), and the longest chapter (Psalm 119) does not scroll sideways
+- [x] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL; a verse range points at its chapter); `/bible` redirects to `/bible/bsb/john/1`; pages return 404 unless `BIBLE_ENABLED=1`
+- [x] Typography per 4.5; checked at 375px, 768px and 1280px, light and dark. Poetry and list lines hang (a wrapped line sits further in than a new line) so they cannot be confused
 
 ### B5 Pickers (version, book, chapter, verses)
 
