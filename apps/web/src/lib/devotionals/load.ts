@@ -5,7 +5,7 @@ import { type Devotional, parseDevotional } from "./parse.ts";
 import type { Series } from "./series.ts";
 import { loadSeries } from "./series-load.ts";
 
-export const CONTENT_DIR = join(process.cwd(), "content");
+export const CONTENT_DIR = join(/* turbopackIgnore: true */ process.cwd(), "content");
 export const DEVOTIONALS_DIR = join(CONTENT_DIR, "devotionals");
 export const VERSE_CARDS = ["verse-card-dawn-patrol.png", "verse-card-night-swell.png"] as const;
 
