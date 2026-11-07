@@ -169,12 +169,14 @@ async def test_the_service_queues_new_and_pending_addresses_only(
 
 @pytest.mark.parametrize(
     "change",
-    [{"website": "http://spam.example"}, {"rendered_at": rendered(0.2)}],
+    [{"website": "http://spam.example"}, {"rendered_at": "just now"}],
     ids=["hidden field filled", "sent too fast"],
 )
 async def test_a_bot_gets_the_normal_answer_and_nothing_is_stored(
     session: AsyncSession, change: dict[str, object]
 ) -> None:
+    if change.get("rendered_at") == "just now":
+        change = {"rendered_at": rendered(0.2)}  # taken now: a stored time goes stale
     response = post({**BODY, **change})
 
     assert (response.status_code, response.json()) == (202, {"status": "check_your_inbox"})

@@ -10,9 +10,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.integrations.email.base import EmailProvider, EmailSendError
+from app.integrations.kit.client import KitError
 from app.models import EmailOutbox
 from app.models.email_outbox import OutboxStatus
 from app.services.email_templates import render
+from app.services.kit_jobs import KIT_SUBSCRIBE, KitSubscribeJob
 
 MAX_ATTEMPTS = 5
 BASE_BACKOFF = timedelta(minutes=5)
@@ -30,13 +32,14 @@ class DrainResult:
 
 def _error_text(exc: Exception) -> str:
     """Only provider errors carry a safe message; anything else logs just its type."""
-    return str(exc) if isinstance(exc, EmailSendError) else type(exc).__name__
+    return str(exc) if isinstance(exc, EmailSendError | KitError) else type(exc).__name__
 
 
 async def drain_outbox(
     session: AsyncSession,
     provider: EmailProvider,
     now: datetime | None = None,
+    kit: KitSubscribeJob | None = None,
     budget: float = TIME_BUDGET_SECONDS,
     clock: Callable[[], float] = time.monotonic,
     send_timeout: float = SEND_TIMEOUT_SECONDS,
@@ -61,14 +64,16 @@ async def drain_outbox(
         )
         if row is None:
             break
-        await _deliver(row, provider, now, result, send_timeout)
+        await _deliver(session, row, provider, kit, now, result, send_timeout)
         await session.commit()
     return result
 
 
 async def _deliver(
+    session: AsyncSession,
     row: EmailOutbox,
     provider: EmailProvider,
+    kit: KitSubscribeJob | None,
     now: datetime,
     result: DrainResult,
     send_timeout: float,
@@ -81,7 +86,12 @@ async def _deliver(
     row.attempts += 1
     try:
         async with asyncio.timeout(send_timeout):
-            await provider.send(render(row.template, row.to_address, row.payload))
+            if row.template == KIT_SUBSCRIBE:
+                if kit is None:
+                    raise KitError("Kit is not configured")
+                await kit.run(session, row)
+            else:
+                await provider.send(render(row.template, row.to_address, row.payload))
     except Exception as exc:  # noqa: BLE001  one bad message must not block the others
         row.last_error = _error_text(exc)
         if row.attempts >= MAX_ATTEMPTS:
