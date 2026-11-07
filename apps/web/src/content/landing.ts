@@ -114,7 +114,7 @@ export const founder = {
   eyebrow: "Who's behind this",
   heading: "Meet the writer",
   name: 'Henno (AKA "H")',
-  bio: "I spent most of my life using drugs, and I have always loved the ocean. Both were my escape from life's problems. Something was missing, and I tried to fill it with surfing and drugs, yet I stayed empty. In 2023 I found Jesus, and the emptiness finally went. I created Word on the Water to share the good news of Jesus, and how much He loves us.",
+  bio: "For most of my life I was caught in addiction. The ocean was my other escape, and surfing was the one place I felt free. But nothing I chased could fill the emptiness. In 2023 I found Jesus, and He did what the waves and the drugs never could. I created Word on the Water to share the good news of Jesus with anyone who feels empty: He loves you and there is hope.",
   church: "Member of Harvest Christian Church.",
   photo: { src: "/henno-surfing.jpg", alt: "Henno riding a wave on his surfboard" } as
     | { src: string; alt: string }
