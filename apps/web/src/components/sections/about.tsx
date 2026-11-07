@@ -36,7 +36,7 @@ export function About() {
           {about.who.map(({ term, description }) => (
             <div
               key={term}
-              className="grid gap-1 border-b border-line py-[18px] lg:grid-cols-[120px_minmax(0,1fr)] lg:gap-4"
+              className="grid gap-1 border-b border-line py-[18px] max-lg:last:border-b-0 lg:grid-cols-[120px_minmax(0,1fr)] lg:gap-4"
             >
               <dt className="font-display font-semibold uppercase tracking-[.1em] text-accent-ink">
                 {term}
