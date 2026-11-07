@@ -8,6 +8,7 @@ VALID = {
     "first_name": "Ann",
     "source": "landing_hero",
     "consent_text_version": "v1",
+    "rendered_at": 1_790_000_000_000,
 }
 
 
@@ -57,7 +58,19 @@ def test_the_first_name_may_be_80_characters_and_not_more() -> None:
         SubscribeRequest.model_validate({**VALID, "first_name": "a" * 81})
 
 
-@pytest.mark.parametrize("field", ["email", "source", "consent_text_version"])
+def test_the_hidden_field_defaults_to_empty_and_is_capped() -> None:
+    assert SubscribeRequest.model_validate(VALID).website == ""
+    with pytest.raises(ValidationError):
+        SubscribeRequest.model_validate({**VALID, "website": "w" * 1001})
+
+
+@pytest.mark.parametrize("value", [-1, "soon", 1.5, None])
+def test_the_render_time_is_a_whole_number_of_milliseconds(value: object) -> None:
+    with pytest.raises(ValidationError):
+        SubscribeRequest.model_validate({**VALID, "rendered_at": value})
+
+
+@pytest.mark.parametrize("field", ["email", "source", "consent_text_version", "rendered_at"])
 def test_the_required_fields_cannot_be_left_out(field: str) -> None:
     with pytest.raises(ValidationError):
         SubscribeRequest.model_validate({k: v for k, v in VALID.items() if k != field})

@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     service_token: SecretStr
     cron_secret: SecretStr
     ip_hash_salt: SecretStr
+    signup_min_seconds: float = 3.0
     email_provider: Literal["smtp", "postmark", "console"] = "smtp"
     email_from: str = "Word on the Water <hello@example.invalid>"
     smtp_host: str = "localhost"

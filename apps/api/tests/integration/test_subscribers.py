@@ -1,3 +1,4 @@
+import time
 from collections.abc import Mapping
 from datetime import UTC, datetime
 
@@ -6,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from structlog.testing import capture_logs
 
 from app.main import create_app
 from app.models import EmailOutbox, Subscriber
@@ -14,11 +16,19 @@ from app.schemas.subscribers import SubscribeRequest
 from app.services.subscribers import request_subscription
 
 AUTH = {"Authorization": "Bearer test-service-token"}
+
+
+def rendered(seconds_ago: float) -> int:
+    return int((time.time() - seconds_ago) * 1000)
+
+
 BODY = {
     "email": "reader@example.com",
     "first_name": "Ann",
     "source": "landing_hero",
     "consent_text_version": "v1",
+    "website": "",
+    "rendered_at": rendered(30),
 }
 
 
@@ -127,3 +137,32 @@ async def test_the_service_queues_new_and_pending_addresses_only(
     await request_subscription(session, SubscribeRequest.model_validate(BODY))
 
     assert len(await jobs(session)) == queued
+
+
+@pytest.mark.parametrize(
+    "change",
+    [{"website": "http://spam.example"}, {"rendered_at": rendered(0.2)}],
+    ids=["hidden field filled", "sent too fast"],
+)
+async def test_a_bot_gets_the_normal_answer_and_nothing_is_stored(
+    session: AsyncSession, change: dict[str, object]
+) -> None:
+    response = post({**BODY, **change})
+
+    assert (response.status_code, response.json()) == (202, {"status": "check_your_inbox"})
+    assert list(await session.scalars(select(Subscriber))) == []
+    assert await jobs(session) == []
+
+
+async def test_a_bot_is_logged_with_the_reason_and_without_the_address(
+    session: AsyncSession,
+) -> None:
+    client = TestClient(create_app())  # building the app sets up logging, so do it first
+    with capture_logs() as logs:
+        client.post(
+            "/v1/subscribers", json={**BODY, "website": "http://spam.example"}, headers=AUTH
+        )
+
+    entry = next(entry for entry in logs if entry["event"] == "signup_bot_rejected")
+    assert entry["reason"] == "honeypot"
+    assert "reader@example.com" not in str(logs) and "spam.example" not in str(logs)

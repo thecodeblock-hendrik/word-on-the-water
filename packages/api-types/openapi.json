@@ -42,18 +42,30 @@
             ],
             "title": "First Name"
           },
+          "rendered_at": {
+            "minimum": 0.0,
+            "title": "Rendered At",
+            "type": "integer"
+          },
           "source": {
             "maxLength": 40,
             "minLength": 1,
             "pattern": "^[a-z0-9_]+$",
             "title": "Source",
             "type": "string"
+          },
+          "website": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Website",
+            "type": "string"
           }
         },
         "required": [
           "email",
           "source",
-          "consent_text_version"
+          "consent_text_version",
+          "rendered_at"
         ],
         "title": "SubscribeRequest",
         "type": "object"
@@ -278,7 +290,7 @@
     },
     "/v1/subscribers": {
       "post": {
-        "description": "Always 202 with the same body, whether the address is new, pending or confirmed.",
+        "description": "Always 202 with the same body, whether the address is new, pending, confirmed or a bot.",
         "operationId": "subscribe_v1_subscribers_post",
         "parameters": [
           {

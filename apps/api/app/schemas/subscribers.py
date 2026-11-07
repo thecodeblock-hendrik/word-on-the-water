@@ -16,6 +16,10 @@ class SubscribeRequest(BaseModel):
     first_name: Annotated[str | None, Field(max_length=80)] = None
     source: Annotated[Label, Field(min_length=1, max_length=40)]
     consent_text_version: Annotated[str, Field(min_length=1, max_length=20)]
+    # A hidden field no person sees: bots fill it. Capped so nobody posts a huge value.
+    website: Annotated[str, Field(max_length=1000)] = ""
+    # When the form was rendered (milliseconds since 1970): a form sent too fast is a bot.
+    rendered_at: Annotated[int, Field(strict=True, ge=0)]
 
     @field_validator("first_name")
     @classmethod

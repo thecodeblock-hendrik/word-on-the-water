@@ -86,7 +86,7 @@ export interface paths {
         put?: never;
         /**
          * Subscribe
-         * @description Always 202 with the same body, whether the address is new, pending or confirmed.
+         * @description Always 202 with the same body, whether the address is new, pending, confirmed or a bot.
          */
         post: operations["subscribe_v1_subscribers_post"];
         delete?: never;
@@ -118,8 +118,15 @@ export interface components {
             email: string;
             /** First Name */
             first_name?: string | null;
+            /** Rendered At */
+            rendered_at: number;
             /** Source */
             source: string;
+            /**
+             * Website
+             * @default
+             */
+            website: string;
         };
         /**
          * SubscribeResponse
