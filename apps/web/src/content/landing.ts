@@ -113,11 +113,12 @@ export const beliefs = {
 export const founder = {
   eyebrow: "Who's behind this",
   heading: "Meet the writer",
-  name: "Hendrik [surname]",
-  bio: "[Where you surf, your family, how you came to faith, in about 80 words.]",
+  name: "Henno",
+  bio: "I spent most of my life using drugs, and I have always loved the ocean. Both were my escape from life's problems. Something was missing, and I tried to fill it with surfing and drugs, yet I stayed empty. In 2023 I found Jesus, and the emptiness finally went. I write Word on the Water because I want everyone to know how much He loves us.",
   church: "Member of [home church, town].",
-  /** Add { src, alt } when a photo is shot; until then the logo mark fills the frame. */
-  photo: undefined as { src: string; alt: string } | undefined,
+  photo: { src: "/henno-surfing.jpg", alt: "Henno riding a wave on his surfboard" } as
+    | { src: string; alt: string }
+    | undefined,
 };
 
 export const footer = {

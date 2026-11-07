@@ -56,27 +56,29 @@ describe("Founder", () => {
     expect(screen.getByRole("heading", { level: 2, name: founder.heading })).toBeInTheDocument();
   });
 
-  it("shows the name, bio and church as highlighted draft copy", () => {
+  it("shows the name and the faith story, with only the church still a draft", () => {
     const { container } = render(<Founder />);
-    expect(container).toHaveTextContent("Hendrik");
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThanOrEqual(3);
+    expect(container).toHaveTextContent("Henno");
+    expect(container).toHaveTextContent("I found Jesus");
+    const drafts = container.querySelectorAll("[data-placeholder]");
+    expect(drafts).toHaveLength(1);
+    expect(drafts[0]).toHaveTextContent(/home church/);
   });
 
-  it("falls back to the logo mark in a 4:5 frame when there is no photo", () => {
+  it("shows the surfing photo in a square frame wide enough to see the wave", () => {
     render(<Founder />);
     const frame = screen.getByTestId("founder-photo");
-    expect(frame.className).toMatch(/aspect-\[4\/5\]/);
-    expect(frame.querySelector("use")).not.toBeNull();
-    expect(frame.querySelector("img")).toBeNull();
+    expect(frame.className).toMatch(/aspect-square/);
+    const img = within(frame).getByRole("img", { name: /Henno/ });
+    expect(img.getAttribute("src")).toMatch(/henno-surfing/);
+    expect(frame.querySelector("use")).toBeNull();
   });
 
-  it("shows the photo with its alt text when there is one", () => {
-    render(<Founder photo={{ src: "/hendrik.jpg", alt: "Hendrik on his board at dawn" }} />);
+  it("falls back to the logo mark when a photo is not given", () => {
+    render(<Founder photo={null} />);
     const frame = screen.getByTestId("founder-photo");
-    expect(
-      within(frame).getByRole("img", { name: "Hendrik on his board at dawn" }),
-    ).toBeInTheDocument();
-    expect(frame.querySelector("use")).toBeNull();
+    expect(frame.querySelector("use")).not.toBeNull();
+    expect(frame.querySelector("img")).toBeNull();
   });
 });
 
