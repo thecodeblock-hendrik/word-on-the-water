@@ -2,9 +2,10 @@
 
 from datetime import UTC, datetime
 from typing import Annotated
+from uuid import UUID
 
 import structlog
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, Request
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,10 +13,14 @@ from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
 from app.core.rate_limit import RateLimiter, client_ip, get_rate_limiter, get_redis
 from app.db.session import get_session
+from app.integrations.email.base import EmailProvider
 from app.integrations.turnstile import TurnstileUnavailableError, TurnstileVerifier
+from app.jobs.drain_outbox import attempt_now
+from app.routers.cron import email_provider, kit_job
 from app.schemas.subscribers import SubscribeRequest, SubscribeResponse
 from app.services.bot_checks import automated_reason
 from app.services.idempotency import IdempotencyStore
+from app.services.kit_jobs import KitSubscribeJob
 from app.services.subscribers import request_subscription
 
 log = structlog.get_logger()
@@ -52,6 +57,9 @@ async def subscribe(
     turnstile: Annotated[TurnstileVerifier, Depends(turnstile_verifier)],
     limiter: Annotated[RateLimiter, Depends(get_rate_limiter)],
     redis: Annotated[Redis, Depends(get_redis)],
+    background: BackgroundTasks,
+    provider: Annotated[EmailProvider, Depends(email_provider)],
+    kit: Annotated[KitSubscribeJob | None, Depends(kit_job)],
     idempotency_key: Annotated[IdempotencyKey, Header()] = None,
 ) -> SubscribeResponse:
     """202 with the same body for a new, pending or confirmed address, and for a simple bot.
@@ -67,13 +75,15 @@ async def subscribe(
     if idempotency_key and not await idempotency.claim(scope, key):
         return SubscribeResponse()
     try:
-        await _sign_up(request, data, session, settings, turnstile, limiter)
+        queued = await _sign_up(request, data, session, settings, turnstile, limiter)
     except BaseException:
         if idempotency_key:
             await idempotency.release(scope, key)
         raise
     if idempotency_key:
         await idempotency.complete(scope, key)
+    if queued is not None and kit is not None:
+        background.add_task(attempt_now, queued, provider, kit)
     return SubscribeResponse()
 
 
@@ -84,14 +94,15 @@ async def _sign_up(
     settings: Settings,
     turnstile: TurnstileVerifier,
     limiter: RateLimiter,
-) -> None:
+) -> UUID | None:
+    """The checks, then the sign-up. Returns the id of the queued Kit job, if any."""
     ip = client_ip(request)
     await limiter.hit("signup_ip", ip, SIGNUPS_PER_IP, SIGNUP_WINDOW_SECONDS)
     await limiter.hit("signup_email", data.email, SIGNUPS_PER_EMAIL, SIGNUP_WINDOW_SECONDS)
     reason = automated_reason(data, datetime.now(UTC), settings.signup_min_seconds)
     if reason:
         log.info("signup_bot_rejected", reason=reason)
-        return
+        return None
     try:
         verified = await turnstile.verify(data.turnstile_token, ip)
     except TurnstileUnavailableError as exc:
@@ -99,4 +110,4 @@ async def _sign_up(
         raise ApiError(503, "turnstile_unavailable", "Sign-up is not available right now.") from exc
     if not verified:
         raise ApiError(400, "turnstile_failed", "The check did not pass. Please try again.")
-    await request_subscription(session, data)
+    return await request_subscription(session, data)

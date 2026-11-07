@@ -9,13 +9,18 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog.testing import capture_logs
 
+from app.integrations.kit.client import KitError
 from app.integrations.turnstile import TurnstileUnavailableError
 from app.main import create_app
 from app.models import EmailOutbox, Subscriber
+from app.models.email_outbox import OutboxStatus
 from app.models.subscriber import SubscriberStatus
+from app.routers.cron import kit_job
 from app.routers.v1 import turnstile_verifier
 from app.schemas.subscribers import SubscribeRequest
+from app.services.kit_jobs import KitSubscribeJob
 from app.services.subscribers import request_subscription
+from tests.integration.test_kit_job import FakeKitClient
 
 AUTH = {"Authorization": "Bearer test-service-token"}
 
@@ -57,9 +62,12 @@ def post(
     headers: Mapping[str, str] = AUTH,
     turnstile: FakeTurnstile | None = None,
     ip: str = "203.0.113.1",
+    kit: KitSubscribeJob | None = None,
 ) -> httpx2.Response:
     app = create_app()
     app.dependency_overrides[turnstile_verifier] = lambda: turnstile or FakeTurnstile()
+    # Never the real Kit: the local .env may hold a real key. No job means nothing is tried now.
+    app.dependency_overrides[kit_job] = lambda: kit
     sent = {"X-Client-IP": ip, **headers}
     return TestClient(app).post("/v1/subscribers", json=body, headers=sent)
 
@@ -189,6 +197,7 @@ async def test_a_bot_is_logged_with_the_reason_and_without_the_address(
 ) -> None:
     app = create_app()  # building the app sets up logging, so do it first
     app.dependency_overrides[turnstile_verifier] = lambda: FakeTurnstile()
+    app.dependency_overrides[kit_job] = lambda: None
     with capture_logs() as logs:
         TestClient(app).post(
             "/v1/subscribers", json={**BODY, "website": "http://spam.example"}, headers=AUTH
@@ -321,3 +330,66 @@ async def test_a_failed_attempt_does_not_use_up_its_key(session: AsyncSession) -
 @pytest.mark.parametrize("key", ["short", "has spaces in it!!", "x" * 129])
 async def test_a_malformed_key_is_a_422(key: str) -> None:
     assert post(headers={**AUTH, "Idempotency-Key": key}).status_code == 422
+
+
+def kit_job_with(client: FakeKitClient) -> KitSubscribeJob:
+    return KitSubscribeJob(client, "https://wordonthewater.net")  # type: ignore[arg-type]
+
+
+async def test_a_new_sign_up_is_sent_to_kit_right_after_the_response(
+    session: AsyncSession,
+) -> None:
+    client = FakeKitClient()
+
+    response = post(kit=kit_job_with(client))
+
+    assert (response.status_code, response.json()) == (202, {"status": "check_your_inbox"})
+    assert [c[0] for c in client.calls] == ["reader@example.com"]
+    [job] = await jobs(session)
+    assert (job.status, job.attempts, job.payload) == (OutboxStatus.SENT, 1, {})
+    subscriber = await session.scalar(select(Subscriber))
+    assert subscriber is not None and subscriber.kit_subscriber_id == 4242
+
+
+async def test_when_kit_fails_the_answer_is_the_same_and_the_job_waits_for_the_cron(
+    session: AsyncSession,
+) -> None:
+    client = FakeKitClient(KitError("Kit rejected status 500"))
+
+    response = post(kit=kit_job_with(client))
+
+    assert (response.status_code, response.json()) == (202, {"status": "check_your_inbox"})
+    [job] = await jobs(session)
+    assert (job.status, job.attempts) == (OutboxStatus.PENDING, 1)
+    assert job.next_attempt_at > datetime.now(UTC)
+    assert job.payload["first_name"] == "Ann"
+
+
+async def test_without_kit_configured_nothing_is_tried_and_the_job_stays_untouched(
+    session: AsyncSession,
+) -> None:
+    post(kit=None)
+
+    [job] = await jobs(session)
+    assert (job.status, job.attempts) == (OutboxStatus.PENDING, 0)
+
+
+async def test_nothing_is_sent_for_a_confirmed_address_or_a_bot(session: AsyncSession) -> None:
+    client = FakeKitClient()
+    await add_subscriber(session, SubscriberStatus.ACTIVE)
+
+    post(kit=kit_job_with(client))
+    post({**BODY, "email": "bot@example.com", "website": "x"}, kit=kit_job_with(client))
+
+    assert client.calls == []
+
+
+async def test_a_repeat_with_the_same_idempotency_key_reaches_kit_once(
+    session: AsyncSession,
+) -> None:
+    client = FakeKitClient()
+
+    post(headers={**AUTH, **KEY}, kit=kit_job_with(client))
+    post(headers={**AUTH, **KEY}, kit=kit_job_with(client))
+
+    assert len(client.calls) == 1

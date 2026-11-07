@@ -26,6 +26,7 @@ Config: `KIT_API_KEY` and `KIT_FORM_ID` (Sensitive on the API project; the test 
 - The redirect after confirming is one URL set on the Kit form. Whether a different URL can be used for the first and second visit is not known; the thank-you page must read correctly for a visitor who arrives after confirming. Because our own form calls the API, there is no Kit redirect after the sign-up itself: our page shows "check your inbox" (or redirects to `/thank-you` itself).
 - Whether a subscriber created as `active` and then added to the form also gets the confirmation email was not established (and is not needed).
 - A person who unsubscribed and signs up again: Kit says re-subscribing needs explicit permission. The sign-up form is that permission, but how Kit treats a `cancelled` subscriber added to a form is to be tested in step 1.3.
+- The immediate attempt after the request runs in a FastAPI background task (so the answer's timing does not reveal whether an address is new). Whether Vercel lets it finish after the response is sent is to be proven on a preview deployment; the outbox cron is the fallback either way.
 - Webhook delivery to the protected API project, and broadcasts: proven in their own steps.
 
 ## Consequences

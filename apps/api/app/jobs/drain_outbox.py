@@ -5,10 +5,13 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from uuid import UUID
 
+import structlog
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.db.session import get_engine
 from app.integrations.email.base import EmailProvider, EmailSendError
 from app.integrations.kit.client import KitError
 from app.models import EmailOutbox
@@ -16,6 +19,7 @@ from app.models.email_outbox import OutboxStatus
 from app.services.email_templates import render
 from app.services.kit_jobs import KIT_SUBSCRIBE, KitSubscribeJob
 
+log = structlog.get_logger()
 MAX_ATTEMPTS = 5
 BASE_BACKOFF = timedelta(minutes=5)
 BATCH_SIZE = 20
@@ -40,6 +44,7 @@ async def drain_outbox(
     provider: EmailProvider,
     now: datetime | None = None,
     kit: KitSubscribeJob | None = None,
+    only: UUID | None = None,
     budget: float = TIME_BUDGET_SECONDS,
     clock: Callable[[], float] = time.monotonic,
     send_timeout: float = SEND_TIMEOUT_SECONDS,
@@ -55,12 +60,13 @@ async def drain_outbox(
     for _ in range(BATCH_SIZE):
         if clock() >= deadline:
             break
+        query = select(EmailOutbox).where(
+            EmailOutbox.status == OutboxStatus.PENDING, EmailOutbox.next_attempt_at <= now
+        )
+        if only is not None:
+            query = query.where(EmailOutbox.id == only)
         row = await session.scalar(
-            select(EmailOutbox)
-            .where(EmailOutbox.status == OutboxStatus.PENDING, EmailOutbox.next_attempt_at <= now)
-            .order_by(EmailOutbox.next_attempt_at)
-            .limit(1)
-            .with_for_update(skip_locked=True)
+            query.order_by(EmailOutbox.next_attempt_at).limit(1).with_for_update(skip_locked=True)
         )
         if row is None:
             break
@@ -105,3 +111,16 @@ async def _deliver(
         row.last_error = None
         row.payload = {}
         result.sent += 1
+
+
+async def attempt_now(row_id: UUID, provider: EmailProvider, kit: KitSubscribeJob) -> None:
+    """Try one queued job right after the request, with its own session. Best effort.
+
+    Run after the response is sent, so the visitor never waits for Kit and the answer's timing
+    reveals nothing. If this does not finish, the row stays pending for the cron to retry.
+    """
+    try:
+        async with async_sessionmaker(get_engine(), expire_on_commit=False)() as session:
+            await drain_outbox(session, provider, kit=kit, only=row_id)
+    except Exception as exc:  # noqa: BLE001  never raise into the response; the cron retries
+        log.warning("immediate_send_failed", error=type(exc).__name__)

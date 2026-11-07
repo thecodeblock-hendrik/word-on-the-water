@@ -1,6 +1,7 @@
 """Sign-up logic: record the consent, then queue the Kit call. No HTTP in here."""
 
 from datetime import UTC, datetime
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
@@ -14,12 +15,13 @@ from app.services.outbox import enqueue
 KIT_SUBSCRIBE = "kit_subscribe"
 
 
-async def request_subscription(session: AsyncSession, data: SubscribeRequest) -> None:
+async def request_subscription(session: AsyncSession, data: SubscribeRequest) -> UUID | None:
     """Store a new address as pending and queue the Kit sign-up.
 
     An address that is still pending is queued again (the confirmation email may have been lost;
     Kit accepts a repeat). Confirmed, unsubscribed and bounced addresses change nothing. The caller
-    gives the same answer in every case, so the response never reveals which one it was.
+    gives the same answer in every case, so the response never reveals which one it was. Returns
+    the id of the queued Kit job, or None when nothing was queued.
     """
     inserted = await session.scalar(
         insert(Subscriber)
@@ -40,8 +42,8 @@ async def request_subscription(session: AsyncSession, data: SubscribeRequest) ->
         )
         if status is not SubscriberStatus.PENDING:
             await session.commit()
-            return
-    await enqueue(
+            return None
+    job = await enqueue(
         session,
         KIT_SUBSCRIBE,
         data.email,
@@ -52,3 +54,4 @@ async def request_subscription(session: AsyncSession, data: SubscribeRequest) ->
         },
     )
     await session.commit()
+    return job.id
