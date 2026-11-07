@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { ContentImage } from "@/components/content-image";
 import { Logo } from "@/components/logo";
 import { PlaceholderText } from "@/components/placeholder-text";
 import { founder } from "@/content/landing";
@@ -22,12 +21,13 @@ export function Founder({ photo = founder.photo }: { photo?: Photo | null }) {
           className="relative grid aspect-square w-full max-w-[420px] place-items-center overflow-hidden rounded-sm border border-line bg-surface"
         >
           {photo ? (
-            <Image
+            <ContentImage
               src={photo.src}
               alt={photo.alt}
-              fill
+              width={960}
+              height={943}
               sizes="(min-width: 1024px) 420px, calc(100vw - 2rem)"
-              className="object-cover"
+              className="absolute inset-0 size-full object-cover"
             />
           ) : (
             <Logo className="w-1/3" />

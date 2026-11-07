@@ -78,6 +78,7 @@ describe("Founder", () => {
     expect(frame.className).toMatch(/aspect-square/);
     const img = within(frame).getByRole("img", { name: /Henno/ });
     expect(img.getAttribute("src")).toMatch(/henno-surfing/);
+    expect(img).not.toHaveAttribute("style");
     expect(frame.querySelector("use")).toBeNull();
   });
 
