@@ -106,6 +106,9 @@ Footnotes, cross-references and Strong's numbers are removed in the first releas
 - Verses present in the WEB and missing in the BSB (the BSB leaves them to footnotes): Matthew 17:21, 18:11, 23:14; Mark 7:16, 9:44, 9:46, 11:26, 15:28; Luke 17:36, 23:17; Acts 8:37, 15:34, 24:7, 28:29; John 5:4. So verse numbers are not always contiguous: the importer must not assume they are, and the picker's last verse comes from the data, not from counting.
 - Romans: the WEB places the closing doxology at 14:24-26 (BSB 16:25-27). Romans 14 has 26 verses in the WEB and 23 in the BSB; Romans 16 has 25 in the WEB and 27 in the BSB. When switching version on these chapters, a range that does not exist in the other version falls back to the whole chapter, as already planned.
 - No other chapter differs in its last verse.
+- Five WEB verse numbers hold only a footnote and no verse text (Luke 17:36, Acts 8:37, 15:34, 24:7, Romans 16:25). The importer leaves them out, so the WEB data has 31,098 verses against 31,103 verse markers in the files. This was found by comparing the markers with the parsed verses, and it is the expected result.
+- Parsed against the real files: BSB 1,189 chapters and 31,086 verses, WEB 1,189 chapters and 31,098 verses, no leftover markup, no repeated or descending verse numbers in either.
+- Words of Jesus (`\\wj`) are kept as plain text for now; red-letter styling could come later from the same markers.
 
 **Rules that follow for the importer and the reader.**
 - Verse numbers ascend within a chapter but may skip; a verse range shows only the verses that exist; if none of the requested verses exist, show the whole chapter with a short note.
@@ -224,7 +227,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 ### B2 Import BSB and WEB (spike, then build)
 
 - [x] Spike: download both USFM zips, parse John, report markup and numbering differences in this file; choose the WEB edition (findings in section 3a)
-- [ ] Test the parser on small USFM samples (paragraphs, poetry, headings, footnote markers removed, verse numbers, ranges like `\v 3-4`)
+- [x] Test the parser on small USFM samples (paragraphs, poetry, headings, footnote markers removed, verse numbers, ranges like `\v 3-4`): `src/lib/bible/usfm.ts` and `types.ts`, 23 tests; also run against the real files (see 3a)
 - [ ] Add `pnpm build:bible` writing `content/bibles/<version>/<book>/<chapter>.json`
 - [ ] Test on the output: all 66 books, 1,189 chapters, no empty verse, verse numbers ascending, BSB John 3:16 and WEB John 3:16 match the source text exactly
 - [ ] Commit the generated files; check repository size and function bundle size (`outputFileTracingIncludes`)
