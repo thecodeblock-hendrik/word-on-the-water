@@ -1,6 +1,6 @@
 # 0008. Kit for subscriptions and newsletters
 
-Status: accepted (sign-up flow proven by a spike on 2026-11-07; webhooks and broadcasts still to be proven)
+Status: accepted (sign-up flow proven by a spike on 2026-11-07 and end to end on a Vercel preview on 2026-11-08; the webhook is built and tested but not yet registered or seen with a real delivery; broadcasts still to be proven)
 
 ## Context
 Kit (kit.com, API v4) owns the subscriber list, the double opt-in confirmation email, unsubscribe links and the legal footer. Our API validates, defends and forwards sign-ups. We needed to know which Kit calls make Kit send the confirmation email and what state a subscriber has until they confirm.
@@ -26,10 +26,15 @@ Config: `KIT_API_KEY` and `KIT_FORM_ID` (Sensitive on the API project; the test 
 - The redirect after confirming is one URL set on the Kit form. Whether a different URL can be used for the first and second visit is not known; the thank-you page must read correctly for a visitor who arrives after confirming. Because our own form calls the API, there is no Kit redirect after the sign-up itself: our page shows "check your inbox" (or redirects to `/thank-you` itself).
 - Whether a subscriber created as `active` and then added to the form also gets the confirmation email was not established (and is not needed).
 - A person who unsubscribed and signs up again: Kit says re-subscribing needs explicit permission. The sign-up form is that permission, but how Kit treats a `cancelled` subscriber added to a form is to be tested in step 1.3.
-- The immediate attempt after the request runs in a FastAPI background task (so the answer's timing does not reveal whether an address is new). Whether Vercel lets it finish after the response is sent is to be proven on a preview deployment; the outbox cron is the fallback either way.
+- The immediate attempt after the request runs in a FastAPI background task (so the answer's timing does not reveal whether an address is new). Proven on a Vercel preview on 2026-11-08: the request returned 202, then the Kit subscriber was created and added to the form (both 201), and after the confirmation link the subscriber was `active`. The outbox cron stays as the fallback.
 - Webhook (built 2026-11-07, from Kit's docs; not yet seen with a real delivery): `POST /v1/webhooks/kit` checks `X-Kit-Signature` (`t=<unix>,v1=<hex>`, HMAC-SHA256 of `{t}.{raw body}`, key = the whole `whsec_...` secret as UTF-8, 5 minute tolerance, any matching `v1` during rotation), dedupes on each event's `id`, and answers 2xx only when every event is handled (Kit retries 8 times over about 41 hours; 410 stops it). The key format is inferred from Kit's example code: confirm it with the first real delivery. Subscribed events: `subscriber.activated`, `.unsubscribed`, `.bounced`, `.complained` (plain strings in the `events` array). Kit shows the secret only when the endpoint is created or rotated.
 - How Kit reaches the protected API project (decided 2026-11-08): Kit calls a route on the web project, `POST /api/webhooks/kit` (`apps/web/src/lib/kit-webhook.ts`), which forwards the untouched body and `X-Kit-Signature` to `/v1/webhooks/kit` and adds the API project's Vercel bypass secret on the server. Chosen over putting the bypass secret in the registered URL because that secret would then sit at Kit (and in its delivery logs) and is project-wide. No service token is sent (the signature is the credential); the API's answer is relayed as a bare status so Kit retries failures; a body over 1 MB is refused; an unreachable API gives 502. Consequences: register `https://wordonthewater.net/api/webhooks/kit` only once the domain is attached and the web project redeployed; preview deployments are behind Vercel's login wall too, so Kit cannot reach a preview address and the route is tested by unit and e2e tests instead. Kit webhooks are account-wide, so sign-ups from the preview test form also reach the production endpoint; the API ignores people it has no record of.
-- Broadcasts: proven in their own step.
+- Broadcasts: proven in their own step (PLAN.md 2.4).
+
+## Operational findings (preview, 2026-11-08)
+- A Turnstile widget refuses every hostname not on its list (error 110200, "domain not allowed"). The production widget lists only `wordonthewater.net` and `www.wordonthewater.net`, so production sign-up cannot be tested on a `*.vercel.app` address.
+- Kit webhooks are account-wide: sign-ups through the preview test form also send events to the production endpoint. The API ignores people it has no record of.
+- Registering the webhook and the Kit form redirect need the live domain, so they are launch-time steps (`docs/production_checklist.md`, Part H; the guide is `docs/kit_webhook_checks.md`).
 
 ## Consequences
 - A Kit outage never loses a sign-up: both calls run from the outbox with retries; a repeat of either is harmless.

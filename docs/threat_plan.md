@@ -27,15 +27,15 @@ Deadline: before step 1.3 starts collecting anything.
 
 ## 3. Step 1.3: subscribers and Kit
 
-- [ ] **T1 (sub)** Pydantic schema for `POST /v1/subscribers` with `extra="forbid"` and limits (name 80, email 254). Test: unknown field, oversize, bad email all rejected.
-- [ ] **D1 (sub)** Wire the rate limiter to sign-up: per hashed IP and per email. Test: the limit trips and returns a generic 429.
-- [ ] **D1 (sub)** Turnstile verification in the API, honeypot field and minimum time-to-submit. Test each rejection path with fakes.
-- [ ] **D3** Double opt-in confirmed through Kit; limits and Turnstile in place. Test: a flood from one IP/email sends at most the limit to Kit.
-- [ ] **I2** Identical 202 body and similar timing for new, pending and confirmed emails, and whether or not Kit succeeded. Test all four cases return the same response.
-- [ ] **S3** Kit webhook signature check: `X-Kit-Signature` `t=...,v1=...`, HMAC-SHA256 over `{t}.{raw body}`, constant-time compare, 5 minute tolerance, any matching `v1` accepted. Tests: valid, bad signature, stale timestamp, tampered body, rotation with two `v1` values.
-- [ ] **R2** Dedupe webhook events on event id; handlers idempotent. Test: the same event twice changes state once.
-- [ ] **Secrets** `KIT_API_KEY` and `KIT_WEBHOOK_SECRET` Sensitive on the API project only; Preview uses a separate Kit test form or account.
-- [ ] Threat model updated for the new endpoints and Kit as a processor (CLAUDE.md section 14 checklist).
+- [x] **T1 (sub)** Pydantic schema for `POST /v1/subscribers` with `extra="forbid"` and limits (name 80, email 254). Test: unknown field, oversize, bad email all rejected.
+- [x] **D1 (sub)** Wire the rate limiter to sign-up: per hashed IP and per email. Test: the limit trips and returns a generic 429.
+- [x] **D1 (sub)** Turnstile verification in the API, honeypot field and minimum time-to-submit. Test each rejection path with fakes.
+- [x] **D3** Double opt-in confirmed through Kit; limits and Turnstile in place. Test: a flood from one IP/email sends at most the limit to Kit.
+- [x] **I2** Identical 202 body and similar timing for new, pending and confirmed emails, and whether or not Kit succeeded. Test all four cases return the same response.
+- [x] **S3** Kit webhook signature check: `X-Kit-Signature` `t=...,v1=...`, HMAC-SHA256 over `{t}.{raw body}`, constant-time compare, 5 minute tolerance, any matching `v1` accepted. Tests: valid, bad signature, stale timestamp, tampered body, rotation with two `v1` values.
+- [x] **R2** Dedupe webhook events on event id; handlers idempotent. Test: the same event twice changes state once.
+- [ ] **Secrets** `KIT_API_KEY` and `KIT_WEBHOOK_SECRET` Sensitive on the API project only; Preview uses a separate Kit test form or account. Done for `KIT_API_KEY` and `KIT_FORM_ID` (2026-11-07); `KIT_WEBHOOK_SECRET` is set when the webhook is registered at launch (production_checklist.md, Part H).
+- [x] Threat model updated for the new endpoints and Kit as a processor (CLAUDE.md section 14 checklist).
 
 ## 4. Step 1.4: prayer requests
 
