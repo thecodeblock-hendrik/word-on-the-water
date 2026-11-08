@@ -285,7 +285,7 @@ Kit owns the subscriber list, the double opt-in confirmation email, unsubscribe 
 #### 1.3 deployment and environment (2026-11-08)
 Done:
 - [x] PR #78 merged to `main` (2026-11-07); the production API is deployed with it
-- [x] `wotw-api` variables re-entered per environment (database runtime password, Turnstile, Kit, service token, cron secret, IP salt) and the Neon and Vercel setup checked after production was restored from `preview-base` to carry the 1.3 migration (`471ab1c015c8`): production test data cleared, production and preview roles given separate passwords, production `/health/ready` ok, nightly backup role reset and the backup workflow green again. Step-by-step in [vercel_api_checklist.md](vercel_api_checklist.md) and [neon_vercel_checks.md](archive/neon_vercel_checks.md)
+- [x] `wotw-api` variables re-entered per environment (database runtime password, Turnstile, Kit, service token, cron secret, IP salt) and the Neon and Vercel setup checked after production was restored from `preview-base` to carry the 1.3 migration (`471ab1c015c8`): production test data cleared, production and preview roles given separate passwords, production `/health/ready` ok, nightly backup role reset and the backup workflow green again. Step-by-step in [neon_vercel_checks.md](archive/neon_vercel_checks.md)
 - [x] Preview sign-up works end to end (Turnstile, rate limit, database, outbox, Kit double opt-in)
 - [x] Runbook: preview databases are not migrated automatically (`docs/runbooks/deploy.md`)
 
