@@ -1,6 +1,6 @@
 # Privacy v1
 
-Data inventory, retention and lawful basis for Word on the Water. Version 1, written 2026-10-31 at the end of Phase 0. **No personal data is collected yet.** Sign-up and the prayer and contact forms arrive in Phase 1 (steps 1.3 to 1.5).
+Data inventory, retention and lawful basis for Word on the Water. Version 1, written 2026-10-31 at the end of Phase 0. **The site is not public, so no real visitor data is collected yet.** The sign-up (with Kit double opt-in) is built and has only been used with test addresses on preview deployments; the prayer and contact forms arrive in steps 1.4 and 1.5. Test subscribers are deleted from Kit's dashboard by hand.
 
 This is the engineering record the public privacy policy page (step 1.6) is written from. It is not legal advice; Hendrik reviews the policy text before launch.
 
@@ -58,7 +58,7 @@ Providers outside the EU and South Africa are covered by their standard contract
 
 - **Withdraw consent, unsubscribe:** the unsubscribe link in every email (Kit), or a message to `hello@wordonthewater.net`.
 - **Access and a copy:** on request to `hello@wordonthewater.net`, answered within 30 days; the owner exports the person's rows from Neon and Kit.
-- **Correction and deletion:** the same route; deletion removes the Neon rows and the Kit subscriber (the exact Kit API call or dashboard action is confirmed in the step 1.3 spike), and the data ages out of backups within the retention above.
+- **Correction and deletion:** the same route; deletion removes the Neon rows and the Kit subscriber (Kit's API cannot delete a subscriber, so deleting from Kit is a dashboard action; confirmed in the step 1.3 spike), and the data ages out of backups within the retention above.
 - **Complaints:** the policy names the relevant regulator (the EU authority of the visitor's country, or South Africa's Information Regulator).
 
 ## Breaches

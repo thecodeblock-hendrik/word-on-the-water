@@ -13,7 +13,7 @@ Browser ──(1)──> Vercel edge + Firewall ──> Next.js (apps/web, wotw-
                                                │ (2) server-to-server, service token + X-Client-IP
                                                ▼
 Vercel Cron ──(6)──────────────────────> FastAPI (apps/api, wotw-api)
-Kit ─────────(5) signed webhook ───────>   │            │             │
+Kit ──(5) signed webhook ──> web /api/webhooks/kit ──(2)──>  │            │             │
                                            │(3)         │(4)          │(4)
                                            ▼            ▼             ▼
                                      Neon Postgres  Upstash Redis  Kit, Postmark, Turnstile
@@ -26,7 +26,7 @@ GitHub Actions ──(7)──> Vercel (Git integration), Neon (preview cleanup)
 | 2 | Web to API | Service token, Deployment Protection with bypass secret; the browser never calls the API |
 | 3 | API to Neon and Upstash | TLS (verify-full to Neon), least-privilege role, secrets in Vercel |
 | 4 | API to third parties | HTTPS with provider tokens; minimum data sent |
-| 5 | Kit to API | Webhook signature over the raw body, 5 minute window, event-id dedupe, 1 MB body cap (Done, step 1.3) |
+| 5 | Kit to web to API | Kit calls a public forwarder route on the web project (it cannot pass the API project's login wall); the forwarder passes the raw body and signature on, adds the bypass secret server-side, relays only a status, caps the body at 1 MB; the API then checks the signature over the raw body, 5 minute window, event-id dedupe, 1 MB body cap (Done, step 1.3; registration at launch) |
 | 6 | Vercel Cron to API | `CRON_SECRET` bearer |
 | 7 | CI and Git to hosting | Branch protection, least-privilege workflows, pinned actions |
 
@@ -92,6 +92,7 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 | K2 | The Kit API key or webhook secret leaks | Never logged or in an error message; the webhook secret is written to `.env` by the registration tool and never printed; gitleaks; `server-only` | Done |
 | K3 | A bot gets a sign-up through without a real check | Turnstile token verified server-side on every sign-up; if Cloudflare cannot judge it, 503 and nothing stored; production refuses Cloudflare's always-pass test secrets | Done |
 | K4 | A confirmation link is used to confirm someone else | Kit issues and expires the confirmation; we hold no tokens | Done (by design, ADR 0008) |
+| K5 | The public forwarder `/api/webhooks/kit` is used to reach the API without credentials, or to send it load | It sends no service token and relays nothing from the API (a bare status); a body over 1 MB is refused; the API verifies the signature before doing anything, so an unsigned call is a 401; the bypass secret never leaves the server | Done (step 1.3); a Firewall rate-limit rule on the route is a launch step |
 
 ### Denial of service
 
@@ -122,6 +123,7 @@ These came from the setup, not from code defects. R-1 to R-4 were closed on 2026
 | R-2 | Preview and production share the role passwords (Neon branches copy roles), and the `NEON_*` variables are not Sensitive | A preview variable shown in the Vercel dashboard or leaked from a build is also a working production credential | Give preview its own roles and passwords, mark the variables Sensitive where the integration allows, rotate after the change | Closed 2026-11-01 |
 | R-3 | Preview and production share one Upstash Redis | A preview can exhaust or pollute production rate limits | A separate Upstash database for preview, or a key prefix per environment | Closed 2026-11-01 |
 | R-4 | CLAUDE.md section 6.6 says previews never get production keys | The statement is not true for R-2 and R-3 | Reword now, restore the rule once R-1 to R-3 are fixed | Closed 2026-11-01 |
+| R-5 | After production `main` was restored from `preview-base` (2026-11-08), `main` is a child of `preview-base` and may carry its roles and passwords | A shared password lets preview code reach production; "Reset from parent" on `main` would overwrite production with preview data | Reset the production role passwords on `main`, keep them different from preview, never reset `main` from its parent | Closed 2026-11-08 (passwords reset; the lineage is recorded in the deploy runbook) |
 Residual risks accepted for Phase 1: the Hobby plan's limits until launch; DMARC at `p=none` for the first weeks; delivery through the `hello@` and `prayer@` forwards depending on Squarespace forwarding.
 
 ## Out of scope for v1

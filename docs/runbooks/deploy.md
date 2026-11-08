@@ -9,7 +9,7 @@ How Word on the Water is deployed on Vercel, and the one-off setup behind it.
 | Root directory | `apps/web` | `apps/api` |
 | Framework | Next.js | FastAPI (entrypoint `app/main.py`, Python from `.python-version`, deps from `uv.lock`) |
 | Region | `fra1` | `fra1` |
-| Production URL | `wotw-web.vercel.app`; custom domain `wordonthewater.net` planned for launch (step 1.9); DNS stays at Squarespace | `wotw-api.vercel.app` (stays on its protected URL) |
+| Production URL | `wotw-web.vercel.app`; custom domain `wordonthewater.net` is a launch step (see [production_checklist.md](../production_checklist.md)); DNS stays at Squarespace and the old site is still live | `wotw-api.vercel.app` (stays on its protected URL) |
 | Deployment Protection | Previews (Standard) | All deployments; the web passes the automation bypass |
 | Data | none | Neon `wotw-db` (`NEON_*`), Upstash `wotw-redis` (`UPSTASH_*`) |
 
@@ -23,7 +23,7 @@ Team `thecodeblock`, Hobby plan. Vercel's Git integration deploys every push: a 
 
 **Long branch names break the derivation.** The alias label is `wotw-web-git-<branch>-thecodeblock`, which must stay under 63 characters, so keep the branch name to 36 characters or fewer (Vercel drops `_` and turns `/` into `-`). Beyond that Vercel shortens the label and appends a hash that differs per project (observed on a Dependabot branch: web `…appswebno-0b4701-…`, API `…appswebno-5dfe3b-…`), so the swapped host does not exist. The web app now refuses to guess: `env.ts` throws "the branch name is too long" naming the alias. To use such a preview anyway, set `API_BASE_URL` for that branch to the API preview's real alias.
 
-**Neon preview branches:** each preview gets a Neon branch `preview/<git branch>`, and the Free plan allows 10. `.github/workflows/neon-preview-cleanup.yml` deletes it when the PR closes (secret `NEON_API_KEY` for Actions and Dependabot, variable `NEON_PROJECT_ID`). If previews fail with "Resource provisioning failed", check the branch count in the Neon console and delete stale `preview/...` branches (never `main`).
+**Neon preview branches:** each preview gets a Neon branch `preview/<git branch>`, copied from `preview-base` (the Default branch) when the git branch first builds, and the Free plan allows 10. After production `main` was restored from `preview-base` (2026-11-08) the lineage is `main_old_...` (backup, root), `preview-base`, then `main` and the previews: never use "Reset from parent" on `main`. `.github/workflows/neon-preview-cleanup.yml` deletes it when the PR closes (secret `NEON_API_KEY` for Actions and Dependabot, variable `NEON_PROJECT_ID`). If previews fail with "Resource provisioning failed", check the branch count in the Neon console and delete stale `preview/...` branches (never `main`).
 
 ## Environment variables
 
@@ -34,17 +34,21 @@ Set for **Preview and Production only**. Development is empty: local work uses t
 | api | `ENVIRONMENT` | `preview` or `production` (production disables `/docs`) |
 | api | `DB_RUNTIME_PASSWORD` | `app_runtime` password. The URL is built from `NEON_PGHOST`, so each preview branch is used automatically |
 | api | `SERVICE_TOKEN`, `CRON_SECRET`, `IP_HASH_SALT` | Random, 32 bytes hex |
+| api | `TURNSTILE_SECRET_KEY` | The widget secret for the environment: Preview widget in Preview, Production widget in Production. A widget refuses any hostname not on its list (error 110200), so the Production widget works only on `wordonthewater.net` |
+| api | `KIT_API_KEY`, `KIT_FORM_ID` | Preview uses the Kit test form; Production the real form |
+| api | `KIT_WEBHOOK_SECRET` | Production only, set when the webhook is registered at launch ([kit_webhook_checks.md](../kit_webhook_checks.md)) |
 | api | `EMAIL_PROVIDER` | Unset until Postmark is set up (step 1.x). Never `console` outside local: the factory refuses it, since it would log email contents |
 | api | `NEON_*`, `UPSTASH_*` | Managed by the integrations; `REDIS_URL` falls back to `UPSTASH_REDIS_URL` |
 | web | `SERVICE_TOKEN` | Same value as the API in the same environment |
 | web | `API_BYPASS_SECRET` | The API project's automation bypass secret (not the web's own `VERCEL_AUTOMATION_BYPASS_SECRET`) |
 | web | `API_BASE_URL` | Production only |
+| web | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | The site key of the same widget (Preview widget in Preview, Production widget in Production); read at build time, so redeploy after changing it |
 
 `DB_MIGRATOR_PASSWORD` is never given to the deployed API: the runtime has no DDL credentials.
 
 ## One-off: Neon roles
 
-Run once on the Neon **main** branch, as the owner (`neondb_owner`). Preview branches copy roles from main.
+Run once on the Neon **main** branch, as the owner (`neondb_owner`). Branches copy roles and passwords from their parent when created, so production and preview must each end up with their own passwords (production on `main`, previews on `preview-base`); a preview branch that already exists does not follow later changes to `preview-base`.
 
 ```
 openssl rand -hex 32   # once for the migrator, once for the runtime
@@ -63,7 +67,7 @@ DATABASE_URL_DIRECT="postgresql+asyncpg://app_migrator:<password>@<NEON_PGHOST_U
 ENVIRONMENT=production uv run alembic upgrade head
 ```
 
-`ENVIRONMENT` other than `local` turns on certificate and hostname verification. Production migrations move to `migrate.yml` with a manual approval (planned).
+`ENVIRONMENT` other than `local` turns on certificate and hostname verification. Production migrations move to `migrate.yml` with a manual approval (planned, a launch step). Run locally with `ENVIRONMENT=production`, the settings refuse Cloudflare's test Turnstile secret that sits in your `.env`: pass a non-test dummy for that one command, for example `TURNSTILE_SECRET_KEY=unused-by-migrations`. Run it from `apps/api` (Alembic imports `app` from the current directory).
 
 **Preview databases are not migrated automatically.** Vercel creates a Neon branch per git branch, copied from `preview-base` when it is first created. A new migration therefore has to be applied to `preview-base` and to the branch of every open pull request that needs it, or the preview API fails with `DBAPIError` on the first query that touches the new schema. Check with `select version_num from alembic_version;` on the branch the preview uses.
 
@@ -85,3 +89,7 @@ Vercel Cron gets through Deployment Protection by itself: it calls the deploymen
 ## Rollback
 
 Vercel Instant Rollback to the previous production deployment (`vercel rollback`). Safe because migrations are backward compatible.
+
+## Kit webhook
+
+Kit cannot pass the API project's Deployment Protection, so it calls the web project: `POST https://wordonthewater.net/api/webhooks/kit` forwards the raw body and `X-Kit-Signature` to `/v1/webhooks/kit` and adds the bypass secret server-side. Previews are behind the login wall too, so the webhook is registered for production only, at launch. Check the chain with `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'`: 503 means the forwarder reached the API but no `KIT_WEBHOOK_SECRET` is set; 401 means the secret is set and the unsigned call was refused; 502 means the API was unreachable. Steps: [kit_webhook_checks.md](../kit_webhook_checks.md).

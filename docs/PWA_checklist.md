@@ -1,6 +1,6 @@
 # PWA checklist
 
-Step by step plan to make Word on the Water an installable web app (a PWA). It expands the PWA items in [PLAN.md](PLAN.md) section 1.6 and 1.8, and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
+Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
 **Scope (Phase 1):** installable, full-screen, with the right icon, name and colours. **Not in scope:** offline reading and a service worker (Phase 3), Web Push (Phase 2 gate), a native app (see [FLUTTER.md](FLUTTER.md)).
 

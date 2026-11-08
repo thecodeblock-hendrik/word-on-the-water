@@ -1,5 +1,7 @@
 # Secret keys and Vercel variables
 
+> Status (2026-11-08): sections A to D are done and the sign-up works on a preview. What is left (the webhook secret, the production keys going live) is in [production_checklist.md](production_checklist.md) and [kit_webhook_checks.md](kit_webhook_checks.md). Kept for reference.
+
 Step by step setup of the keys that step 1.3 (email sign-up) needs. Do the sections in order: the keys you create in Cloudflare and Kit are the values you paste into Vercel. Tick each box as you go.
 
 **Rules for secrets**
