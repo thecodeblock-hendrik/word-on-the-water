@@ -290,7 +290,7 @@ Done:
 - [x] Runbook: preview databases are not migrated automatically (`docs/runbooks/deploy.md`)
 
 Left to do (this is the only list; the old `continue.md` is archived):
-- [ ] **(Hendrik)** Rotate the preview `app_migrator` password in Neon: it was pasted in chat on 2026-11-08 (the production one was reset)
+- [x] **(Hendrik)** Rotate the preview `app_migrator` password in Neon: it was pasted in chat on 2026-11-08 (the production one was reset). Done 2026-11-08 on `preview-base` and the PR branch
 - [ ] **(Hendrik)** Set the Kit form redirect and register the webhook (items above), then redeploy production web and API yourself (`/thank-you` exists on production only after the web redeploy; `wordonthewater.net` still points at Squarespace until step 1.9)
 - [ ] Record in ADR 0008: the background Kit call finishes after the response on Vercel; the Turnstile 110200 finding; the Kit redirect and webhook decisions
 - [ ] Tests first, then fix: make the `unhandled_error` and `readiness_failed` logs name the cause class (never the message, which can hold hosts or credentials) so a database login failure is identifiable from the log. Finding it took many attempts because the log only said `DBAPIError`
