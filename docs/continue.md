@@ -4,7 +4,9 @@ Written 2026-11-07 at the end of the day, so the next session has a starting poi
 
 ## Where we are
 
-Step **1.3 (email sign-up with Kit)** is built and in review.
+Step **1.3 (email sign-up with Kit)** is built and PR #78 is merged to `main` (2026-11-07). Production is not redeployed and `wordonthewater.net` still points at Squarespace, so test on the preview alias (the production Turnstile widget only allows the real domain).
+
+**Open problem (2026-11-08):** on the preview, Subscribe shows "Sign-up is not available right now". The API log shows Turnstile passing and then `DBAPIError` (`asyncpg.py:840`) on `POST /v1/subscribers`. `preview-base` was behind one migration and was migrated to `471ab1c015c8`, but the error stayed, so check which Neon branch the preview API really uses (the per-git-branch branch) and its `alembic_version`. See the Migrations section of `docs/runbooks/deploy.md`.
 
 - **PR:** https://github.com/thecodeblock-hendrik/word-on-the-water/pull/78 (branch `feat/1.3-kit-signup`). All 14 checks pass, including Playwright e2e. **Not merged yet**: one section branch per plan section, merge only when the section is done.
 - **Preview deployments** (behind Vercel login, so only you can open them):
