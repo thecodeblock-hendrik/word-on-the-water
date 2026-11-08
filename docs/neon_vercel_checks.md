@@ -120,4 +120,4 @@ This is not caused by the restore. The preview API must be able to log in to the
 - [ ] `app_backup` password updated and the GitHub backup run is green.
 - [ ] The backup branch from the restore is scheduled for deletion.
 - [ ] All new passwords stored only in the password manager.
-- [ ] Still to do before launch (yours): the Kit form redirect, the Kit webhook and the production redeploys listed in `docs/continue.md`.
+- [ ] Still to do before launch (yours): the Kit form redirect, the Kit webhook and the production redeploys listed in `docs/PLAN.md` under step 1.3.

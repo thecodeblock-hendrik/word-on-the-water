@@ -1,3 +1,5 @@
+> Archived 2026-11-08. Superseded by docs/PLAN.md (step 1.3 holds everything that was outstanding). Kept for history only.
+
 # Continue here
 
 Written 2026-11-07 at the end of the day, so the next session has a starting point. Read this first, then `CLAUDE.md` and `docs/PLAN.md`.
