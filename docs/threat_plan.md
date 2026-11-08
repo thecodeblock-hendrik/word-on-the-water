@@ -44,7 +44,7 @@ Deadline: before step 1.3 starts collecting anything.
 - [ ] **I1 (part)** Notification email holds the request text only when the requester ticked consent, otherwise "a new request is waiting". Test both.
 - [ ] **I1 (part)** Prayer text absent from logs, Sentry and error responses. Test with a captured log stream and a forced exception.
 - [ ] **D1 (sub)** Rate limit (3/hour/IP), Turnstile, honeypot on prayer requests.
-- [ ] Retention: `delete_after` set on every row (job arrives in 1.9).
+- [ ] Retention: `delete_after` set on every row (job arrives in 1.7).
 - [ ] Threat model updated.
 
 ## 5. Step 1.5: contact form
@@ -54,25 +54,20 @@ Deadline: before step 1.3 starts collecting anything.
 - [ ] Contact text kept out of logs and Sentry. Test as in 4.
 - [ ] Threat model updated.
 
-## 6. Step 1.9: launch hardening
+## 6. Retention (before real data)
 
-- [ ] **D1 (final)** Vercel Firewall rate-limit rules on the form routes; Attack Challenge Mode noted in the incident runbook.
-- [ ] **D4** Move to Vercel Pro so deployments are not blocked by Hobby quotas.
-- [ ] **S5** SPF (one merged record), DKIM per sender, DMARC at `p=none` with reports to `hello@`, custom return-paths, Kit sending domain. Verify with a test send to an external mailbox.
-- [ ] **S5 (later)** Move DMARC to `quarantine` after a few weeks of clean reports.
-- [ ] End-to-end test of notification delivery through the `hello@` and `prayer@` forwards; fall back to direct inboxes if unreliable (accepted risk).
 - [ ] Retention job (daily cron): unconfirmed subscribers 7 days, prayer requests 90 days, contact messages 12 months, audit logs 1 year. Test each deletion.
-- [ ] Tested restore from backup (`docs/runbooks/restore-db.md`).
-- [ ] ZAP baseline scan clean of high findings.
+
+Moved to [production_checklist.md](production_checklist.md) because they are only needed just before launch: **D1 (final)** Firewall rate-limit rules and Attack Challenge Mode, **D4** Vercel Pro, **S5** SPF, DKIM, DMARC, return-paths and the Kit sending domain (and the later move to `quarantine`), the end-to-end test of the `hello@` and `prayer@` forwards, the tested restore from backup, and the ZAP baseline scan.
 
 ## 7. Owner actions (E4)
 
 Not verifiable from the repository. Hendrik ticks these and notes the date.
 
 - [ ] Two-factor on GitHub, Vercel, Neon, Upstash, Kit, Postmark.
-- [ ] Two-factor on Squarespace (domain and DNS) and the registrar lock enabled.
 - [ ] Recovery codes stored offline.
-- [ ] Vercel audit log enabled (Pro).
+
+Moved to [production_checklist.md](production_checklist.md): two-factor and the registrar lock on Squarespace, and the Vercel audit log (needs Pro).
 
 ## 8. Phase 2 gate (not now)
 
@@ -86,10 +81,10 @@ Run at each phase gate and after any change to the area.
 
 - [ ] S1 and S4: calls without the service token or `CRON_SECRET` return 401 in the integration tests.
 - [ ] S2: a forged `X-Client-IP` without a valid token is ignored.
-- [ ] T3: CSP header present and enforced in production (`CSP_REPORT_ONLY` off).
 - [ ] T4: CI security workflows green; Dependabot PRs reviewed.
-- [ ] I5: `/docs` and `/openapi.json` return 404 in production.
 - [ ] E1: `app_runtime` cannot run DDL (try `CREATE TABLE` as that role).
+
+Moved to [production_checklist.md](production_checklist.md): T3 (CSP enforced in production) and I5 (`/docs` and `/openapi.json` return 404 in production).
 
 ## Residual risks accepted for Phase 1
 
