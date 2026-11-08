@@ -6,6 +6,7 @@ import { createServer } from "node:http";
 
 let last: { body: Record<string, unknown>; headers: Record<string, string | undefined> } | null =
   null;
+let lastWebhook: { body: string; headers: Record<string, string | undefined> } | null = null;
 
 createServer((request, response) => {
   const chunks: Buffer[] = [];
@@ -17,6 +18,18 @@ createServer((request, response) => {
     };
     if (request.url === "/health/live") return send(200, { status: "ok" });
     if (request.url === "/__last") return send(200, last);
+    if (request.url === "/__last_webhook") return send(200, lastWebhook);
+    if (request.url === "/v1/webhooks/kit" && request.method === "POST") {
+      lastWebhook = {
+        body: Buffer.concat(chunks).toString(),
+        headers: {
+          authorization: request.headers.authorization,
+          "x-kit-signature": request.headers["x-kit-signature"] as string | undefined,
+        },
+      };
+      const bad = request.headers["x-kit-signature"] === "t=1,v1=bad";
+      return send(bad ? 401 : 200, {});
+    }
     if (request.url === "/v1/subscribers" && request.method === "POST") {
       const body = JSON.parse(Buffer.concat(chunks).toString() || "{}");
       last = {
