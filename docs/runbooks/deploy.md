@@ -65,6 +65,8 @@ ENVIRONMENT=production uv run alembic upgrade head
 
 `ENVIRONMENT` other than `local` turns on certificate and hostname verification. Production migrations move to `migrate.yml` with a manual approval (planned).
 
+**Preview databases are not migrated automatically.** Vercel creates a Neon branch per git branch, copied from `preview-base` when it is first created. A new migration therefore has to be applied to `preview-base` and to the branch of every open pull request that needs it, or the preview API fails with `DBAPIError` on the first query that touches the new schema. Check with `select version_num from alembic_version;` on the branch the preview uses.
+
 ## Cron
 
 `/cron/drain-outbox` runs daily at 05:00 UTC: Hobby only allows daily crons, and more frequent schedules fail the deploy. Change it to `*/5 * * * *` after moving to Pro. Vercel sends `Authorization: Bearer $CRON_SECRET`.
