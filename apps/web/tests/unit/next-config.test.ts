@@ -9,16 +9,13 @@ describe("next.config images", () => {
 });
 
 describe("next.config local images", () => {
-  it("only lets the optimizer touch content images and the writer photo, without query strings", () => {
-    expect(nextConfig.images?.localPatterns).toEqual([
-      { pathname: "/content/**", search: "" },
-      { pathname: "/henno-surfing.jpg", search: "" },
-    ]);
+  it("only lets the optimizer touch content images, without query strings", () => {
+    expect(nextConfig.images?.localPatterns).toEqual([{ pathname: "/content/**", search: "" }]);
   });
 });
 
 describe("next.config file tracing", () => {
-  const articles = ["./content/devotionals/**/*", "./content/series/**/*"];
+  const articles = ["./content/devotionals/**/*", "./content/series/**/*", "./content/site/**/*"];
 
   it("ships each route only the content it reads", () => {
     expect(nextConfig.outputFileTracingIncludes).toEqual({

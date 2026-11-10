@@ -44,12 +44,8 @@ describe("devotional page", () => {
     const art = container.querySelectorAll("figure img");
     expect(art).toHaveLength(2);
     const sources = [...art].map((i) => decodeURIComponent(i.getAttribute("src")!));
-    expect(sources.some((s) => s.includes("/content/series/advent/art-dawn-patrol.png"))).toBe(
-      true,
-    );
-    expect(sources.some((s) => s.includes("/content/series/advent/art-night-swell.png"))).toBe(
-      true,
-    );
+    expect(sources.some((s) => s.includes("/art-dawn-patrol.png"))).toBe(true);
+    expect(sources.some((s) => s.includes("/art-night-swell.png"))).toBe(true);
     expect(screen.getByText("Illustration: Advent series art")).toBeInTheDocument();
   });
 
@@ -104,10 +100,10 @@ describe("devotional page", () => {
     const { container } = await renderPage();
     const share = container.querySelector("section[aria-labelledby='h-verse']")!;
     const saves = [...share.querySelectorAll("a[download]")].map((a) => a.getAttribute("href"));
-    expect(saves).toEqual([
-      `/content/devotionals/${slug}/verse-card-dawn-patrol.png`,
-      `/content/devotionals/${slug}/verse-card-night-swell.png`,
-    ]);
+    const card = (file: string) => new RegExp(`^/content/devotionals/${slug}/[0-9a-f]{8}/${file}$`);
+    expect(saves).toHaveLength(2);
+    expect(saves[0]).toMatch(card("verse-card-dawn-patrol.png"));
+    expect(saves[1]).toMatch(card("verse-card-night-swell.png"));
     expect(within(share as HTMLElement).getAllByAltText(/Psalm 130:6/)).toHaveLength(2);
   });
 
@@ -164,6 +160,8 @@ describe("generateMetadata", () => {
     expect(meta.description).toMatch(/^Every dawn patrol starts in the dark/);
     expect(meta.alternates?.canonical).toBe(`/devotionals/${slug}`);
     const images = JSON.stringify(meta.openGraph?.images);
-    expect(images).toContain(`/content/devotionals/${slug}/verse-card-night-swell.png`);
+    expect(images).toMatch(
+      /\/content\/devotionals\/[^"]+\/[0-9a-f]{8}\/verse-card-night-swell\.png/,
+    );
   });
 });

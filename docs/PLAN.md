@@ -223,7 +223,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] What's coming (weekly devotional, teaching series, audio) with the latest devotional as the surf report; the weekly card is labelled "Rolling in consistently"
 - [x] Start here (gospel in 4 steps; wording to be read by a pastor or elder before launch)
 - [x] Statement of faith: four points, no placeholder (a full-statement link appears once a page or URL exists)
-- [x] Writer section: `Henno (AKA "H")`, Harvest Christian Church, faith story and a square surfing photo (`public/henno-surfing.jpg`)
+- [x] Writer section: `Henno (AKA "H")`, Harvest Christian Church, faith story and a square surfing photo (`content/site/founder/henno-surfing.jpg`)
 - [x] Footer with the full ESV notice per the Crossway API terms: usage-limit line, Creative Commons and translation sentence, www.esv.org link, "(ESV)" on quotations (social and privacy links appear when their addresses exist: privacy in 1.6)
 - [x] Theme toggle moved to the header: top right from `lg`, a Theme row in the mobile menu below `lg`
 - [x] Scripture references stored as structured data (`book`, `chapter`, `verses`)
