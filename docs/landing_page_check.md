@@ -131,7 +131,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 
 ## I. Visual polish and consistency
 
-- [ ] Compare each section against `docs/design/A. Night swell@2x.png` and `B. Dawn patrol@2x.png` (both are untracked in git; decide whether to commit them)
+- [ ] Compare each section against `docs/design/A. Night swell@2x.png` and `B. Dawn patrol@2x.png` (both are committed)
 - [ ] Light and dark pass over every section, including the new forms
 - [ ] Text contrast checked for both schemes (WCAG 2.2 AA)
 - [ ] Devotional text uses Lora at a `62ch` measure, base size 16px or more
