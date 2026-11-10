@@ -77,7 +77,9 @@ describe("Founder", () => {
     const frame = screen.getByTestId("founder-photo");
     expect(frame.className).toMatch(/aspect-square/);
     const img = within(frame).getByRole("img", { name: /Henno/ });
-    expect(img.getAttribute("src")).toMatch(/henno-surfing/);
+    expect(decodeURIComponent(img.getAttribute("src")!)).toMatch(
+      /url=\/content\/site\/founder\/[0-9a-f]{8}\/henno-surfing\.jpg/,
+    );
     expect(img).not.toHaveAttribute("style");
     expect(frame.querySelector("use")).toBeNull();
   });

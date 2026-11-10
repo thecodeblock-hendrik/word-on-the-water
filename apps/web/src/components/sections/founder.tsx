@@ -1,9 +1,10 @@
 import { ContentImage } from "@/components/content-image";
+import { mediaUrl } from "@/components/devotional/media";
 import { Logo } from "@/components/logo";
 import { PlaceholderText } from "@/components/placeholder-text";
 import { founder } from "@/content/landing";
 
-type Photo = { src: string; alt: string };
+type Photo = { file: string; alt: string };
 
 /** Who writes this. Shows the logo mark in the photo frame if there is no photo. */
 export function Founder({ photo = founder.photo }: { photo?: Photo | null }) {
@@ -22,7 +23,7 @@ export function Founder({ photo = founder.photo }: { photo?: Photo | null }) {
         >
           {photo ? (
             <ContentImage
-              src={photo.src}
+              src={mediaUrl("site", "founder", photo.file)}
               alt={photo.alt}
               width={960}
               height={943}

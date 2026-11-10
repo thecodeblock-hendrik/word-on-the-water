@@ -13,7 +13,11 @@ loadEnvConfig(
   true,
 );
 
-const devotionalFiles = ["./content/devotionals/**/*", "./content/series/**/*"];
+const devotionalFiles = [
+  "./content/devotionals/**/*",
+  "./content/series/**/*",
+  "./content/site/**/*",
+];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -21,11 +25,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: (process.env.DEV_ORIGINS ?? "").split(",").filter(Boolean),
   images: {
     formats: ["image/avif", "image/webp"],
-    // Content images are served by src/app/content; the writer's photo lives in public/. No query strings.
-    localPatterns: [
-      { pathname: "/content/**", search: "" },
-      { pathname: "/henno-surfing.jpg", search: "" },
-    ],
+    // Every image is served by src/app/content, with a content hash in its path. No query strings.
+    localPatterns: [{ pathname: "/content/**", search: "" }],
   },
   // The loader reads content/ with paths built at run time, so say which routes need it.
   outputFileTracingIncludes: {
