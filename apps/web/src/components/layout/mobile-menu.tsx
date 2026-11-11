@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "radix-ui";
-import { useSyncExternalStore, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { NavLink } from "@/components/layout/nav-link";
 import type { NavItem } from "@/components/layout/nav-links";
@@ -19,7 +19,7 @@ function useHydrated() {
 
 /**
  * Menu for screens below lg. Non-modal, so the button stays usable and toggles it.
- * Esc, the button or choosing a link closes it, and focus returns to the button.
+ * Esc, the button or choosing a link or switching the theme closes it, and focus returns to the button.
  * The theme toggle sits at the foot of the panel, because the header bar has no room for it here.
  */
 export function MobileMenu({
@@ -30,8 +30,9 @@ export function MobileMenu({
   themeToggle: ReactNode;
 }) {
   const hydrated = useHydrated();
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog.Root modal={false}>
+    <Dialog.Root modal={false} open={open} onOpenChange={setOpen}>
       <Dialog.Trigger
         aria-label="Menu"
         className={`inline-flex size-11 flex-none items-center justify-center rounded-sm border-[1.5px] border-line text-ink lg:hidden ${hydrated ? "" : "invisible"}`}
@@ -66,7 +67,10 @@ export function MobileMenu({
             </Dialog.Close>
           ))}
         </nav>
-        <div className="flex items-center justify-between pt-3 font-ui text-[17px] font-medium text-ink">
+        <div
+          onClick={() => setOpen(false)}
+          className="flex items-center justify-between pt-3 font-ui text-[17px] font-medium text-ink"
+        >
           <span>Theme</span>
           {themeToggle}
         </div>

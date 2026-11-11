@@ -19,14 +19,14 @@ export function Founder({ photo = founder.photo }: { photo?: Photo | null }) {
       <div className="mt-3 grid gap-5">
         <div
           data-testid="founder-photo"
-          className="relative grid aspect-square w-full max-w-[420px] place-items-center overflow-hidden rounded-sm border border-line bg-surface"
+          className="relative grid aspect-[4/5] w-full max-w-[420px] place-items-center overflow-hidden rounded-sm border border-line bg-surface"
         >
           {photo ? (
             <ContentImage
               src={mediaUrl("site", "founder", photo.file)}
               alt={photo.alt}
-              width={960}
-              height={943}
+              width={640}
+              height={800}
               sizes="(min-width: 1024px) 420px, calc(100vw - 2rem)"
               className="absolute inset-0 size-full object-cover"
             />

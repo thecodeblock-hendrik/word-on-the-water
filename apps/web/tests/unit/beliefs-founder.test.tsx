@@ -72,10 +72,10 @@ describe("Founder", () => {
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
-  it("shows the surfing photo in a square frame wide enough to see the wave", () => {
+  it("shows the surfing photo in a 4:5 frame so the whole portrait shows", () => {
     render(<Founder />);
     const frame = screen.getByTestId("founder-photo");
-    expect(frame.className).toMatch(/aspect-square/);
+    expect(frame.className).toMatch(/aspect-\[4\/5\]/);
     const img = within(frame).getByRole("img", { name: /Henno/ });
     expect(decodeURIComponent(img.getAttribute("src")!)).toMatch(
       /url=\/content\/site\/founder\/[0-9a-f]{8}\/henno-surfing\.jpg/,
