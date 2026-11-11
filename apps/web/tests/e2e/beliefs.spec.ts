@@ -15,10 +15,10 @@ test("beliefs and founder sit side by side only from lg", async ({ page }) => {
   else expect(founderX).toBe(beliefsX);
 });
 
-test("the founder frame is square and the page does not scroll sideways", async ({ page }) => {
+test("the founder frame is 4:5 and the page does not scroll sideways", async ({ page }) => {
   await page.goto("/#founder");
   const box = (await page.getByTestId("founder-photo").boundingBox())!;
-  expect(box.height / box.width).toBeCloseTo(1, 1);
+  expect(box.height / box.width).toBeCloseTo(1.25, 1);
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
   );
