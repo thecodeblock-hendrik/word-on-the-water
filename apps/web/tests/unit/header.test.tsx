@@ -1,10 +1,12 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Header } from "@/components/layout/header";
 import { NAV_LINKS } from "@/components/layout/nav-links";
+
+vi.mock("@/lib/actions/theme", () => ({ setTheme: vi.fn() }));
 
 afterEach(cleanup);
 
@@ -84,6 +86,19 @@ describe("mobile menu", () => {
     await user.click(button);
     await user.click(button);
     expect(screen.queryByTestId("mobile-menu")).not.toBeInTheDocument();
+  });
+
+  it("closes when the theme is switched", async () => {
+    document.documentElement.dataset.theme = "light";
+    const { user, button } = await setup();
+    await user.click(button);
+    await user.click(
+      within(screen.getByTestId("mobile-menu")).getByRole("button", {
+        name: /switch between light and dark/i,
+      }),
+    );
+    expect(screen.queryByTestId("mobile-menu")).not.toBeInTheDocument();
+    delete document.documentElement.dataset.theme;
   });
 
   it("closes when a link is chosen", async () => {
