@@ -2,11 +2,17 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { isBibleEnabled } from "@/lib/bible/flag";
-import { parseVersion, VERSION_COOKIE } from "@/lib/bible/remember";
+import { readHref } from "@/lib/bible/picker";
+import { parsePassage, parseVersion, PASSAGE_COOKIE, VERSION_COOKIE } from "@/lib/bible/remember";
 
-/** Opens John 1 in the Bible you read last (the BSB if you have not read one yet). */
+/**
+ * Resumes where you left off, in the Bible you read last. A first visit, or a cookie that cannot
+ * be read, opens John 3:16 in the BSB.
+ */
 export default async function BiblePage() {
   if (!isBibleEnabled()) notFound();
-  const version = parseVersion((await cookies()).get(VERSION_COOKIE)?.value);
-  redirect(`/bible/${version}/john/1`);
+  const jar = await cookies();
+  const version = parseVersion(jar.get(VERSION_COOKIE)?.value);
+  const passage = parsePassage(jar.get(PASSAGE_COOKIE)?.value);
+  redirect(readHref({ version, ...passage }));
 }
