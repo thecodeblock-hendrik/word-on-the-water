@@ -7,6 +7,7 @@ import { ChapterNav } from "@/components/bible/chapter-nav";
 import { PassagePopover } from "@/components/bible/passage-popover";
 import { PassageSheet } from "@/components/bible/passage-sheet";
 import { Reader } from "@/components/bible/reader";
+import { RememberPassage } from "@/components/bible/remember-passage";
 import { RememberVersion } from "@/components/bible/remember-version";
 import { VersionSwitcher } from "@/components/bible/version-switcher";
 import { type Book, type ChapterRef, findBook, neighbours } from "@/lib/bible/books";
@@ -81,6 +82,7 @@ export default async function BibleChapterPage(props: Props) {
   return (
     <div className={`mx-auto max-w-[1080px] ${gutters}`}>
       <RememberVersion id={version.id} />
+      <RememberPassage book={state.book} chapter={state.chapter} from={state.from} to={state.to} />
       <ArrowKeys previous={links.previous} next={links.next} />
       <div className="flex items-center gap-2 border-b border-line py-2 lg:hidden">
         <PassageSheet state={state} />
