@@ -82,7 +82,8 @@ Goal: unsafe or unusable input never reaches search. Pure functions, table-drive
   - [ ] Result carries a reason code only, never the matched text.
 - [ ] Crisis check (runs before everything else except normalisation):
   - [ ] A reviewed list of phrases and patterns (suicide, self-harm, "end my life", "don't want to be here anymore", abuse, "being hurt", "in danger").
-  - [ ] Negatives that must not trigger: "I am dying to know", "kill time", "is suicide a sin" (a theology question still gets a compassionate path: decide with Hendrik; default is the crisis reply, it is the safer error).
+  - [ ] Negatives that must not trigger: "I am dying to know", "kill time".
+  - [ ] **Decided 2026-11-14:** any question that mentions suicide or self-harm, including theology questions such as "is suicide a sin", gets the crisis reply, not the knowledge base entry (10.13). Test it with several phrasings. The crisis reply may add a pointer to entry 10.13 afterwards (decide in K4).
   - [ ] Returns the KB `responses.crisis` text plus the "outside South Africa" line; the text is not generated.
 - [ ] Prompt-injection style input (for example "ignore previous instructions") is harmless here (no model); a test documents that it is treated as an ordinary low-confidence question.
 - [ ] Validate: a fuzz test with 1000 random strings never raises and always returns within a bound.
