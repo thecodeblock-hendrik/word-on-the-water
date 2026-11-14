@@ -31,7 +31,7 @@ The site stays free ([site-is-free decision in CLAUDE.md](../CLAUDE.md)).
 URLs (shareable, no JavaScript needed to read):
 
 ```
-/bible                          -> redirects to /bible/bsb/john/1
+/bible                          -> redirects to /bible/bsb/john/3?v=16 (John 3:16 in the version you read last)
 /bible/bsb/john/3               whole chapter, BSB
 /bible/web/john/3?v=16-18       verse range (one chapter only), WEB
 /bible/esv/john/3               ESV (404 until the ESV is enabled)
@@ -273,7 +273,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [x] E2E: `?v=16-18` shows only those verses with the range in the heading and a "Show full chapter" link (44px tall)
 - [x] E2E: bad input gives 404 or a clear message, never a crash. Unknown book, chapter out of range, `03`, `1.5`, `abc`, the disabled ESV and unknown versions return 404; a verse range that cannot be read (`20-10`, `abc`, `0`, `1,2`, a repeated `?v=`) shows the whole chapter with a note instead
 - [x] E2E: CSP holds (no inline style, no console violations, every inline script has the nonce), and the longest chapter (Psalm 119) does not scroll sideways
-- [x] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL; a verse range points at its chapter); `/bible` redirects to `/bible/bsb/john/1`; pages return 404 unless `BIBLE_ENABLED=1`
+- [x] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL; a verse range points at its chapter); `/bible` redirects to `/bible/bsb/john/3?v=16` (changed from John 1 on 2026-11-14, so a first visit opens on John 3:16); pages return 404 unless `BIBLE_ENABLED=1`
 - [x] Typography per 4.5; checked at 375px, 768px and 1280px, light and dark. Poetry and list lines hang (a wrapped line sits further in than a new line) so they cannot be confused
 
 ### B5 Pickers (version, book, chapter, verses)
