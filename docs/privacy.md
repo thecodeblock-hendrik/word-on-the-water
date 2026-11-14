@@ -25,15 +25,16 @@ No data about children is sought and the site is not aimed at them. No advertisi
 
 ## Retention
 
-Enforced by a daily retention job (step 1.7). Prayer and contact rows already carry a `delete_after` column; the other rules use status and creation time.
+Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Prayer and contact rows carry a `delete_after` column; the other rules use status and creation time. The job deletes in our database only: Kit holds its own copy of a subscriber, and Kit's API cannot delete one.
 
 | Data | Kept for | Then |
 |---|---|---|
-| Unconfirmed subscribers | 7 days | Deleted from Neon and from Kit |
+| Unconfirmed subscribers | 7 days | Deleted from Neon by the job. In Kit they stay as unconfirmed (Kit never emails them) until the owner deletes them in the Kit dashboard, a monthly task: Kit's API has no delete, and unsubscribing them through the API would block a later honest sign-up |
 | Active subscribers | Until they unsubscribe, then the unsubscribe record | Deleted on request |
 | Prayer requests | 90 days (`delete_after`) | Deleted or anonymised |
 | Contact messages | 12 months (`delete_after`) | Deleted |
 | Audit log | 1 year | Deleted |
+| Email outbox (the queue of emails to send: it holds the recipient's address) | Sent: 7 days. Failed: 30 days, so the cause can be looked at | Deleted |
 | Rate-limit keys | The limit window (minutes to one hour) | Expire in Redis |
 | Neon point-in-time recovery | At least 7 days on the paid plan | Rolls off |
 | Nightly database dumps (encrypted) | 30 days from upload | Deleted by the bucket's lifecycle rule |

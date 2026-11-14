@@ -10,9 +10,10 @@ from fastapi.testclient import TestClient
         {"Authorization": "Bearer test-service-token"},
     ],
 )
-def test_drain_endpoint_rejects_bad_credentials(
-    client: TestClient, headers: dict[str, str]
+@pytest.mark.parametrize("path", ["/cron/drain-outbox", "/cron/retention"])
+def test_cron_endpoints_reject_bad_credentials(
+    client: TestClient, path: str, headers: dict[str, str]
 ) -> None:
-    response = client.get("/cron/drain-outbox", headers=headers)
+    response = client.get(path, headers=headers)
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "unauthorized"

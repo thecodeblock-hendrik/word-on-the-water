@@ -109,7 +109,14 @@ ENVIRONMENT=production uv run alembic upgrade head
 
 ## Cron
 
-`/cron/drain-outbox` runs daily at 05:00 UTC: Hobby only allows daily crons, and more frequent schedules fail the deploy. Change it to `*/5 * * * *` after moving to Pro. Vercel sends `Authorization: Bearer $CRON_SECRET`.
+Two crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON_SECRET`:
+
+| Path | When | What |
+|---|---|---|
+| `/cron/retention` | daily 03:30 UTC | Deletes data past its retention period (docs/privacy.md); logs counts only |
+| `/cron/drain-outbox` | daily 05:00 UTC | Sends queued emails and retries Kit calls; a message that fails for good logs `outbox_messages_failed` and sends Sentry one message |
+
+Hobby only allows daily crons and limits how many an account may have (two when this was written; check Vercel's current limits before adding a third, which may need Pro); more frequent schedules fail the deploy. Change the drain to `*/5 * * * *` after moving to Pro. **Crons run only on the Production deployment**, never on previews. To try one on a preview, call it by hand with the cron secret and the Deployment Protection bypass (`curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api-git-<branch>-thecodeblock.vercel.app/cron/retention`); the preview database is its own Neon branch, so this is safe. `tests/test_vercel_config.py` checks that each cron calls a route that exists and refuses an unauthenticated call.
 
 ## Checks after a deploy
 
