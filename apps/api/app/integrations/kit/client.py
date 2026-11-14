@@ -1,9 +1,13 @@
-"""Kit (kit.com) API v4: the two calls that start a double opt-in sign-up.
+"""Kit (kit.com) API v4: the calls that start a double opt-in sign-up and create a broadcast draft.
 
 A subscriber created without a state is active at once, which would skip the confirmation, so it
 is created as inactive. Adding it to the double opt-in form makes Kit send the confirmation email
 (proven in the 1.3 spike, see docs/adr/0008-kit-subscriptions.md).
+
+Broadcasts are only ever created as drafts; a person schedules them in Kit (2.4 spike, same ADR).
 """
+
+from typing import Any
 
 import httpx
 
@@ -42,7 +46,41 @@ class KitClient:
             f"/forms/{self._form_id}/subscribers/{subscriber_id}", {"referrer": referrer}
         )
 
-    async def _post(self, path: str, payload: dict[str, str]) -> dict[str, dict[str, int]]:
+    async def create_broadcast(
+        self,
+        *,
+        subject: str,
+        preview_text: str,
+        description: str,
+        content: str,
+        email_address: str,
+        tag_id: int | None,
+    ) -> int:
+        """Create a draft broadcast and return its id. It is never scheduled and never public.
+
+        Kit fills in anything left out (sender, template and an audience of all subscribers), and an
+        update resets what it does not carry, so every field is sent. `tag_id` is required: pass
+        None only to mean all subscribers on purpose.
+        """
+        audience = (
+            {"type": "all_subscribers"} if tag_id is None else {"type": "tag", "ids": [tag_id]}
+        )
+        data = await self._post(
+            "/broadcasts",
+            {
+                "subject": subject,
+                "preview_text": preview_text,
+                "description": description,
+                "content": content,
+                "email_address": email_address,
+                "public": False,
+                "send_at": None,
+                "subscriber_filter": [{"all": [audience]}],
+            },
+        )
+        return int(data["broadcast"]["id"])
+
+    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
         response = await self._client.post(
             KIT_URL + path,
             headers={"X-Kit-Api-Key": self._api_key, "Accept": "application/json"},

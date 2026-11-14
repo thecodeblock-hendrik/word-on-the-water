@@ -372,7 +372,7 @@ Moved to [production_checklist.md](production_checklist.md): everything that nee
 - [ ] Basic search with Postgres full-text
 
 ### 2.4 Weekly email
-- [ ] Publishing a devotional creates a Kit broadcast (`POST /v4/broadcasts`) as a draft (`send_at` null): subject, preview text, rendered HTML content, internal description, subscriber filter by tag or segment
+- [ ] Publishing a devotional creates a Kit broadcast (`POST /v4/broadcasts`) as a draft (`send_at` null): subject, preview text, rendered HTML content, internal description, subscriber filter by tag or segment. Progress 2026-11-14: `KitClient.create_broadcast` is built and proven against the real Kit (draft only, full field set, explicit audience); still to build: the devotional-to-email-HTML renderer (inline-styled quotes) and the draft-only command
 - [ ] Spike first: confirm how a draft is scheduled (update with `send_at`), whether the chosen Kit template adds the unsubscribe link and address footer, and that sending is allowed on our Kit plan; otherwise put `{{ unsubscribe_url }}` and `{{ address }}` in our content
 - [ ] Send a test to Hendrik before scheduling; the editor schedules from our admin UI or from Kit
 - [ ] Kit sends only to active subscribers and adds the unsubscribe link; bounces and complaints reach us through the Kit webhook (built in 1.3)
