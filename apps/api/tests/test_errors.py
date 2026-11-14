@@ -3,7 +3,44 @@ from fastapi.testclient import TestClient
 from starlette.requests import Request
 from structlog.testing import capture_logs
 
-from app.core.errors import ApiError, _unhandled, register_error_handlers
+from app.core.errors import ApiError, _unhandled, cause_class, register_error_handlers
+
+
+def test_cause_class_names_the_innermost_cause() -> None:
+    try:
+        try:
+            raise KeyError("password=hunter2")
+        except KeyError as inner:
+            raise RuntimeError("wrapper host=db.internal") from inner
+    except RuntimeError as outer:
+        assert cause_class(outer) == "KeyError"
+
+
+def test_cause_class_of_an_exception_without_a_cause_is_its_own_class() -> None:
+    assert cause_class(ValueError("x")) == "ValueError"
+
+
+def _wrapped_failure_app() -> FastAPI:
+    app = FastAPI()
+    register_error_handlers(app)
+
+    @app.get("/wrapped")
+    async def wrapped() -> None:
+        try:
+            raise PermissionError("password=hunter2")
+        except PermissionError as inner:
+            raise RuntimeError("wrapper") from inner
+
+    return app
+
+
+def test_unhandled_error_logs_the_cause_class_without_its_message() -> None:
+    with capture_logs() as logs:
+        TestClient(_wrapped_failure_app(), raise_server_exceptions=False).get("/wrapped")
+    entry = next(entry for entry in logs if entry["event"] == "unhandled_error")
+    assert entry["error"] == "RuntimeError"
+    assert entry["cause"] == "PermissionError"
+    assert "hunter2" not in str(logs)
 
 
 def _failing_app() -> FastAPI:
