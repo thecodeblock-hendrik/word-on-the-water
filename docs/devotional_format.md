@@ -20,7 +20,7 @@ The email is a Kit broadcast made from the same file, so the wording is written 
 3. Send yourself a test and read it on your phone. Kit adds the unsubscribe link, your postal address and the "Built with Kit" badge itself.
 4. Schedule it in Kit for the day. Only drafts can be deleted: a sent broadcast stays in Kit.
 
-The command uses `KIT_API_KEY_PREVIEW` from the root `.env`; add `--live` to use `KIT_API_KEY`. Both keys are the same Kit account, so the draft appears in the live account either way. Mail from `hello@wordonthewater.net` only reaches inboxes once Kit's sending domain is authenticated (DKIM): see Part E of [production_checklist.md](production_checklist.md).
+The email is dark, in the Night swell look, with the series banner on top. The command uses `KIT_API_KEY_PREVIEW` from the root `.env`; add `--live` to use `KIT_API_KEY`. `SITE_URL` sets the "read it on the website" link and `EMAIL_IMAGE_BASE` sets where the banner is fetched from (both optional). Both keys are the same Kit account, so the draft appears in the live account either way. Mail from `hello@wordonthewater.net` only reaches inboxes once Kit's sending domain is authenticated (DKIM): see Part E of [production_checklist.md](production_checklist.md).
 
 ## Previewing a future date
 
@@ -74,7 +74,7 @@ Unknown header fields are rejected, so a typo such as `autor` is caught.
 - `*italic*` and `**bold**` work in every section.
 - `^5^` shows a small verse number.
 - Type **LORD** in capitals exactly as the ESV prints it. The site shows it in small capitals. Type "Lord" where the ESV does.
-- A line starting with `> ` in any section is shown as a pull quote (website only).
+- A line starting with `> ` in any section is shown as a pull quote (on the website and in the email).
 - The prayer's closing "Amen." is styled by the site.
 - Go Deeper has one paragraph per item, written `**Label:** text`. The site adds "Next week: ..." to the "Read further" item.
 
@@ -83,7 +83,8 @@ Unknown header fields are rejected, so a typo such as `autor` is caught.
 A series is described once, in `apps/web/content/series/<name>/`, not in every devotional:
 
 - `series.yml`: the title, a tagline, the illustration's alt text, and the outline, one entry per planned week (number, working title, passage, date).
-- `art-dawn-patrol.png` and `art-night-swell.png`: the series illustration for each colour scheme (about 1600 by 686).
+- `art-dawn-patrol.png` and `art-night-swell.png`: the series illustration for each colour scheme (the Advent files are tall portraits, 2833 by 4533; the site crops them to a banner).
+- `art-night-swell-email.jpg`: the banner at the top of the weekly email, a wide crop (about 7:3) of the Night swell art, 1200 px wide, JPEG, under 100 KB. On macOS: `sips -c <height> <width> --cropOffset <y> <x> art-night-swell.png --out crop.png`, then `sips -s format jpeg -s formatOptions 78 -Z 1200 crop.png --out art-night-swell-email.jpg` (Advent used a 2833 by 1214 crop starting 1560 px from the top). Without it the email has no banner.
 
 Copy `content/series/_template/` to start a new series. The outline drives "Advent 1 of 5", the series list beside the article and the Next link. Once a week's `devotional.md` exists, its own title, passage and date replace the outline's working title. A week only becomes a link once it is published.
 
