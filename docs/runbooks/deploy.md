@@ -2,6 +2,42 @@
 
 How Word on the Water is deployed on Vercel, and the one-off setup behind it.
 
+## How the pieces fit
+
+```
+Browser
+  |  HTTPS
+  v
+wotw-web (Next.js)          the only thing the browser talks to
+  |  server to server: SERVICE_TOKEN + X-Client-IP (and the Vercel bypass secret)
+  v
+wotw-api (FastAPI)          validation, rules, rate limits, the email outbox
+|         |         |         \
+v         v         v          v
+Neon      Upstash   Kit        Turnstile (verifies the token), Postmark (once set up)
+Postgres  Redis     (list, double opt-in)
+```
+
+Two more ways into the API besides the web app:
+
+- **Vercel Cron** calls `/cron/drain-outbox` with `Authorization: Bearer $CRON_SECRET`. It sends the queued emails and retries the Kit calls that failed.
+- **Kit webhooks** cannot pass the API project's login wall, so Kit calls `wotw-web` at `/api/webhooks/kit`. That route passes the untouched body and `X-Kit-Signature` to `/v1/webhooks/kit` on the API and adds the bypass secret itself. The API checks the signature before it does anything.
+
+Vercel does not proxy the data services. The Neon and Upstash integrations put environment variables (`NEON_*`, `UPSTASH_*`) into the API project, and the API connects to the addresses in them, so which database a deployment uses is decided only by the variables it receives. Neon and Redis never talk to each other.
+
+| | Production (`main`) | Preview (each PR branch) |
+|---|---|---|
+| Web and API | `wotw-web`, `wotw-api` | a deployment of each per git branch (the web finds its API by swapping the project name in its alias, so keep branch names to 36 characters or fewer) |
+| Neon | branch `main`, real data | branch `preview/<git branch>`, copied from `preview-base` when the git branch first builds |
+| Redis | `wotw-redis` | its own separate Upstash database |
+| Database passwords | the production roles on `main` | the roles and passwords set on `preview-base` |
+| Kit | the real sign-up form | the test form |
+| Turnstile | the production widget (works on `wordonthewater.net` only) | the preview widget (`localhost` and `vercel.app`) |
+
+**Neon lineage** (since the restore on 2026-11-08): `main_old_...` (backup, root), then `preview-base` (the Default branch), then `main` (production) and every `preview/<git branch>`. `preview-base` is the data-free base that previews copy: it has the schema and its own passwords but no production data, so a preview never holds production data or a working production credential (threat model R-1 to R-3). A change to `preview-base` does not reach previews that already exist, which is why each migration is applied there first (see Migrations). Never use "Reset from parent" on `main`.
+
+`/api/health` on the web app calls the API's `/health/ready`, which checks Neon and Redis, so `{"status":"ok"}` proves the whole chain for that deployment.
+
 ## Layout
 
 | | `wotw-web` | `wotw-api` |
