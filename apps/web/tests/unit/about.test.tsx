@@ -29,8 +29,8 @@ describe("about content", () => {
     expect(about.heading.length).toBeLessThanOrEqual(40);
   });
 
-  it("says who it is for: men, surfers and the curious", () => {
-    expect(about.who.map((w) => w.term)).toEqual(["Men", "Surfers", "The curious"]);
+  it("says who it is for: surfers, everyone and the curious", () => {
+    expect(about.who.map((w) => w.term)).toEqual(["Surfers", "Everyone", "The curious"]);
   });
 });
 
@@ -54,7 +54,7 @@ describe("About", () => {
     const { container } = render(<About />);
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
     expect(container.querySelectorAll("p.font-serif")).toHaveLength(3);
-    expect(screen.getByText(/Word on the Water is for men who surf/)).toBeInTheDocument();
+    expect(screen.getByText(/Word on the Water is for surfers/)).toBeInTheDocument();
   });
 
   it("links 'paddle out with us' to the sign-up section", () => {
