@@ -110,6 +110,7 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 - [ ] Send a contact message: it arrives in `hello@`.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
+- [ ] Share the home page and a devotional in WhatsApp and check the preview (the default lighthouse image, and the verse card for a devotional); `og:image` is an absolute `https://wordonthewater.net/...` address (in development it shows `localhost` by design). Paste the home page into Google's Rich Results Test or the Schema.org validator: the `Organization` and `WebSite` data have no errors. Once the PWA icons exist, add a `logo` to the Organization data.
 - [ ] `https://wordonthewater.net/.well-known/security.txt` loads as plain text with the contact, the canonical address and an `Expires` about a year ahead.
 - [ ] `https://wordonthewater.net/robots.txt` and `/sitemap.xml` load; the sitemap lists only the devotionals that are published today and gains the next one on its publish day without a redeploy.
 - [ ] Send a tag-limited test broadcast from `hello@` and read it (Part K).
