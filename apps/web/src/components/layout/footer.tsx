@@ -28,7 +28,7 @@ function withBible(group: FooterGroup): FooterGroup {
   };
 }
 
-export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) {
+export function Footer({ year = new Date().getFullYear(), privacyHref = "/privacy" }: Props) {
   const follow = [
     ...footer.social.flatMap((s) => (s.href ? [{ label: s.label, href: s.href }] : [])),
     footer.email,
@@ -90,7 +90,10 @@ export function Footer({ year = new Date().getFullYear(), privacyHref }: Props) 
               {privacyHref ? (
                 <>
                   {" · "}
-                  <Link href={privacyHref} className="underline hover:text-on-deep">
+                  <Link
+                    href={privacyHref}
+                    className="inline-flex min-h-11 items-center underline hover:text-on-deep"
+                  >
                     Privacy policy
                   </Link>
                 </>
