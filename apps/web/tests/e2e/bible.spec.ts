@@ -166,21 +166,34 @@ test.describe("accessibility", () => {
 });
 
 test.describe("remembering the Bible you read last", () => {
-  test("/bible opens John 3:16 in the version you read last", async ({ page, context }) => {
-    const remembered = async () =>
-      (await context.cookies()).find((c) => c.name === "bible-version")?.value;
-    await page.goto("/bible/web/romans/8");
-    await expect(page.getByRole("heading", { level: 1, name: "Romans 8" })).toBeVisible();
-    await expect.poll(remembered).toBe("web");
+  test("/bible resumes the passage and the version you read last", async ({ page, context }) => {
+    const remembered = async (name: string) =>
+      (await context.cookies()).find((c) => c.name === name)?.value;
+    await page.goto("/bible/web/romans/8?v=28-30");
+    await expect(page.getByRole("heading", { level: 1, name: "Romans 8:28–30" })).toBeVisible();
+    await expect.poll(() => remembered("bible-version")).toBe("web");
+    await expect.poll(() => remembered("bible-passage")).toBe("romans.8.28-30");
     await page.goto("/bible");
-    await expect(page).toHaveURL("/bible/web/john/3?v=16");
+    await expect(page).toHaveURL("/bible/web/romans/8?v=28-30");
     await page.goto("/bible/bsb/mark/1");
-    await expect.poll(remembered).toBe("bsb");
+    await expect.poll(() => remembered("bible-version")).toBe("bsb");
+    await expect.poll(() => remembered("bible-passage")).toBe("mark.1");
     await page.goto("/bible");
-    await expect(page).toHaveURL("/bible/bsb/john/3?v=16");
+    await expect(page).toHaveURL("/bible/bsb/mark/1");
   });
 
-  test("a first visit, an unavailable version or a forged value opens the BSB", async ({
+  test("moving to another chapter changes where /bible resumes", async ({ page, context }) => {
+    await page.goto("/bible/bsb/john/3?v=16");
+    await page.getByRole("link", { name: /John 4/ }).click();
+    await expect(page).toHaveURL("/bible/bsb/john/4");
+    await expect
+      .poll(async () => (await context.cookies()).find((c) => c.name === "bible-passage")?.value)
+      .toBe("john.4");
+    await page.goto("/bible");
+    await expect(page).toHaveURL("/bible/bsb/john/4");
+  });
+
+  test("a first visit, an unavailable version or a forged value opens John 3:16 in the BSB", async ({
     page,
     context,
     baseURL,
@@ -189,6 +202,14 @@ test.describe("remembering the Bible you read last", () => {
     await expect(page).toHaveURL("/bible/bsb/john/3?v=16");
     for (const value of ["esv", "kjv", "..%2F..%2Fweb", "web%3Bpath"]) {
       await context.addCookies([{ name: "bible-version", value, url: baseURL! }]);
+      await page.goto("/bible");
+      await expect(page, value).toHaveURL("/bible/bsb/john/3?v=16");
+    }
+  });
+
+  test("a forged passage cookie opens John 3:16", async ({ page, context, baseURL }) => {
+    for (const value of ["nope.1", "john.99", "john.3.18-16", "..%2F..%2Fweb.1", "john.3%3Bpath"]) {
+      await context.addCookies([{ name: "bible-passage", value, url: baseURL! }]);
       await page.goto("/bible");
       await expect(page, value).toHaveURL("/bible/bsb/john/3?v=16");
     }

@@ -31,7 +31,7 @@ The site stays free ([site-is-free decision in CLAUDE.md](../CLAUDE.md)).
 URLs (shareable, no JavaScript needed to read):
 
 ```
-/bible                          -> redirects to /bible/bsb/john/3?v=16 (John 3:16 in the version you read last)
+/bible                          -> resumes the passage you read last, in the version you read last; a first visit opens /bible/bsb/john/3?v=16
 /bible/bsb/john/3               whole chapter, BSB
 /bible/web/john/3?v=16-18       verse range (one chapter only), WEB
 /bible/esv/john/3               ESV (404 until the ESV is enabled)
@@ -205,7 +205,7 @@ Best-practice choices:
 - **Plain language.** "Berean Standard Bible (BSB), modern English, easy to read", "World English Bible (WEB), modern English, classic style", "English Standard Version (ESV), coming soon".
 - **Disabled state explained.** The ESV card is not hidden: it shows "Coming soon" with `aria-disabled`, so the plan is visible and nothing looks broken.
 - **Keeps your place.** Switching the version keeps book, chapter and verses (URL swap).
-- **Remembered.** The last Bible you read is kept in a first-party preference cookie (`bible-version`), so `/bible` opens in it. The URL still decides what renders; the cookie only chooses where `/bible` goes. It is a functional preference like the theme cookie, not tracking.
+- **Remembered.** The last Bible you read (`bible-version`) and the passage you were reading (`bible-passage`, for example `romans.8.28-30`, `john.3.16` or `mark.1`) are kept in first-party preference cookies, so `/bible` resumes there; a first visit, or a cookie that cannot be read, opens John 3:16. The URL still decides what renders; the cookies only choose where `/bible` goes, and the passage cookie is checked against the real books and chapters before it is used. It is a functional preference like the theme cookie, not tracking.
 - **Modal dialogs and the CSP:** a modal Radix dialog locks page scrolling by injecting a `<style>` element, which the nonce-based CSP blocks unless it carries the nonce. `CspNonce` (in the root layout) hands the page's script nonce to the library (`get-nonce`), and an e2e test opens the sheet and fails on any CSP violation. Use modal dialogs freely after this; keep the mobile menu non-modal as it is.
 - **Mobile:** bottom sheet for quick switch (reachable by thumb, drag handle, close on Escape or scrim tap, focus trapped); full-screen sheet for the picker. **Desktop:** the same segmented control at the top of the columns popover.
 
@@ -273,7 +273,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [x] E2E: `?v=16-18` shows only those verses with the range in the heading and a "Show full chapter" link (44px tall)
 - [x] E2E: bad input gives 404 or a clear message, never a crash. Unknown book, chapter out of range, `03`, `1.5`, `abc`, the disabled ESV and unknown versions return 404; a verse range that cannot be read (`20-10`, `abc`, `0`, `1,2`, a repeated `?v=`) shows the whole chapter with a note instead
 - [x] E2E: CSP holds (no inline style, no console violations, every inline script has the nonce), and the longest chapter (Psalm 119) does not scroll sideways
-- [x] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL; a verse range points at its chapter); `/bible` redirects to `/bible/bsb/john/3?v=16` (changed from John 1 on 2026-11-14, so a first visit opens on John 3:16); pages return 404 unless `BIBLE_ENABLED=1`
+- [x] Build `app/bible/[version]/[book]/[chapter]/page.tsx` with `generateMetadata` (title "John 3 (BSB)", canonical URL; a verse range points at its chapter); `/bible` resumes the passage you read last and opens John 3:16 on a first visit (changed from John 1 on 2026-11-14); pages return 404 unless `BIBLE_ENABLED=1`
 - [x] Typography per 4.5; checked at 375px, 768px and 1280px, light and dark. Poetry and list lines hang (a wrapped line sits further in than a new line) so they cannot be confused
 
 ### B5 Pickers (version, book, chapter, verses)
@@ -284,6 +284,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 - [x] Replace the desktop left column with the columns popover (option A in `docs/design/bible_mockups.html`): one passage button opens books (with a filter), chapters (pages of 25 for long books) and a verse grid side by side; one click is one verse, a second click a range, Whole chapter clears; nothing applies until Read; each verse picker has its own radio group name (two mounted pickers shared one and unchecked each other)
 - [x] Replace the four-step phone sheet with the tabbed sheet (option M1 in `docs/design/bible_mockups.html`): a bottom sheet with Book, Chapter and Verses tabs that show the current choice (John, 3, 16–18), the same book filter, chapter pages of 25 and verse band as the desktop popover, the Bible as a segmented control in the header, and Whole chapter and Read in a footer in thumb reach (`passage-sheet.tsx`; shared parts in `picker-parts.tsx` and `use-passage-picker.ts`)
 - [x] E2E on iPhone SE, iPhone 13, Pixel 7 (and desktop browsers at 800px and 1280px): open, choose WEB, John, chapter 3, verses 16 to 18, read; every control at least 44px in every step; focus trap and Escape work; switching version keeps the passage; no CSP violation and no serious axe problem on any step in light and dark (`bible-picker.spec.ts`, `bible-version.spec.ts`, `bible-popover.spec.ts`)
+- [x] Resume the passage you left off (2026-11-14): a second first-party cookie, `bible-passage` (`<book>.<chapter>[.<from>[-<to>]]`, same attributes as the version cookie), written by `RememberPassage` on every reader page and read by `/bible`, validated with `parsePassage` (a real book and chapter, plain numbers, `to` not before `from`; anything else opens John 3:16). Unit tests in `tests/unit/bible-remember.test.tsx` and `bible-landing.test.ts`, e2e in `bible.spec.ts`.
 - [x] Remember the last version (page works without it). Done with a first-party preference cookie (`bible-version`, Lax, one year, Secure over https, like the theme cookie) instead of `localStorage`, so `/bible` opens in your last Bible on the server with no flash and no JavaScript. The reader writes it from the browser (no request); only an enabled version is ever accepted, so a forged value opens the BSB
 - [x] Add "Bible" after "Devotionals" in the desktop header, the mobile menu (mockup 8) and the footer's Read group, shown only while `BIBLE_ENABLED=1` (`navLinks()`, `NavLink`); `aria-current="page"` on `/bible/...` with an underline and heavier weight (and a bar and tint in the mobile menu), not colour alone; nav tests updated
 - [x] E2E: the header does not wrap at 1024px, 1100px and 1280px with six links, the theme toggle and the CTA (no change to the header needed); the menu entry and footer link work on phones (`tests/e2e/bible-nav.spec.ts`)
