@@ -15,6 +15,8 @@ Related guides: [kit_webhook_checks.md](kit_webhook_checks.md) (domain, webhook 
 - [ ] PLAN.md steps 1.3 to 1.8 are all ticked (sign-up, prayer form, contact form, legal and SEO, retention, quality gates).
 - [ ] Budgets met on a deployed preview: Lighthouse mobile (Performance 95, Accessibility 100, Best Practices 100, SEO 100), LCP under 2.0 s, CLS under 0.05, INP under 200 ms, landing JS under 100 KB gzipped.
 - [ ] No unresolved high or critical finding in CodeQL, the dependency audits or gitleaks.
+- [ ] **Privacy policy:** in `apps/web/src/content/privacy.ts` replace the two `[placeholders]` (the name, or registered name, of whoever runs Word on the Water, and the postal address; Kit already prints a PO Box in every email footer, so use the same one), read the whole page once, and update `PRIVACY_UPDATED`. `pnpm check:placeholders` then passes (it also needs the two social handles).
+- [ ] Kit: add a link to `https://wordonthewater.net/privacy` to the Kit form's sign-up and confirmation pages if Kit allows it (the site's own sign-up line already links it).
 
 ---
 
@@ -110,6 +112,7 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 - [ ] Send a contact message: it arrives in `hello@`.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
+- [ ] `https://wordonthewater.net/privacy` loads; the footer link on any page and the "privacy policy" link beside the sign-up button both reach it, and a new sign-up shows consent version `v2` in the database.
 - [ ] Share the home page and a devotional in WhatsApp and check the preview (the default lighthouse image, and the verse card for a devotional); `og:image` is an absolute `https://wordonthewater.net/...` address (in development it shows `localhost` by design). Paste the home page into Google's Rich Results Test or the Schema.org validator: the `Organization` and `WebSite` data have no errors. Once the PWA icons exist, add a `logo` to the Organization data.
 - [ ] `https://wordonthewater.net/.well-known/security.txt` loads as plain text with the contact, the canonical address and an `Expires` about a year ahead.
 - [ ] `https://wordonthewater.net/robots.txt` and `/sitemap.xml` load; the sitemap lists only the devotionals that are published today and gains the next one on its publish day without a redeploy.

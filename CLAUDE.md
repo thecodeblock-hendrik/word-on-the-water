@@ -135,10 +135,12 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │   │   ├── src/proxy.ts          ← per-request CSP nonce (Next 16 name for middleware)
 │   │   ├── src/app/ (layout.tsx, page.tsx, not-found.tsx, error.tsx, api/health/route.ts, api/webhooks/kit/route.ts (forwards Kit webhooks to the API),
 │   │   │   thank-you/page.tsx (where Kit sends a subscriber after confirming), devotionals/[slug]/page.tsx, content/[kind]/[slug]/[version]/[file]/route.ts for content images (the version is a content hash that busts caches),
-│   │   │   bible/page.tsx and bible/[version]/[book]/[chapter]/page.tsx, behind BIBLE_ENABLED)
-│   │   │   └── planned: (marketing)/ privacy page, sitemap/robots/OG image, prayer and contact forms,
+│   │   │   bible/page.tsx and bible/[version]/[book]/[chapter]/page.tsx, behind BIBLE_ENABLED,
+│   │   │   privacy/page.tsx (the public privacy policy), robots.ts, sitemap.ts, opengraph-image.tsx, .well-known/security.txt/route.ts)
+│   │   │   └── planned: prayer and contact forms,
 │   │   │       manifest (a launch step, see production_checklist.md), (admin)/ for Phase 2
 │   │   ├── src/content/landing.ts ← all landing page copy as typed data
+│   │   ├── src/content/privacy.ts ← the public privacy policy as typed data; written from docs/privacy.md, keep the two in step; the launch check scans it
 │   │   ├── src/components/ (layout/, sections/, devotional/, bible/, signup/, ui/, content-image.tsx, theme-toggle.tsx)
 │   │   │   └── bible/: reader, passage-popover (lg and up), passage-sheet (below lg), picker-parts, use-passage-picker, chapter-nav, version-switcher
 │   │   ├── src/lib/ (api-client.ts, env.ts, csp.ts, security-headers.ts, scripture.ts, theme.ts, sentry.ts,
