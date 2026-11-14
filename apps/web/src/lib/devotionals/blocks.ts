@@ -1,3 +1,6 @@
+/** The inline marks in devotional text: **bold**, *italic*, ^5^ verse numbers and LORD. */
+export const INLINE_MARKS = /(\*\*[^*]+\*\*|\*[^*]+\*|\^\d+\^|\bLORD\b)/;
+
 export type Block = { kind: "paragraph" | "quote"; text: string };
 export type GoDeeperItem = { term: string; text: string };
 
