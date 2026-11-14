@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { connection } from "next/server";
 
 import { today } from "@/lib/devotionals/format";
+import { PRIVACY_UPDATED } from "@/content/privacy";
 import { isViewable, loadContent } from "@/lib/devotionals/load";
 import { absoluteUrl } from "@/lib/site";
 
@@ -21,5 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: absoluteUrl(`/devotionals/${d.slug}`),
       lastModified: d.meta.publishAt,
     })),
+    { url: absoluteUrl("/privacy"), lastModified: PRIVACY_UPDATED },
   ];
 }

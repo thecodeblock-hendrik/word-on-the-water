@@ -159,6 +159,13 @@ export const signup = {
   button: "Subscribe",
   consent:
     "By subscribing you agree to receive one email a week from Word on the Water. Unsubscribe anytime.",
+  // Changing the consent wording (this line or the one above) means a new CONSENT_TEXT_VERSION.
+  consentPrivacy: {
+    before: "See how we look after your details in our ",
+    label: "privacy policy",
+    href: "/privacy",
+    after: ".",
+  },
   success: {
     heading: "Check your inbox",
     body: "We sent you a link to confirm your email. If it does not arrive in a few minutes, look in your spam folder.",

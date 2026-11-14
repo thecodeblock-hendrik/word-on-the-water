@@ -73,7 +73,7 @@ test.describe("the sign-up form", () => {
       email: "reader@example.com",
       first_name: "Ann",
       source: "landing_closing",
-      consent_text_version: "v1",
+      consent_text_version: "v2",
       website: "",
     });
     expect(last.body.turnstile_token).toBeTruthy();

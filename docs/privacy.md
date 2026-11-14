@@ -2,7 +2,7 @@
 
 Data inventory, retention and lawful basis for Word on the Water. Version 1, written 2026-10-31 at the end of Phase 0. **The site is not public, so no real visitor data is collected yet.** The sign-up (with Kit double opt-in) is built and has only been used with test addresses on preview deployments; the prayer and contact forms arrive in steps 1.4 and 1.5. Test subscribers are deleted from Kit's dashboard by hand.
 
-This is the engineering record the public privacy policy page (step 1.6) is written from. It is not legal advice; Hendrik reviews the policy text before launch.
+This is the engineering record the public privacy policy page is written from. The page is `/privacy` and its text is `apps/web/src/content/privacy.ts`: keep the two in step. The page lists only what is true today, so it leaves out the prayer and contact forms (and Postmark) until they exist. It is not legal advice; Hendrik reviews the policy text before launch.
 
 Designed to comply with the **GDPR** and **POPIA** by default: collect the minimum, record consent, keep data only as long as listed, and delete on request.
 
@@ -57,6 +57,7 @@ Providers outside the EU and South Africa are covered by their standard contract
 
 ## Rights and how they are met
 
+- **Consent record:** each sign-up stores when it happened, which page it came from and the version of the wording shown beside the button (`consent_text_version`). The version is `v2` since the privacy-policy link was added to that line on 2026-11-14; change it whenever that wording changes.
 - **Withdraw consent, unsubscribe:** the unsubscribe link in every email (Kit), or a message to `hello@wordonthewater.net`.
 - **Access and a copy:** on request to `hello@wordonthewater.net`, answered within 30 days; the owner exports the person's rows from Neon and Kit.
 - **Correction and deletion:** the same route; deletion removes the Neon rows and the Kit subscriber (Kit's API cannot delete a subscriber, so deleting from Kit is a dashboard action; confirmed in the step 1.3 spike), and the data ages out of backups within the retention above.
@@ -68,7 +69,7 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 
 ## Decisions needed from Hendrik
 
-1. **Who is the data controller and what is the legal entity name and address** for the policy and the email footer (also required in newsletters).
+1. **Who is the data controller and what is the legal entity name and address** for the policy and the email footer (also required in newsletters). Answered 2026-11-14: the privacy page names Word On The Water, the registered name, and gives PO Box 6055, Port Elizabeth, Eastern Cape 6001 (the PO Box Kit prints in every email footer). If the registered name ever changes, change it there.
 2. **Which regulator and jurisdiction** to name first: where the owner and most readers live.
 3. ~~How long nightly dumps are kept.~~ Decided: 30 days, enforced by an R2 lifecycle rule. A dump holds deleted-on-request data until it expires, so erased data is gone from backups within 30 days.
 4. **Upstash region** and **which mailbox provider receives the forwards.**

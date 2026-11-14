@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Script from "next/script";
 import { useActionState, useEffect, useRef, useState } from "react";
 
@@ -132,7 +133,13 @@ export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Prop
       <Button type="submit" variant="primary-on-deep" busy={pending}>
         {signup.button}
       </Button>
-      <p className="font-ui text-[13px] text-on-deep-muted">{signup.consent}</p>
+      <p className="font-ui text-[13px] text-on-deep-muted">
+        {signup.consent} {signup.consentPrivacy.before}
+        <Link href={signup.consentPrivacy.href} className="underline hover:text-on-deep">
+          {signup.consentPrivacy.label}
+        </Link>
+        {signup.consentPrivacy.after}
+      </p>
       <noscript>
         <p className="font-ui text-sm text-on-deep">{signup.noScript}</p>
       </noscript>

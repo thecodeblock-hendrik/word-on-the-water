@@ -71,18 +71,25 @@ describe("Footer", () => {
     }
   });
 
-  it("shows the copyright year it is given, and no privacy link until the page exists", () => {
+  it("shows the copyright year it is given", () => {
     render(<Footer year={2026} />);
-    const info = screen.getByRole("contentinfo");
-    expect(info).toHaveTextContent("© 2026 Word on the Water");
-    expect(within(info).queryByRole("link", { name: /privacy/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("contentinfo")).toHaveTextContent("© 2026 Word on the Water");
   });
 
-  it("links the privacy policy once its address is set", () => {
-    render(<Footer year={2026} privacyHref="/privacy" />);
+  it("links the privacy policy on every page, in a target at least 44px high", () => {
+    render(<Footer year={2026} />);
+    const link = within(screen.getByRole("contentinfo")).getByRole("link", {
+      name: "Privacy policy",
+    });
+    expect(link).toHaveAttribute("href", "/privacy");
+    expect(link.className).toContain("min-h-11");
+  });
+
+  it("can point the privacy link somewhere else", () => {
+    render(<Footer year={2026} privacyHref="/elsewhere" />);
     expect(screen.getByRole("link", { name: "Privacy policy" })).toHaveAttribute(
       "href",
-      "/privacy",
+      "/elsewhere",
     );
   });
 

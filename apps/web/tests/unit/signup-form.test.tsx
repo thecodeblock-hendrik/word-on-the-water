@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SignupForm } from "@/components/signup/signup-form";
@@ -80,8 +80,18 @@ describe("SignupForm fields", () => {
 
   it("says what they agree to next to the button, and the button is 44px tall", () => {
     render(<SignupForm {...props} />);
-    expect(screen.getByText(signup.consent)).toBeInTheDocument();
+    expect(screen.getByText(signup.consent, { exact: false })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: signup.button }).className).toMatch(/min-h-11/);
+  });
+
+  it("links the privacy policy in the same line, where the details are given", () => {
+    render(<SignupForm {...props} />);
+    const note = screen.getByText(signup.consent, { exact: false }).closest("p")!;
+    expect(note).toHaveTextContent(
+      "By subscribing you agree to receive one email a week from Word on the Water. Unsubscribe anytime. See how we look after your details in our privacy policy.",
+    );
+    const link = within(note).getByRole("link", { name: "privacy policy" });
+    expect(link).toHaveAttribute("href", "/privacy");
   });
 
   it("says so, and shows no form, when there is no site key", () => {
