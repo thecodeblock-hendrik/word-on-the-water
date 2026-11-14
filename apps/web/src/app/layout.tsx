@@ -29,7 +29,7 @@ const lora = Lora({ subsets: ["latin"], variable: "--font-lora", display: "swap"
 
 export const metadata: Metadata = {
   title: { default: "Word on the Water", template: "%s | Word on the Water" },
-  description: "Devotionals and Bible teaching for men and surfers.",
+  description: "Devotionals and Bible teaching for surfers and anyone who feels the swell of life.",
 };
 
 export async function generateViewport(): Promise<Viewport> {
