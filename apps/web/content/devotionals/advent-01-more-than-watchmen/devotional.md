@@ -1,6 +1,6 @@
 ---
 title: More Than Watchmen
-publishAt: 2026-12-05
+publishAt: 2026-11-28
 author: H
 series: advent
 seriesNumber: 1

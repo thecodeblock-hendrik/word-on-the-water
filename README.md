@@ -10,9 +10,9 @@ Christian ministry web app publishing devotionals and Bible teaching for men and
 
 ## Status
 
-Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress and the site is **not public yet**: `wordonthewater.net` still points at the old Squarespace site.
+Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress and the site is **not public yet**: `wordonthewater.net` still points at the old Squarespace site. The planned launch date is **Saturday 28 November 2026**.
 
-Built: the landing page with its real copy, light and dark themes, the devotional pages (three Advent devotionals), a Bible reader (BSB and WEB, behind a flag), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; mail from `hello@` needs Kit's DKIM first (launch checklist, Parts E and K). Next: the prayer request form (1.4), the contact form (1.5), legal and SEO (1.6). The PWA and everything that needs the live domain are launch-time steps.
+Built: the landing page with its real copy, light and dark themes, the devotional pages (four Advent devotionals, the first on the launch date), a Bible reader (BSB and WEB, behind a flag), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; mail from `hello@` needs Kit's DKIM first (launch checklist, Parts E and K). Next: the prayer request form (1.4), the contact form (1.5), legal and SEO (1.6). The PWA and everything that needs the live domain are launch-time steps.
 
 ## Stack
 

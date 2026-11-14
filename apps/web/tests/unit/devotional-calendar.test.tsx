@@ -11,6 +11,7 @@ const bySeriesNumber = (n: number) => devotionals.find((d) => d.meta.seriesNumbe
 const one = bySeriesNumber(1);
 const two = bySeriesNumber(2);
 const three = bySeriesNumber(3);
+const four = bySeriesNumber(4);
 
 const on = (day: string) => {
   vi.useFakeTimers({ toFake: ["Date"] });
@@ -29,12 +30,14 @@ describe("the landing card follows the calendar", () => {
 
   it.each([
     ["before launch", "2026-11-06", one],
-    ["on launch day", "2026-12-05", one],
-    ["the day before week 2", "2026-12-11", one],
-    ["on the day week 2 is published", "2026-12-12", two],
-    ["the day before week 3", "2026-12-18", two],
-    ["on the day week 3 is published", "2026-12-19", three],
-    ["after week 3", "2027-01-01", three],
+    ["on launch day", "2026-11-28", one],
+    ["the day before week 2", "2026-12-04", one],
+    ["on the day week 2 is published", "2026-12-05", two],
+    ["the day before week 3", "2026-12-11", two],
+    ["on the day week 3 is published", "2026-12-12", three],
+    ["the day before week 4", "2026-12-18", three],
+    ["on the day week 4 is published", "2026-12-19", four],
+    ["after week 4", "2027-01-01", four],
   ])("%s (%s) shows the right devotional", (_label, day, expected) => {
     on(day);
     render(<Home />);
@@ -53,7 +56,7 @@ describe("going back through the series", () => {
   const seriesNav = () => screen.getByRole("navigation", { name: "Series" });
 
   it("week 2 links back to week 1 in the list and in the Previous card", async () => {
-    on("2026-12-12");
+    on("2026-12-05");
     render(await DevotionalPage(props(two.slug)));
     const items = weeks().querySelectorAll("li");
     expect(
@@ -67,21 +70,21 @@ describe("going back through the series", () => {
   });
 
   it("only published weeks are links: week 3 is not", async () => {
-    on("2026-12-12");
+    on("2026-12-05");
     render(await DevotionalPage(props(two.slug)));
     const items = weeks().querySelectorAll("li");
     expect(within(items[2] as HTMLElement).queryByRole("link")).toBeNull();
-    expect(seriesNav()).toHaveTextContent("Next · 19 December");
+    expect(seriesNav()).toHaveTextContent("Next · 12 December");
     expect(within(seriesNav()).queryAllByRole("link", { name: /Next/ })).toHaveLength(0);
   });
 
   it("week 1 links forward to week 2 once it is published, and not before", async () => {
-    on("2026-12-11");
+    on("2026-12-04");
     const before = render(await DevotionalPage(props(one.slug)));
     expect(within(weeks().querySelectorAll("li")[1] as HTMLElement).queryByRole("link")).toBeNull();
     before.unmount();
 
-    on("2026-12-12");
+    on("2026-12-05");
     render(await DevotionalPage(props(one.slug)));
     expect(
       within(weeks().querySelectorAll("li")[1] as HTMLElement).getByRole("link"),
@@ -93,7 +96,7 @@ describe("going back through the series", () => {
   });
 
   it("week 2 is a 404 until its publish date", async () => {
-    on("2026-12-11");
+    on("2026-12-04");
     await expect(DevotionalPage(props(two.slug))).rejects.toThrow(
       /NEXT_HTTP_ERROR_FALLBACK;404|NEXT_NOT_FOUND/,
     );

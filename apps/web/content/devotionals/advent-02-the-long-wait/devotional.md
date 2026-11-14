@@ -1,6 +1,6 @@
 ---
 title: The Long Wait
-publishAt: 2026-12-12
+publishAt: 2026-12-05
 author: H
 series: advent
 seriesNumber: 2

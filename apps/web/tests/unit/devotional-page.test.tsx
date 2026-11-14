@@ -16,7 +16,7 @@ async function renderPage() {
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(new Date("2026-12-06T08:00:00Z"));
+  vi.setSystemTime(new Date("2026-11-29T08:00:00Z"));
   vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", "1x00000000000000000000AA");
 });
 afterEach(() => {
@@ -35,7 +35,7 @@ describe("devotional page", () => {
     expect(screen.getByText("Advent · 1 of 5", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByText(/Every dawn patrol starts in the dark/)).toBeInTheDocument();
     expect(screen.getByText("By H")).toBeInTheDocument();
-    expect(screen.getByText("Saturday 5 December 2026")).toBeInTheDocument();
+    expect(screen.getByText("Saturday 28 November 2026")).toBeInTheDocument();
     expect(screen.getByText("3 min read")).toBeInTheDocument();
   });
 
@@ -115,7 +115,7 @@ describe("devotional page", () => {
       "href",
       "/#start",
     );
-    expect(nav).toHaveTextContent("Next · 12 December");
+    expect(nav).toHaveTextContent("Next · 5 December");
     expect(nav).toHaveTextContent("The Long Wait");
     expect(within(nav).queryByRole("link", { name: /The Long Wait/ })).toBeNull();
   });
@@ -136,7 +136,7 @@ describe("devotional page", () => {
     expect(items).toHaveLength(5);
     expect(items[0]).toHaveAttribute("aria-current", "page");
     expect(items[1]).toHaveTextContent("The Long Wait");
-    expect(items[1]).toHaveTextContent("Luke 1:5–25 · 12 Dec");
+    expect(items[1]).toHaveTextContent("Luke 1:5–25 · 5 Dec");
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 

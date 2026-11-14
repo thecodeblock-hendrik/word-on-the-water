@@ -3,8 +3,8 @@ tagline: Waiting for the light
 artAlt: Surfers sitting in a dark lineup, a watchtower on the headland, the first light of dawn on the horizon.
 # The planned weeks. Once a week's devotional.md exists, its own title, passage and date are used instead.
 outline:
-  - { number: 1, title: More Than Watchmen, passage: "Psalm 130:5–6; Isaiah 9:2", date: 2026-12-05 }
-  - { number: 2, title: The Long Wait, passage: "Luke 1:5–25", date: 2026-12-12 }
-  - { number: 3, title: A Quiet Man's Yes, passage: "Matthew 1:18–25", date: 2026-12-19 }
-  - { number: 4, title: Shepherds on the Night Shift, passage: "Luke 2:8–20", date: 2026-12-26 }
-  - { number: 5, title: The Word Became Flesh, passage: "John 1:1–14", date: 2027-01-02 }
+  - { number: 1, title: More Than Watchmen, passage: "Psalm 130:5–6; Isaiah 9:2", date: 2026-11-28 }
+  - { number: 2, title: The Long Wait, passage: "Luke 1:5–25", date: 2026-12-05 }
+  - { number: 3, title: A Quiet Man's Yes, passage: "Matthew 1:18–25", date: 2026-12-12 }
+  - { number: 4, title: Shepherds on the Night Shift, passage: "Luke 2:8–20", date: 2026-12-19 }
+  - { number: 5, title: The Word Became Flesh, passage: "John 1:1–14", date: 2026-12-26 }

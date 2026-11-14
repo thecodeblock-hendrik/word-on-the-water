@@ -11,10 +11,10 @@ describe("devotional content in the repo", () => {
     expect(loadContent().devotionals.length).toBeGreaterThan(0);
   });
 
-  it("the launch devotional is More Than Watchmen on Saturday 5 December 2026", () => {
+  it("the launch devotional is More Than Watchmen on Saturday 28 November 2026", () => {
     const first = loadContent().devotionals.at(-1)!;
     expect(first.meta.title).toBe("More Than Watchmen");
-    expect(first.meta.publishAt).toBe("2026-12-05");
+    expect(first.meta.publishAt).toBe("2026-11-28");
     expect(new Date(`${first.meta.publishAt}T00:00:00Z`).getUTCDay()).toBe(6);
     expect(first.readMinutes).toBeGreaterThanOrEqual(2);
   });

@@ -27,7 +27,7 @@ Work top to bottom. Build and screenshot at 375px before wider widths.
 `pnpm check:placeholders` (in `apps/web`) currently reports 2 leftovers (the footer social handles). It must report none before launch (gate in 1.9). All text lives in `apps/web/src/content/landing.ts`.
 
 - [x] About: two new paragraphs and the "paddle out with us" link to `#subscribe` (from `about.md`)
-- [x] What's coming: the weekly card is labelled "Rolling in consistently" (the 5 December 2026 launch date was removed)
+- [x] What's coming: the weekly card is labelled "Rolling in consistently" (the launch date was removed from the card)
 - [x] What's coming: publish day set to Saturday
 - [x] What's coming: first series sentence removed (decide later)
 - [x] What's coming: audio format sentence removed (decide later)

@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 const path = "/devotionals/advent-01-more-than-watchmen";
 const week2 = "/devotionals/advent-02-the-long-wait";
-// The test server pretends it is Saturday 12 December 2026 (see playwright.config.ts),
+// The test server pretends it is Saturday 5 December 2026 (see playwright.config.ts),
 // so weeks 1 and 2 are published and the card shows the newest, week 2.
 
 test("the landing card shows the newest published devotional and opens it in full", async ({
@@ -37,7 +37,7 @@ test("the Previous card on week 2 opens week 1, and week 3 is shown but not a li
 }) => {
   await page.goto(week2);
   const nav = page.getByRole("navigation", { name: "Series" });
-  await expect(nav).toContainText("Next · 19 December");
+  await expect(nav).toContainText("Next · 12 December");
   await expect(nav.getByRole("link", { name: /Next/ })).toHaveCount(0);
   const weeks = page.getByRole("navigation", { name: "Advent weeks" });
   await expect(weeks.getByRole("link")).toHaveCount(1);

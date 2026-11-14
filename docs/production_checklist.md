@@ -1,6 +1,6 @@
 # Production checklist (just before launch)
 
-Everything that is only needed when the site goes public lives here, not in [PLAN.md](PLAN.md). It was moved out of PLAN.md step 1.9, the launch parts of 1.3, 1.6 and 1.8, and the launch items of [threat_plan.md](threat_plan.md), so the rest of the plan can be finished first.
+**Launch date: Saturday 28 November 2026.** Everything that is only needed when the site goes public lives here, not in [PLAN.md](PLAN.md). It was moved out of PLAN.md step 1.9, the launch parts of 1.3, 1.6 and 1.8, and the launch items of [threat_plan.md](threat_plan.md), so the rest of the plan can be finished first.
 
 **`wordonthewater.net` stays inactive until Part G.** Parts A to F do not point the website at Vercel: the old Squarespace site keeps serving. Part E adds email DNS records only; the mailboxes (MX) are never touched.
 
@@ -140,10 +140,10 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 - [ ] **Clean up the spike leftovers in Kit before real subscribers arrive**, so the first `--all` goes only to real people: the test subscriber(s), the `spike-test` tag, the empty "Imported November 14th, 2026…" tag, and the sent test broadcasts (ids 27039425, 27039513, 27039763, 27040594; the API cannot delete a sent broadcast, use the Kit dashboard).
 - [ ] Keys: the command uses `KIT_API_KEY_PREVIEW` (add `--live` for `KIT_API_KEY`). Both belong to the same Kit account, so a draft appears in the live account either way. Keep the keys in the root `.env` only, never in the repo, chat or a Vercel variable for this command.
 
-**The first real broadcast (`advent-01-more-than-watchmen`, publishAt Saturday 2026-12-05)**
+**The first real broadcast (`advent-01-more-than-watchmen`, publishAt Saturday 2026-11-28, the launch date)**
 - [ ] A few days before, run `pnpm broadcast:devotional advent-01-more-than-watchmen --all`, open the draft in Kit and check the subject (`emailSubject`), the preview text (`summary`) and the sender.
 - [ ] Send yourself a test from Kit and read it on your phone.
-- [ ] Schedule it in Kit for 2026-12-05 after 02:00 Harare time (the page goes live at 00:00 UTC), so the website link works when readers tap it.
+- [ ] Schedule it in Kit for 2026-11-28 after 02:00 Harare time (the page goes live at 00:00 UTC), so the website link works when readers tap it.
 - [ ] Check the unsubscribe link in the test: Kit shows `unsubscribed` and our mirror follows through the webhook (Part H).
 
 **After the first send**
