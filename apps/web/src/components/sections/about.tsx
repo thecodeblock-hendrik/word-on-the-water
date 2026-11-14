@@ -4,7 +4,7 @@ import { about } from "@/content/landing";
 /** Why the ministry exists, beside who it is for. */
 export function About() {
   return (
-    <section id="about" aria-labelledby="about-h" className="py-[72px]">
+    <section id="about" aria-labelledby="about-h" className="py-10 md:py-[72px]">
       <div className="mx-auto grid max-w-[1120px] items-start gap-8 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] lg:grid-cols-2 lg:gap-14">
         <div className="grid max-w-[62ch] gap-[18px]">
           <p className="font-display text-sm font-semibold uppercase tracking-[.18em] text-accent-ink">
