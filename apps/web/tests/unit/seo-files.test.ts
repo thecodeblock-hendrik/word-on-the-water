@@ -38,19 +38,21 @@ describe("robots.txt", () => {
 
 describe("sitemap.xml", () => {
   const home = "https://wordonthewater.net/";
+  const privacy = "https://wordonthewater.net/privacy";
   const week = (slug: string) => `https://wordonthewater.net/devotionals/${slug}`;
 
   it("lists the home page and only the launch devotional before anything else is published", async () => {
-    expect(await urls("2026-11-14")).toEqual([home, week("advent-01-more-than-watchmen")]);
+    expect(await urls("2026-11-14")).toEqual([home, week("advent-01-more-than-watchmen"), privacy]);
   });
 
   it("grows by one devotional on each publish day, with no redeploy", async () => {
-    expect(await urls("2026-11-28")).toEqual([home, week("advent-01-more-than-watchmen")]);
-    expect(await urls("2026-12-04")).toEqual([home, week("advent-01-more-than-watchmen")]);
+    expect(await urls("2026-11-28")).toEqual([home, week("advent-01-more-than-watchmen"), privacy]);
+    expect(await urls("2026-12-04")).toEqual([home, week("advent-01-more-than-watchmen"), privacy]);
     expect(await urls("2026-12-05")).toEqual([
       home,
       week("advent-02-the-long-wait"),
       week("advent-01-more-than-watchmen"),
+      privacy,
     ]);
   });
 
@@ -61,7 +63,14 @@ describe("sitemap.xml", () => {
       week("advent-03-a-quiet-mans-yes"),
       week("advent-02-the-long-wait"),
       week("advent-01-more-than-watchmen"),
+      privacy,
     ]);
+  });
+
+  it("lists the privacy page, dated by the day the policy was last updated", async () => {
+    vi.stubEnv("DEVOTIONAL_TODAY", "2026-12-21");
+    const entry = (await sitemap()).find((e) => e.url === privacy);
+    expect(entry?.lastModified).toBe("2026-11-14");
   });
 
   it("never lists the thank-you page or API routes, and every address is absolute", async () => {

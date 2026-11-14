@@ -1,0 +1,101 @@
+import { describe, expect, it } from "vitest";
+
+import { PRIVACY_UPDATED, privacyPolicy } from "@/content/privacy";
+import { findPlaceholders } from "@/lib/placeholders";
+
+const policy = (bibleEnabled = false) => privacyPolicy({ bibleEnabled });
+const everything = (bibleEnabled = false) => JSON.stringify(policy(bibleEnabled));
+const section = (id: string, bibleEnabled = false) =>
+  policy(bibleEnabled).sections.find((s) => s.id === id)!;
+const terms = (id: string, bibleEnabled = false) =>
+  section(id, bibleEnabled).items!.map((item) => item.term);
+
+describe("the privacy policy content", () => {
+  it("carries the date it was last updated", () => {
+    expect(PRIVACY_UPDATED).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(Number.isNaN(Date.parse(PRIVACY_UPDATED))).toBe(false);
+  });
+
+  it("has these sections, in this order, each with a heading and something to read", () => {
+    const { sections } = policy();
+    expect(sections.map((s) => s.id)).toEqual([
+      "who-we-are",
+      "what-we-collect",
+      "cookies",
+      "how-long",
+      "who-else",
+      "your-rights",
+      "children",
+      "changes",
+      "contact",
+    ]);
+    for (const s of sections) {
+      expect(s.heading.length).toBeGreaterThan(0);
+      expect((s.paragraphs?.length ?? 0) + (s.items?.length ?? 0)).toBeGreaterThan(0);
+    }
+  });
+
+  it("says what is collected: the sign-up, the bot check, abuse keys, logs, analytics, errors, email", () => {
+    expect(terms("what-we-collect")).toEqual([
+      "The weekly email",
+      "Checking you are a person",
+      "Stopping abuse",
+      "Running the site",
+      "Counting visits",
+      "Fixing errors",
+      "Emails you send us",
+    ]);
+  });
+
+  it("names every service that handles personal data", () => {
+    expect(terms("who-else")).toEqual([
+      "Kit",
+      "Vercel",
+      "Neon",
+      "Upstash",
+      "Cloudflare",
+      "Sentry",
+      "Squarespace",
+    ]);
+  });
+
+  it("states the retention the job enforces: 7 days unconfirmed, 30 days of backups", () => {
+    const kept = JSON.stringify(section("how-long"));
+    expect(kept).toContain("7 days");
+    expect(kept).toContain("30 days");
+  });
+
+  it("names the theme cookie, and the Bible cookies only when the Bible reader is switched on", () => {
+    expect(terms("cookies", false)).toEqual(["theme"]);
+    expect(terms("cookies", true)).toEqual(["theme", "bible-version and bible-passage"]);
+  });
+
+  it("promises no tracking and no selling, and that children are not the audience", () => {
+    const all = everything().toLowerCase();
+    expect(all).toContain("no advertising or tracking cookies");
+    expect(all).toContain("never sell");
+    expect(JSON.stringify(section("children"))).toMatch(/not aimed at children/);
+  });
+
+  it("gives a way to reach us, and the regulators a person can complain to", () => {
+    expect(JSON.stringify(section("contact"))).toContain("hello@wordonthewater.net");
+    const rights = JSON.stringify(section("your-rights"));
+    expect(rights).toContain("Information Regulator");
+    expect(rights).toMatch(/30 days/);
+  });
+
+  it("does not describe things that do not exist yet: the prayer and contact forms, Postmark", () => {
+    const all = everything(true).toLowerCase();
+    for (const word of ["postmark", "prayer request form", "prayer form", "contact form"]) {
+      expect(all, word).not.toContain(word);
+    }
+  });
+
+  it("leaves only the two facts the owner must supply as [placeholders], which the launch check catches", () => {
+    const found = findPlaceholders(policy(true));
+    expect(found.length).toBeGreaterThan(0);
+    for (const { text } of found) {
+      expect(text).toMatch(/^\[(full name|postal address)/);
+    }
+  });
+});
