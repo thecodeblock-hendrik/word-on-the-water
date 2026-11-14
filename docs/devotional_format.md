@@ -84,7 +84,7 @@ A series is described once, in `apps/web/content/series/<name>/`, not in every d
 
 - `series.yml`: the title, a tagline, the illustration's alt text, and the outline, one entry per planned week (number, working title, passage, date).
 - `art-dawn-patrol.png` and `art-night-swell.png`: the series illustration for each colour scheme (the Advent files are tall portraits, 2833 by 4533; the site crops them to a banner).
-- `art-night-swell-email.jpg`: the banner at the top of the weekly email, a wide crop (about 7:3) of the Night swell art, 1200 px wide, JPEG, under 100 KB. On macOS: `sips -c <height> <width> --cropOffset <y> <x> art-night-swell.png --out crop.png`, then `sips -s format jpeg -s formatOptions 78 -Z 1200 crop.png --out art-night-swell-email.jpg` (Advent used a 2833 by 1214 crop starting 1560 px from the top). Without it the email has no banner.
+- `art-night-swell-email.jpg`: the banner at the top of the weekly email, a wide crop (about 16:9) of the Night swell art, 1200 px wide, JPEG, under 100 KB. On macOS: `sips -c <height> <width> --cropOffset <y> <x> art-night-swell.png --out crop.png`, then `sips -s format jpeg -s formatOptions 78 -Z 1200 crop.png --out art-night-swell-email.jpg` (Advent used a 2833 by 1600 crop starting 1800 px from the top, which keeps the lamp in the upper third and shows the tower down to the hills). Without it the email has no banner.
 
 Copy `content/series/_template/` to start a new series. The outline drives "Advent 1 of 5", the series list beside the article and the Next link. Once a week's `devotional.md` exists, its own title, passage and date replace the outline's working title. A week only becomes a link once it is published.
 
