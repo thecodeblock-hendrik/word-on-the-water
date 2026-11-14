@@ -1,6 +1,6 @@
 ---
 title: A Quiet Man's Yes
-publishAt: 2026-12-19
+publishAt: 2026-12-12
 author: H
 series: advent
 seriesNumber: 3
