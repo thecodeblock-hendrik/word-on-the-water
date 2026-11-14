@@ -9,6 +9,7 @@ import { LogoSprite } from "@/components/logo";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { siteMetadata } from "@/lib/seo";
 import { THEME_COOKIE, parseTheme, themeColor } from "@/lib/theme";
 
 import "./globals.css";
@@ -27,10 +28,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora", display: "swap" });
 
-export const metadata: Metadata = {
-  title: { default: "Word on the Water", template: "%s | Word on the Water" },
-  description: "Devotionals and Bible teaching for men and surfers.",
-};
+export const metadata: Metadata = siteMetadata;
 
 export async function generateViewport(): Promise<Viewport> {
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
