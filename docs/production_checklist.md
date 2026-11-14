@@ -15,7 +15,7 @@ Related guides: [kit_webhook_checks.md](kit_webhook_checks.md) (domain, webhook 
 - [ ] PLAN.md steps 1.3 to 1.8 are all ticked (sign-up, prayer form, contact form, legal and SEO, retention, quality gates).
 - [ ] Budgets met on a deployed preview: Lighthouse mobile (Performance 95, Accessibility 100, Best Practices 100, SEO 100), LCP under 2.0 s, CLS under 0.05, INP under 200 ms, landing JS under 100 KB gzipped.
 - [ ] No unresolved high or critical finding in CodeQL, the dependency audits or gitleaks.
-- [ ] **Privacy policy:** the name (Henno Oosthuizen) and the postal address (PO Box 6055, Port Elizabeth, Eastern Cape 6001, the same one Kit prints) are filled in (2026-11-14). Still to do: read the whole page once, update `PRIVACY_UPDATED` if you change anything, and fill the two social handles so that `pnpm check:placeholders` passes.
+- [ ] **Privacy policy:** the responsible name (the registered name, Word On The Water) and the postal address (PO Box 6055, Port Elizabeth, Eastern Cape 6001, the same one Kit prints) are filled in (2026-11-14). Still to do: read the whole page once, update `PRIVACY_UPDATED` if you change anything, and fill the two social handles so that `pnpm check:placeholders` passes.
 - [ ] Kit: add a link to `https://wordonthewater.net/privacy` to the Kit form's sign-up and confirmation pages if Kit allows it (the site's own sign-up line already links it).
 
 ---

@@ -91,10 +91,10 @@ describe("the privacy policy content", () => {
     }
   });
 
-  it("names who runs the ministry and gives the postal address", () => {
-    expect(JSON.stringify(section("who-we-are"))).toContain(
-      "Henno Oosthuizen runs Word on the Water",
-    );
+  it("names the registered name that runs the site, not a person, and gives the postal address", () => {
+    const who = JSON.stringify(section("who-we-are"));
+    expect(who).toContain("run by Word On The Water, the registered name of the ministry");
+    expect(who).not.toContain("Oosthuizen");
     expect(JSON.stringify(section("contact"))).toContain(
       "PO Box 6055, Port Elizabeth, Eastern Cape 6001",
     );

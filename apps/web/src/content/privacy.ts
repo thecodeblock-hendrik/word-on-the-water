@@ -18,9 +18,9 @@ export type PrivacyPolicy = {
   sections: PolicySection[];
 };
 
-// Who is responsible, and where to write. The same PO Box that Kit prints in every email footer. A
+// Who is responsible (the registered name), and where to write. The same PO Box that Kit prints in every email footer. A
 // [bracketed] value would show highlighted on the page, and the launch check would fail on it.
-const RESPONSIBLE = "Henno Oosthuizen";
+const RESPONSIBLE = "Word On The Water";
 const POSTAL = "PO Box 6055, Port Elizabeth, Eastern Cape 6001";
 
 /**
@@ -41,7 +41,7 @@ export function privacyPolicy({ bibleEnabled }: { bibleEnabled: boolean }): Priv
         id: "who-we-are",
         heading: "Who we are",
         paragraphs: [
-          `${RESPONSIBLE} runs Word on the Water and decides how your details are used. You can write to us at ${CONTACT_EMAIL}.`,
+          `This site is run by ${RESPONSIBLE}, the registered name of the ministry. We decide how your details are used. You can write to us at ${CONTACT_EMAIL}.`,
         ],
       },
       {

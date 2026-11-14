@@ -29,7 +29,9 @@ describe("the privacy page", () => {
   it("shows who runs the ministry and the postal address, with nothing left to fill in", () => {
     const { container } = render(<PrivacyPage />);
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
-    expect(screen.getByText(/Henno Oosthuizen runs Word on the Water/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/run by Word On The Water, the registered name of the ministry/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/PO Box 6055, Port Elizabeth, Eastern Cape 6001/)).toBeInTheDocument();
   });
 
