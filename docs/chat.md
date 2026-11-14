@@ -1,7 +1,7 @@
 # chat.md - "Got Questions" faith chat (scope, v2: local knowledge base)
 
 Status: scope accepted, nothing built. Rewritten 2026-11-14 (v1 used OpenRouter and web search; replaced, see section 2).
-Recorded in: [ADR 0009](adr/0009-chat-local-knowledge-base.md), [PLAN.md](PLAN.md) step 1.10, `CLAUDE.md` (sections 1, 4, 6.1, 8, 9, 13 and decisions), [threat-model.md](threat-model.md) (C1 to C9), [privacy.md](privacy.md), [production_checklist.md](production_checklist.md) Part L, `README.md` and `.env.example` (`CHAT_ENABLED`). Mockups: [design/chat_mockups.html](design/chat_mockups.html).
+Recorded in: [ADR 0009](adr/0009-chat-local-knowledge-base.md), [PLAN.md](PLAN.md) step 1.10, `CLAUDE.md` (sections 1, 4, 6.1, 8, 9, 13 and decisions), [threat-model.md](threat-model.md) (C1 to C9), [privacy.md](privacy.md), [production_checklist.md](production_checklist.md) Part L, `README.md` and `.env.example` (`CHAT_ENABLED`). Build checklist: [chat_checks.md](chat_checks.md). Mockups: [design/chat_mockups.html](design/chat_mockups.html).
 
 Files this scope is based on (currently in `~/Downloads`, to be moved into the repo in step K0):
 - `build_kb.py` - converts the knowledge-base markdown export into JSON.
