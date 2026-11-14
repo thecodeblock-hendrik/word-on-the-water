@@ -110,6 +110,7 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 - [ ] Send a contact message: it arrives in `hello@`.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
+- [ ] Send a tag-limited test broadcast from `hello@` and read it (Part K).
 
 ---
 
@@ -117,6 +118,35 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 
 - [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request, and the prayer team receives it.
 - [ ] All Part A budgets met and no high security findings.
+- [ ] Part K is complete: the first weekly email reached a real inbox (not spam), from `hello@`, with the banner, the unsubscribe link and a working "Read it on the website" link.
 - [ ] Two weeks after launch: review the DMARC reports, then move DMARC to `p=quarantine`.
 - [ ] Revisit the accepted risks: delivery through Squarespace forwards and DMARC at `p=none` in the first weeks.
 - [ ] Tell Claude Code, so it ticks the matching items in PLAN.md and the threat plan and closes Phase 1.
+
+---
+
+## Part K. Weekly email broadcasts (Kit)
+
+How it works is in [devotional_format.md](devotional_format.md), "The weekly email (Kit)", and what was proven is in [ADR 0008](adr/0008-kit-subscriptions.md), "Broadcast spike". In short: `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a **draft** in Kit; nothing is sent until you schedule it in Kit. The command runs on your own machine from the root `.env`, not on Vercel.
+
+**One-time, before the first broadcast**
+- [ ] Part E is done for Kit: sending domain authenticated (DKIM signed as `wordonthewater.net`), Kit in the merged SPF record, and the DMARC decision made. `_dmarc.wordonthewater.net` already publishes `p=reject` with strict alignment (found 2026-11-14), so without Kit's DKIM, mail from `hello@` is very likely rejected.
+- [ ] Prove delivery from `hello@`: create a draft with `--tag <id>` for a tag that only you carry, send it, and check it lands in the inbox, not spam. In Gmail, "Show original" must say SPF, DKIM and DMARC pass. (The spike sent from a Gmail address as a workaround and landed in spam; that workaround is not needed once DKIM is set.)
+- [ ] Read the test on a phone in the Mail app and the Gmail app, with dark mode on and off, and in Outlook if you can: the banner shows, the dark panels hold, quotes and "Paddle Out" are styled, and the dashes, quotes and © are correct.
+- [ ] **Banner address.** The email loads the series banner (`art-night-swell-email.jpg`, 1200 px wide, 44 KB) from `SERIES_IMAGE_BASE` in `apps/web/src/lib/devotionals/kit-broadcast.ts`, which is the public repository on `main`. That works before launch but is not meant for heavy hotlinking: decide whether to keep it for a small list or point `EMAIL_IMAGE_BASE` at the live site's content address once Part G is done. Every new series needs its own email banner in its folder (crop the art wide, resize to 1200 px, JPEG under 100 KB).
+- [ ] After Part G, the "Read it on the website" link (`SITE_URL`, default `https://wordonthewater.net`) opens the devotional. Click it in the test email.
+- [ ] Kit account settings: timezone (set to Harare, UTC+2, 2026-11-14), the postal address Kit prints in the footer is the one you want public (it shows "PO Box 6055, Port Elizabeth, Eastern Cape 6001"), default sender `hello@wordonthewater.net`.
+- [ ] Decide about the "Built with Kit" badge. The free plan adds it below every email and it cannot be restyled; a paid plan removes it.
+- [ ] **Clean up the spike leftovers in Kit before real subscribers arrive**, so the first `--all` goes only to real people: the test subscriber(s), the `spike-test` tag, the empty "Imported November 14th, 2026…" tag, and the sent test broadcasts (ids 27039425, 27039513, 27039763, 27040594; the API cannot delete a sent broadcast, use the Kit dashboard).
+- [ ] Keys: the command uses `KIT_API_KEY_PREVIEW` (add `--live` for `KIT_API_KEY`). Both belong to the same Kit account, so a draft appears in the live account either way. Keep the keys in the root `.env` only, never in the repo, chat or a Vercel variable for this command.
+
+**The first real broadcast (`advent-01-more-than-watchmen`, publishAt Saturday 2026-12-05)**
+- [ ] A few days before, run `pnpm broadcast:devotional advent-01-more-than-watchmen --all`, open the draft in Kit and check the subject (`emailSubject`), the preview text (`summary`) and the sender.
+- [ ] Send yourself a test from Kit and read it on your phone.
+- [ ] Schedule it in Kit for 2026-12-05 after 02:00 Harare time (the page goes live at 00:00 UTC), so the website link works when readers tap it.
+- [ ] Check the unsubscribe link in the test: Kit shows `unsubscribed` and our mirror follows through the webhook (Part H).
+
+**After the first send**
+- [ ] In Kit's report, check recipients, opens, unsubscribes, bounces and complaints, and that bounces and complaints reached our mirror.
+- [ ] Read the first DMARC reports and confirm Kit's mail passes, then continue with the `p=quarantine` step in Part J.
+- [ ] From the second week on, follow the four steps in [devotional_format.md](devotional_format.md).
