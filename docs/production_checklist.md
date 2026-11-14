@@ -12,11 +12,12 @@ Related guides: [kit_webhook_checks.md](kit_webhook_checks.md) (domain, webhook 
 
 ## Part A. Gate: is the rest done?
 
-- [ ] PLAN.md steps 1.3 to 1.8 are all ticked (sign-up, prayer form, contact form, legal and SEO, retention, quality gates).
+- [ ] PLAN.md steps 1.3, 1.6, 1.7 and 1.8 are all ticked (sign-up, legal and SEO, retention, quality gates). The prayer form (1.4) and contact form (1.5) are deferred past launch (decided 2026-11-14).
 - [ ] Budgets met on a deployed preview: Lighthouse mobile (Performance 95, Accessibility 100, Best Practices 100, SEO 100), LCP under 2.0 s, CLS under 0.05, INP under 200 ms, landing JS under 100 KB gzipped.
 - [ ] No unresolved high or critical finding in CodeQL, the dependency audits or gitleaks.
 - [ ] **Privacy policy:** the responsible name (the registered name, Word On The Water) and the postal address (PO Box 6055, Port Elizabeth, Eastern Cape 6001, the same one Kit prints) are filled in (2026-11-14). Still to do: read the whole page once, update `PRIVACY_UPDATED` if you change anything, and fill the two social handles so that `pnpm check:placeholders` passes.
 - [ ] Kit: add a link to `https://wordonthewater.net/privacy` to the Kit form's sign-up and confirmation pages if Kit allows it (the site's own sign-up line already links it).
+- [ ] Got Questions chat (PLAN.md 1.10): either ready for Part L, or left off with `CHAT_ENABLED` unset and the button a mail link to `hello@wordonthewater.net`.
 
 ---
 
@@ -108,7 +109,7 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 
 - [ ] Subscribe with a real address, confirm through the Kit email, land on `/thank-you`; Kit shows `active` and our mirror shows the same.
 - [ ] Unsubscribe through the Kit link; our mirror shows `unsubscribed`.
-- [ ] Send a prayer request: the prayer inbox receives it (and the text is in the email only if the consent box was ticked).
+- [ ] Deferred past launch (forms not built): the `prayer@` and `hello@` mail links on the page open a mail to the right address. When the prayer form ships, send one and check the prayer inbox receives it (the text only if the consent box was ticked).
 - [ ] Send a contact message: it arrives in `hello@`.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
@@ -123,13 +124,14 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 
 ## Part J. Exit gate and after launch
 
-- [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request, and the prayer team receives it.
+- [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and reach `prayer@` and `hello@` through the mail links (the forms are deferred).
 - [ ] All Part A budgets met and no high security findings.
 - [ ] Part K is complete: the first weekly email reached a real inbox (not spam), from `hello@`, with the banner, the unsubscribe link and a working "Read it on the website" link.
 - [ ] Alerts are set up and each one has been seen to fire once ([runbooks/alerts.md](runbooks/alerts.md)).
 - [ ] **Monthly:** in the Kit dashboard, delete the subscribers that are still unconfirmed after 7 days (Subscribers, filter Unconfirmed). The retention job cannot do this: Kit's API has no delete (see [privacy.md](privacy.md)).
 - [ ] Two weeks after launch: review the DMARC reports, then move DMARC to `p=quarantine`.
 - [ ] Revisit the accepted risks: delivery through Squarespace forwards and DMARC at `p=none` in the first weeks.
+- [ ] If the chat launched (Part L): the first week's counts of answers and no-answers reviewed, and weak or missing questions added to the knowledge base by pull request.
 - [ ] Tell Claude Code, so it ticks the matching items in PLAN.md and the threat plan and closes Phase 1.
 
 ---
@@ -159,3 +161,19 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 - [ ] In Kit's report, check recipients, opens, unsubscribes, bounces and complaints, and that bounces and complaints reached our mirror.
 - [ ] Read the first DMARC reports and confirm Kit's mail passes, then continue with the `p=quarantine` step in Part J.
 - [ ] From the second week on, follow the four steps in [devotional_format.md](devotional_format.md).
+
+---
+
+## Part L. Got Questions chat (only if it launches with the site)
+
+Scope: [chat.md](chat.md), decision: [ADR 0009](adr/0009-chat-local-knowledge-base.md). No domain or external service is needed, so this part can be done on a preview first.
+
+- [ ] **Pastoral review done and recorded** (reviewer, date, knowledge base version) in the repo. Without it `CHAT_ENABLED` stays unset in Production.
+- [ ] The knowledge base `meta.status` no longer says "Draft for pastoral review", and `meta.version` matches the sign-off.
+- [ ] **Crisis numbers verified** on the providers' own sites: SADAG Suicide Crisis Helpline 0800 567 567 and LifeLine South Africa 0861 322 322, plus the line for visitors outside South Africa.
+- [ ] `make kb-check` is green in CI (committed JSON equals the markdown source).
+- [ ] Privacy notice has the chat section (no storage on the server, thread only in the tab) and the threat model rows C1 to C9 are ticked.
+- [ ] On a preview with `CHAT_ENABLED=1`: ask the starter questions, a contested one (baptism), an off-topic one, a message with a phone number (rejected) and a crisis phrase (fixed reply); try follow-ups ("tell me more", "why"); press Clear chat; reload (thread survives) and close the tab (thread gone).
+- [ ] Phone check at 375px on a real device: keyboard, safe areas, tap targets, dark and light.
+- [ ] Rate limit seen to trip (generic 429) and the Vercel Firewall rule on the chat route is set.
+- [ ] Set `CHAT_ENABLED=1` in Production, redeploy **(Hendrik)**, and check the Got Questions button opens the chat. Rollback is unsetting the variable: the button then is a mail link to `hello@wordonthewater.net`.

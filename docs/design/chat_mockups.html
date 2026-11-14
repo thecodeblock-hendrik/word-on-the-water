@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Got Questions chat mockups</title>
+<style>
+:root{--bg:#fbf3e8;--surface:#fffaf3;--ink:#2b2d42;--muted:#5c5e70;--line:#e9dccb;--accent:#d9703a;--accent-ink:#a9501f;--on-accent:#fff;--deep:#2b2d42;--on-deep:#fbf3e8;--warn:#fff1d6;--warn-line:#e8c27a;--danger:#fde9e4;--danger-line:#e8a898}
+.night{--bg:#0f2233;--surface:#152c40;--ink:#f4f1ea;--muted:#a9b7c2;--line:#28425a;--accent:#4fa9a6;--accent-ink:#6fc0bc;--on-accent:#0a1825;--deep:#0a1825;--on-deep:#f4f1ea;--warn:#3a3322;--warn-line:#7a6a3a;--danger:#3a2222;--danger-line:#8a4a44}
+*{box-sizing:border-box}
+body{margin:0;background:#e7e2da;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#2b2d42;padding:24px 16px 80px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:40px 0 4px}
+.lead{color:#5c5e70;margin:0 0 8px;max-width:78ch}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:14px}
+figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width:375px}
+.wide figcaption{max-width:1100px}
+.notes{max-width:78ch;font-size:14px;color:#3b3d4e}
+.notes li{margin:2px 0}
+
+/* frames */
+.phone{width:375px;height:760px;background:var(--bg);color:var(--ink);border-radius:30px;border:8px solid #111;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.desk{width:1100px;max-width:100%;height:680px;background:var(--bg);color:var(--ink);border:1px solid #b9b3a8;border-radius:10px;overflow:hidden;position:relative}
+.status{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font:600 12px system-ui;flex:none}
+
+/* page behind (landing) */
+.site-top{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.logo{font:700 20px "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.02em;flex:1}
+.page{padding:20px 16px}
+.eyebrow{font:700 12px system-ui;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.page h3{font:700 34px/1.1 "Barlow Condensed","Arial Narrow",system-ui;margin:4px 0 14px}
+.steps{display:grid;gap:10px;margin:0 0 18px;padding:0;list-style:none}
+.steps li{display:flex;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:15px}
+.steps b{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex:none;font-size:14px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+
+/* buttons */
+.btn{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:0 16px;font:600 16px system-ui;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent;border-color:var(--accent-ink);color:var(--accent-ink)}
+.btn.focus{outline:3px solid var(--accent);outline-offset:2px}
+
+/* dimmed overlay + panels */
+.dim{position:absolute;inset:0;background:rgba(10,24,37,.55)}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:440px;background:var(--bg);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.sheet{position:absolute;inset:26px 0 0 0;background:var(--bg);display:flex;flex-direction:column}
+.sheet.partial{inset:90px 0 0 0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.3)}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 0;flex:none}
+
+/* chat */
+.chat-h{display:flex;align-items:center;gap:6px;padding:8px 8px 8px 16px;border-bottom:1px solid var(--line);flex:none}
+.chat-h strong{font:700 22px "Barlow Condensed","Arial Narrow",system-ui;flex:1;letter-spacing:.01em}
+.iconbtn{min-height:44px;min-width:44px;display:grid;place-items:center;border:0;background:transparent;color:var(--ink);font:600 15px system-ui;border-radius:10px}
+.iconbtn.txt{padding:0 10px;color:var(--accent-ink)}
+.thread{flex:1;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.intro{font-size:15px;color:var(--muted);margin:0}
+.intro b{color:var(--ink)}
+.starter{display:flex;flex-direction:column;gap:8px}
+.chip{min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:22px;padding:0 16px;font:600 15px system-ui;display:inline-flex;align-items:center;text-align:left}
+.chip.sm{min-height:44px;font-weight:500}
+.chip .arrow{margin-left:auto;color:var(--accent-ink);padding-left:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.label{font:700 12px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 0}
+.me{align-self:flex-end;max-width:82%;background:var(--accent);color:var(--on-accent);padding:10px 14px;border-radius:18px 18px 4px 18px;font-size:16px}
+.bot{align-self:flex-start;max-width:96%;background:var(--surface);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:14px;font-size:16px;line-height:1.55;display:flex;flex-direction:column;gap:10px}
+.bot p{margin:0}
+.bot .more{color:var(--accent-ink);font:600 15px system-ui;min-height:44px;display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;text-align:left}
+.bot .exp{border-top:1px solid var(--line);padding-top:10px;color:var(--ink)}
+.verse{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:0 10px;min-height:36px;display:inline-flex;align-items:center;font:600 14px system-ui;color:var(--accent-ink)}
+.note{background:var(--warn);border:1px solid var(--warn-line);border-radius:10px;padding:10px 12px;font-size:14px;display:flex;gap:8px}
+.note.danger{background:var(--danger);border-color:var(--danger-line)}
+.badge{font:700 11px system-ui;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--warn-line);background:var(--warn);border-radius:99px;padding:2px 8px;align-self:flex-start}
+.typing{align-self:flex-start;display:flex;gap:5px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:4px 18px 18px 18px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.6}
+.typing i:nth-child(2){opacity:.8}.typing i:nth-child(3){opacity:1}
+.tel{min-height:56px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 14px;font:700 15px/1.25 system-ui}
+.tel>span:last-child{white-space:nowrap;font-size:17px}
+.tel small{font-weight:500;display:block;opacity:.9}
+.comp{border-top:1px solid var(--line);padding:8px 12px calc(10px + 6px);background:var(--surface);flex:none}
+.hint{font-size:13px;color:var(--muted);margin:0 0 6px;display:flex;gap:6px;align-items:center}
+.field{display:flex;gap:8px;align-items:flex-end}
+.input{flex:1;min-height:48px;border:1px solid var(--muted);border-radius:12px;background:var(--bg);padding:12px 14px;font-size:16px;color:var(--muted)}
+.input.err{border-color:#c0392b;border-width:2px;color:var(--ink)}
+.input.on{border-color:var(--accent);border-width:2px;color:var(--ink)}
+.send{width:48px;height:48px;border-radius:12px;background:var(--accent);color:var(--on-accent);border:0;font:700 20px system-ui;display:grid;place-items:center;flex:none}
+.send.off{background:var(--line);color:var(--muted)}
+.err-msg{font-size:14px;color:#a52a1d;margin:6px 0 0;display:flex;gap:6px}
+.night .err-msg{color:#ff9d8f}
+.foot{font-size:12px;color:var(--muted);margin:8px 0 0;text-align:center}
+.kb{font-size:12px;color:var(--muted)}
+.topic{min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);font-weight:600}
+.topic small{color:var(--muted);font-weight:500}
+.back{color:var(--accent-ink);font:600 15px system-ui}
+</style>
+</head>
+<body>
+<h1>Got Questions - chat mockups</h1>
+<p class="lead">Local knowledge base, no AI model. Drawer on desktop, full-height sheet on mobile. Colours are the real Dawn patrol and Night swell tokens; fonts fall back to system fonts here (the site uses Barlow). Text in the answers is taken from the real knowledge base entries 3.1 and 8.5.</p>
+<ul class="notes">
+<li>Every control is at least 44px tall; the send button is 48px. The privacy line sits <b>above</b> the input as visible text, not a placeholder.</li>
+<li>Answers are cards that never take focus; the input keeps focus. New answers are announced politely (<code>aria-live</code>).</li>
+<li>Follow-ups are one-tap chips, so people never need to type a clever question.</li>
+</ul>
+
+<h2>1. Entry point and mobile flow (Dawn patrol, light)</h2>
+<div class="row">
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="iconbtn">&#9776;</span></div>
+ <div class="page">
+  <div class="eyebrow">New to faith?</div>
+  <h3>Start here</h3>
+  <ul class="steps">
+   <li><b>1</b><span>God made you and loves you.</span></li>
+   <li><b>2</b><span>Sin separates us from him.</span></li>
+   <li><b>3</b><span>Jesus died and rose to rescue us.</span></li>
+   <li><b>4</b><span>You receive this by faith, as a gift.</span></li>
+  </ul>
+  <div class="cta"><span class="btn primary">Get the devotional</span><span class="btn ghost focus">Got Questions</span></div>
+ </div>
+</div><figcaption><b>Entry.</b> The ghost button replaces "Talk to someone". One tap opens the sheet.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn" aria-label="Close">&#10005;</span></div>
+  <div class="thread">
+   <p class="intro"><b>Ask about the Christian faith.</b> Answers come from our reviewed knowledge base. It is not a replacement for a pastor.</p>
+   <div class="label">Try one of these</div>
+   <div class="starter">
+    <span class="chip">Who is Jesus?</span>
+    <span class="chip">What is the gospel?</span>
+    <span class="chip">Does God exist?</span>
+   </div>
+   <div class="label">Or browse by topic</div>
+   <span class="chip">God, Jesus, Salvation and more <span class="arrow">&rsaquo;</span></span>
+  </div>
+  <div class="comp">
+   <p class="hint">&#9432; Please don't share personal details.</p>
+   <div class="field"><div class="input on">Type your question&#8230;</div><span class="send off">&uarr;</span></div>
+  </div>
+ </div>
+</div><figcaption><b>Empty state.</b> Starter questions remove the blank page. Browse by topic helps people who do not know what to ask.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">What is the gospel?</div>
+   <div class="bot">
+    <p>The gospel is the good news that Jesus Christ died for our sins, was buried and rose again, so that everyone who turns from sin and trusts in him is forgiven and receives eternal life as a free gift.</p>
+    <span class="more">Read more &#9662;</span>
+    <div><div class="label">Key scriptures</div><div class="chips" style="margin-top:6px"><span class="verse">John 3:16</span><span class="verse">Romans 1:16</span><span class="verse">Romans 3:23&ndash;24</span></div></div>
+    <div><div class="label">You might also ask</div><div class="chips" style="margin-top:6px"><span class="chip sm">How can I be saved?</span><span class="chip sm">What did Jesus teach?</span></div></div>
+   </div>
+  </div>
+  <div class="comp">
+   <p class="hint">&#9432; Please don't share personal details.</p>
+   <div class="field"><div class="input">Ask a follow-up&#8230;</div><span class="send off">&uarr;</span></div>
+  </div>
+ </div>
+</div><figcaption><b>Answer.</b> Short answer first, depth on demand, verses as tappable references, related questions as chips.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">What is the gospel?</div>
+   <div class="bot"><p>The gospel is the good news that Jesus Christ died for our sins&#8230;</p></div>
+   <div class="me">tell me more</div>
+   <div class="bot">
+    <p>Paul summarises it in 1 Corinthians 15:3&ndash;4. The gospel has four parts: God is holy and created us for himself; we have all sinned and are separated from him; Christ died and rose to rescue us; we receive this by faith, not by earning it. &ldquo;Gospel&rdquo; means &ldquo;good news.&rdquo;</p>
+    <div class="label">You might also ask</div>
+    <div class="chips"><span class="chip sm">Can I be saved by being a good person?</span><span class="chip sm">Who is Jesus?</span></div>
+   </div>
+   <div class="typing"><i></i><i></i><i></i></div>
+  </div>
+  <div class="comp">
+   <p class="hint">&#9432; Please don't share personal details.</p>
+   <div class="field"><div class="input on">why did he die</div><span class="send">&uarr;</span></div>
+  </div>
+ </div>
+</div><figcaption><b>Follow-ups.</b> "tell me more" shows the full explanation of the last answer. "why did he die" is understood from the last topic. The dots show a pending reply (instant in practice).</figcaption></figure>
+
+</div>
+
+<h2>2. Special states (mobile, light)</h2>
+<div class="row">
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">Should babies be baptised?</div>
+   <div class="bot">
+    <span class="badge">Christians differ on this</span>
+    <p>Evangelicals agree that baptism is important and commanded. They differ on who should be baptised and how.</p>
+    <span class="more">Read more &#9662;</span>
+    <div class="note"><span>&#9432;</span><span>Christians who hold to the Bible's authority disagree on this. Your local pastor can help you think it through.</span></div>
+    <div><div class="label">Key scriptures</div><div class="chips" style="margin-top:6px"><span class="verse">Acts 2:38&ndash;39</span><span class="verse">Romans 6:3&ndash;4</span></div></div>
+    <div><div class="label">You might also ask</div><div class="chips" style="margin-top:6px"><span class="chip sm">What is baptism?</span></div></div>
+   </div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input">Ask a follow-up&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </div>
+</div><figcaption><b>Contested topic.</b> A visible badge and the standard note. No side is taken.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">is dunking needed</div>
+   <div class="bot">
+    <p>I'm not sure what you mean. Did you mean one of these?</p>
+    <div class="chips" style="flex-direction:column;align-items:stretch">
+     <span class="chip sm">What is baptism?</span>
+     <span class="chip sm">Should babies be baptised? How should baptism be done?</span>
+     <span class="chip sm">Is baptism needed to be saved?</span>
+    </div>
+   </div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input">Ask a follow-up&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </div>
+</div><figcaption><b>Did you mean.</b> Medium confidence offers the top three questions instead of guessing.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">How do I bake bread?</div>
+   <div class="bot">
+    <p>I don't have an answer to that in my knowledge base. Please speak with your local pastor, who can help you with this question.</p>
+    <div class="chips"><span class="chip sm">Email us instead</span><span class="chip sm">Browse topics</span></div>
+   </div>
+  </div>
+  <div class="comp">
+   <p class="hint">&#9432; Please don't share personal details.</p>
+   <div class="field"><div class="input err">My number is 082 555 1234, can you</div><span class="send off">&uarr;</span></div>
+   <p class="err-msg" role="alert"><span>&#9888;</span><span>This chat can't take personal details. Please ask a question about the Christian faith. To reach a person, email hello@wordonthewater.net.</span></p>
+  </div>
+ </div>
+</div><figcaption><b>No answer and rejected input.</b> The no-answer text is the knowledge base's own, with a way out. A rejected message is blocked in the box before sending: red border, icon and text (not colour alone).</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">I don't want to be here anymore</div>
+   <div class="bot">
+    <div class="note danger"><span>&#9829;</span><span>If you are in danger or thinking about harming yourself, please reach out for help right away.</span></div>
+    <span class="tel"><span>SADAG Suicide Crisis Line<small>Free, 24 hours</small></span><span>0800 567 567</span></span>
+    <span class="tel"><span>LifeLine National Counselling<small>24 hours</small></span><span>0861 322 322</span></span>
+    <p style="font-size:14px">If your life is in immediate danger, contact emergency services. Outside South Africa, please call your local emergency number.</p>
+   </div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input">Ask a follow-up&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </div>
+</div><figcaption><b>Crisis.</b> Compassion first, no theology, big tappable <code>tel:</code> buttons. Fixed text, never matched or scored.</figcaption></figure>
+
+</div>
+
+<h2>3. Browse by topic and a half-height sheet (mobile)</h2>
+<div class="row">
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><span class="iconbtn back">&lsaquo; Back</span><strong style="text-align:center">Topics</strong><span class="iconbtn">&#10005;</span></div>
+  <div style="overflow:hidden">
+   <div class="topic">God <small>14 &rsaquo;</small></div>
+   <div class="topic">Jesus Christ <small>20 &rsaquo;</small></div>
+   <div class="topic">The Gospel and Salvation <small>19 &rsaquo;</small></div>
+   <div class="topic">The Bible <small>15 &rsaquo;</small></div>
+   <div class="topic">The Holy Spirit <small>12 &rsaquo;</small></div>
+   <div class="topic">Creation and Humanity <small>14 &rsaquo;</small></div>
+   <div class="topic">Prayer and Spiritual Growth <small>16 &rsaquo;</small></div>
+   <div class="topic">The Church <small>12 &rsaquo;</small></div>
+   <div class="topic">Suffering and Evil <small>14 &rsaquo;</small></div>
+   <div class="topic">Death and the Afterlife <small>14 &rsaquo;</small></div>
+   <div class="topic">Angels, Satan and Spiritual Warfare <small>10 &rsaquo;</small></div>
+   <div class="topic">End Times <small>12 &rsaquo;</small></div>
+  </div>
+ </div>
+</div><figcaption><b>Browse by topic.</b> The 14 themes from the knowledge base, each opening its questions. Counts are illustrative.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="iconbtn">&#9776;</span></div>
+ <div class="page"><div class="eyebrow">New to faith?</div><h3>Start here</h3></div>
+ <div class="dim"></div>
+ <div class="sheet partial">
+  <div class="grab"></div>
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <p class="intro"><b>Ask about the Christian faith.</b> Answers come from our reviewed knowledge base.</p>
+   <div class="starter"><span class="chip">Who is Jesus?</span><span class="chip">What is the gospel?</span></div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input">Type your question&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </div>
+</div><figcaption><b>Option: partial sheet.</b> A taller-than-half sheet with a grab handle keeps the page visible. The default in this scope is full height, because a keyboard takes half the screen anyway.</figcaption></figure>
+
+</div>
+
+<h2>4. Desktop (1024px and up)</h2>
+<div class="row wide">
+<figure class="wide"><div class="desk">
+ <div class="site-top"><span class="logo">Word on the Water</span><span style="font-size:15px;display:flex;gap:22px;margin-right:12px"><span>About</span><span>Devotionals</span><span>Start here</span><span>Contact</span></span><span class="btn primary">Get the devotional</span></div>
+ <div class="page" style="max-width:640px;padding:28px 40px">
+  <div class="eyebrow">New to faith?</div><h3>Start here</h3>
+  <ul class="steps"><li><b>1</b><span>God made you and loves you.</span></li><li><b>2</b><span>Sin separates us from him.</span></li><li><b>3</b><span>Jesus died and rose to rescue us.</span></li><li><b>4</b><span>You receive this by faith, as a gift.</span></li></ul>
+  <div class="cta"><span class="btn primary">Get the devotional</span><span class="btn ghost">Got Questions</span></div>
+ </div>
+ <div class="dim"></div>
+ <aside class="drawer" role="dialog" aria-label="Got Questions">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <p class="intro"><b>Ask about the Christian faith.</b> Answers come from our reviewed knowledge base. It is not a replacement for a pastor.</p>
+   <div class="label">Try one of these</div>
+   <div class="starter"><span class="chip">Who is Jesus?</span><span class="chip">What is the gospel?</span><span class="chip">Does God exist?</span></div>
+   <div class="label">Or browse by topic</div>
+   <div class="chips"><span class="chip sm">God</span><span class="chip sm">Jesus Christ</span><span class="chip sm">Salvation</span><span class="chip sm">The Bible</span><span class="chip sm">All topics &rsaquo;</span></div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input on">Type your question&#8230;</div><span class="send off">&uarr;</span></div><p class="foot">Enter to send, Shift+Enter for a new line. Esc closes.</p></div>
+ </aside>
+</div><figcaption><b>Desktop, empty (light).</b> A 440px right-hand drawer over a dimmed page. Focus is trapped inside; Esc and the X close it and focus returns to the Got Questions button.</figcaption></figure>
+</div>
+
+<div class="row wide night">
+<figure class="wide"><div class="desk">
+ <div class="site-top"><span class="logo">Word on the Water</span><span style="font-size:15px;display:flex;gap:22px;margin-right:12px"><span>About</span><span>Devotionals</span><span>Start here</span><span>Contact</span></span><span class="btn primary">Get the devotional</span></div>
+ <div class="page" style="max-width:640px;padding:28px 40px"><div class="eyebrow">New to faith?</div><h3>Start here</h3>
+  <ul class="steps"><li><b>1</b><span>God made you and loves you.</span></li><li><b>2</b><span>Sin separates us from him.</span></li></ul></div>
+ <div class="dim"></div>
+ <aside class="drawer">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">Should babies be baptised?</div>
+   <div class="bot">
+    <span class="badge">Christians differ on this</span>
+    <p>Evangelicals agree that baptism is important and commanded. They differ on who should be baptised and how.</p>
+    <span class="more">Read more &#9662;</span>
+    <div class="note"><span>&#9432;</span><span>Christians who hold to the Bible's authority disagree on this. Your local pastor can help you think it through.</span></div>
+    <div><div class="label">Key scriptures</div><div class="chips" style="margin-top:6px"><span class="verse">Acts 2:38&ndash;39</span><span class="verse">Acts 8:36&ndash;39</span><span class="verse">Romans 6:3&ndash;4</span></div></div>
+    <div><div class="label">You might also ask</div><div class="chips" style="margin-top:6px"><span class="chip sm">What is baptism?</span><span class="chip sm">Why are there so many denominations?</span></div></div>
+   </div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input">Ask a follow-up&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </aside>
+</div><figcaption><b>Desktop, contested answer (Night swell, dark).</b> The same components in the dark scheme; the accent turns teal and the badge and note keep their contrast.</figcaption></figure>
+</div>
+
+<h2>5. Dark scheme (mobile)</h2>
+<div class="row night">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <p class="intro"><b>Ask about the Christian faith.</b> Answers come from our reviewed knowledge base. It is not a replacement for a pastor.</p>
+   <div class="label">Try one of these</div>
+   <div class="starter"><span class="chip">Who is Jesus?</span><span class="chip">What is the gospel?</span><span class="chip">Does God exist?</span></div>
+   <div class="label">Or browse by topic</div>
+   <span class="chip">God, Jesus, Salvation and more <span class="arrow">&rsaquo;</span></span>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input on">Type your question&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </div>
+</div><figcaption>Empty state, Night swell.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">What is the gospel?</div>
+   <div class="bot">
+    <p>The gospel is the good news that Jesus Christ died for our sins, was buried and rose again, so that everyone who turns from sin and trusts in him is forgiven and receives eternal life as a free gift.</p>
+    <span class="more">Read more &#9662;</span>
+    <div><div class="label">Key scriptures</div><div class="chips" style="margin-top:6px"><span class="verse">John 3:16</span><span class="verse">Romans 1:16</span><span class="verse">Romans 3:23&ndash;24</span></div></div>
+    <div><div class="label">You might also ask</div><div class="chips" style="margin-top:6px"><span class="chip sm">How can I be saved?</span><span class="chip sm">What did Jesus teach?</span></div></div>
+   </div>
+  </div>
+  <div class="comp"><p class="hint">&#9432; Please don't share personal details.</p><div class="field"><div class="input">Ask a follow-up&#8230;</div><span class="send off">&uarr;</span></div></div>
+ </div>
+</div><figcaption>Answer, Night swell.</figcaption></figure>
+</div>
+
+<h2>UX decisions in one place</h2>
+<ul class="notes">
+<li><b>Drawer on desktop, sheet on mobile:</b> the same pattern as the Bible picker; a dialog with a focus trap, Esc to close, focus returns to the button.</li>
+<li><b>Short answer first, depth on request:</b> a phone shows the whole short answer without scrolling; "Read more" reveals the explanation.</li>
+<li><b>Chips over typing:</b> related questions, terms and "tell me more" are one tap, and they send entry ids so they always work.</li>
+<li><b>Honest labelling:</b> "reviewed knowledge base, not a pastor". It never says AI.</li>
+<li><b>Privacy rule visible:</b> a line above the input and a clear inline error, not a placeholder or a colour change alone.</li>
+<li><b>Safety:</b> crisis replies are fixed text with tappable numbers; contested topics carry a badge and a note.</li>
+<li><b>Control:</b> Clear chat deletes the thread (kept only in this tab). Nothing is stored on the server.</li>
+<li><b>Accessibility:</b> 44px targets, visible labels, 4.5:1 text contrast in both schemes, <code>aria-live="polite"</code> on new answers, reduced-motion respected, keyboard operable throughout.</li>
+</ul>
+</body>
+</html>
