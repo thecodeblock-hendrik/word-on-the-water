@@ -5,7 +5,7 @@ import type { ApiOptions } from "@/lib/api-client";
 import type { SignupState } from "@/lib/signup-state";
 
 /** The wording the visitor agreed to; bump it when the text beside the button changes. */
-export const CONSENT_TEXT_VERSION = "v1";
+export const CONSENT_TEXT_VERSION = "v2";
 
 type Post = (path: string, options: ApiOptions) => Promise<Response>;
 
