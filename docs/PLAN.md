@@ -319,7 +319,7 @@ Left to do (this is the only list; the old `continue.md` is archived):
 - [ ] `/.well-known/security.txt` (`Contact: mailto:hello@wordonthewater.net`, `Canonical: https://wordonthewater.net/.well-known/security.txt`, `Expires` within a year)
 - [ ] Real addresses on the page in place of the mockup placeholders: `prayer@wordonthewater.net` for prayer, `hello@wordonthewater.net` for contact and the footer
 - [ ] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization`
-- [ ] `sitemap.ts` and `robots.ts`
+- [x] `sitemap.ts` and `robots.ts` (2026-11-14): `robots` allows everything except `/api/` and names the sitemap; `sitemap` lists the home page and the devotionals a reader can open today, newest first, and awaits `connection()` so a devotional appears on its publish day with no redeploy (a code sitemap is otherwise cached at build time). `/thank-you` is left out. Both use `SITE_URL` (`src/lib/site.ts`, default `https://wordonthewater.net`, the same setting as the API). The Bible pages are not listed yet (decision open)
 - [x] Moved to [production_checklist.md](production_checklist.md): the PWA conversion (manifest, icons, shortcuts, iOS settings, tests; the steps are in [PWA_checklist.md](PWA_checklist.md)) and enforcing the CSP in production
 
 ### 1.7 Retention and operations
