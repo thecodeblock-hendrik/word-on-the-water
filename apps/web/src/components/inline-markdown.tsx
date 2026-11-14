@@ -1,13 +1,13 @@
 import { Fragment } from "react";
 
-const MARKS = /(\*\*[^*]+\*\*|\*[^*]+\*|\^\d+\^|\bLORD\b)/;
+import { INLINE_MARKS } from "@/lib/devotionals/blocks";
 
 /**
  * Renders devotional text: **bold**, *italic*, ^5^ verse numbers, and LORD (the ESV's
  * divine name) in small capitals. Everything else stays plain text, never HTML.
  */
 export function InlineMarkdown({ children }: { children: string }) {
-  return children.split(MARKS).map((part, i) => {
+  return children.split(INLINE_MARKS).map((part, i) => {
     if (part.startsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("*")) return <em key={i}>{part.slice(1, -1)}</em>;
     if (part.startsWith("^")) {
