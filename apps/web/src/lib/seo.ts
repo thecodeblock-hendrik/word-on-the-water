@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SITE_URL } from "./site.ts";
+import { absoluteUrl, CONTACT_EMAIL, SITE_URL } from "./site.ts";
 
 export const SITE_NAME = "Word on the Water";
 export const SITE_DESCRIPTION = "Devotionals and Bible teaching for men and surfers.";
@@ -20,3 +20,31 @@ export const siteMetadata: Metadata = {
   openGraph: { type: "website", ...OPEN_GRAPH_BASE },
   twitter: { card: "summary_large_image" },
 };
+
+/**
+ * Who the site is, for search engines (schema.org). Only what is public and true today: no logo
+ * file yet (the icons arrive with the PWA) and no social profiles (the handles are placeholders).
+ */
+export function siteJsonLd() {
+  const organization = absoluteUrl("/#organization");
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": organization,
+        name: SITE_NAME,
+        url: SITE_URL,
+        description: SITE_DESCRIPTION,
+        email: CONTACT_EMAIL,
+      },
+      {
+        "@type": "WebSite",
+        "@id": absoluteUrl("/#website"),
+        name: SITE_NAME,
+        url: SITE_URL,
+        publisher: { "@id": organization },
+      },
+    ],
+  };
+}
