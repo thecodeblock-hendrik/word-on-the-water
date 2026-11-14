@@ -23,3 +23,10 @@ def test_ready_failure_logs_dependency_without_details(client: TestClient) -> No
     assert failure["dependency"] == "database"
     assert failure["error"]
     assert "localhost" not in str(failure)
+
+
+def test_ready_failure_logs_the_cause_class(client: TestClient) -> None:
+    with capture_logs() as logs:
+        client.get("/health/ready")
+    failure = next(entry for entry in logs if entry["event"] == "readiness_failed")
+    assert failure["cause"]

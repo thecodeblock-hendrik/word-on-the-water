@@ -48,11 +48,27 @@ async def _validation_error(_: Request, __: RequestValidationError) -> JSONRespo
     return error_response(422, "validation_error", "Invalid request.")
 
 
+def cause_class(exc: BaseException) -> str:
+    """Class name of the innermost cause (never its message, which can hold hosts or credentials).
+
+    SQLAlchemy wraps driver errors, so the outer class alone says only `DBAPIError`.
+    """
+    while exc.__cause__ is not None:
+        exc = exc.__cause__
+    return type(exc).__name__
+
+
 async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
-    # Type and location only: exception messages can contain hosts, credentials or user data.
+    # Types and location only: exception messages can contain hosts, credentials or user data.
     frames = traceback.extract_tb(exc.__traceback__)
     where = f"{Path(frames[-1].filename).name}:{frames[-1].lineno}" if frames else "unknown"
-    log.error("unhandled_error", error=type(exc).__name__, path=request.url.path, where=where)
+    log.error(
+        "unhandled_error",
+        error=type(exc).__name__,
+        cause=cause_class(exc),
+        path=request.url.path,
+        where=where,
+    )
     response = error_response(500, "internal_error", "Something went wrong.")
     response.headers["X-Request-ID"] = structlog.contextvars.get_contextvars().get("request_id", "")
     response.headers["Cache-Control"] = "no-store"
