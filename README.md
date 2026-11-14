@@ -1,6 +1,6 @@
 # Word on the Water
 
-Christian ministry web app publishing devotionals and Bible teaching for men and surfers.
+Christian ministry web app publishing devotionals and Bible teaching for surfers and anyone who feels the swell of life.
 
 - Plan and progress (the one document to follow): [PLAN.md](docs/PLAN.md)
 - Launch-time steps, kept apart until the site goes public: [production_checklist.md](docs/production_checklist.md)

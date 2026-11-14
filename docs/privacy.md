@@ -17,7 +17,7 @@ Designed to comply with the **GDPR** and **POPIA** by default: collect the minim
 | Request logs: path, status, request ID, timing | Run and debug the service | Vercel logs (short built-in retention) and later a log drain | Legitimate interest in security and operation. Bodies, emails and prayer text are never logged |
 | Page analytics and Core Web Vitals | Understand reading and speed | Vercel Web Analytics and Speed Insights: cookieless, no personal profile | Legitimate interest; no consent banner is needed because nothing is stored on the device |
 | Theme preference (light or dark) | Show the chosen theme without a flash | One first-party cookie on the visitor's device (planned, step 1.1) | Strictly necessary for a feature the visitor asked for |
-| Last Bible read (BSB or WEB) | Open the Bible reader in the Bible you used last | One first-party cookie (`bible-version`, a year, no personal data) | Strictly necessary for a feature the visitor asked for |
+| Last Bible and passage read | Open the Bible reader in the Bible you used last, at the passage you were reading (John 3:16 on a first visit) | Two first-party cookies (`bible-version` and `bible-passage`, for example `web` and `romans.8.28-30`, a year each, no personal data) | Strictly necessary for a feature the visitor asked for |
 | Bot check result | Block automated submissions | Cloudflare Turnstile, loaded only when a visitor reaches or uses the sign-up form (not on every page view); Cloudflare receives the visitor's IP address and browser signals to judge the check | Legitimate interest in security |
 | Error reports | Fix faults | Sentry with `sendDefaultPii: false` and scrubbing (planned, step 0.10) | Legitimate interest; no personal data is sent |
 
@@ -25,15 +25,16 @@ No data about children is sought and the site is not aimed at them. No advertisi
 
 ## Retention
 
-Enforced by a daily retention job (step 1.7). Prayer and contact rows already carry a `delete_after` column; the other rules use status and creation time.
+Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Prayer and contact rows carry a `delete_after` column; the other rules use status and creation time. The job deletes in our database only: Kit holds its own copy of a subscriber, and Kit's API cannot delete one.
 
 | Data | Kept for | Then |
 |---|---|---|
-| Unconfirmed subscribers | 7 days | Deleted from Neon and from Kit |
+| Unconfirmed subscribers | 7 days | Deleted from Neon by the job. In Kit they stay as unconfirmed (Kit never emails them) until the owner deletes them in the Kit dashboard, a monthly task: Kit's API has no delete, and unsubscribing them through the API would block a later honest sign-up |
 | Active subscribers | Until they unsubscribe, then the unsubscribe record | Deleted on request |
 | Prayer requests | 90 days (`delete_after`) | Deleted or anonymised |
 | Contact messages | 12 months (`delete_after`) | Deleted |
 | Audit log | 1 year | Deleted |
+| Email outbox (the queue of emails to send: it holds the recipient's address) | Sent: 7 days. Failed: 30 days, so the cause can be looked at | Deleted |
 | Rate-limit keys | The limit window (minutes to one hour) | Expire in Redis |
 | Neon point-in-time recovery | At least 7 days on the paid plan | Rolls off |
 | Nightly database dumps (encrypted) | 30 days from upload | Deleted by the bucket's lifecycle rule |

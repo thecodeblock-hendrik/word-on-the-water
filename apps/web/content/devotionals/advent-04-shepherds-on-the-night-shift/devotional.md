@@ -5,7 +5,7 @@ author: H
 series: advent
 seriesNumber: 4
 passages: ["Luke 2:8–20"]
-summary: The first men to hear that Jesus was born weren't priests or kings. They were working men on the night shift, and the news was for them.
+summary: The first people to hear that Jesus was born weren't priests or kings. They were shepherds working the night shift, and the news was for them.
 emailSubject: Nobody throws a party for the night shift
 tags: [Advent, Christmas, good news, work, joy, Saviour]
 conditions:
@@ -29,7 +29,7 @@ Ask him about it and he laughs. "Nobody throws a party for the night shift."
 
 Luke tells us who heard about Jesus' birth first: "shepherds out in the field, keeping watch over their flock by night" (Luke 2:8). Not the priests. Not the palace. God sent the first Christmas announcement to the night shift.
 
-Shepherding was hard, cold, unglamorous work. You slept rough and you couldn't leave the flock. While Bethlehem slept, these men were on the clock.
+Shepherding was hard, cold, unglamorous work. You slept rough and you couldn't leave the flock. While Bethlehem slept, these shepherds were on the clock.
 
 Then heaven breaks into their ordinary night. "The glory of the Lord shone around them, and they were filled with great fear" (v9). The angel says, "Fear not, for behold, I bring you good news of great joy that will be for all the people. For unto you is born this day in the city of David a Savior, who is Christ the Lord" (v10–11).
 
@@ -39,17 +39,17 @@ Unto you. Not to someone else, with the shepherds listening in. To them. Born in
 
 Look at what they did next. They "went with haste" (v16). They found it all just as they'd been told, and they told everyone who would listen (v17). Then "the shepherds returned" (v20), back to the same fields and the same cold nights. But they went back "glorifying and praising God."
 
-Their job didn't change. They did. That's good news for working men. Jesus didn't come only for men who have it together. He came for you, in your work gear, at the end of a long shift. He would later call Himself "the good shepherd" who "lays down his life for the sheep" (John 10:11).
+Their job didn't change. They did. That's good news for anyone who works. Jesus didn't come only for people who have it together. He came for you, in your work gear, at the end of a long shift. He would later call Himself "the good shepherd" who "lays down his life for the sheep" (John 10:11).
 
 ## Paddle Out
 
 The shepherds heard the news, went to see Jesus, then went back to work praising God. Do the same this week.
 
-Before Christmas Day, read Luke 2:1–20 slowly and thank God the Saviour was born for you. Then think of one bloke who'll be working over Christmas. Buy him a coffee, and tell him in one sentence why you're glad Jesus came.
+Before Christmas Day, read Luke 2:1–20 slowly and thank God the Saviour was born for you. Then think of someone who'll be working over Christmas. Buy them a coffee, and tell them in one sentence why you're glad Jesus came.
 
 ## Pray
 
-Lord Jesus, thank You that You came for ordinary men: the night shift, the early starts, the ones nobody throws a party for. Thank You that the good news is for me. Like the shepherds, let me come and see You, and then go back to my work glorifying and praising God. Amen.
+Lord Jesus, thank You that You came for ordinary people: the night shift, the early starts, the ones nobody throws a party for. Thank You that the good news is for me. Like the shepherds, let me come and see You, and then go back to my work glorifying and praising God. Amen.
 
 ## Go Deeper
 

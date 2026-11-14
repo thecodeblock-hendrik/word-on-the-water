@@ -21,11 +21,11 @@ sharePrompt: Know a mate who does the hard thing quietly?
 
 ## The Lineup
 
-There's a bloke at our break nobody films. He doesn't call waves or tell stories in the car park. But he's the one who drove four hours at night to tow a mate's van home. He sat with a grom's dad in the hospital after the reef got the boy. When the club's books came up short, he quietly paid the gap.
+There's a surfer at our break nobody films. No waves called, no stories in the car park. But this is the one who drove four hours at night to tow a mate's van home, who sat with a grom's dad in the hospital after the reef got the boy, and who quietly paid the gap when the club's books came up short.
 
-Ask him about any of it and he shrugs. "Had to be done."
+Ask about any of it and you get a shrug. "Had to be done."
 
-No speeches. He just does the hard thing, even when it costs him.
+No speeches. Just the hard thing, done even when it costs.
 
 ## The Word
 
@@ -41,13 +41,13 @@ Here's how Matthew records his answer: "When Joseph woke from sleep, he did as t
 
 And he named the boy Jesus, which made Him, in law, a son of David. The name means "he will save his people from their sins" (v21). This child is "Immanuel… God with us" (v23).
 
-Joseph carried shame for a while to welcome Him. Jesus would carry far more, "despising the shame" of the cross (Hebrews 12:2), to save men like us. That's the Christmas Joseph said yes to.
+Joseph carried shame for a while to welcome Him. Jesus would carry far more, "despising the shame" of the cross (Hebrews 12:2), to save people like us. That's the Christmas Joseph said yes to.
 
 ## Paddle Out
 
 Is there one thing you know God is asking you to do that will cost you? Owning up to something. Making the apology. Stepping up at home. Paying back what you owe.
 
-Do it this week, before Christmas Day. Do it quietly, without announcing it. Then tell one mate you've done it, so he can pray for you as it plays out.
+Do it this week, before Christmas Day. Do it quietly, without announcing it. Then tell a mate you've done it, so someone is praying for you as it plays out.
 
 ## Pray
 
