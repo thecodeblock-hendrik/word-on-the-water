@@ -12,7 +12,7 @@ Christian ministry web app publishing devotionals and Bible teaching for men and
 
 Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress and the site is **not public yet**: `wordonthewater.net` still points at the old Squarespace site.
 
-Built: the landing page with its real copy, light and dark themes, the devotional pages (three Advent devotionals), a Bible reader (BSB and WEB, behind a flag), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. Next: the prayer request form (1.4), the contact form (1.5), legal and SEO (1.6). The PWA and everything that needs the live domain are launch-time steps.
+Built: the landing page with its real copy, light and dark themes, the devotional pages (three Advent devotionals), a Bible reader (BSB and WEB, behind a flag), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; mail from `hello@` needs Kit's DKIM first (launch checklist, Parts E and K). Next: the prayer request form (1.4), the contact form (1.5), legal and SEO (1.6). The PWA and everything that needs the live domain are launch-time steps.
 
 ## Stack
 
@@ -58,6 +58,6 @@ make kit-webhook URL=https://<site>/api/webhooks/kit   # register the Kit webhoo
 make down        # stop services
 ```
 
-In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, and `pnpm build:bible` regenerates the Bible data.
+In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, `pnpm build:bible` regenerates the Bible data, and `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a Kit draft for the weekly email (never sends; steps in [devotional format](docs/devotional_format.md)).
 
 Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` the first two in your shell: the unit tests read them and fail.
