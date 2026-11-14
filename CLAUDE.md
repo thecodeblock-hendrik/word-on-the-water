@@ -161,7 +161,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │       │   ├── services/ (subscribers, kit_jobs, kit_events, bot_checks, idempotency, outbox, email_templates)
 │       │   ├── integrations/email/ (base, console, smtp, postmark, factory); integrations/turnstile.py
 │       │   ├── integrations/kit/ (client, factory, webhook signature check, webhook_endpoint registration tool)
-│       │   ├── jobs/ (drain_outbox; retention planned)
+│       │   ├── jobs/ (drain_outbox, retention)
 │       │   └── schemas/ (subscribers, kit_webhook; prayer and contact come with their steps)
 │       ├── tests/ (unit tests at the top level; integration/ against real Postgres, Valkey, Mailpit)
 │       └── vercel.json           ← region, maxDuration, ignored builds, cron
@@ -282,7 +282,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 ### 6.9 Backups and data retention
 
 - Neon point-in-time recovery (≥ 7 days on the paid plan) plus a nightly `pg_dump` (`backup.yml`, read-only role `app_backup`) encrypted with age and stored in a private Cloudflare R2 bucket in Western Europe for 30 days; **restore tested quarterly** (`docs/runbooks/restore-db.md`).
-- Retention (proposed): unconfirmed subscribers deleted after 7 days; prayer requests deleted (or anonymised) after 90 days; contact messages after 12 months; audit logs 1 year. Enforced by a daily Vercel Cron job.
+- Retention: unconfirmed subscribers deleted after 7 days; prayer requests after 90 days; contact messages after 12 months; audit logs 1 year; sent outbox rows after 7 days and failed ones after 30 (they hold the recipient's address). Enforced by `/cron/retention` (a daily Vercel Cron job, 03:30 UTC) in our database only: Kit's API cannot delete a subscriber, so unconfirmed Kit subscribers are deleted by hand in the Kit dashboard (monthly).
 
 ---
 
@@ -342,7 +342,7 @@ Phase 1 endpoints:
 
 Settings via `pydantic-settings`, failing fast at startup if required secrets are missing. Blank environment values count as unset.
 
-**Implemented so far:** `GET /health/live`, `GET /health/ready` (database and Redis), `GET /v1/ping` (service token required; stands in for the default-deny `/v1` router) and `GET /cron/drain-outbox` (`CRON_SECRET`). Of the Phase 1 endpoints in the table above, `POST /v1/subscribers` exists (step 1.3: rate limits it (5 an hour per address, 3 per email), honours an `Idempotency-Key`, checks the honeypot, the minimum time and Turnstile, stores the pending subscriber and queues the Kit call, which is tried right after the response and retried by the cron; `POST /v1/webhooks/kit` verifies Kit's signature and mirrors subscriber status (the forwarder `/api/webhooks/kit` on the web project is built too; registering the webhook in Kit needs the live domain, see `docs/production_checklist.md`). The sign-up form has been proven end to end on a Vercel preview (2026-11-08). The web sign-up form (a `useActionState` form with a Server Action in the `SubscribeBand`, `#subscribe`, on the landing page and every devotional) and `/thank-you` are built; Turnstile loads only when the form is near the screen or used); the prayer and contact endpoints arrive in steps 1.4 and 1.5.
+**Implemented so far:** `GET /health/live`, `GET /health/ready` (database and Redis), `GET /v1/ping` (service token required; stands in for the default-deny `/v1` router) and `GET /cron/drain-outbox` and `GET /cron/retention` (`CRON_SECRET`). Of the Phase 1 endpoints in the table above, `POST /v1/subscribers` exists (step 1.3: rate limits it (5 an hour per address, 3 per email), honours an `Idempotency-Key`, checks the honeypot, the minimum time and Turnstile, stores the pending subscriber and queues the Kit call, which is tried right after the response and retried by the cron; `POST /v1/webhooks/kit` verifies Kit's signature and mirrors subscriber status (the forwarder `/api/webhooks/kit` on the web project is built too; registering the webhook in Kit needs the live domain, see `docs/production_checklist.md`). The sign-up form has been proven end to end on a Vercel preview (2026-11-08). The web sign-up form (a `useActionState` form with a Server Action in the `SubscribeBand`, `#subscribe`, on the landing page and every devotional) and `/thank-you` are built; Turnstile loads only when the form is near the screen or used); the prayer and contact endpoints arrive in steps 1.4 and 1.5.
 
 ---
 
