@@ -1,10 +1,33 @@
-import { devotionalEmailHtml } from "./email.ts";
+import { devotionalEmailHtml, type EmailSeries } from "./email.ts";
 import type { Devotional } from "./parse.ts";
+import { type Series, seriesPosition } from "./series.ts";
 
 const KIT_URL = "https://api.kit.com/v4";
 
 /** The public contact address, as in the footer and the Kit account's default sender. */
 export const BROADCAST_SENDER = "hello@wordonthewater.net";
+
+/** The email-sized banner in each series folder (1200 px wide, under 100 KB). */
+export const EMAIL_ART = "art-night-swell-email.jpg";
+
+/**
+ * Where email images are fetched from: the public repository, which works before the site is live.
+ * At launch this moves to the site's own content address (production_checklist.md).
+ */
+export const SERIES_IMAGE_BASE =
+  "https://raw.githubusercontent.com/thecodeblock-hendrik/word-on-the-water/main/apps/web/content/series";
+
+/** The series line and header image for a devotional's email. */
+export function emailSeries(
+  series: Series,
+  number: number,
+  imageBase: string = SERIES_IMAGE_BASE,
+): EmailSeries {
+  return {
+    position: seriesPosition(series, number),
+    image: { url: `${imageBase}/${series.slug}/${EMAIL_ART}`, alt: series.artAlt },
+  };
+}
 
 /** A tag id, or "all" for every subscriber on purpose: there is no default audience. */
 export type Audience = { tag: number } | "all";
@@ -27,7 +50,7 @@ export function audienceFromArgs({ tag, all }: { tag?: string; all?: boolean }):
  */
 export function broadcastDraft(
   devotional: Devotional,
-  { siteUrl, audience }: { siteUrl: string; audience: Audience },
+  { siteUrl, audience, series }: { siteUrl: string; audience: Audience; series?: EmailSeries },
 ) {
   const filter =
     audience === "all" ? { type: "all_subscribers" } : { type: "tag", ids: [audience.tag] };
@@ -35,7 +58,7 @@ export function broadcastDraft(
     subject: devotional.meta.emailSubject,
     preview_text: devotional.meta.summary,
     description: `Devotional: ${devotional.slug}`,
-    content: devotionalEmailHtml(devotional, { siteUrl }),
+    content: devotionalEmailHtml(devotional, { siteUrl, series }),
     email_address: BROADCAST_SENDER,
     public: false,
     send_at: null,

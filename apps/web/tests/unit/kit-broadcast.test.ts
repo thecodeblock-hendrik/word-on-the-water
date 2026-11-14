@@ -6,8 +6,12 @@ import {
   BROADCAST_SENDER,
   broadcastDraft,
   createBroadcastDraft,
+  EMAIL_ART,
+  emailSeries,
+  SERIES_IMAGE_BASE,
 } from "@/lib/devotionals/kit-broadcast";
 import { loadDevotionals } from "@/lib/devotionals/load";
+import { loadSeries } from "@/lib/devotionals/series-load";
 
 const SITE = "https://wordonthewater.net";
 const KEY = "kit-secret-key";
@@ -81,5 +85,29 @@ describe("audienceFromArgs", () => {
 
   it.each(["abc", "0", "-3", "5.5"])("rejects the tag %s", (tag) => {
     expect(() => audienceFromArgs({ tag })).toThrow(/whole number/);
+  });
+});
+
+describe("emailSeries", () => {
+  const [advent] = loadSeries();
+
+  it("gives the series line, the email image address and the art's alt text", () => {
+    expect(emailSeries(advent, 1)).toEqual({
+      position: "Advent · 1 of 5",
+      image: { url: `${SERIES_IMAGE_BASE}/advent/${EMAIL_ART}`, alt: advent.artAlt },
+    });
+  });
+
+  it("takes another image base, for a preview branch or the live site", () => {
+    expect(emailSeries(advent, 2, "https://example.test/s").image?.url).toBe(
+      `https://example.test/s/advent/${EMAIL_ART}`,
+    );
+  });
+
+  it("puts the series header into the draft's content", () => {
+    const series = emailSeries(advent, 1);
+    const withSeries = broadcastDraft(devotional, { siteUrl: SITE, audience: "all", series });
+    expect(withSeries.content).toBe(devotionalEmailHtml(devotional, { siteUrl: SITE, series }));
+    expect(withSeries.content).toContain(series.image!.url);
   });
 });
