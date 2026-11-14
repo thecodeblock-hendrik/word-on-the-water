@@ -13,7 +13,15 @@ test("the Kit webhook address passes the exact body and signature to the API", a
   expect(response.status()).toBe(200);
   expect(await response.text()).toBe("");
 
-  const seen = await (await request.get(`${STUB}/__last_webhook`)).json();
+  // Another webhook arriving in between (tests run in parallel against one stub) must not hide ours.
+  await request.post("/api/webhooks/kit", {
+    headers: { "content-type": "application/json", "x-kit-signature": "t=1,v1=other" },
+    data: Buffer.from("{}"),
+  });
+
+  const seen = await (
+    await request.get(`${STUB}/__last_webhook`, { params: { signature: "t=1,v1=good" } })
+  ).json();
   expect(seen.body).toBe(RAW);
   expect(seen.headers["x-kit-signature"]).toBe("t=1,v1=good");
   // The signature is the credential: no service token goes along.
