@@ -11,6 +11,15 @@ export type Audience = { tag: number } | "all";
 
 export type BroadcastDraft = ReturnType<typeof broadcastDraft>;
 
+/** The audience from the command line: `--tag <id>` or `--all`, never a silent default. */
+export function audienceFromArgs({ tag, all }: { tag?: string; all?: boolean }): Audience {
+  if (tag !== undefined && all) throw new Error("Give --tag <id> or --all, not both.");
+  if (all) return "all";
+  if (tag === undefined) throw new Error("Choose the audience: --tag <id> or --all.");
+  if (!/^[1-9]\d*$/.test(tag)) throw new Error(`--tag must be a whole number, but is "${tag}".`);
+  return { tag: Number(tag) };
+}
+
 /**
  * The Kit broadcast fields for a devotional. Always a draft (never scheduled, never public).
  * Kit fills in anything left out and resets what an update leaves out, so every field is sent

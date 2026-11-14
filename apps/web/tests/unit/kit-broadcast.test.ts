@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { devotionalEmailHtml } from "@/lib/devotionals/email";
 import {
+  audienceFromArgs,
   BROADCAST_SENDER,
   broadcastDraft,
   createBroadcastDraft,
@@ -64,5 +65,21 @@ describe("createBroadcastDraft", () => {
 
   it("says when Kit is rate limiting so the run can simply be repeated later", async () => {
     await expect(createBroadcastDraft(draft(), KEY, fakeKit(429))).rejects.toThrow(/rate limit/i);
+  });
+});
+
+describe("audienceFromArgs", () => {
+  it("takes a tag id or --all", () => {
+    expect(audienceFromArgs({ tag: "555" })).toEqual({ tag: 555 });
+    expect(audienceFromArgs({ all: true })).toBe("all");
+  });
+
+  it("refuses to guess: one of the two must be given, not both", () => {
+    expect(() => audienceFromArgs({})).toThrow(/--tag <id> or --all/);
+    expect(() => audienceFromArgs({ tag: "555", all: true })).toThrow(/not both/);
+  });
+
+  it.each(["abc", "0", "-3", "5.5"])("rejects the tag %s", (tag) => {
+    expect(() => audienceFromArgs({ tag })).toThrow(/whole number/);
   });
 });

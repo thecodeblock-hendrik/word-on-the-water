@@ -11,7 +11,16 @@ How a weekly devotional gets onto the website. Your working file (study notes, r
 5. In `apps/web`, run `pnpm check:devotionals`. It lists every devotional or says exactly what is wrong.
 6. Preview it (see "Previewing a future date" below), then open a pull request, check the Vercel preview at 375px and merge. The devotional appears on its `publishAt` date, with no redeploy.
 
-The email still goes out from Kit.
+## The weekly email (Kit)
+
+The email is a Kit broadcast made from the same file, so the wording is written once. A command creates a **draft** only; you review and schedule it in Kit, so nothing can go out by accident.
+
+1. After the pull request is merged, in `apps/web` run `pnpm broadcast:devotional <folder> --tag <id>` to try it on a test tag, or `--all` for the real send. One of the two is required.
+2. In Kit, open Broadcasts and the new draft ("Devotional: <folder>"). The subject is `emailSubject`, the preview text is `summary`, the sender is `hello@wordonthewater.net`.
+3. Send yourself a test and read it on your phone. Kit adds the unsubscribe link, your postal address and the "Built with Kit" badge itself.
+4. Schedule it in Kit for the day. Only drafts can be deleted: a sent broadcast stays in Kit.
+
+The command uses `KIT_API_KEY_PREVIEW` from the root `.env`; add `--live` to use `KIT_API_KEY`. Both keys are the same Kit account, so the draft appears in the live account either way. Mail from `hello@wordonthewater.net` only reaches inboxes once Kit's sending domain is authenticated (DKIM): see Part E of [production_checklist.md](production_checklist.md).
 
 ## Previewing a future date
 
