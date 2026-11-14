@@ -98,7 +98,8 @@ test.describe("mobile menu", () => {
     const fromHome = page.getByTestId("mobile-menu").getByRole("link", { name: "Bible" });
     await expect(fromHome).not.toHaveAttribute("aria-current");
     await fromHome.click();
-    await expect(page).toHaveURL("/bible/bsb/john/3?v=16");
+    // The reader was open on John 3 a moment ago, so /bible resumes there.
+    await expect(page).toHaveURL("/bible/bsb/john/3");
   });
 });
 
