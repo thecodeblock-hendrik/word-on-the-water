@@ -8,7 +8,7 @@ export function Start() {
     <section
       id="start"
       aria-labelledby="start-h"
-      className="border-y border-line bg-surface py-[72px]"
+      className="border-y border-line bg-surface py-10 md:py-[72px]"
     >
       <div className="mx-auto max-w-[1120px] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
         <div className="mb-9 grid max-w-[62ch] gap-3">

@@ -18,7 +18,7 @@ export function Coming({ devotional, series }: { devotional: Devotional; series:
   const report = reportRows(devotional, series);
   const excerpt = devotional.sections[0].markdown.split("\n\n");
   return (
-    <section id="coming" aria-labelledby="coming-h" className="py-[72px]">
+    <section id="coming" aria-labelledby="coming-h" className="py-10 md:py-[72px]">
       <div className="mx-auto max-w-[1120px] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
         <div className="mb-9 grid max-w-[62ch] gap-3">
           <p className={eyebrow}>{coming.eyebrow}</p>
