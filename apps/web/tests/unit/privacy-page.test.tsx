@@ -26,9 +26,11 @@ describe("the privacy page", () => {
       expect(link).toHaveAttribute("href", "mailto:hello@wordonthewater.net");
   });
 
-  it("shows the unfilled facts as highlighted placeholders, so they cannot be missed", () => {
+  it("shows who runs the ministry and the postal address, with nothing left to fill in", () => {
     const { container } = render(<PrivacyPage />);
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThan(0);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
+    expect(screen.getByText(/Henno Oosthuizen runs Word on the Water/)).toBeInTheDocument();
+    expect(screen.getByText(/PO Box 6055, Port Elizabeth, Eastern Cape 6001/)).toBeInTheDocument();
   });
 
   it("lists the Bible cookies only when the Bible reader is on", () => {

@@ -69,7 +69,7 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 
 ## Decisions needed from Hendrik
 
-1. **Who is the data controller and what is the legal entity name and address** for the policy and the email footer (also required in newsletters). The two highlighted `[placeholders]` on the privacy page wait for this: the name and the postal address.
+1. **Who is the data controller and what is the legal entity name and address** for the policy and the email footer (also required in newsletters). Answered 2026-11-14: the privacy page names Henno Oosthuizen and gives PO Box 6055, Port Elizabeth, Eastern Cape 6001 (the PO Box Kit prints in every email footer). A registered entity name, if one is ever set up, replaces the name there.
 2. **Which regulator and jurisdiction** to name first: where the owner and most readers live.
 3. ~~How long nightly dumps are kept.~~ Decided: 30 days, enforced by an R2 lifecycle rule. A dump holds deleted-on-request data until it expires, so erased data is gone from backups within 30 days.
 4. **Upstash region** and **which mailbox provider receives the forwards.**

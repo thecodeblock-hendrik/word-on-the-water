@@ -18,10 +18,10 @@ export type PrivacyPolicy = {
   sections: PolicySection[];
 };
 
-// The two facts only the owner can supply. They show highlighted on the page, and the launch check
-// (pnpm check:placeholders) fails until they are replaced with the real name and address.
-const RESPONSIBLE = "[full name, or registered name, of whoever runs Word on the Water]";
-const POSTAL = "[postal address]";
+// Who is responsible, and where to write. The same PO Box that Kit prints in every email footer. A
+// [bracketed] value would show highlighted on the page, and the launch check would fail on it.
+const RESPONSIBLE = "Henno Oosthuizen";
+const POSTAL = "PO Box 6055, Port Elizabeth, Eastern Cape 6001";
 
 /**
  * The public privacy policy, written from docs/privacy.md (keep the two in step). It says only what

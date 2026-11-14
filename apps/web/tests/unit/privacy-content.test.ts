@@ -91,11 +91,16 @@ describe("the privacy policy content", () => {
     }
   });
 
-  it("leaves only the two facts the owner must supply as [placeholders], which the launch check catches", () => {
-    const found = findPlaceholders(policy(true));
-    expect(found.length).toBeGreaterThan(0);
-    for (const { text } of found) {
-      expect(text).toMatch(/^\[(full name|postal address)/);
-    }
+  it("names who runs the ministry and gives the postal address", () => {
+    expect(JSON.stringify(section("who-we-are"))).toContain(
+      "Henno Oosthuizen runs Word on the Water",
+    );
+    expect(JSON.stringify(section("contact"))).toContain(
+      "PO Box 6055, Port Elizabeth, Eastern Cape 6001",
+    );
+  });
+
+  it("has no [placeholder] left, so the launch check has nothing to stop on", () => {
+    expect(findPlaceholders(policy(true))).toEqual([]);
   });
 });
