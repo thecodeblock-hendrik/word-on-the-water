@@ -63,8 +63,8 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 - [ ] One merged SPF record that includes Postmark and Kit and keeps what Squarespace's email forwarding already put there.
 - [ ] DKIM for Postmark and for Kit.
 - [ ] A custom return-path for each sender.
-- [ ] DMARC at `_dmarc.wordonthewater.net` with `p=none` and reports to `hello@wordonthewater.net`.
-- [ ] Kit: the sending domain authenticated, sender `hello@wordonthewater.net`, the confirmation email branded.
+- [ ] DMARC at `_dmarc.wordonthewater.net`: found 2026-11-14 already published as `p=reject; adkim=s; aspf=s` with reports to Mailgun and a second address, not the `p=none` this list assumed. Until Kit and Postmark are signed with DKIM for `wordonthewater.net`, their mail from `hello@` is very likely rejected (a Kit confirmation never reached Gmail). Decide: keep `reject` and set DKIM first, or move to `p=none` with reports to `hello@wordonthewater.net` for the first weeks.
+- [ ] Kit: the sending domain authenticated, sender `hello@wordonthewater.net`, the confirmation email branded. **Required before the first weekly broadcast and before any real sign-up** (see ADR 0008, broadcast spike); then re-test a sign-up confirmation and a tag-limited test broadcast from `hello@` and check the headers.
 - [ ] Postmark: the sender signature or domain verified for `hello@wordonthewater.net`.
 - [ ] Send a test from Postmark to `hello@` and to `prayer@` and confirm each arrives after forwarding (inbox, not spam); check the SPF, DKIM and DMARC results in the message headers. If forwarding proves unreliable, point `PRAYER_INBOX` and `CONTACT_INBOX` straight at the destination mailbox and keep `hello@` and `prayer@` as the public addresses.
 
