@@ -373,7 +373,7 @@ Moved to [production_checklist.md](production_checklist.md): everything that nee
 
 ### 2.4 Weekly email
 - [ ] Publishing a devotional creates a Kit broadcast (`POST /v4/broadcasts`) as a draft (`send_at` null): subject, preview text, rendered HTML content, internal description, subscriber filter by tag or segment
-- [ ] Spike first: confirm how a draft is scheduled (update with `send_at`), whether the chosen Kit template adds the unsubscribe link and address footer, and that sending is allowed on our Kit plan; otherwise put `{{ unsubscribe_url }}` and `{{ address }}` in our content
+- [x] Spike first: confirm how a draft is scheduled (update with `send_at`), whether the chosen Kit template adds the unsubscribe link and address footer, and that sending is allowed on our Kit plan; otherwise put `{{ unsubscribe_url }}` and `{{ address }}` in our content. Done 2026-11-14, findings in [ADR 0008](adr/0008-kit-subscriptions.md): drafts work on the free plan, `PUT` with `send_at` schedules (and resets fields it does not carry), the Text only template adds the unsubscribe link and address itself, blockquotes need inline styles. Open: delivery from `hello@` needs Kit's DKIM first (Part E of [production_checklist.md](production_checklist.md))
 - [ ] Send a test to Hendrik before scheduling; the editor schedules from our admin UI or from Kit
 - [ ] Kit sends only to active subscribers and adds the unsubscribe link; bounces and complaints reach us through the Kit webhook (built in 1.3)
 - [ ] Failed broadcast creation is visible in the admin UI and retried
