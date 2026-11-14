@@ -8,3 +8,6 @@ export const SITE_URL = (process.env.SITE_URL || "https://wordonthewater.net").r
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path}`;
 }
+
+/** The public contact address: the footer, the weekly email's sender and security reports. */
+export const CONTACT_EMAIL = "hello@wordonthewater.net";

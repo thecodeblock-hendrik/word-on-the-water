@@ -110,6 +110,7 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 - [ ] Send a contact message: it arrives in `hello@`.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
+- [ ] `https://wordonthewater.net/.well-known/security.txt` loads as plain text with the contact, the canonical address and an `Expires` about a year ahead.
 - [ ] `https://wordonthewater.net/robots.txt` and `/sitemap.xml` load; the sitemap lists only the devotionals that are published today and gains the next one on its publish day without a redeploy.
 - [ ] Send a tag-limited test broadcast from `hello@` and read it (Part K).
 

@@ -316,7 +316,7 @@ Left to do (this is the only list; the old `continue.md` is archived):
 
 ### 1.6 Legal, SEO and trust
 - [ ] Privacy policy page (matches `docs/privacy.md`) **(Hendrik: review)**
-- [ ] `/.well-known/security.txt` (`Contact: mailto:hello@wordonthewater.net`, `Canonical: https://wordonthewater.net/.well-known/security.txt`, `Expires` within a year)
+- [x] `/.well-known/security.txt` (2026-11-14, RFC 9116): `Contact: mailto:hello@wordonthewater.net`, `Canonical`, `Policy` (the repository's SECURITY.md), `Preferred-Languages: en`. `Expires` is worked out on each request, about 360 days ahead (rounded to the day), so it never goes stale and needs no yearly renewal; it is a per-request route for that reason
 - [ ] Real addresses on the page in place of the mockup placeholders: `prayer@wordonthewater.net` for prayer, `hello@wordonthewater.net` for contact and the footer
 - [ ] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization`
 - [x] `sitemap.ts` and `robots.ts` (2026-11-14): `robots` allows everything except `/api/` and names the sitemap; `sitemap` lists the home page and the devotionals a reader can open today, newest first, and awaits `connection()` so a devotional appears on its publish day with no redeploy (a code sitemap is otherwise cached at build time). `/thank-you` is left out. Both use `SITE_URL` (`src/lib/site.ts`, default `https://wordonthewater.net`, the same setting as the API). The Bible pages are not listed yet (decision open)
