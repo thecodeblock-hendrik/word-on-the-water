@@ -12,6 +12,7 @@ import { VerseShare } from "@/components/devotional/verse-share";
 import { today } from "@/lib/devotionals/format";
 import { isViewable, loadContent } from "@/lib/devotionals/load";
 import { seriesView } from "@/lib/devotionals/series-view";
+import { OPEN_GRAPH_BASE } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -38,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: `/devotionals/${devotional.slug}` },
     openGraph: {
       type: "article",
+      ...OPEN_GRAPH_BASE,
       title: meta.title,
       description: meta.summary,
       publishedTime: meta.publishAt,

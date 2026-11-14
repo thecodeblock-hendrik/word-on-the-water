@@ -12,8 +12,12 @@ test("page loads with zero CSP violations and every inline script has the nonce"
   await page.waitForLoadState("networkidle");
 
   expect(violations).toEqual([]);
+  // A JSON-LD block is inert data that the CSP does not apply to; any other inline script must have it.
   const inlineWithoutNonce = await page.evaluate(
-    () => [...document.scripts].filter((script) => !script.src && !script.nonce).length,
+    () =>
+      [...document.scripts].filter(
+        (script) => !script.src && !script.nonce && script.type !== "application/ld+json",
+      ).length,
   );
   expect(inlineWithoutNonce).toBe(0);
 });
