@@ -118,7 +118,24 @@ Two crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON
 | `/cron/retention` | daily 03:30 UTC | Deletes data past its retention period (docs/privacy.md); logs counts only |
 | `/cron/drain-outbox` | daily 05:00 UTC | Sends queued emails and retries Kit calls; a message that fails for good logs `outbox_messages_failed` and sends Sentry one message |
 
-Hobby only allows daily crons and limits how many an account may have (two when this was written; check Vercel's current limits before adding a third, which may need Pro); more frequent schedules fail the deploy. Change the drain to `*/5 * * * *` after moving to Pro. **Crons run only on the Production deployment**, never on previews. To try one on a preview, call it by hand with the cron secret and the Deployment Protection bypass (`curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api-git-<branch>-thecodeblock.vercel.app/cron/retention`); the preview database is its own Neon branch, so this is safe. `tests/test_vercel_config.py` checks that each cron calls a route that exists and refuses an unauthenticated call.
+Hobby only allows crons that run once a day, at any time within the scheduled hour (so 03:30 means somewhere between 03:00 and 03:59 UTC); a more frequent one fails the deploy. Since Vercel's January 2026 change there is no per-team limit and each project may have 100 crons on every plan (it used to be two per team on Hobby). Change the drain to `*/5 * * * *` after moving to Pro. **Crons run only on the Production deployment**, never on previews. To try one on a preview, call it by hand with the cron secret and the Deployment Protection bypass (`curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api-git-<branch>-thecodeblock.vercel.app/cron/retention`); the preview database is its own Neon branch, so this is safe. `tests/test_vercel_config.py` checks that each cron calls a route that exists and refuses an unauthenticated call.
+
+**Cron Jobs are a legacy feature (noted 2026-11-14).** Vercel's pages say they "will be migrated to Schedules in the future", with no removal date, and the dashboard shows a banner saying so. Nothing has to change yet. When we move (after launch, not before 28 November), it is a configuration change in `apps/api/vercel.json` and the routes stay as they are:
+
+```json
+"schedules": {
+  "retention":    { "schedule": "30 3 * * *", "path": "/cron/retention",    "requestMethod": "GET" },
+  "drain-outbox": { "schedule": "0 5 * * *",  "path": "/cron/drain-outbox", "requestMethod": "GET" }
+}
+```
+
+- Remove the `crons` entries in the same change, or each route runs twice per occurrence.
+- `"requestMethod": "GET"` is required: schedules send POST by default and our routes are GET.
+- The `Authorization: Bearer $CRON_SECRET` header is unchanged, so `require_cron_secret` keeps working. Leave out `timezone` and the times stay UTC.
+- Vercel creates the schedules when the deployment becomes the production one. Test with the dashboard's Run Schedule or `vercel schedules invoke <name>`. "Disable Cron Jobs" no longer affects them; use the Schedules Disable action.
+- A possible gain on Hobby: Schedules may run as often as every 15 minutes (within a 15-minute jitter window), where Cron Jobs run once a day. That would let the outbox drain retry a failed email within the hour before Pro; check the Schedules limits page first, which I have not read.
+
+Sources: [migrate from Cron Jobs](https://vercel.com/docs/schedules/migrate-from-cron-jobs), [Cron Jobs usage and pricing](https://vercel.com/docs/schedules/cron-jobs/usage-and-pricing) and [the January 2026 limits change](https://vercel.com/changelog/cron-jobs-now-support-100-per-project-on-every-plan).
 
 ## Checks after a deploy
 
