@@ -23,6 +23,8 @@ export default defineConfig({
       env: {
         // Pin the date so the tests do not change when the real calendar moves on.
         DEVOTIONAL_TODAY: "2026-12-05",
+        // Absolute links in the pages (canonical, prev and next) point back at this server.
+        SITE_URL: `http://localhost:${port}`,
         BIBLE_ENABLED: "1",
         API_BASE_URL: "http://localhost:3101",
         SERVICE_TOKEN: "e2e-service-token-0123456789",
