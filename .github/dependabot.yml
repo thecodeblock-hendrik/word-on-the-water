@@ -40,6 +40,11 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # Playwright 1.65 ships Firefox 159, where four desktop-firefox e2e tests crash with
+      # "Page crashed" (PR #90, 2026-11-14). 1.64.1 passes. A later release is proposed again:
+      # try it, then remove this entry and restore the caret range in apps/web/package.json.
+      - dependency-name: "@playwright/test"
+        versions: ["1.65.x"]
 
   - package-ecosystem: docker-compose
     directory: /
