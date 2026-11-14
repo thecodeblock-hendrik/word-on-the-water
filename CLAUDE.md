@@ -1,6 +1,6 @@
 # CLAUDE.md — Word on the Water
 
-Development plan and working rules for the **Word on the Water** web application: an online Christian ministry publishing devotionals and Bible teaching for men and surfers.
+Development plan and working rules for the **Word on the Water** web application: an online Christian ministry publishing devotionals and Bible teaching for surfers and anyone who feels the swell of life.
 
 > *"Who then is this, that even the wind and the sea obey him?"* — Mark 4:41 (ESV)
 
