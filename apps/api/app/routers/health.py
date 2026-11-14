@@ -6,7 +6,7 @@ from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.errors import ApiError
+from app.core.errors import ApiError, cause_class
 from app.core.rate_limit import get_redis
 from app.db.session import get_session
 
@@ -32,6 +32,11 @@ async def ready(
         dependency = "redis"
         await redis.ping()
     except Exception as exc:
-        log.warning("readiness_failed", dependency=dependency, error=type(exc).__name__)
+        log.warning(
+            "readiness_failed",
+            dependency=dependency,
+            error=type(exc).__name__,
+            cause=cause_class(exc),
+        )
         raise ApiError(503, "not_ready", "A dependency is unavailable.") from exc
     return {"status": "ok"}

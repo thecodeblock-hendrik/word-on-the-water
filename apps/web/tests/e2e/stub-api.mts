@@ -6,7 +6,8 @@ import { createServer } from "node:http";
 
 let last: { body: Record<string, unknown>; headers: Record<string, string | undefined> } | null =
   null;
-let lastWebhook: { body: string; headers: Record<string, string | undefined> } | null = null;
+// Webhooks by signature: tests run in parallel, so one global slot would be overwritten by a neighbour.
+const webhooks = new Map<string, { body: string; headers: Record<string, string | undefined> }>();
 
 createServer((request, response) => {
   const chunks: Buffer[] = [];
@@ -18,15 +19,18 @@ createServer((request, response) => {
     };
     if (request.url === "/health/live") return send(200, { status: "ok" });
     if (request.url === "/__last") return send(200, last);
-    if (request.url === "/__last_webhook") return send(200, lastWebhook);
+    const url = new URL(request.url ?? "/", "http://stub");
+    if (url.pathname === "/__last_webhook") {
+      return send(200, webhooks.get(url.searchParams.get("signature") ?? "") ?? null);
+    }
     if (request.url === "/v1/webhooks/kit" && request.method === "POST") {
-      lastWebhook = {
+      webhooks.set(String(request.headers["x-kit-signature"]), {
         body: Buffer.concat(chunks).toString(),
         headers: {
           authorization: request.headers.authorization,
           "x-kit-signature": request.headers["x-kit-signature"] as string | undefined,
         },
-      };
+      });
       const bad = request.headers["x-kit-signature"] === "t=1,v1=bad";
       return send(bad ? 401 : 200, {});
     }
