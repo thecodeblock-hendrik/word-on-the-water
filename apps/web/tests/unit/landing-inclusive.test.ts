@@ -17,7 +17,9 @@ describe("the landing copy is for surfers of every kind, and for anyone", () => 
 
   it("has no row in the who-it-is-for list for one sex", () => {
     expect(landing.about.who.map((w) => w.term)).toEqual(["Surfers", "Everyone", "The curious"]);
-    expect(landing.about.who[1].description).toMatch(/husbands, wives, parents and friends/i);
+    expect(landing.about.who[1].description).toBe(
+      "Anyone who wants to read the Bible honestly and live it out at home and at work.",
+    );
   });
 
   it("never singles out men: the plural 'men' and 'for men' stay out of the copy", () => {

@@ -36,7 +36,7 @@ export const about = {
     {
       term: "Everyone",
       description:
-        "Husbands, wives, parents and friends who want to read the Bible honestly and live it out at home and at work.",
+        "Anyone who wants to read the Bible honestly and live it out at home and at work.",
     },
     {
       term: "The curious",
