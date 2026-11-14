@@ -3,6 +3,7 @@
 from dataclasses import asdict
 from typing import Annotated
 
+import sentry_sdk
 import structlog
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,6 +39,11 @@ async def drain(
     result = await drain_outbox(session, provider, kit=kit)
     counts = {"sent": result.sent, "retried": result.retried, "failed": result.failed}
     log.info("outbox_drained", **counts)
+    if result.failed:
+        # The outbox swallows delivery errors, so Sentry would never hear of a message that has run
+        # out of retries. The text is fixed: no address and no count, so these group into one issue.
+        log.error("outbox_messages_failed", failed=result.failed)
+        sentry_sdk.capture_message("Outbox messages failed for good", level="error")
     return counts
 
 
