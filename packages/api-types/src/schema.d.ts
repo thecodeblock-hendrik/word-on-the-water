@@ -21,6 +21,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cron/retention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retention
+         * @description Delete data past its retention period (docs/privacy.md). Logs counts, never rows.
+         */
+        get: operations["retention_cron_retention_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health/live": {
         parameters: {
             query?: never;
@@ -196,6 +216,39 @@ export interface components {
 export type $defs = Record<string, never>;
 export interface operations {
     drain_cron_drain_outbox_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retention_cron_retention_get: {
         parameters: {
             query?: never;
             header?: {

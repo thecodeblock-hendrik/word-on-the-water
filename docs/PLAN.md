@@ -323,10 +323,10 @@ Left to do (this is the only list; the old `continue.md` is archived):
 - [x] Moved to [production_checklist.md](production_checklist.md): the PWA conversion (manifest, icons, shortcuts, iOS settings, tests; the steps are in [PWA_checklist.md](PWA_checklist.md)) and enforcing the CSP in production
 
 ### 1.7 Retention and operations
-- [ ] Retention job: unconfirmed subscribers 7 days (mirror row and, if Kit keeps them, the Kit subscriber via API), prayer 90 days, contact 12 months, audit logs 1 year
-- [ ] Tests with time-shifted fixtures
-- [ ] Vercel Cron configured and verified in preview
-- [ ] Alerts: error rate, 5xx, failed email sends, DB connection failures, cert expiry
+- [x] Retention job (2026-11-14, `apps/api/app/jobs/retention.py`, called by `GET /cron/retention`): unconfirmed subscribers 7 days, prayer requests and contact messages at their `delete_after`, audit logs 1 year, and (added: the outbox keeps the recipient's address) sent outbox rows 7 days and failed ones 30. One transaction; counts only in the log. **Kit:** its API cannot delete a subscriber and unsubscribing an unconfirmed one would block a later sign-up, so unconfirmed Kit subscribers are deleted by hand in the Kit dashboard, a monthly task (privacy.md and the production checklist say so; the privacy notice used to say they were deleted from Kit)
+- [x] Tests with time-shifted fixtures (`tests/integration/test_retention.py`, 10 tests against real Postgres: a row just inside and just outside every limit, pending outbox rows and active, unsubscribed and bounced subscribers never touched, idempotent, real clock when none is given); the endpoint, its logging and its auth are in `test_cron_retention.py`, `test_cron_auth.py` and `test_vercel_config.py`
+- [ ] Vercel Cron configured and verified in preview. Configured: a second cron, `/cron/retention` at 03:30 UTC, beside the drain at 05:00 (Hobby: daily only; see runbooks/deploy.md). **Verification: (Hendrik)** crons run only on Production, so on the PR's preview call `/cron/retention` once by hand with the cron secret and the protection bypass (the command is in runbooks/deploy.md), and see the counts
+- [ ] Alerts: error rate, 5xx, failed email sends, DB connection failures, cert expiry. Code side done (2026-11-14): the drain cron now logs `outbox_messages_failed` and sends Sentry one scrubbed message when a message fails for good (before this nothing reported it; the outbox swallows delivery errors), and `/api/health` plus Sentry already cover 5xx and database failures. **Set up in the dashboards: (Hendrik)**, following [runbooks/alerts.md](runbooks/alerts.md): the uptime monitor, the Sentry alert rules and the SSL and domain reminders; then check each one fires
 
 ### 1.8 Quality gates
 - [ ] Playwright e2e on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox: sign-up via Mailpit, prayer form, navigation

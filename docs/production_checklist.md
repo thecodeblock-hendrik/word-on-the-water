@@ -110,6 +110,7 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 - [ ] Send a contact message: it arrives in `hello@`.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
+- [ ] Vercel, the API project, Cron Jobs lists `/cron/retention` (03:30 UTC) and `/cron/drain-outbox` (05:00 UTC). Trigger each once by hand with `curl -H "Authorization: Bearer $CRON_SECRET" https://wotw-api.vercel.app/cron/retention` (with the protection bypass header) and read the counts; the day after, the Cron Jobs page shows a successful run.
 - [ ] Send a tag-limited test broadcast from `hello@` and read it (Part K).
 
 ---
@@ -119,6 +120,8 @@ Follow [kit_webhook_checks.md](kit_webhook_checks.md), Part 0 to Part 2, step by
 - [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request, and the prayer team receives it.
 - [ ] All Part A budgets met and no high security findings.
 - [ ] Part K is complete: the first weekly email reached a real inbox (not spam), from `hello@`, with the banner, the unsubscribe link and a working "Read it on the website" link.
+- [ ] Alerts are set up and each one has been seen to fire once ([runbooks/alerts.md](runbooks/alerts.md)).
+- [ ] **Monthly:** in the Kit dashboard, delete the subscribers that are still unconfirmed after 7 days (Subscribers, filter Unconfirmed). The retention job cannot do this: Kit's API has no delete (see [privacy.md](privacy.md)).
 - [ ] Two weeks after launch: review the DMARC reports, then move DMARC to `p=quarantine`.
 - [ ] Revisit the accepted risks: delivery through Squarespace forwards and DMARC at `p=none` in the first weeks.
 - [ ] Tell Claude Code, so it ticks the matching items in PLAN.md and the threat plan and closes Phase 1.

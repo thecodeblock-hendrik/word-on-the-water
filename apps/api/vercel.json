@@ -9,5 +9,8 @@
       "excludeFiles": "{tests/**,alembic/**,.venv/**,.pytest_cache/**,.mypy_cache/**,.ruff_cache/**,.coverage}"
     }
   },
-  "crons": [{ "path": "/cron/drain-outbox", "schedule": "0 5 * * *" }]
+  "crons": [
+    { "path": "/cron/drain-outbox", "schedule": "0 5 * * *" },
+    { "path": "/cron/retention", "schedule": "30 3 * * *" }
+  ]
 }

@@ -19,6 +19,7 @@ describe("generated API types", () => {
   it("know which paths exist", () => {
     expectTypeOf<keyof paths>().toEqualTypeOf<
       | "/cron/drain-outbox"
+      | "/cron/retention"
       | "/health/live"
       | "/health/ready"
       | "/v1/ping"
