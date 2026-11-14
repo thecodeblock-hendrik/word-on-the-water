@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { absoluteUrl, CONTACT_EMAIL, SITE_URL } from "./site.ts";
 
 export const SITE_NAME = "Word on the Water";
-export const SITE_DESCRIPTION = "Devotionals and Bible teaching for men and surfers.";
+export const SITE_DESCRIPTION =
+  "Devotionals and Bible teaching for surfers and anyone who feels the swell of life.";
 
 /** The Open Graph values every page shares. A page with its own `openGraph` spreads these in. */
 export const OPEN_GRAPH_BASE = { siteName: SITE_NAME, locale: "en_GB" } as const;

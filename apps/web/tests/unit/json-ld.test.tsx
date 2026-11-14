@@ -22,7 +22,8 @@ describe("siteJsonLd", () => {
       "@id": "https://wordonthewater.net/#organization",
       name: "Word on the Water",
       url: "https://wordonthewater.net",
-      description: "Devotionals and Bible teaching for men and surfers.",
+      description:
+        "Devotionals and Bible teaching for surfers and anyone who feels the swell of life.",
       email: "hello@wordonthewater.net",
     });
   });

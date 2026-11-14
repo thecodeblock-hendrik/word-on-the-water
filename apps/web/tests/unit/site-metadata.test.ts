@@ -14,7 +14,9 @@ describe("the site-wide metadata", () => {
       default: "Word on the Water",
       template: "%s | Word on the Water",
     });
-    expect(siteMetadata.description).toBe("Devotionals and Bible teaching for men and surfers.");
+    expect(siteMetadata.description).toBe(
+      "Devotionals and Bible teaching for surfers and anyone who feels the swell of life.",
+    );
     expect(siteMetadata.applicationName).toBe("Word on the Water");
   });
 

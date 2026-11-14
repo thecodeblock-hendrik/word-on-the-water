@@ -3,7 +3,8 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
-export const alt = "Word on the Water: devotionals and Bible teaching for men and surfers";
+export const alt =
+  "Word on the Water: devotionals and Bible teaching for surfers and anyone who feels the swell of life";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -81,7 +82,7 @@ export default async function OpenGraphImage() {
           Word on the Water
         </div>
         <div style={{ display: "flex", marginTop: 30, fontSize: 36, color: MUTED }}>
-          For men and surfers
+          For surfers and anyone who feels the swell of life
         </div>
       </div>
     </div>,

@@ -6,7 +6,9 @@ describe("the default social preview image", () => {
   it("is declared 1200 by 630, a PNG, with alt text", () => {
     expect(size).toEqual({ width: 1200, height: 630 });
     expect(contentType).toBe("image/png");
-    expect(alt).toBe("Word on the Water: devotionals and Bible teaching for men and surfers");
+    expect(alt).toBe(
+      "Word on the Water: devotionals and Bible teaching for surfers and anyone who feels the swell of life",
+    );
   });
 
   it("renders a real PNG of exactly that size, small enough for every network", async () => {
