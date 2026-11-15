@@ -364,4 +364,16 @@ describe("scripture references", () => {
     expect(screen.getByText("Hezekiah 3:1")).toBeDefined();
     expect(screen.queryByRole("link", { name: "Hezekiah 3:1" })).toBeNull();
   });
+
+  it("tapping a verse remembers the page the chat was on, so the Bible can offer the way back", async () => {
+    ok(reply({ kind: "answer", entry: entry("2.1") }));
+    const { user } = await openPanel(true);
+    await user.type(box(), "who is jesus{Enter}");
+    const link = await screen.findByRole("link", { name: "John 3:16" });
+    link.addEventListener("click", (e) => e.preventDefault());
+    await user.click(link);
+    expect(sessionStorage.getItem("wotw-chat-return")).toBe(
+      `${location.pathname}${location.search}`,
+    );
+  });
 });

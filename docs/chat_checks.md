@@ -159,6 +159,8 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 
 - Enhancement 1 (2026-11-15, after testing on an iPhone, branch `feat/chat-enhancements`): Got Questions is also in the menu bar (from `lg`) and in the mobile menu, not only under Start here. One `ChatHost` in the layout holds the single panel; `ChatLauncher` links ask it to open (`lib/chat/open.ts`). The button under Start here is solid with a chat icon and reads "Got Questions?"; the bar and menu say "Got Questions". The bar links no longer wrap at 1024 px (nowrap, tighter gaps, "Subscribe" until `xl`).
 
+- Enhancement 2 (2026-11-15): a floating "Your chat" button in the Bible reader (Option B in the mockups, section 6), shown only to a visitor who left the chat by tapping a verse (a flag in the tab's `sessionStorage`, `lib/chat/return.ts`; never an address, so shared links show nothing). On a phone it rides on the sticky chapter bar so it never covers the buttons; from `lg` it is fixed at the bottom right. It stays across chapters and has a Hide button. Tapping it returns to the page the chat was on and reopens the chat with the thread; the browser Back button does the same. Opening the chat any other way clears it.
+
 ## K7. End to end and quality (`feat/chat-k7-e2e`)
 
 - [x] Stub API for e2e (`tests/e2e/stub-api.mts`): extend with chat replies keyed per request (no global "last request": e2e runs fully parallel).

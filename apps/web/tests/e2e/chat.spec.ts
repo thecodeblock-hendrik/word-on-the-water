@@ -3,7 +3,7 @@ import { expect, type Page, test } from "@playwright/test";
 import { gzipSync } from "node:zlib";
 
 const CHAT = "http://localhost:3102";
-const MARKER = "wotw-chat"; // the storage key: only the chat's code contains it
+const MARKER = '"wotw-chat"'; // the panel's own storage key, quotes included (the return flags share the prefix)
 
 /** Collects CSP violations from the console, to be checked at the end of a journey. */
 function watchCsp(page: Page) {
@@ -160,6 +160,71 @@ test.describe("with the chat on", () => {
     await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test.describe("coming back from a verse in the Bible", () => {
+    async function readVerse(page: Page) {
+      const dialog = await openChat(page);
+      await dialog.getByRole("button", { name: "Who is Jesus?" }).click();
+      await dialog.getByRole("link", { name: "John 3:16" }).click();
+      await expect(page).toHaveURL(/\/bible\/web\/john\/3\?v=16/);
+    }
+
+    test("a Your chat button appears, stays across chapters, and takes you back to the open chat", async ({
+      page,
+    }) => {
+      await readVerse(page);
+      const back = page.getByRole("link", { name: "Your chat" });
+      await expect(back).toBeVisible();
+
+      await page.getByRole("link", { name: /Next chapter/ }).click();
+      await expect(page).toHaveURL(/\/john\/4/);
+      await expect(back).toBeVisible();
+
+      await back.click();
+      const dialog = page.getByRole("dialog", { name: "Got Questions" });
+      await expect(dialog).toBeVisible();
+      await expect(dialog.getByText("Short answer 2.1.")).toBeVisible();
+      await page.goto("/bible/web/john/3");
+      await expect(page.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+    });
+
+    test("the browser Back button reopens the chat too", async ({ page }) => {
+      await readVerse(page);
+      await page.goBack();
+      await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
+      await page.goForward();
+      await expect(page.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+    });
+
+    test("is not there for someone reading the Bible on their own, or in a shared link", async ({
+      page,
+      browser,
+    }) => {
+      await page.goto("/bible/web/john/3?v=16");
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+
+      await readVerse(page);
+      const fresh = await (await browser.newContext({ baseURL: CHAT })).newPage();
+      await fresh.goto(page.url());
+      await expect(fresh.getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(fresh.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+    });
+
+    test("can be hidden, and never covers the chapter buttons", async ({ page }) => {
+      await readVerse(page);
+      const back = page.getByRole("link", { name: "Your chat" });
+      const nav = page.getByRole("navigation", { name: "Previous and next chapter" });
+      const [pill, bar] = [(await back.boundingBox())!, (await nav.boundingBox())!];
+      expect(pill.x + pill.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+      // On a phone it rides on the chapter bar, above it; from lg it floats at the bottom right.
+      if (page.viewportSize()!.width < 1024)
+        expect(pill.y + pill.height).toBeLessThanOrEqual(bar.y);
+
+      await page.getByRole("button", { name: /Hide the Your chat button/ }).click();
+      await expect(back).toHaveCount(0);
+    });
   });
 
   test("the menu bar keeps every link on one line with no sideways scroll", async ({ page }) => {

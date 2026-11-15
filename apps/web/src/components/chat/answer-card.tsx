@@ -1,6 +1,7 @@
 import { Chip } from "@/components/chat/chip";
 import { chat } from "@/content/chat";
 import type { EntryView } from "@/lib/chat/thread";
+import { markChatLeft } from "@/lib/chat/return";
 import { verseHref } from "@/lib/chat/verses";
 
 type Props = {
@@ -56,7 +57,11 @@ export function AnswerCard({
               return (
                 <li key={verse} className="font-ui text-[15px] font-medium text-accent-ink">
                   {href ? (
-                    <a href={href} className="inline-flex min-h-11 items-center underline">
+                    <a
+                      href={href}
+                      onClick={() => markChatLeft(`${location.pathname}${location.search}`)}
+                      className="inline-flex min-h-11 items-center underline"
+                    >
                       {verse}
                     </a>
                   ) : (

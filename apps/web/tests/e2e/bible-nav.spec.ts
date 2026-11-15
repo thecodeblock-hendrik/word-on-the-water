@@ -24,7 +24,8 @@ test.describe("desktop header", () => {
       expect(new Set(boxes.map((b) => b.top)).size, "all links on one row").toBe(1);
       expect(boxes.every((b) => b.height >= 44)).toBe(true);
 
-      const cta = await page.getByRole("link", { name: "Get the devotional" }).boundingBox();
+      // The button says "Subscribe" up to 1279px and "Get the devotional" from there; it is found by address.
+      const cta = await page.locator("header a[href='/#subscribe']").boundingBox();
       const toggle = await page
         .getByRole("banner")
         .getByRole("button", { name: /switch between light and dark/i })
