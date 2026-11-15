@@ -18,20 +18,13 @@ afterEach(() => {
 describe("ChatReturn, the floating Your chat button in the Bible", () => {
   it("is not there when the visitor did not come from the chat", () => {
     render(<ChatReturn />);
-    expect(screen.queryByRole("link", { name: /your chat/i })).toBeNull();
-  });
-
-  it("is a link back to the page the chat was on", async () => {
-    markChatLeft("/devotionals/advent-01");
-    render(<ChatReturn />);
-    const link = await screen.findByRole("link", { name: /your chat/i });
-    expect(link).toHaveAttribute("href", "/devotionals/advent-01");
+    expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
 
   it("is a round ink button of 60px with its words under it, marked so the page can leave room", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
-    const link = await screen.findByRole("link", { name: /your chat/i });
+    const link = await screen.findByRole("button", { name: /^your chat$/i });
     const round = link.querySelector("span");
     expect(round?.className).toMatch(/\bbg-ink\b/);
     expect(round?.className).toMatch(/size-\[60px\]/);
@@ -40,30 +33,35 @@ describe("ChatReturn, the floating Your chat button in the Bible", () => {
     expect(link.closest("[data-chat-return]")).not.toBeNull();
   });
 
-  it("asks the chat to reopen when it is used", async () => {
+  it("opens the chat over the page without leaving it, and clears the way back", async () => {
     markChatLeft("/");
-    render(<ChatReturn />);
-    const link = await screen.findByRole("link", { name: /your chat/i });
-    link.addEventListener("click", (e) => e.preventDefault());
-    await userEvent.setup().click(link);
-    expect(sessionStorage.getItem("wotw-chat-reopen")).toBe("1");
+    render(
+      <>
+        <ChatHost />
+        <ChatReturn />
+      </>,
+    );
+    await userEvent.setup().click(await screen.findByRole("button", { name: /^your chat$/i }));
+    await screen.findByRole("dialog", { name: "Got Questions" });
+    expect(chatReturnUrl()).toBeNull();
+    expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
 
   it("can be dismissed, and then stays away", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
-    await screen.findByRole("link", { name: /your chat/i });
+    await screen.findByRole("button", { name: /^your chat$/i });
     await userEvent.setup().click(screen.getByRole("button", { name: /hide/i }));
-    expect(screen.queryByRole("link", { name: /your chat/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
     expect(chatReturnUrl()).toBeNull();
   });
 
   it("goes away when the way back is cleared elsewhere", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
-    await screen.findByRole("link", { name: /your chat/i });
+    await screen.findByRole("button", { name: /^your chat$/i });
     act(() => clearChatReturn());
-    expect(screen.queryByRole("link", { name: /your chat/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
 });
 
@@ -73,15 +71,6 @@ describe("the chat reopening when the visitor comes back", () => {
   it("stays closed on an ordinary page load", () => {
     render(<ChatHost />);
     expect(screen.queryByRole("dialog")).toBeNull();
-  });
-
-  it("opens once when the Your chat button asked for it, and clears the way back", async () => {
-    markChatLeft("/");
-    sessionStorage.setItem("wotw-chat-reopen", "1");
-    render(<ChatHost />);
-    await dialog();
-    expect(chatReturnUrl()).toBeNull();
-    expect(sessionStorage.getItem("wotw-chat-reopen")).toBeNull();
   });
 
   it("opens after the browser Back button returns to the page the chat was on", async () => {

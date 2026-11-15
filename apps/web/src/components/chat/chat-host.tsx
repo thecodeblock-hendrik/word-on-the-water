@@ -3,12 +3,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import { OPEN_CHAT } from "@/lib/chat/open";
-import {
-  cameBackByHistory,
-  chatReturnUrl,
-  clearChatReturn,
-  consumeReopen,
-} from "@/lib/chat/return";
+import { cameBackByHistory, chatReturnUrl, clearChatReturn } from "@/lib/chat/return";
 
 // The panel is a separate chunk, fetched on the first request to open it, so page JS stays small.
 const ChatPanel = lazy(() =>
@@ -33,10 +28,10 @@ export function ChatHost({ bibleLinks = false }: { bibleLinks?: boolean }) {
     }
     window.addEventListener(OPEN_CHAT, onOpen);
 
-    // Back from the Bible: by the Your chat button, or the browser's Back to the page the chat was on.
+    // The browser's Back button returning to the page the chat was on.
     const backOnChatPage =
       cameBackByHistory() && chatReturnUrl() === `${location.pathname}${location.search}`;
-    if (consumeReopen() || backOnChatPage) {
+    if (backOnChatPage) {
       clearChatReturn();
       onOpen(new CustomEvent(OPEN_CHAT, { detail: null }));
     }

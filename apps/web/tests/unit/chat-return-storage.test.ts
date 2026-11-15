@@ -1,13 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  chatReturnUrl,
-  clearChatReturn,
-  consumeReopen,
-  markChatLeft,
-  requestReopen,
-} from "@/lib/chat/return";
+import { chatReturnUrl, clearChatReturn, markChatLeft } from "@/lib/chat/return";
 
 afterEach(() => {
   sessionStorage.clear();
@@ -43,13 +37,6 @@ describe("the way back to the chat", () => {
     expect(seen).toHaveBeenCalledTimes(2);
   });
 
-  it("asks to reopen the chat once", () => {
-    expect(consumeReopen()).toBe(false);
-    requestReopen();
-    expect(consumeReopen()).toBe(true);
-    expect(consumeReopen()).toBe(false);
-  });
-
   it("does not break when storage is blocked", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new Error("blocked");
@@ -63,7 +50,5 @@ describe("the way back to the chat", () => {
     expect(chatReturnUrl()).toBeNull();
     expect(() => markChatLeft("/")).not.toThrow();
     expect(() => clearChatReturn()).not.toThrow();
-    expect(() => requestReopen()).not.toThrow();
-    expect(consumeReopen()).toBe(false);
   });
 });

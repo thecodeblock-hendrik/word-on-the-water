@@ -170,11 +170,11 @@ test.describe("with the chat on", () => {
       await expect(page).toHaveURL(/\/bible\/web\/john\/3\?v=16/);
     }
 
-    test("a Your chat button appears, stays across chapters, and takes you back to the open chat", async ({
+    test("a Your chat button appears, stays across chapters, and opens the chat over the page", async ({
       page,
     }) => {
       await readVerse(page);
-      const back = page.getByRole("link", { name: "Your chat" });
+      const back = page.getByRole("button", { name: "Your chat", exact: true });
       await expect(back).toBeVisible();
 
       await page.getByRole("link", { name: /Next chapter/ }).click();
@@ -184,9 +184,10 @@ test.describe("with the chat on", () => {
       await back.click();
       const dialog = page.getByRole("dialog", { name: "Got Questions" });
       await expect(dialog).toBeVisible();
+      await expect(page).toHaveURL(/\/john\/4/);
       await expect(dialog.getByText("Short answer 2.1.")).toBeVisible();
       await page.goto("/bible/web/john/3");
-      await expect(page.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
     test("the browser Back button reopens the chat too", async ({ page }) => {
@@ -194,7 +195,7 @@ test.describe("with the chat on", () => {
       await page.goBack();
       await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
       await page.goForward();
-      await expect(page.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
     test("is not there for someone reading the Bible on their own, or in a shared link", async ({
@@ -203,13 +204,13 @@ test.describe("with the chat on", () => {
     }) => {
       await page.goto("/bible/web/john/3?v=16");
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
 
       await readVerse(page);
       const fresh = await (await browser.newContext({ baseURL: CHAT })).newPage();
       await fresh.goto(page.url());
       await expect(fresh.getByRole("heading", { level: 1 })).toBeVisible();
-      await expect(fresh.getByRole("link", { name: "Your chat" })).toHaveCount(0);
+      await expect(fresh.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
     test("on a phone it is a round button between Previous and Next, not covering either", async ({
@@ -218,7 +219,9 @@ test.describe("with the chat on", () => {
       test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
       await readVerse(page);
       const bar = page.getByRole("navigation", { name: "Previous and next chapter" });
-      const round = (await page.getByRole("link", { name: "Your chat" }).boundingBox())!;
+      const round = (await page
+        .getByRole("button", { name: "Your chat", exact: true })
+        .boundingBox())!;
       const prev = (await bar.getByRole("link", { name: /Previous chapter/ }).boundingBox())!;
       const next = (await bar.getByRole("link", { name: /Next chapter/ }).boundingBox())!;
       expect(prev.x + prev.width).toBeLessThanOrEqual(round.x);
@@ -240,7 +243,9 @@ test.describe("with the chat on", () => {
       await page.goto("/bible/web/psalms/119");
       await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
       await page.waitForTimeout(300);
-      const round = (await page.getByRole("link", { name: "Your chat" }).boundingBox())!;
+      const round = (await page
+        .getByRole("button", { name: "Your chat", exact: true })
+        .boundingBox())!;
       const credit = (await page
         .getByText("World English Bible (WEB), public domain")
         .boundingBox())!;
@@ -250,7 +255,7 @@ test.describe("with the chat on", () => {
     test("on a wide screen it floats at the bottom right and can be hidden", async ({ page }) => {
       test.skip(page.viewportSize()!.width < 1024, "the floating button is for wide screens");
       await readVerse(page);
-      const back = page.getByRole("link", { name: "Your chat" });
+      const back = page.getByRole("button", { name: "Your chat", exact: true });
       const box = (await back.boundingBox())!;
       expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
       await page.getByRole("button", { name: /Hide the Your chat button/ }).click();

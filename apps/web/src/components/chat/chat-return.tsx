@@ -3,17 +3,14 @@
 import { useSyncExternalStore } from "react";
 
 import { chat } from "@/content/chat";
-import {
-  chatReturnUrl,
-  clearChatReturn,
-  requestReopen,
-  subscribeChatReturn,
-} from "@/lib/chat/return";
+import { openChat } from "@/lib/chat/open";
+import { chatReturnUrl, clearChatReturn, subscribeChatReturn } from "@/lib/chat/return";
 
 const nothing = () => null;
 
 /**
- * The way back to the chat in the Bible reader, shown only to a visitor who came from the chat (a
+ * The way back to the chat in the Bible reader (it opens the chat over the page, no navigation),
+ * shown only to a visitor who came from the chat (a
  * flag in this tab, so a shared link shows nothing). On a phone it is a round button in the middle
  * of the pinned chapter bar, between Previous and Next, rising above the bar with "Your chat" under
  * it. From lg, where the chapter buttons sit under the text, it is a pill fixed at the bottom
@@ -27,9 +24,9 @@ export function ChatReturn() {
       data-chat-return
       className="-mt-8 flex flex-none items-center gap-1 lg:fixed lg:bottom-6 lg:right-6 lg:z-30 lg:mt-0"
     >
-      <a
-        href={url}
-        onClick={requestReopen}
+      <button
+        type="button"
+        onClick={() => openChat(null)}
         className="flex flex-col items-center gap-0.5 font-ui text-[11px] font-bold leading-none text-ink lg:min-h-12 lg:flex-row lg:gap-2 lg:rounded-full lg:border-[1.5px] lg:border-accent-ink lg:bg-accent-ink lg:px-5 lg:text-[15px] lg:text-bg lg:shadow-menu lg:hover:brightness-110"
       >
         <span className="grid size-[60px] place-items-center rounded-full border-[3px] border-surface bg-ink text-bg shadow-menu lg:size-auto lg:border-0 lg:bg-transparent lg:shadow-none">
@@ -41,7 +38,7 @@ export function ChatReturn() {
           </svg>
         </span>
         {chat.yourChat}
-      </a>
+      </button>
       <button
         type="button"
         onClick={clearChatReturn}

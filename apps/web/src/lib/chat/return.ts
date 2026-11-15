@@ -1,5 +1,4 @@
 const RETURN = "wotw-chat-return";
-const REOPEN = "wotw-chat-reopen";
 const CHANGED = "wotw:chat-return";
 
 /**
@@ -34,16 +33,6 @@ export const clearChatReturn = () => write(RETURN, null);
 export function chatReturnUrl(): string | null {
   const url = read(RETURN);
   return url && url.startsWith("/") && !url.startsWith("//") ? url : null;
-}
-
-/** Set by the Your chat button, so the next page opens the chat. */
-export const requestReopen = () => write(REOPEN, "1");
-
-/** True once after requestReopen. */
-export function consumeReopen(): boolean {
-  const asked = read(REOPEN) === "1";
-  if (asked) write(REOPEN, null);
-  return asked;
 }
 
 /** Calls `onChange` when the way back is set or cleared, here or in another tab. */
