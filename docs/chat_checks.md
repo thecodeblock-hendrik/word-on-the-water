@@ -136,24 +136,26 @@ Goal: `POST /v1/chat/messages`, safe and rate limited, following the new-endpoin
 
 Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile first at 375px, behind `CHAT_ENABLED`.
 
-- [ ] Read `node_modules/next/dist/docs/` for Server Actions and dynamic imports in this Next version.
-- [ ] `src/lib/env.ts`: `CHAT_ENABLED` validated server side only (never `NEXT_PUBLIC_`).
-- [ ] Tests first (Vitest and Testing Library):
-  - [ ] Opening, closing (button, Escape, backdrop), focus moves into the dialog and returns to the Got Questions button.
-  - [ ] Send with Enter, new line with Shift+Enter, send button disabled when empty.
-  - [ ] Starter questions and chips send ids, not text.
-  - [ ] Thread renders each reply kind (answer, clarify, no answer, rejected, crisis); crisis numbers are `tel:` links.
-  - [ ] `sessionStorage`: thread restored after remount; Clear chat empties both state and storage; storage failure (private mode) does not break the chat (wrapped in try/catch).
-  - [ ] New answers are in an `aria-live="polite"` region; focus stays in the input.
-  - [ ] Text is rendered as text (a reply containing `<script>` appears literally).
-- [ ] `src/lib/chat.ts` (Zod schema for replies and context, thread reducer, context builder: `last_entry_id` and `seen_entry_ids` capped at 20, thread capped at 30 messages).
-- [ ] `src/lib/actions/chat.ts`: Server Action calling the API with the service token and the visitor's IP (reuse `api-client.ts` and `clientIpFrom`), `rendered_at`, the honeypot field. Map API errors to friendly messages (429, 503).
-- [ ] Components in `src/components/chat/`: `chat-panel` (Radix Dialog; drawer from `lg`, full-height sheet below), `message-list`, `answer-card` (short answer, Read more, verses, related chips, terms), `chip`, `topic-browser` (the 14 themes then their questions; needs the theme and question list: ship a small generated `topics.json` from the KB or fetch it from the API), `chat-input` (visible privacy line above the input, inline rejected message).
-- [ ] Verse chips: parse `key_verses` ("John 3:16", "Romans 3:23–24", "Acts 16:15, 31–34", "1 Corinthians 15:1–4") with the existing `lib/bible` helpers; link to `/bible/web/...` only when `BIBLE_ENABLED` is on and the reference parses; otherwise plain text. Test the odd formats.
-- [ ] Entry point: `landing.ts` and `components/sections/start.tsx`: when `CHAT_ENABLED` the ghost button is "Got Questions" and opens the panel (loaded with a dynamic import on first click so the landing JS budget stays under 100 KB); otherwise, and without JavaScript, it stays a mail link to `hello@wordonthewater.net`. Test both.
-- [ ] Styling with the existing tokens only (Dawn patrol and Night swell), 44px targets, safe-area insets (`env(safe-area-inset-*)`, `100dvh`), `prefers-reduced-motion`.
+- [x] Read `node_modules/next/dist/docs/` for Server Actions and dynamic imports in this Next version.
+- [x] `CHAT_ENABLED` is read on the server only (never `NEXT_PUBLIC_`), by `src/lib/chat/flag.ts`, the same way as `BIBLE_ENABLED` (it is not in `env.ts`, which holds the API settings).
+- [x] Tests first (Vitest and Testing Library):
+  - [x] Opening, closing (button, Escape, backdrop), focus moves into the dialog and returns to the Got Questions button.
+  - [x] Send with Enter, new line with Shift+Enter, send button disabled when empty.
+  - [x] Starter questions and chips send ids, not text.
+  - [x] Thread renders each reply kind (answer, clarify, no answer, rejected, crisis); crisis numbers are `tel:` links.
+  - [x] `sessionStorage`: thread restored after remount; Clear chat empties both state and storage; storage failure (private mode) does not break the chat (wrapped in try/catch).
+  - [x] New answers are in an `aria-live="polite"` region; focus stays in the input.
+  - [x] Text is rendered as text (a reply containing `<script>` appears literally).
+- [x] `src/lib/chat.ts` (Zod schema for replies and context, thread reducer, context builder: `last_entry_id` and `seen_entry_ids` capped at 20, thread capped at 30 messages).
+- [x] `src/lib/actions/chat.ts`: Server Action calling the API with the service token and the visitor's IP (reuse `api-client.ts` and `clientIpFrom`), `rendered_at`, the honeypot field. Map API errors to friendly messages (429, 503).
+- [x] Components in `src/components/chat/`: `chat-panel` (Radix Dialog; drawer from `lg`, full-height sheet below), `message-list`, `answer-card` (short answer, Read more, verses, related chips, terms), `chip`, `topic-browser` (the 14 themes then their questions; needs the theme and question list: ship a small generated `topics.json` from the KB or fetch it from the API), `chat-input` (visible privacy line above the input, inline rejected message).
+- [x] Verse chips: parse `key_verses` ("John 3:16", "Romans 3:23–24", "Acts 16:15, 31–34", "1 Corinthians 15:1–4") with the existing `lib/bible` helpers; link to `/bible/web/...` only when `BIBLE_ENABLED` is on and the reference parses; otherwise plain text. Test the odd formats.
+- [x] Entry point: `landing.ts` and `components/sections/start.tsx`: when `CHAT_ENABLED` the ghost button is "Got Questions" and opens the panel (loaded with a dynamic import on first click so the landing JS budget stays under 100 KB); otherwise, and without JavaScript, it stays a mail link to `hello@wordonthewater.net`. Test both.
+- [x] Styling with the existing tokens only (Dawn patrol and Night swell), 44px targets, safe-area insets (`env(safe-area-inset-*)`, `100dvh`), `prefers-reduced-motion`.
 - [ ] CSP: no change expected (no third-party calls); confirm no inline styles or scripts are added (the nonce CSP blocks them).
 - [ ] Validate: `pnpm dev` with `CHAT_ENABLED=1` and the API running; screenshot at 375, 768 and 1280, light and dark, against the mockups; run through the Part L preview checks informally.
+- Done so far (2026-11-15): 6a `lib/chat` (flag, thread, storage), 6b Server Action, 6c panel components, 6d landing button, 6e topic browser (generated `chat-topics.json`, kept in step by `make kb` and a test), 6f verse links. Checked live at 375 and 1280 px, light and dark, against the API: an answer, a did-you-mean and a refused message. Still to do: the 768 px screenshot, a check that the nonce CSP blocks nothing (K7 e2e), and the Part L preview checks.
+- Deviations: (1) a refused message is shown only in the box with its error and is never added to the thread or `sessionStorage`; (2) with the flag off the button stays the existing "Talk to someone" link to `/#contact`, with it on the button is "Got Questions" and a mail link without JavaScript; (3) a verse links to the first part of its reference in the reader (`/bible/web/<book>/<chapter>?v=`), since one reader address holds one passage; every one of the knowledge base's 1,029 key verses is tested to parse; (4) the intro says "our own knowledge base" without "reviewed", since no pastoral review gate remains; (5) a new reply is scrolled to its first line.
 
 ## K7. End to end and quality (`feat/chat-k7-e2e`)
 

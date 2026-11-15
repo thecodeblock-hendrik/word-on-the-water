@@ -108,10 +108,10 @@ A visitor types free text; the API answers from a local knowledge base. No model
 | C3 | A wrong or unreviewed doctrinal answer | Contested entries carry the badge and the contested note; the knowledge base version is in every reply; answers are fixed text, not generated | Planned |
 | C4 | The knowledge base is tampered with (repo, build, deploy) | Changes only by reviewed pull request; the committed JSON is checked against the markdown by `make kb-check` in CI; Pydantic validation on load; a test that no field holds HTML and every id resolves | Planned |
 | C5 | Flooding or expensive queries | Rate limit per hashed visitor address, input cap, constant-size in-memory index, no external calls, Vercel Firewall rule on the route, `CHAT_ENABLED=0` kill switch | Done (K5); the Firewall rule is a launch step |
-| C6 | Cross-site scripting through a reply or the echoed question | Everything rendered as plain text by React; no `dangerouslySetInnerHTML`; no external links in answers; verse links are internal and built from validated references | Planned |
+| C6 | Cross-site scripting through a reply or the echoed question | Everything rendered as plain text by React; no `dangerouslySetInnerHTML`; no external links in answers; verse links are internal and built from validated references | Done (K6) |
 | C7 | Forged `last_entry_id` or `seen_entry_ids` | Validated against the knowledge base; the only effect is which genuine entry is ranked higher; no model to manipulate | Done (K4, K5) |
 | C8 | Message text leaks into logs, Sentry or analytics | Only counts, the outcome kind and the matched entry id are logged; a test asserts a message never appears in logs or Sentry events | Done (K5) |
-| C9 | Chat history is seen by the next person on a shared device | Thread kept in `sessionStorage` only (gone when the tab closes), a Clear chat button, nothing on the server | Planned |
+| C9 | Chat history is seen by the next person on a shared device | Thread kept in `sessionStorage` only (gone when the tab closes), a Clear chat button, nothing on the server | Done (K6) |
 
 ### Denial of service
 

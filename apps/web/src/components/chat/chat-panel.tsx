@@ -37,7 +37,11 @@ export function ChatPanel({
   const opener = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
+    const box = scroller.current;
+    if (!box) return;
+    // Show a new reply from its first line; the visitor's own message goes to the bottom.
+    const reply = box.querySelector<HTMLElement>("[data-latest-reply]");
+    box.scrollTop = reply ? reply.offsetTop - box.offsetTop - 8 : box.scrollHeight;
   }, [shown]);
 
   async function send(turn: ChatTurn, display: string, restore?: string) {

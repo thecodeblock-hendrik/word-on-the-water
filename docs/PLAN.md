@@ -359,7 +359,7 @@ Step-by-step build checklist: [chat_checks.md](chat_checks.md). Scope, mockups a
 - [x] **K3** Guards: personal details, crisis phrases, input normalisation; table-driven positive and negative cases
 - [x] **K4** Chat logic: small talk, "more" and "why", context boost, seen-entry down-ranking, chips, contested note; 20 follow-up sequences
 - [x] **K5** `POST /v1/chat/messages`: schema (`extra="forbid"`), service token, rate limit, honeypot and minimum time, integration tests, no message text in logs or Sentry (tested), OpenAPI types regenerated
-- [ ] **K6** Web panel: dialog, thread, chips, topic browser, `sessionStorage` history, Clear chat, 375px first, Vitest, lazy loaded; the button change in `landing.ts` and `start.tsx` behind `CHAT_ENABLED` with the contact link as the fallback
+- [x] **K6** Web panel: dialog, thread, chips, topic browser, `sessionStorage` history, Clear chat, 375px first, Vitest, lazy loaded; the button change in `landing.ts` and `start.tsx` behind `CHAT_ENABLED` with the contact link as the fallback
 - [ ] **K7** E2E on the six browser projects against a stub API, axe in both schemes, bundle size check, real phone keyboard and safe-area check
 - [ ] **K8** Threat model (C1 to C9 are drafted), privacy notice, runbook entry (update the knowledge base, kill switch), verify the SADAG and LifeLine numbers, then enable in Production **(Hendrik)** (launch steps: Part L of [production_checklist.md](production_checklist.md))
 

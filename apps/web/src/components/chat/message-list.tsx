@@ -104,6 +104,7 @@ export function MessageList({
         ) : (
           <div
             key={i}
+            data-latest-reply={i === thread.length - 1 ? "" : undefined}
             className="max-w-[95%] rounded-2xl rounded-bl-sm border border-line bg-surface px-4 py-3"
           >
             <Reply
