@@ -40,7 +40,7 @@ test.describe("with the chat off (like Production)", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.getByRole("link", { name: "Talk to someone" })).toHaveAttribute(
       "href",
-      "/#contact",
+      "mailto:hello@wordonthewater.net",
     );
     await expect(page.getByRole("link", { name: /Got Questions/ })).toHaveCount(0);
     expect(bodies.filter((b) => b.includes(MARKER))).toEqual([]);

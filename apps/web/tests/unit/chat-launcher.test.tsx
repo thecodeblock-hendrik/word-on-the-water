@@ -59,7 +59,7 @@ describe("Start with the chat", () => {
     render(<Start />);
     expect(screen.getByRole("link", { name: "Talk to someone" })).toHaveAttribute(
       "href",
-      "/#contact",
+      "mailto:hello@wordonthewater.net",
     );
     expect(screen.queryByRole("link", { name: "Got Questions" })).toBeNull();
   });
