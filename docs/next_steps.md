@@ -10,12 +10,12 @@ Written 2026-11-15, after the Got Questions chat enhancements (PR #113). Launch 
 
 ## The shape of the next two weeks
 
-The long pole is **email authentication** (Part E). The domain already publishes DMARC `p=reject`, so until Kit signs mail with DKIM for `wordonthewater.net`, mail from `hello@` is very likely rejected, including the confirmation email every new subscriber must receive. DNS changes and Kit's verification take time, so start this first.
+Email authentication (Part E) was the long pole and is **done for Kit** (2026-11-15, [kit_setup.md](kit_setup.md)). The domain publishes DMARC `p=reject`; Kit now signs with DKIM as `wordonthewater.net`, and a test reached the Gmail inbox with SPF, DKIM and DMARC all passing. The confirmation email of a real sign-up is still to be proven on the live form.
 
 ### 1. This week: start what has waiting time
 
 1. **Merge PR #113** (checks green) so the work is on `main`.
-2. **Email authentication, Part E (Hendrik).** Add Kit's DKIM, merge Kit into the single SPF record, decide the DMARC policy, set the return-paths. Then prove delivery with the Kit test send in Part K (SPF, DKIM and DMARC must all say pass in "Show original").
+2. **Email authentication, Part E: done for Kit on 2026-11-15** ([kit_setup.md](kit_setup.md): sending domain verified, three CNAMEs in Squarespace, a test reached the Gmail inbox with SPF, DKIM and DMARC all PASS). Left: a real sign-up on the live form once the domain is attached (Part I), and deleting the test and SPIKE drafts in Kit.
 3. **Vercel Pro, Part B (Hendrik).** Hobby is non-commercial and limits crons; Pro is needed before the public launch. Turn on two-factor, audit log, the registrar lock, and store the recovery codes offline.
 4. **Content decisions only Hendrik can make:** the two social handles in the footer (or hide them), a pastor or elder reading "Start here", and one full read of the privacy page (Part A).
 
@@ -62,7 +62,7 @@ Each Saturday's devotional is already in the repo (weeks 2 to 5 on 5, 12, 19 and
 
 ## Risks to watch
 
-- **Email is the single point of failure for launch.** Without Kit's DKIM, sign-ups never get their confirmation email. Prove it with a real test before 28 November.
+- **Email is still the single point of failure for launch.** Kit's DKIM is set and a broadcast test passed, but prove a real sign-up confirmation on the live domain before 28 November.
 - **Hobby limits.** Daily crons only; the outbox drain is daily until Pro. The immediate send after each request covers normal use.
 - **Preview databases are migrated by hand.** Any new migration must be applied to `preview-base` first (PLAN 1.3).
 - **Public repo.** Never commit secrets, subscriber data or real prayer requests; gitleaks guards it.
