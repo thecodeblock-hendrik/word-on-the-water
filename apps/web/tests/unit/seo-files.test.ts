@@ -70,7 +70,7 @@ describe("sitemap.xml", () => {
   it("lists the privacy page, dated by the day the policy was last updated", async () => {
     vi.stubEnv("DEVOTIONAL_TODAY", "2026-12-21");
     const entry = (await sitemap()).find((e) => e.url === privacy);
-    expect(entry?.lastModified).toBe("2026-11-14");
+    expect(entry?.lastModified).toBe("2026-11-15");
   });
 
   it("never lists the thank-you page or API routes, and every address is absolute", async () => {

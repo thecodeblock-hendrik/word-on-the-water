@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "../lib/site.ts";
 
 /** The day the policy was last changed. Change it whenever the text below changes. */
-export const PRIVACY_UPDATED = "2026-11-14";
+export const PRIVACY_UPDATED = "2026-11-15";
 
 export type PolicyItem = { term: string; text: string };
 export type PolicySection = {
@@ -26,9 +26,15 @@ const POSTAL = "PO Box 6055, Port Elizabeth, Eastern Cape 6001";
 /**
  * The public privacy policy, written from docs/privacy.md (keep the two in step). It says only what
  * is true today: the weekly email sign-up, and email you send us. The Bible cookies are listed only
- * while the Bible reader is switched on.
+ * while the Bible reader is switched on, and the Got Questions chat is described only while it is.
  */
-export function privacyPolicy({ bibleEnabled }: { bibleEnabled: boolean }): PrivacyPolicy {
+export function privacyPolicy({
+  bibleEnabled,
+  chatEnabled = false,
+}: {
+  bibleEnabled: boolean;
+  chatEnabled?: boolean;
+}): PrivacyPolicy {
   return {
     title: "Privacy policy",
     description:
@@ -72,6 +78,14 @@ export function privacyPolicy({ bibleEnabled }: { bibleEnabled: boolean }): Priv
             term: "Fixing errors",
             text: "If the site breaks, an error report is sent to Sentry. Personal details are removed before it is sent.",
           },
+          ...(chatEnabled
+            ? [
+                {
+                  term: "Got Questions chat",
+                  text: "The questions you type are matched against our own written answers on our server. They are not stored, not sent to anyone else and not written to our logs; we keep only a count of how many questions were answered. We refuse messages that look like personal details, so please do not share any. Your conversation is kept only in your browser tab, and it is gone when you close the tab or press Clear chat.",
+                },
+              ]
+            : []),
           {
             term: "Emails you send us",
             text: `If you email ${CONTACT_EMAIL} or prayer@wordonthewater.net, it is ordinary email: it passes through our email host (Squarespace) to our own mailbox. We keep it only as long as we need to answer you. Please do not send anything you would not want to put in an email.`,

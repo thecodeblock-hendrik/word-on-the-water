@@ -119,6 +119,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: (cd apps/api && uv sync --locked)
       - run: make types-check
+      - run: make kb-check
 
   e2e:
     name: End to end (Playwright)

@@ -47,7 +47,7 @@ def test_every_v1_route_needs_the_service_token_except_the_signed_webhooks(
     forgets the token is caught here instead of in production."""
     paths = client.get("/openapi.json").json()["paths"]
     v1 = {path: spec for path, spec in paths.items() if path.startswith("/v1/")}
-    assert {"/v1/ping", "/v1/subscribers", "/v1/webhooks/kit"} <= set(v1)
+    assert {"/v1/ping", "/v1/subscribers", "/v1/chat/messages", "/v1/webhooks/kit"} <= set(v1)
     for path, methods in v1.items():
         for method in methods:
             code = client.request(method.upper(), path).json()["error"]["code"]

@@ -1,6 +1,272 @@
 {
   "components": {
     "schemas": {
+      "ChatContext": {
+        "additionalProperties": false,
+        "description": "What the browser remembers: ids only, never text.",
+        "properties": {
+          "explained_entry_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Explained Entry Ids",
+            "type": "array"
+          },
+          "last_entry_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Entry Id"
+          },
+          "seen_entry_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Seen Entry Ids",
+            "type": "array"
+          }
+        },
+        "title": "ChatContext",
+        "type": "object"
+      },
+      "ChatReply": {
+        "properties": {
+          "entry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EntryView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expand": {
+            "default": false,
+            "title": "Expand",
+            "type": "boolean"
+          },
+          "kb_version": {
+            "title": "Kb Version",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "answer",
+              "clarify",
+              "no_answer",
+              "crisis",
+              "smalltalk",
+              "rejected",
+              "term"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "options": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TermView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "kind",
+          "kb_version"
+        ],
+        "title": "ChatReply",
+        "type": "object"
+      },
+      "ChatRequest": {
+        "additionalProperties": false,
+        "description": "The body of POST /v1/chat/messages: a turn plus the context and the bot-check fields.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "enum": [
+                  "more",
+                  "related",
+                  "term"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "context": {
+            "$ref": "#/components/schemas/ChatContext",
+            "default": {
+              "explained_entry_ids": [],
+              "seen_entry_ids": []
+            }
+          },
+          "entry_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Id"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "rendered_at": {
+            "minimum": 0.0,
+            "title": "Rendered At",
+            "type": "integer"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "website": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rendered_at"
+        ],
+        "title": "ChatRequest",
+        "type": "object"
+      },
+      "EntryView": {
+        "properties": {
+          "contested": {
+            "title": "Contested",
+            "type": "boolean"
+          },
+          "contested_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contested Note"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "glossary_terms": {
+            "items": {
+              "$ref": "#/components/schemas/TermView"
+            },
+            "title": "Glossary Terms",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key_verses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Verses",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "related": {
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "title": "Related",
+            "type": "array"
+          },
+          "short_answer": {
+            "title": "Short Answer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "short_answer",
+          "explanation",
+          "contested",
+          "contested_note",
+          "key_verses",
+          "related",
+          "glossary_terms"
+        ],
+        "title": "EntryView",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -12,6 +278,24 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Option": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question"
+        ],
+        "title": "Option",
         "type": "object"
       },
       "SubscribeRequest": {
@@ -88,6 +372,40 @@
           }
         },
         "title": "SubscribeResponse",
+        "type": "object"
+      },
+      "TermView": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "key_verses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Key Verses",
+            "type": "array"
+          },
+          "meaning": {
+            "title": "Meaning",
+            "type": "string"
+          },
+          "term": {
+            "title": "Term",
+            "type": "string"
+          }
+        },
+        "required": [
+          "term",
+          "meaning",
+          "key_verses",
+          "entries"
+        ],
+        "title": "TermView",
         "type": "object"
       },
       "ValidationError": {
@@ -293,6 +611,66 @@
         "summary": "Ready",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/v1/chat/messages": {
+      "post": {
+        "description": "Answer one turn. A bot (filled honeypot, or sent too fast) gets a plain no-answer reply.",
+        "operationId": "chat_message_v1_chat_messages_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Chat Message",
+        "tags": [
+          "chat"
         ]
       }
     },

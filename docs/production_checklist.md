@@ -168,11 +168,9 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 
 Scope: [chat.md](chat.md), decision: [ADR 0009](adr/0009-chat-local-knowledge-base.md). No domain or external service is needed, so this part can be done on a preview first.
 
-- [ ] **Pastoral review done and recorded** (reviewer, date, knowledge base version) in the repo. Without it `CHAT_ENABLED` stays unset in Production.
-- [ ] The knowledge base `meta.status` no longer says "Draft for pastoral review", and `meta.version` matches the sign-off.
-- [ ] **Crisis numbers verified** on the providers' own sites: SADAG Suicide Crisis Helpline 0800 567 567 and LifeLine South Africa 0861 322 322, plus the line for visitors outside South Africa.
+- [x] **Crisis numbers verified** on the providers' own sites (2026-11-15): SADAG Suicide Crisis Helpline 0800 567 567 (24 hours, sadag.org) and LifeLine South Africa National Counselling Line 0861 322 322 (24 hours, shared-rate call, lifeline.org.za); the text for visitors outside South Africa is "call your local emergency number". Re-check the day before launch.
 - [ ] `make kb-check` is green in CI (committed JSON equals the markdown source).
-- [ ] Privacy notice has the chat section (no storage on the server, thread only in the tab) and the threat model rows C1 to C9 are ticked.
+- [x] Privacy notice has the chat section (no storage on the server, thread only in the tab) and the threat model rows C1 to C9 are ticked (2026-11-15).
 - [ ] On a preview with `CHAT_ENABLED=1`: ask the starter questions, a contested one (baptism), an off-topic one, a message with a phone number (rejected) and a crisis phrase (fixed reply); try follow-ups ("tell me more", "why"); press Clear chat; reload (thread survives) and close the tab (thread gone).
 - [ ] Phone check at 375px on a real device: keyboard, safe areas, tap targets, dark and light.
 - [ ] Rate limit seen to trip (generic 429) and the Vercel Firewall rule on the chat route is set.

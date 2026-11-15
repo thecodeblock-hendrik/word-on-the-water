@@ -78,6 +78,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/chat/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Chat Message
+         * @description Answer one turn. A bot (filled honeypot, or sent too fast) gets a plain no-answer reply.
+         */
+        post: operations["chat_message_v1_chat_messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ping": {
         parameters: {
             query?: never;
@@ -150,10 +170,110 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ChatContext
+         * @description What the browser remembers: ids only, never text.
+         */
+        ChatContext: {
+            /**
+             * Explained Entry Ids
+             * @default []
+             */
+            explained_entry_ids: string[];
+            /** Last Entry Id */
+            last_entry_id?: string | null;
+            /**
+             * Seen Entry Ids
+             * @default []
+             */
+            seen_entry_ids: string[];
+        };
+        /** ChatReply */
+        ChatReply: {
+            entry?: components["schemas"]["EntryView"] | null;
+            /**
+             * Expand
+             * @default false
+             */
+            expand: boolean;
+            /** Kb Version */
+            kb_version: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "answer" | "clarify" | "no_answer" | "crisis" | "smalltalk" | "rejected" | "term";
+            /**
+             * Options
+             * @default []
+             */
+            options: components["schemas"]["Option"][];
+            /** Reason */
+            reason?: string | null;
+            term?: components["schemas"]["TermView"] | null;
+            /** Text */
+            text?: string | null;
+        };
+        /**
+         * ChatRequest
+         * @description The body of POST /v1/chat/messages: a turn plus the context and the bot-check fields.
+         */
+        ChatRequest: {
+            /** Action */
+            action?: ("more" | "related" | "term") | null;
+            /**
+             * @default {
+             *       "explained_entry_ids": [],
+             *       "seen_entry_ids": []
+             *     }
+             */
+            context: components["schemas"]["ChatContext"];
+            /** Entry Id */
+            entry_id?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Rendered At */
+            rendered_at: number;
+            /** Term */
+            term?: string | null;
+            /**
+             * Website
+             * @default
+             */
+            website: string;
+        };
+        /** EntryView */
+        EntryView: {
+            /** Contested */
+            contested: boolean;
+            /** Contested Note */
+            contested_note: string | null;
+            /** Explanation */
+            explanation: string;
+            /** Glossary Terms */
+            glossary_terms: components["schemas"]["TermView"][];
+            /** Id */
+            id: string;
+            /** Key Verses */
+            key_verses: string[];
+            /** Question */
+            question: string;
+            /** Related */
+            related: components["schemas"]["Option"][];
+            /** Short Answer */
+            short_answer: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Option */
+        Option: {
+            /** Id */
+            id: string;
+            /** Question */
+            question: string;
         };
         /**
          * SubscribeRequest
@@ -192,6 +312,17 @@ export interface components {
              * @constant
              */
             status: "check_your_inbox";
+        };
+        /** TermView */
+        TermView: {
+            /** Entries */
+            entries: components["schemas"]["Option"][];
+            /** Key Verses */
+            key_verses: string[];
+            /** Meaning */
+            meaning: string;
+            /** Term */
+            term: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -321,6 +452,41 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    chat_message_v1_chat_messages_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatReply"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

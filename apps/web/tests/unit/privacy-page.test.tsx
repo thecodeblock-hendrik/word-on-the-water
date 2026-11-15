@@ -14,7 +14,7 @@ describe("the privacy page", () => {
     render(<PrivacyPage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Privacy policy" })).toBeInTheDocument();
-    expect(screen.getByText("Last updated 14 November 2026")).toBeInTheDocument();
+    expect(screen.getByText("Last updated 15 November 2026")).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(9);
   });
 
