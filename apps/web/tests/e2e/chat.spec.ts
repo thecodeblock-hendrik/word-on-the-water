@@ -14,9 +14,12 @@ function watchCsp(page: Page) {
   return violations;
 }
 
+const startButton = (page: Page) =>
+  page.locator("#start").getByRole("link", { name: "Got Questions?" });
+
 async function openChat(page: Page) {
   await page.goto("/#start");
-  await page.getByRole("link", { name: "Got Questions" }).click();
+  await startButton(page).click();
   const dialog = page.getByRole("dialog", { name: "Got Questions" });
   await expect(dialog).toBeVisible();
   return dialog;
@@ -39,7 +42,7 @@ test.describe("with the chat off (like Production)", () => {
       "href",
       "/#contact",
     );
-    await expect(page.getByRole("link", { name: "Got Questions" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Got Questions/ })).toHaveCount(0);
     expect(bodies.filter((b) => b.includes(MARKER))).toEqual([]);
   });
 });
@@ -52,10 +55,7 @@ test.describe("with the chat on", () => {
     const context = await browser.newContext({ javaScriptEnabled: false, baseURL: CHAT });
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.getByRole("link", { name: "Got Questions" })).toHaveAttribute(
-      "href",
-      "mailto:hello@wordonthewater.net",
-    );
+    await expect(startButton(page)).toHaveAttribute("href", "mailto:hello@wordonthewater.net");
     await context.close();
   });
 
@@ -72,7 +72,7 @@ test.describe("with the chat on", () => {
     await page.goto("/#start");
     await page.waitForLoadState("networkidle");
     expect(chatScripts).toEqual([]);
-    await page.getByRole("link", { name: "Got Questions" }).click();
+    await startButton(page).click();
     await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
     expect(chatScripts.length).toBeGreaterThan(0);
   });
@@ -125,12 +125,12 @@ test.describe("with the chat on", () => {
     await expect(dialog.getByText("Short answer 2.1.")).toBeVisible();
 
     await page.reload();
-    await page.getByRole("link", { name: "Got Questions" }).click();
+    await startButton(page).click();
     await expect(page.getByText("Short answer 2.1.")).toBeVisible();
 
     const other = await context.newPage();
     await other.goto("/#start");
-    await other.getByRole("link", { name: "Got Questions" }).click();
+    await startButton(other).click();
     await expect(other.getByRole("button", { name: "Who is Jesus?" })).toBeVisible();
     await expect(other.getByText("Short answer 2.1.")).toHaveCount(0);
   });
@@ -139,7 +139,52 @@ test.describe("with the chat on", () => {
     await openChat(page);
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Got Questions" })).toBeFocused();
+    await expect(startButton(page)).toBeFocused();
+  });
+
+  test("is also in the menu bar (large screens) or the menu (phones) and opens the same chat", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const wide = page.viewportSize()!.width >= 1024;
+    if (wide) {
+      await page
+        .getByRole("navigation", { name: "Main" })
+        .getByRole("link", { name: "Got Questions" })
+        .click();
+    } else {
+      await page.getByRole("button", { name: "Menu" }).click();
+      await page.getByTestId("mobile-menu").getByRole("link", { name: "Got Questions" }).click();
+      await expect(page.getByTestId("mobile-menu")).toHaveCount(0);
+    }
+    await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("the menu bar keeps every link on one line with no sideways scroll", async ({ page }) => {
+    test.skip(page.viewportSize()!.width < 1024, "the bar is shown from lg");
+    await page.goto("/");
+    const links = page.getByRole("navigation", { name: "Main" }).getByRole("link");
+    for (const link of await links.all()) {
+      expect((await link.boundingBox())!.height).toBeLessThanOrEqual(48);
+    }
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBe(0);
+  });
+
+  test("the Start here button is solid, labelled with a question and 44px tall or more", async ({
+    page,
+  }) => {
+    await page.goto("/#start");
+    const button = startButton(page);
+    await expect(button).toBeVisible();
+    expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    expect(await button.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
   });
 
   test("fits the screen, has 44px targets and no serious axe problem, in both schemes", async ({

@@ -4,11 +4,14 @@ import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, Lora } from "next/font/google";
 import { cookies } from "next/headers";
 
+import { ChatHost } from "@/components/chat/chat-host";
 import { CspNonce } from "@/components/csp-nonce";
 import { LogoSprite } from "@/components/logo";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { isBibleEnabled } from "@/lib/bible/flag";
+import { isChatEnabled } from "@/lib/chat/flag";
 import { siteMetadata } from "@/lib/seo";
 import { THEME_COOKIE, parseTheme, themeColor } from "@/lib/theme";
 
@@ -58,6 +61,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        {isChatEnabled() && <ChatHost bibleLinks={isBibleEnabled()} />}
         <Analytics />
         <SpeedInsights />
       </body>

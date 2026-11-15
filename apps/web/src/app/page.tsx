@@ -7,7 +7,6 @@ import { SubscribeBand } from "@/components/devotional/subscribe-band";
 import { Hero } from "@/components/sections/hero";
 import { JsonLd } from "@/components/json-ld";
 import { Start } from "@/components/sections/start";
-import { isBibleEnabled } from "@/lib/bible/flag";
 import { isChatEnabled } from "@/lib/chat/flag";
 import { today } from "@/lib/devotionals/format";
 import { featured, loadContent } from "@/lib/devotionals/load";
@@ -27,7 +26,7 @@ export default function Home() {
       <About />
       <hr className="border-0 border-t border-line max-lg:hidden" />
       <Coming devotional={devotional} series={devotionalSeries} />
-      <Start chatEnabled={isChatEnabled()} bibleEnabled={isBibleEnabled()} />
+      <Start chatEnabled={isChatEnabled()} />
       <BeliefsFounder />
       <SubscribeBand source="landing_closing" />
     </>

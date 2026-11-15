@@ -1,7 +1,9 @@
 "use client";
 
 import { Dialog } from "radix-ui";
-import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+
+import { ChatLauncher } from "@/components/chat/chat-launcher";
 
 import { NavLink } from "@/components/layout/nav-link";
 import type { NavItem } from "@/components/layout/nav-links";
@@ -24,16 +26,21 @@ function useHydrated() {
  */
 export function MobileMenu({
   links,
+  chat = false,
   themeToggle,
 }: {
   links: readonly NavItem[];
+  /** Add Got Questions after the links. */
+  chat?: boolean;
   themeToggle: ReactNode;
 }) {
   const hydrated = useHydrated();
   const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
   return (
     <Dialog.Root modal={false} open={open} onOpenChange={setOpen}>
       <Dialog.Trigger
+        ref={trigger}
         aria-label="Menu"
         className={`inline-flex size-11 flex-none items-center justify-center rounded-sm border-[1.5px] border-line text-ink lg:hidden ${hydrated ? "" : "invisible"}`}
       >
@@ -66,6 +73,13 @@ export function MobileMenu({
               </NavLink>
             </Dialog.Close>
           ))}
+          {chat && (
+            <ChatLauncher
+              returnFocusTo={trigger}
+              onActivate={() => setOpen(false)}
+              className="border-b border-line py-3.5 font-ui text-[17px] font-medium text-ink"
+            />
+          )}
         </nav>
         <div
           onClick={() => setOpen(false)}
