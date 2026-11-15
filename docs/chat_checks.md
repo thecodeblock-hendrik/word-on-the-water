@@ -92,19 +92,25 @@ Goal: unsafe or unusable input never reaches search. Pure functions, table-drive
 
 Goal: follow-ups understood from the last answer. Stateless: the request carries the context.
 
-- [ ] `app/services/chat.py`: `reply(message_or_action, context) -> Reply`, a pure function over the KB.
-- [ ] Context model: `last_entry_id` (optional) and `seen_entry_ids` (at most 20), validated against the KB; unknown ids rejected.
-- [ ] Order of work inside `reply`: normalise, crisis, personal details, small talk, actions (entry, more, related, term), follow-up detection, search, band, build the reply.
-- [ ] Small talk (fixed replies): hello, thanks, ok, bye. No search.
-- [ ] Actions from buttons (no free text): `entry_id` returns that entry; `more` returns the last entry's explanation; `related` entry ids; `term` returns the glossary meaning. Tests that an unknown id or term is rejected.
-- [ ] Short free-text follow-ups ("tell me more", "why", "what about baptism?", "explain simply"):
-  - [ ] Detection: three or fewer meaningful words, or a reference word (it, that, this, he, him, they, more, why).
-  - [ ] Boost toward the last entry, its `related` ids and its theme; down-rank entries in `seen_entry_ids`.
-  - [ ] "More / explain / elaborate" returns the last entry's explanation if not yet shown, otherwise offers related questions.
-- [ ] Reply shape: `answer` (entry with short answer, explanation, verses, related questions with text, glossary terms with meaning, contested flag and the `contested_suffix`), `clarify` (up to three options), `no_answer` (KB text), `crisis`, `smalltalk`, `rejected` (reason code).
-- [ ] Contested rule: every contested entry reply carries the contested note. A test loops over all 16.
-- [ ] 20 follow-up sequences as tests (for example gospel then "tell me more" then "why did he die"; baptism then "what about babies"; grace then "can I lose it"). Each asserts the entry ids at every turn.
-- [ ] Validate: a small CLI or test helper plays a conversation and prints the replies; read three of them as a person would.
+- [x] `app/services/chat.py`: `reply(message_or_action, context) -> Reply`, a pure function over the KB.
+- [x] Context model: `last_entry_id` (optional) and `seen_entry_ids` (at most 20), validated against the KB; unknown ids rejected.
+- [x] Order of work inside `reply`: normalise, crisis, personal details, small talk, actions (entry, more, related, term), follow-up detection, search, band, build the reply.
+- [x] Small talk (fixed replies): hello, thanks, ok, bye. No search.
+- [x] Actions from buttons (no free text): `entry_id` returns that entry; `more` returns the last entry's explanation; `related` entry ids; `term` returns the glossary meaning. Tests that an unknown id or term is rejected.
+- [x] Short free-text follow-ups ("tell me more", "why", "what about baptism?", "explain simply"):
+  - [x] Detection: three or fewer meaningful words, or a reference word (it, that, this, he, him, they, more, why).
+  - [x] Boost toward the last entry, its `related` ids and its theme; down-rank entries in `seen_entry_ids`.
+  - [x] "More / explain / elaborate" returns the last entry's explanation if not yet shown, otherwise offers related questions.
+- [x] Reply shape: `answer` (entry with short answer, explanation, verses, related questions with text, glossary terms with meaning, contested flag and the `contested_suffix`), `clarify` (up to three options), `no_answer` (KB text), `crisis`, `smalltalk`, `rejected` (reason code).
+- [x] Contested rule: every contested entry reply carries the contested note. A test loops over all 16.
+- [x] 20 follow-up sequences as tests (for example gospel then "tell me more" then "why did he die"; baptism then "what about babies"; grace then "can I lose it"). Each asserts the entry ids at every turn.
+- [x] Validate: a small CLI or test helper plays a conversation and prints the replies; read three of them as a person would.
+- Notes (2026-11-15), deviations from the first scope:
+  - The context also carries `explained_entry_ids` (up to 20 ids), so "tell me more" can tell whether the explanation was already shown. Ids only, no text.
+  - A glossary term chip gets its own reply kind, `term`.
+  - Context boost is deliberately small (related +4, same theme +2, already shown -3) and is applied only to short messages or ones with a pointing word (it, that, he, why, "and ...", "what about ..."). "about", "he", "him", "his", "they" and "them" are search stop words.
+  - A pointing follow-up that matches nothing falls back to the last answer's related questions (`clarify`), not to no answer. A keyword engine cannot answer "what does he do" on its own.
+  - The 20 sequences are 10 played free-text conversations plus 10 dedicated tests (more, related, chips, term, small talk, crisis mid-conversation, off-topic after a conversation, pronoun fallback, loose follow-up).
 
 ## K5. Endpoint (`feat/chat-k5-endpoint`)
 

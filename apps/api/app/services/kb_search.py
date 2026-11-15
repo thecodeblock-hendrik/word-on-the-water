@@ -22,6 +22,7 @@ import math
 import re
 import unicodedata
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Literal
 
@@ -79,6 +80,12 @@ STOP_WORDS = frozenset(
         "ok",
         "okay",
         "im",
+        "about",
+        "he",
+        "him",
+        "his",
+        "they",
+        "them",
     ]
 )
 WEIGHTS = {"question": 3.0, "tags": 2.0, "glossary": 2.0, "short": 1.0, "explanation": 0.5}
@@ -161,11 +168,15 @@ class SearchIndex:
                 total[word] = total.get(word, 0.0) + WEIGHTS[name]
         return total
 
-    def search(self, query: str) -> SearchResult:
+    def search(self, query: str, adjust: Mapping[str, float] | None = None) -> SearchResult:
+        """Rank the entries for `query`; `adjust` adds context bonuses or penalties by id."""
         words = {self._correct(w) for w in tokens(query)}
         if not words:
             return NO_RESULT
-        scores = [self._score(words, i) for i in range(len(self.ids))]
+        adjust = adjust or {}
+        scores = [
+            self._score(words, i) + adjust.get(self.ids[i], 0.0) for i in range(len(self.ids))
+        ]
         order = sorted(range(len(scores)), key=lambda i: -scores[i])[:3]
         best = order[0]
         score = scores[best]

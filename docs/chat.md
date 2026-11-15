@@ -83,7 +83,7 @@ A follow-up is understood from what was just shown, not from keywords alone.
 
 **Where history lives (decision D1): in the browser, nothing stored on the server.**
 - The chat thread is kept in the browser's `sessionStorage` (survives reloads of the tab, gone when the tab closes), as a list of `{role, text or entry id}`. A **Clear chat** button deletes it at once.
-- Each request sends only the new message plus a small context: `last_entry_id` and up to 20 `seen_entry_ids`. The server checks that they are real KB ids and holds nothing between requests (no Redis conversation, no database). A visitor who forges an id can only change which genuine KB entry gets a ranking boost; there is no model to manipulate, so there is nothing to exploit.
+- Each request sends only the new message plus a small context: `last_entry_id`, up to 20 `seen_entry_ids` and up to 20 `explained_entry_ids` (so "tell me more" knows whether the explanation was already shown). The server checks that they are real KB ids and holds nothing between requests (no Redis conversation, no database). A visitor who forges an id can only change which genuine KB entry gets a ranking boost; there is no model to manipulate, so there is nothing to exploit.
 - Why not keep history on the server: it would store what people ask about their faith for no benefit, and it would add retention rules, deletion and a notice. Browser-only history is private by construction and still gives follow-ups.
 - Decided: `sessionStorage` only, so the thread is gone when the tab closes (safer on shared phones and computers). No `localStorage`.
 - History is capped at 30 messages in the browser; the server context is capped at 20 ids.
