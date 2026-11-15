@@ -122,6 +122,9 @@ class Chat:
             return self._clarify([self.entries[i] for i in result.ranked])
         if last is not None and pointing:
             return self._related(last)
+        return self.no_answer()
+
+    def no_answer(self) -> ChatReply:
         return ChatReply(
             kind="no_answer", text=self.kb.responses.no_answer, kb_version=self.kb.version
         )

@@ -116,20 +116,21 @@ Goal: follow-ups understood from the last answer. Stateless: the request carries
 
 Goal: `POST /v1/chat/messages`, safe and rate limited, following the new-endpoint checklist in CLAUDE.md section 14.
 
-- [ ] Tests first (`tests/integration/test_chat.py`, real Redis):
-  - [ ] Happy path for each reply kind; unknown fields rejected (`extra="forbid"`); either `message` or an action is required, not both.
-  - [ ] No service token gives 401 (and the existing test that every `/v1` path rejects missing credentials still passes).
-  - [ ] Rate limit: 30 messages per 10 minutes per hashed visitor address, the 31st gets a generic 429 with `Retry-After`; two visitors have separate allowances; limit keys are hashed.
-  - [ ] Honeypot filled or form sent faster than `CHAT_MIN_SECONDS` gets a normal-looking reply and does no work (log reason only).
-  - [ ] Over-long body gets the existing 413/400 behaviour; wrong content type is refused.
-  - [ ] `CHAT_ENABLED` unset gives 503 `chat_unavailable`.
-  - [ ] **No-leak test:** send a message containing a unique marker and a fake phone number; assert the marker never appears in captured logs, the error responses or the Sentry `before_send` output.
-- [ ] `app/schemas/chat.py` (request and reply models), `app/routers/chat.py` (HTTP only), registered under the default-deny `/v1` router.
-- [ ] Settings: `CHAT_ENABLED` (bool, default off), `CHAT_MIN_SECONDS`, rate limit values; blank values count as unset; list them in `.env.example` and `make setup` leaves them off.
-- [ ] Logging: one line per request with outcome kind, matched entry id, band and latency only.
-- [ ] `make types`: regenerate `packages/api-types`; `make types-check` passes.
-- [ ] Validate: `curl` the endpoint with the service token for an answer, a follow-up, a rejected message and a crisis phrase; check headers (`Cache-Control: no-store`).
-- [ ] Threat model rows C1, C2, C5, C7 and C8 moved from Planned to Done in the PR that makes them true.
+- [x] Tests first (`tests/integration/test_chat.py`, real Redis):
+  - [x] Happy path for each reply kind; unknown fields rejected (`extra="forbid"`); either `message` or an action is required, not both.
+  - [x] No service token gives 401 (and the existing test that every `/v1` path rejects missing credentials still passes).
+  - [x] Rate limit: 30 messages per 10 minutes per hashed visitor address, the 31st gets a generic 429 with `Retry-After`; two visitors have separate allowances; limit keys are hashed.
+  - [x] Honeypot filled or form sent faster than `CHAT_MIN_SECONDS` gets a normal-looking reply and does no work (log reason only).
+  - [x] Over-long body gets the existing 413/400 behaviour; wrong content type is refused.
+  - [x] `CHAT_ENABLED` unset gives 503 `chat_unavailable`.
+  - [x] **No-leak test:** send a message containing a unique marker and a fake phone number; assert the marker never appears in captured logs, the error responses or the Sentry `before_send` output.
+- [x] `app/schemas/chat.py` (request and reply models), `app/routers/chat.py` (HTTP only), registered under the default-deny `/v1` router.
+- [x] Settings: `CHAT_ENABLED` (bool, default off), `CHAT_MIN_SECONDS`, rate limit values; blank values count as unset; list them in `.env.example` and `make setup` leaves them off.
+- [x] Logging: one line per request with outcome kind, matched entry id and latency only (the band is not logged: it follows from the kind, answer = high, clarify = medium, no answer = low).
+- [x] `make types`: regenerate `packages/api-types`; `make types-check` passes.
+- [x] Validate: `curl` the endpoint with the service token for an answer, a follow-up, a rejected message and a crisis phrase; check headers (`Cache-Control: no-store`).
+- [x] Threat model rows C1, C2, C5, C7 and C8 moved from Planned to Done in the PR that makes them true.
+- Deviations (2026-11-15): a rejected message is a 200 with `kind: "rejected"` and a reason, not a 400 `chat_rejected` (chat.md said 400; K4 made it a reply kind so the panel shows it inline). A wrong content type or unknown field is the usual 422. Rate limit values are settings (`CHAT_LIMIT`, `CHAT_WINDOW_SECONDS`), default 30 per 600 s; `CHAT_MIN_SECONDS` defaults to 0.5. The curl check ran against a local server with `CHAT_ENABLED=1`.
 
 ## K6. Web panel (`feat/chat-k6-panel`)
 

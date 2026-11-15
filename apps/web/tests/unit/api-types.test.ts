@@ -22,6 +22,7 @@ describe("generated API types", () => {
       | "/cron/retention"
       | "/health/live"
       | "/health/ready"
+      | "/v1/chat/messages"
       | "/v1/ping"
       | "/v1/subscribers"
       | "/v1/webhooks/kit"

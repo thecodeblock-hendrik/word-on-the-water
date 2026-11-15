@@ -41,6 +41,15 @@ class ChatTurn(BaseModel):
         return self
 
 
+class ChatRequest(ChatTurn):
+    """The body of POST /v1/chat/messages: a turn plus the context and the bot-check fields."""
+
+    context: ChatContext = ChatContext()
+    # The hidden field bots fill, and when the panel was rendered (ms since 1970).
+    website: Annotated[str, Field(max_length=1000)] = ""
+    rendered_at: Annotated[int, Field(strict=True, ge=0)]
+
+
 class Option(BaseModel):
     id: str
     question: str

@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     cron_secret: SecretStr
     ip_hash_salt: SecretStr
     signup_min_seconds: float = 3.0
+    chat_enabled: bool = False
+    chat_min_seconds: float = 0.5
+    chat_limit: int = 30
+    chat_window_seconds: int = 600
     turnstile_secret_key: SecretStr | None = None
     kit_api_key: SecretStr | None = None
     kit_form_id: int | None = None
