@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useState, type MouseEvent } from "react";
+import { lazy, Suspense, useRef, useState, type MouseEvent } from "react";
 
 import { chat } from "@/content/chat";
 
@@ -22,6 +22,7 @@ export function ChatLauncher({
 }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const button = useRef<HTMLAnchorElement>(null);
 
   function onClick(event: MouseEvent) {
     event.preventDefault();
@@ -31,12 +32,17 @@ export function ChatLauncher({
 
   return (
     <>
-      <a href={`mailto:${chat.mail}`} onClick={onClick} className={className}>
+      <a ref={button} href={`mailto:${chat.mail}`} onClick={onClick} className={className}>
         {chat.title}
       </a>
       {loaded && (
         <Suspense fallback={null}>
-          <ChatPanel open={open} onOpenChange={setOpen} bibleLinks={bibleLinks} />
+          <ChatPanel
+            open={open}
+            onOpenChange={setOpen}
+            bibleLinks={bibleLinks}
+            returnFocusTo={button}
+          />
         </Suspense>
       )}
     </>

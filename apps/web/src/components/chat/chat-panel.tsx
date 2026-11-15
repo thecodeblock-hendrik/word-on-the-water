@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "radix-ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 import { ChatInput } from "@/components/chat/chat-input";
 import { Chip } from "@/components/chat/chip";
@@ -22,11 +22,14 @@ export function ChatPanel({
   open,
   onOpenChange,
   bibleLinks = false,
+  returnFocusTo,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Link key verses to the Bible reader (only when it is switched on). */
   bibleLinks?: boolean;
+  /** Where focus goes on close. Safari does not focus a button on click, so the opener is told. */
+  returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const { thread, shown, pending, ask, clear } = useChat();
   const [text, setText] = useState("");
@@ -83,7 +86,7 @@ export function ChatPanel({
           }}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            opener.current?.focus();
+            (returnFocusTo?.current ?? opener.current)?.focus();
           }}
           className="fixed inset-0 z-50 flex h-dvh flex-col bg-bg pt-[env(safe-area-inset-top)] shadow-menu lg:left-auto lg:w-[28rem] lg:border-l lg:border-line"
         >

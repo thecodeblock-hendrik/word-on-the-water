@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = 3100;
+// The same build with Got Questions switched on; the main server has it off, like Production.
+const chatPort = 3102;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -29,6 +31,21 @@ export default defineConfig({
         API_BASE_URL: "http://localhost:3101",
         SERVICE_TOKEN: "e2e-service-token-0123456789",
         // Cloudflare's always-pass test site key.
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
+      },
+      timeout: 180_000,
+    },
+    {
+      command: `pnpm start -p ${chatPort}`,
+      url: `http://localhost:${chatPort}/`,
+      reuseExistingServer: !process.env.CI,
+      env: {
+        DEVOTIONAL_TODAY: "2026-12-05",
+        SITE_URL: `http://localhost:${chatPort}`,
+        BIBLE_ENABLED: "1",
+        CHAT_ENABLED: "1",
+        API_BASE_URL: "http://localhost:3101",
+        SERVICE_TOKEN: "e2e-service-token-0123456789",
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
       },
       timeout: 180_000,

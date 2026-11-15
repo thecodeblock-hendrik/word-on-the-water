@@ -9,6 +9,57 @@ let last: { body: Record<string, unknown>; headers: Record<string, string | unde
 // Webhooks by signature: tests run in parallel, so one global slot would be overwritten by a neighbour.
 const webhooks = new Map<string, { body: string; headers: Record<string, string | undefined> }>();
 
+const view = (id: string, extra: Record<string, unknown> = {}) => ({
+  id,
+  question: `Question ${id}?`,
+  short_answer: `Short answer ${id}.`,
+  explanation: `Long explanation ${id}.`,
+  contested: false,
+  contested_note: null,
+  key_verses: ["John 3:16"],
+  related: [{ id: "3.1", question: "What is the gospel?" }],
+  glossary_terms: [],
+  ...extra,
+});
+const reply = (extra: Record<string, unknown>) => ({
+  kind: "answer",
+  kb_version: "e2e",
+  entry: null,
+  term: null,
+  options: [],
+  text: null,
+  reason: null,
+  expand: false,
+  ...extra,
+});
+
+/** A chat reply that depends only on this one request, so parallel tests never disturb each other. */
+function chatReply(body: Record<string, unknown>) {
+  const text = String(body.message ?? "").toLowerCase();
+  if (typeof body.entry_id === "string") return reply({ entry: view(body.entry_id) });
+  if (body.action === "more") {
+    return reply({
+      entry: view(
+        String((body.context as { last_entry_id?: string } | undefined)?.last_entry_id ?? "2.1"),
+      ),
+      expand: true,
+    });
+  }
+  if (text.includes("082")) return reply({ kind: "rejected", reason: "personal_details" });
+  if (text.includes("end my life")) {
+    return reply({
+      kind: "crisis",
+      text: "Please call the SADAG line on 0800 567 567 or LifeLine on 0861 322 322 now.",
+    });
+  }
+  if (text.includes("baptise")) {
+    const note = "Christians who hold to the Bible's authority disagree on this.";
+    return reply({ entry: view("8.3", { contested: true, contested_note: note }) });
+  }
+  if (text.includes("jesus")) return reply({ entry: view("2.1") });
+  return reply({ kind: "no_answer", text: "I don't have an answer to that." });
+}
+
 createServer((request, response) => {
   const chunks: Buffer[] = [];
   request.on("data", (chunk: Buffer) => chunks.push(chunk));
@@ -33,6 +84,9 @@ createServer((request, response) => {
       });
       const bad = request.headers["x-kit-signature"] === "t=1,v1=bad";
       return send(bad ? 401 : 200, {});
+    }
+    if (request.url === "/v1/chat/messages" && request.method === "POST") {
+      return send(200, chatReply(JSON.parse(Buffer.concat(chunks).toString() || "{}")));
     }
     if (request.url === "/v1/subscribers" && request.method === "POST") {
       const body = JSON.parse(Buffer.concat(chunks).toString() || "{}");
