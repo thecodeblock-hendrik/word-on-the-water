@@ -163,6 +163,8 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 
 - Enhancement 3 (2026-11-15): the Bible reader pages (any page with the chapter bar) have no site footer, on phone and desktop. Below 1024 px the chapter bar is pinned to the bottom of the screen and the reader fills the viewport; from 1024 px the layout is unchanged, only without the footer (a CSS rule on `body:has([data-chapter-nav])`). Effect: no Crossway notice and no Privacy policy link on those pages (they show only the public-domain BSB and WEB); the privacy page is reachable from the home page. Needs revisiting when the ESV is added to the reader.
 
+- Enhancement 4 (2026-11-15): on a phone the way back to the chat is a round ink button (60px, "Your chat" under it) in the middle of the pinned chapter bar, between Previous and Next, rising above the bar (V3 in the mockups, section 6c). It replaces the floating pill below 1024 px, has no hide button there, and the page leaves 2rem more room under the text while it shows. From 1024 px it is still the pill at the bottom right with a hide button (not yet revisited).
+
 ## K7. End to end and quality (`feat/chat-k7-e2e`)
 
 - [x] Stub API for e2e (`tests/e2e/stub-api.mts`): extend with chat replies keyed per request (no global "last request": e2e runs fully parallel).

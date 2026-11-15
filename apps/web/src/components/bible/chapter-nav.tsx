@@ -28,7 +28,7 @@ export function ChapterNav({
   version: string;
   book: Book;
   chapter: number;
-  /** Rides on the bar, just above it on a phone (the Your chat button). */
+  /** Sits between Previous and Next on a phone (the Your chat button). */
   children?: ReactNode;
 }) {
   const { previous, next } = neighbours(book, chapter);
@@ -54,6 +54,7 @@ export function ChapterNav({
           <span aria-hidden="true">←</span> Start of the Bible
         </button>
       )}
+      {children}
       {next ? (
         <Link
           href={href(next)}
@@ -68,7 +69,6 @@ export function ChapterNav({
           End of the Bible <span aria-hidden="true">→</span>
         </button>
       )}
-      {children}
     </nav>
   );
 }

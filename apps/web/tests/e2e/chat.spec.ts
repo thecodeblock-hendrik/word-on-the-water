@@ -212,16 +212,47 @@ test.describe("with the chat on", () => {
       await expect(fresh.getByRole("link", { name: "Your chat" })).toHaveCount(0);
     });
 
-    test("can be hidden, and never covers the chapter buttons", async ({ page }) => {
+    test("on a phone it is a round button between Previous and Next, not covering either", async ({
+      page,
+    }) => {
+      test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
+      await readVerse(page);
+      const bar = page.getByRole("navigation", { name: "Previous and next chapter" });
+      const round = (await page.getByRole("link", { name: "Your chat" }).boundingBox())!;
+      const prev = (await bar.getByRole("link", { name: /Previous chapter/ }).boundingBox())!;
+      const next = (await bar.getByRole("link", { name: /Next chapter/ }).boundingBox())!;
+      expect(prev.x + prev.width).toBeLessThanOrEqual(round.x);
+      expect(round.x + round.width).toBeLessThanOrEqual(next.x);
+      // Centred in the bar, rising above it, and 44px or more to tap.
+      const width = page.viewportSize()!.width;
+      expect(Math.abs(round.x + round.width / 2 - width / 2)).toBeLessThan(8);
+      const barBox = (await bar.boundingBox())!;
+      expect(round.y).toBeLessThan(barBox.y);
+      expect(round.width).toBeGreaterThanOrEqual(44);
+      await expect(page.getByRole("button", { name: /Hide the Your chat button/ })).toBeHidden();
+    });
+
+    test("at the end of a long chapter its words and the passage credit do not overlap", async ({
+      page,
+    }) => {
+      test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
+      await readVerse(page);
+      await page.goto("/bible/web/psalms/119");
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(300);
+      const round = (await page.getByRole("link", { name: "Your chat" }).boundingBox())!;
+      const credit = (await page
+        .getByText("World English Bible (WEB), public domain")
+        .boundingBox())!;
+      expect(credit.y + credit.height).toBeLessThanOrEqual(round.y + 1);
+    });
+
+    test("on a wide screen it floats at the bottom right and can be hidden", async ({ page }) => {
+      test.skip(page.viewportSize()!.width < 1024, "the floating button is for wide screens");
       await readVerse(page);
       const back = page.getByRole("link", { name: "Your chat" });
-      const nav = page.getByRole("navigation", { name: "Previous and next chapter" });
-      const [pill, bar] = [(await back.boundingBox())!, (await nav.boundingBox())!];
-      expect(pill.x + pill.width).toBeLessThanOrEqual(page.viewportSize()!.width);
-      // On a phone it rides on the chapter bar, above it; from lg it floats at the bottom right.
-      if (page.viewportSize()!.width < 1024)
-        expect(pill.y + pill.height).toBeLessThanOrEqual(bar.y);
-
+      const box = (await back.boundingBox())!;
+      expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
       await page.getByRole("button", { name: /Hide the Your chat button/ }).click();
       await expect(back).toHaveCount(0);
     });

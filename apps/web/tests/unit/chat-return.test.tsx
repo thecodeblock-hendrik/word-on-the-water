@@ -28,13 +28,16 @@ describe("ChatReturn, the floating Your chat button in the Bible", () => {
     expect(link).toHaveAttribute("href", "/devotionals/advent-01");
   });
 
-  it("is a solid button of 44px or more that sits above the chapter buttons", async () => {
+  it("is a round ink button of 60px with its words under it, marked so the page can leave room", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
     const link = await screen.findByRole("link", { name: /your chat/i });
-    expect(link.className).toMatch(/bg-accent-ink/);
-    expect(link.className).toMatch(/min-h-12/);
-    expect(link.parentElement?.className).toMatch(/fixed/);
+    const round = link.querySelector("span");
+    expect(round?.className).toMatch(/\bbg-ink\b/);
+    expect(round?.className).toMatch(/size-\[60px\]/);
+    expect(round?.className).toMatch(/rounded-full/);
+    expect(link).toHaveTextContent("Your chat");
+    expect(link.closest("[data-chat-return]")).not.toBeNull();
   });
 
   it("asks the chat to reopen when it is used", async () => {
