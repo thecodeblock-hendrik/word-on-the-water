@@ -21,9 +21,12 @@ const headerButton =
 export function ChatPanel({
   open,
   onOpenChange,
+  bibleLinks = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Link key verses to the Bible reader (only when it is switched on). */
+  bibleLinks?: boolean;
 }) {
   const { thread, shown, pending, ask, clear } = useChat();
   const [text, setText] = useState("");
@@ -127,7 +130,12 @@ export function ChatPanel({
                     </Chip>
                   </div>
                 )}
-                <MessageList thread={shown} pending={pending} actions={actions} />
+                <MessageList
+                  thread={shown}
+                  pending={pending}
+                  actions={actions}
+                  bibleLinks={bibleLinks}
+                />
               </>
             )}
           </div>

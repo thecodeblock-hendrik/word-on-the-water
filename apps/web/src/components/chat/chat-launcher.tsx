@@ -13,7 +13,13 @@ const ChatPanel = lazy(() =>
  * The Got Questions button. A mail link without JavaScript; with it, a click opens the chat.
  * Once opened the panel stays mounted, so the conversation is not rebuilt on every open.
  */
-export function ChatLauncher({ className }: { className: string }) {
+export function ChatLauncher({
+  className,
+  bibleLinks = false,
+}: {
+  className: string;
+  bibleLinks?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -30,7 +36,7 @@ export function ChatLauncher({ className }: { className: string }) {
       </a>
       {loaded && (
         <Suspense fallback={null}>
-          <ChatPanel open={open} onOpenChange={setOpen} />
+          <ChatPanel open={open} onOpenChange={setOpen} bibleLinks={bibleLinks} />
         </Suspense>
       )}
     </>

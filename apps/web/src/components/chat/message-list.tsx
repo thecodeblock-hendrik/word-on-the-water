@@ -27,10 +27,12 @@ function Reply({
   reply,
   isLastAnswer,
   actions,
+  bibleLinks,
 }: {
   reply: ChatReply;
   isLastAnswer: boolean;
   actions: Actions;
+  bibleLinks: boolean;
 }) {
   if (reply.kind === "answer" && reply.entry) {
     return (
@@ -38,6 +40,7 @@ function Reply({
         entry={reply.entry}
         expanded={reply.expand}
         canExpand={isLastAnswer}
+        bibleLinks={bibleLinks}
         onAsk={actions.onAsk}
         onMore={actions.onMore}
         onTerm={actions.onTerm}
@@ -78,10 +81,12 @@ export function MessageList({
   thread,
   pending,
   actions,
+  bibleLinks,
 }: {
   thread: Thread;
   pending: boolean;
   actions: Actions;
+  bibleLinks: boolean;
 }) {
   const lastAnswer = thread.findLastIndex(
     (item) => item.role === "bot" && item.reply.kind === "answer",
@@ -101,7 +106,12 @@ export function MessageList({
             key={i}
             className="max-w-[95%] rounded-2xl rounded-bl-sm border border-line bg-surface px-4 py-3"
           >
-            <Reply reply={item.reply} isLastAnswer={i === lastAnswer} actions={actions} />
+            <Reply
+              reply={item.reply}
+              isLastAnswer={i === lastAnswer}
+              actions={actions}
+              bibleLinks={bibleLinks}
+            />
           </div>
         ),
       )}

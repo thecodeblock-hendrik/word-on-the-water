@@ -1,6 +1,7 @@
 import { Chip } from "@/components/chat/chip";
 import { chat } from "@/content/chat";
 import type { EntryView } from "@/lib/chat/thread";
+import { verseHref } from "@/lib/chat/verses";
 
 type Props = {
   entry: EntryView;
@@ -8,6 +9,8 @@ type Props = {
   expanded: boolean;
   /** Only the newest answer offers Read more. */
   canExpand: boolean;
+  /** Link each key verse to the Bible reader. */
+  bibleLinks: boolean;
   onAsk: (entryId: string, question: string) => void;
   onMore: () => void;
   onTerm: (term: string) => void;
@@ -16,7 +19,15 @@ type Props = {
 const label = "font-ui text-xs font-semibold uppercase tracking-[.12em] text-muted";
 
 /** One answer: the short answer first, depth on request, then verses and follow-up chips. */
-export function AnswerCard({ entry, expanded, canExpand, onAsk, onMore, onTerm }: Props) {
+export function AnswerCard({
+  entry,
+  expanded,
+  canExpand,
+  bibleLinks,
+  onAsk,
+  onMore,
+  onTerm,
+}: Props) {
   return (
     <div className="grid gap-3">
       {entry.contested && (
@@ -40,11 +51,20 @@ export function AnswerCard({ entry, expanded, canExpand, onAsk, onMore, onTerm }
         <div className="grid gap-1.5">
           <span className={label}>{chat.verses}</span>
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-            {entry.key_verses.map((verse) => (
-              <li key={verse} className="font-ui text-[15px] font-medium text-accent-ink">
-                {verse}
-              </li>
-            ))}
+            {entry.key_verses.map((verse) => {
+              const href = bibleLinks ? verseHref(verse) : null;
+              return (
+                <li key={verse} className="font-ui text-[15px] font-medium text-accent-ink">
+                  {href ? (
+                    <a href={href} className="inline-flex min-h-11 items-center underline">
+                      {verse}
+                    </a>
+                  ) : (
+                    verse
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

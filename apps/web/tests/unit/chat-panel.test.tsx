@@ -38,19 +38,19 @@ const reply = (extra: Partial<ChatReply>): ChatReply => ({
 const answer = (id = "2.1", extra: object = {}) =>
   reply({ kind: "answer", entry: entry(id, extra) });
 
-function Harness() {
+function Harness({ bibleLinks = false }: { bibleLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <button onClick={() => setOpen(true)}>Got Questions</button>
-      <ChatPanel open={open} onOpenChange={setOpen} />
+      <ChatPanel open={open} onOpenChange={setOpen} bibleLinks={bibleLinks} />
     </>
   );
 }
 
-async function openPanel() {
+async function openPanel(bibleLinks = false) {
   const user = userEvent.setup();
-  render(<Harness />);
+  render(<Harness bibleLinks={bibleLinks} />);
   const trigger = screen.getByRole("button", { name: "Got Questions" });
   await user.click(trigger);
   return { user, trigger, dialog: await screen.findByRole("dialog", { name: "Got Questions" }) };
@@ -332,5 +332,36 @@ describe("browse by topic", () => {
     await user.type(box(), "bread{Enter}");
     await user.click(await within(dialog).findByRole("button", { name: "Browse topics" }));
     expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
+  });
+});
+
+describe("scripture references", () => {
+  it("are plain text when the Bible reader is off", async () => {
+    ok(answer());
+    const { user } = await openPanel();
+    await user.type(box(), "who is jesus{Enter}");
+    expect(await screen.findByText("John 3:16")).toBeDefined();
+    expect(screen.queryByRole("link", { name: "John 3:16" })).toBeNull();
+  });
+
+  it("link to the Bible reader when it is on, and a reference that does not parse stays text", async () => {
+    ok(
+      reply({
+        kind: "answer",
+        entry: entry("2.1", { key_verses: ["John 3:16", "Acts 16:15, 31–34", "Hezekiah 3:1"] }),
+      }),
+    );
+    const { user } = await openPanel(true);
+    await user.type(box(), "who is jesus{Enter}");
+    expect(await screen.findByRole("link", { name: "John 3:16" })).toHaveAttribute(
+      "href",
+      "/bible/web/john/3?v=16",
+    );
+    expect(screen.getByRole("link", { name: "Acts 16:15, 31–34" })).toHaveAttribute(
+      "href",
+      "/bible/web/acts/16?v=15",
+    );
+    expect(screen.getByText("Hezekiah 3:1")).toBeDefined();
+    expect(screen.queryByRole("link", { name: "Hezekiah 3:1" })).toBeNull();
   });
 });

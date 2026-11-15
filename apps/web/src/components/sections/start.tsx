@@ -4,7 +4,13 @@ import { start } from "@/content/landing";
 import { formatReference } from "@/lib/scripture";
 
 /** The gospel in four short parts, for readers who are new to faith. */
-export function Start({ chatEnabled = false }: { chatEnabled?: boolean }) {
+export function Start({
+  chatEnabled = false,
+  bibleEnabled = false,
+}: {
+  chatEnabled?: boolean;
+  bibleEnabled?: boolean;
+}) {
   return (
     <section
       id="start"
@@ -48,7 +54,7 @@ export function Start({ chatEnabled = false }: { chatEnabled?: boolean }) {
         </ol>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           {chatEnabled ? (
-            <ChatLauncher className={buttonClasses("ghost")} />
+            <ChatLauncher className={buttonClasses("ghost")} bibleLinks={bibleEnabled} />
           ) : (
             <a href={start.talk.href} className={buttonClasses("ghost")}>
               {start.talk.label}
