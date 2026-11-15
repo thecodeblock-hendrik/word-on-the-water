@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 const pages = [
   ["landing page", "/"],
   ["devotional", "/devotionals/advent-01-more-than-watchmen"],
+  ["devotional with an unpublished next week", "/devotionals/advent-02-the-long-wait"],
   ["not found", "/no-such-page"],
 ] as const;
 
