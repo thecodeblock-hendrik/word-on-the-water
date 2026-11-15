@@ -56,6 +56,7 @@ Showing other Bibles next to the ESV: none of the ESV pages I read (api.esv.org,
 - The ESV rules (limits, caching, notice) apply only to ESV pages. BSB and WEB pages are not limited by them.
 - The ESV pages do not say whether other translations on the same page count towards the 500-verse and 25% limits. That is why the first release shows one version per page. A parallel view (two versions side by side) needs a check with Crossway first.
 - The ESV is non-commercial only. That is already how the site works.
+- **Update 2026-11-15:** the Bible reader pages have no site footer (the reader fills the screen; the phone chapter bar is pinned to the bottom), so the ESV notice and the www.esv.org link must be shown inside the reader when the ESV is added. The note below was written when the footer was on every page.
 - Because the footer carries the full ESV notice on every page, no extra notice is needed on BSB and WEB pages for compliance. We still show a short "Berean Standard Bible, public domain" credit line there, because it is clearer to readers.
 - This is my reading of the published text, not legal advice. If anything is unclear, ask Crossway (licensing@crossway.org).
 
@@ -184,7 +185,7 @@ ESV rules (R-numbers are used in the plan below):
 | R2 | At most 500 verses or half a book (whichever is less) per query and per page: one chapter at most (Psalm 119 is 176 verses) |
 | R3 | Store or cache at most 500 verses locally; clear caches regularly. Cache in memory only (400 verses total, 1 hour), `fetch` with `cache: "no-store"`, never in the database, repo, Redis, disk or CDN |
 | R4 | Rate limits: 5,000 queries a day, 1,000 an hour, 60 a minute; beyond that the app is throttled |
-| R5 | Each quotation includes "ESV"; each page links to www.esv.org; the standard notice is on the site (the footer has it) |
+| R5 | Each quotation includes "ESV"; each page links to www.esv.org; the standard notice is on the site (the footer has it; the reader pages have no footer since 2026-11-15, so the ESV needs its own notice and link inside the reader) |
 | R6 | Do not alter the words. Headings, footnotes, cross-references and verse numbers may be omitted. Omissions inside a verse are marked with an ellipsis |
 | R7 | Never publish the API key: server-only module, Sensitive Vercel variable, never `NEXT_PUBLIC_` |
 | R8 | No download or bulk copy feature (users may not copy more than 500 verses or half a book) |
@@ -269,7 +270,7 @@ One branch and PR per step, tests first (red, green, refactor), as in [PLAN.md](
 
 ### B4 Reader page
 
-- [x] E2E (all projects): `/bible/bsb/john/3` shows "John 3", verse 16, the BSB credit and the footer notice; axe has no serious or critical issues in light and dark (`tests/e2e/bible.spec.ts`, which also proves the axe helper catches a real violation)
+- [x] E2E (all projects): `/bible/bsb/john/3` shows "John 3", verse 16 and the BSB credit, with no site footer; axe has no serious or critical issues in light and dark (`tests/e2e/bible.spec.ts`, which also proves the axe helper catches a real violation)
 - [x] E2E: `?v=16-18` shows only those verses with the range in the heading and a "Show full chapter" link (44px tall)
 - [x] E2E: bad input gives 404 or a clear message, never a crash. Unknown book, chapter out of range, `03`, `1.5`, `abc`, the disabled ESV and unknown versions return 404; a verse range that cannot be read (`20-10`, `abc`, `0`, `1,2`, a repeated `?v=`) shows the whole chapter with a note instead
 - [x] E2E: CSP holds (no inline style, no console violations, every inline script has the nonce), and the longest chapter (Psalm 119) does not scroll sideways

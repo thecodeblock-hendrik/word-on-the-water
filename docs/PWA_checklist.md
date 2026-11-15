@@ -15,7 +15,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 - [ ] Source of the icon: use the existing inline SVG logo (the ring, wave and cross in the header) **(Hendrik: confirm, or supply a master SVG or a 1024 px PNG)**
 - [ ] App names: `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
 - [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
-- [ ] Start page: `/` for everyone, with shortcuts to Start here and Prayer request (the Bible shortcut only once `BIBLE_ENABLED` is on in production)
+- [ ] Start page: `/` for everyone, with a shortcut to Start here (the Bible shortcut only once `BIBLE_ENABLED` is on in production)
 - [ ] Orientation: portrait only, or leave it open (the Bible reader is fine in landscape on a tablet)
 
 ## 2. Icons
@@ -45,7 +45,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 4. Shortcuts and screenshots
 
-- [ ] `shortcuts`: "Start here" (`/#start`) and "Prayer request" (`/#contact`), each with a short name and a 96 px icon (long-pressing the icon on Android lists them); add "Bible" only behind the same `BIBLE_ENABLED` flag
+- [ ] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" only behind the same `BIBLE_ENABLED` flag
 - [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of the Bible reader, taken from the real site in Dawn patrol (Android shows these on the richer install sheet)
 - [ ] Add `label` and `type: "image/png"` to every screenshot
 - [ ] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`

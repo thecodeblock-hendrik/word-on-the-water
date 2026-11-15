@@ -11,7 +11,7 @@ Files this scope is based on (currently in `~/Downloads`, to be moved into the r
 
 ## 1. What changes
 
-In the "New to faith? Start here" section the ghost button **Talk to someone** (`apps/web/src/content/landing.ts:98`, rendered in `components/sections/start.tsx:49`, today a link to `/#contact`; the `hello@` mail link is deferred past launch, so the page has no contact section yet) becomes **Got Questions**. It opens a chat panel. The visitor types a question about the Christian faith and gets an answer from our own knowledge base (KB). Follow-up questions work: the chat remembers what was just discussed.
+In the "New to faith? Start here" section the ghost button **Talk to someone** (`apps/web/src/content/landing.ts:98`, rendered in `components/sections/start.tsx:49`, with the chat off it is now a `mailto:hello@wordonthewater.net` link, because the page has no contact section) becomes **Got Questions**. It opens a chat panel. The visitor types a question about the Christian faith and gets an answer from our own knowledge base (KB). Follow-up questions work: the chat remembers what was just discussed.
 
 The prayer and contact forms are not part of the launch (decided 2026-11-14), so "contact" in this scope means the `hello@wordonthewater.net` mail link. The route to a real person is kept inside the chat: the no-answer, crisis and "views differ" replies all point to a local pastor.
 
