@@ -25,14 +25,14 @@ Work from this file, top to bottom, like [PWA_checklist.md](PWA_checklist.md). I
 
 Goal: the markdown source, the build script and the generated JSON live in the repo, and CI fails if they drift.
 
-- [ ] Create `apps/api/kb/` with `faith_kb.md` (the markdown source, renamed from `Christian_Faith_Knowledge_Base.md`) and `build_kb.py`.
-- [ ] `build_kb.py`: fix the docstring (`uv run`, not `python3`); take the output path as an argument; make the output reproducible (no timestamp in a field that `kb-check` compares: either drop `meta.generated` or ignore it in the check); keep `scikit-learn` out of the API's runtime dependencies (use `uv run --with scikit-learn` or a `kb` dependency group, so it never ships in the function bundle).
-- [ ] Generate `apps/api/app/data/faith_kb.json` (the committed output the API loads).
-- [ ] Test first: `tests/test_kb_build.py` rebuilds from the markdown into a temp file and compares with the committed JSON (ignoring `meta.generated`). It must fail before the JSON exists.
-- [ ] Makefile: `make kb` (rebuild the committed JSON) and `make kb-check` (rebuild into a temp file, fail on any difference). Add `kb-check` to CI next to `types-check`.
-- [ ] `apps/api/kb/SIGNOFF.md`: the pastoral review record, empty template (reviewer, role, date, knowledge base version, scope reviewed, signature line). Status line says "NOT REVIEWED".
-- [ ] Validate: `make kb` leaves `git status` clean; editing one word in the markdown makes `make kb-check` fail; reverting makes it pass.
-- [ ] Docs: PLAN.md 1.10 K0 ticked; the bundle includes the JSON (check `apps/api/vercel.json` does not exclude `app/data`).
+- [x] Create `apps/api/kb/` with `faith_kb.md` (the markdown source, renamed from `Christian_Faith_Knowledge_Base.md`) and `build_kb.py`.
+- [x] `build_kb.py`: fix the docstring (`uv run`, not `python3`); take the output path as an argument; make the output reproducible (no timestamp in a field that `kb-check` compares: either drop `meta.generated` or ignore it in the check); keep `scikit-learn` out of the API's runtime dependencies (it is a dev dependency, and `kb/**` is excluded from the function bundle in `vercel.json`).
+- [x] Generate `apps/api/app/data/faith_kb.json` (the committed output the API loads).
+- [x] Test first: `tests/test_kb_build.py` rebuilds from the markdown into a temp file and compares with the committed JSON (ignoring `meta.generated`). It must fail before the JSON exists.
+- [x] Makefile: `make kb` (rebuild the committed JSON) and `make kb-check` (rebuild into a temp file, fail on any difference). Add `kb-check` to CI next to `types-check`.
+- [x] `apps/api/kb/SIGNOFF.md`: the pastoral review record, empty template (reviewer, role, date, knowledge base version, scope reviewed, signature line). Status line says "NOT REVIEWED".
+- [x] Validate: `make kb` leaves `git status` clean; editing one word in the markdown makes `make kb-check` fail; reverting makes it pass.
+- [x] Docs: PLAN.md 1.10 K0 ticked; the bundle includes the JSON (check `apps/api/vercel.json` does not exclude `app/data`).
 
 ## K1. Load and validate (`feat/chat-k1-kb-load`)
 

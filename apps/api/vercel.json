@@ -6,7 +6,7 @@
   "functions": {
     "app/main.py": {
       "maxDuration": 30,
-      "excludeFiles": "{tests/**,alembic/**,.venv/**,.pytest_cache/**,.mypy_cache/**,.ruff_cache/**,.coverage}"
+      "excludeFiles": "{tests/**,alembic/**,kb/**,.venv/**,.pytest_cache/**,.mypy_cache/**,.ruff_cache/**,.coverage}"
     }
   },
   "crons": [
