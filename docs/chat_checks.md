@@ -161,6 +161,8 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 
 - Enhancement 2 (2026-11-15): a floating "Your chat" button in the Bible reader (Option B in the mockups, section 6), shown only to a visitor who left the chat by tapping a verse (a flag in the tab's `sessionStorage`, `lib/chat/return.ts`; never an address, so shared links show nothing). On a phone it rides on the sticky chapter bar so it never covers the buttons; from `lg` it is fixed at the bottom right. It stays across chapters and has a Hide button. Tapping it returns to the page the chat was on and reopens the chat with the thread; the browser Back button does the same. Opening the chat any other way clears it.
 
+- Enhancement 3 (2026-11-15): the Bible reader pages (any page with the chapter bar) have no site footer, on phone and desktop. Below 1024 px the chapter bar is pinned to the bottom of the screen and the reader fills the viewport; from 1024 px the layout is unchanged, only without the footer (a CSS rule on `body:has([data-chapter-nav])`). Effect: no Crossway notice and no Privacy policy link on those pages (they show only the public-domain BSB and WEB); the privacy page is reachable from the home page. Needs revisiting when the ESV is added to the reader.
+
 ## K7. End to end and quality (`feat/chat-k7-e2e`)
 
 - [x] Stub API for e2e (`tests/e2e/stub-api.mts`): extend with chat replies keyed per request (no global "last request": e2e runs fully parallel).

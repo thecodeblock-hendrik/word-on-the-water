@@ -21,7 +21,8 @@ test("a BSB chapter shows its title, verse 16, the BSB credit and the footer not
   await expect(
     page.getByText("Berean Standard Bible (BSB), dedicated to the public domain."),
   ).toBeVisible();
-  await expect(page.getByRole("contentinfo")).toContainText("Crossway");
+  // The reader fills the screen: no site footer here (the BSB and WEB are public domain).
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
   await expect(page).toHaveTitle("John 3 (BSB) | Word on the Water");
 });
 
