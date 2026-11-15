@@ -224,7 +224,7 @@ def test_the_answer_view_has_verses_related_questions_and_terms(chat: Chat) -> N
     view = Visitor(chat).send(entry_id="2.6").entry
     assert view
     assert view.key_verses
-    assert [o.id for o in view.related] == ["3.16", "2.1", "1.9", "3.1", "2.12"]
+    assert [o.id for o in view.related] == ["3.16", "2.1", "1.9", "2.12", "3.1"]
     assert view.related[0].question == "What is atonement?"
     assert [t.term for t in view.glossary_terms] == ["Atonement"]
     assert view.glossary_terms[0].meaning

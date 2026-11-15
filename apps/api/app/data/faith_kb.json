@@ -831,8 +831,8 @@
         "3.16",
         "2.1",
         "1.9",
-        "3.1",
-        "2.12"
+        "2.12",
+        "3.1"
       ],
       "glossary_terms": [
         "Atonement"
@@ -2060,8 +2060,8 @@
       ],
       "related": [
         "4.2",
-        "4.4",
         "4.7",
+        "4.4",
         "4.12",
         "4.1"
       ],
@@ -2075,14 +2075,17 @@
       "question": "Can we trust the Bible we have today?",
       "also_asked": [
         "Has the Bible been changed?",
-        "Is the Bible reliable?"
+        "Is the Bible reliable?",
+        "Is the Bible true?",
+        "Is the Bible accurate?"
       ],
-      "short_answer": "Yes. The Bible is the best-attested ancient document in existence. Thousands of manuscripts allow scholars to reconstruct the original text with very high confidence, and no core Christian teaching depends on an uncertain reading.",
+      "short_answer": "Yes. The Bible is the best-attested ancient document in existence. Thousands of manuscripts allow scholars to reconstruct the original text with very high confidence, and no core Christian teaching depends on an uncertain reading. The Bible also claims to be God’s truthful word (John 17:17), and the church has trusted it as such from the start.",
       "explanation": "There are over 5,000 Greek manuscripts of the New Testament, some dating to within about 100–150 years of the originals, far more than for any other ancient work. The Dead Sea Scrolls, discovered from 1947, include a copy of Isaiah about 1,000 years older than the earliest one previously known, and it closely matches later copies.",
       "contested": false,
       "key_verses": [
         "Isaiah 40:8",
         "Matthew 24:35",
+        "John 17:17",
         "1 Peter 1:24–25"
       ],
       "tags": [
@@ -2092,14 +2095,14 @@
         "apologetics"
       ],
       "related": [
-        "4.8",
         "4.7",
+        "4.8",
+        "4.9",
         "4.13",
-        "4.15",
-        "4.12"
+        "4.15"
       ],
       "glossary_terms": [],
-      "search_text": "Can we trust the Bible we have today? | Has the Bible been changed? | Is the Bible reliable? | bible, reliability, manuscripts, apologetics | Yes. The Bible is the best-attested ancient document in existence. Thousands of manuscripts allow scholars to reconstruct the original text with very high confidence, and no core Christian teaching depends on an uncertain reading."
+      "search_text": "Can we trust the Bible we have today? | Has the Bible been changed? | Is the Bible reliable? | Is the Bible true? | Is the Bible accurate? | bible, reliability, manuscripts, apologetics | Yes. The Bible is the best-attested ancient document in existence. Thousands of manuscripts allow scholars to reconstruct the original text with very high confidence, and no core Christian teaching depends on an uncertain reading. The Bible also claims to be God’s truthful word (John 17:17), and the church has trusted it as such from the start."
     },
     {
       "id": "4.5",
@@ -2126,8 +2129,8 @@
         "4.6",
         "4.1",
         "4.2",
-        "4.7",
-        "4.4"
+        "4.4",
+        "4.7"
       ],
       "glossary_terms": [
         "Gospel"
@@ -2257,9 +2260,9 @@
       "related": [
         "4.10",
         "12.7",
-        "7.9",
         "4.8",
-        "4.7"
+        "7.9",
+        "4.4"
       ],
       "glossary_terms": [
         "Gospel"
@@ -2426,7 +2429,7 @@
         "4.1",
         "4.9",
         "4.13",
-        "4.11"
+        "4.4"
       ],
       "glossary_terms": [
         "Gospel",
@@ -5403,7 +5406,7 @@
         "11.5",
         "11.7",
         "11.4",
-        "11.9"
+        "11.6"
       ],
       "glossary_terms": [],
       "search_text": "Is it wrong to use horoscopes, tarot or fortune tellers? | What does the Bible say about astrology and the occult? | occult, astrology, spiritual warfare | Yes. The Bible forbids seeking guidance through divination, astrology, mediums and similar practices, because they seek hidden knowledge apart from God and can open people to deception."
@@ -6644,7 +6647,7 @@
         "Can a gay person be a Christian?"
       ],
       "short_answer": "Evangelicals hold the historic Christian view that the Bible reserves sexual relationships for marriage between a man and a woman, so same-sex sexual activity is outside God’s design. Experiencing same-sex attraction is not itself the same as acting on it, and every person is loved by God and welcome to come to Christ.",
-      "explanation": "Passages often cited include Leviticus 18:22, Romans 1:26–27 and 1 Corinthians 6:9–11, read alongside Jesus’ affirmation of marriage in Matthew 19:4–6. 1 Corinthians 6:11 also says “such were some of you,” showing that all sinners can be washed and made new. Christians are called to speak truthfully and lovingly, rejecting hatred and mistreatment of anyone. Single Christians, whatever their attractions, are called to the same sexual faithfulness.",
+      "explanation": "Passages often cited include Leviticus 18:22, Romans 1:26–27 and 1 Corinthians 6:9–11, read alongside Jesus’ affirmation of marriage in Matthew 19:4–6. 1 Corinthians 6:11 also says “such were some of you,” showing that all sinners can be washed and made new. Christians are called to speak truthfully and lovingly, rejecting hatred and mistreatment of anyone. Single Christians, whatever their attractions, are called to the same sexual faithfulness. Some churches and Christians read these passages differently, but this is the historic teaching of the church and the view of this ministry. If this question is personal, speak with a pastor you trust.",
       "contested": false,
       "key_verses": [
         "Genesis 2:24",

@@ -27,7 +27,7 @@ def own_questions(kb: KnowledgeBase) -> list[tuple[str, str]]:
 
 def test_the_knowledge_bases_own_questions_are_found(kb: KnowledgeBase, index: SearchIndex) -> None:
     cases = own_questions(kb)
-    assert len(cases) == 532
+    assert len(cases) == 534
     first = sum(index.search(q).ranked[:1] == (i,) for q, i in cases)
     top3 = sum(i in index.search(q).ranked[:3] for q, i in cases)
     print(f"own questions: first {first / len(cases):.3f}, top three {top3 / len(cases):.3f}")

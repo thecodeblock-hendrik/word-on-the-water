@@ -730,13 +730,13 @@ This knowledge base answers the questions people most often ask about the Christ
 
 ### 4.4 Can we trust the Bible we have today?
 
-**Also asked:** Has the Bible been changed? · Is the Bible reliable?
+**Also asked:** Has the Bible been changed? · Is the Bible reliable? · Is the Bible true? · Is the Bible accurate?
 
-**Short answer:** Yes. The Bible is the best-attested ancient document in existence. Thousands of manuscripts allow scholars to reconstruct the original text with very high confidence, and no core Christian teaching depends on an uncertain reading.
+**Short answer:** Yes. The Bible is the best-attested ancient document in existence. Thousands of manuscripts allow scholars to reconstruct the original text with very high confidence, and no core Christian teaching depends on an uncertain reading. The Bible also claims to be God’s truthful word (John 17:17), and the church has trusted it as such from the start.
 
 **Explanation:** There are over 5,000 Greek manuscripts of the New Testament, some dating to within about 100–150 years of the originals, far more than for any other ancient work. The Dead Sea Scrolls, discovered from 1947, include a copy of Isaiah about 1,000 years older than the earliest one previously known, and it closely matches later copies.
 
-**Key verses:** Isaiah 40:8; Matthew 24:35; 1 Peter 1:24–25
+**Key verses:** Isaiah 40:8; Matthew 24:35; John 17:17; 1 Peter 1:24–25
 
 **Tags:** Bible, reliability, manuscripts, apologetics
 
@@ -2362,7 +2362,7 @@ This knowledge base answers the questions people most often ask about the Christ
 
 **Short answer:** Evangelicals hold the historic Christian view that the Bible reserves sexual relationships for marriage between a man and a woman, so same-sex sexual activity is outside God’s design. Experiencing same-sex attraction is not itself the same as acting on it, and every person is loved by God and welcome to come to Christ.
 
-**Explanation:** Passages often cited include Leviticus 18:22, Romans 1:26–27 and 1 Corinthians 6:9–11, read alongside Jesus’ affirmation of marriage in Matthew 19:4–6. 1 Corinthians 6:11 also says “such were some of you,” showing that all sinners can be washed and made new. Christians are called to speak truthfully and lovingly, rejecting hatred and mistreatment of anyone. Single Christians, whatever their attractions, are called to the same sexual faithfulness.
+**Explanation:** Passages often cited include Leviticus 18:22, Romans 1:26–27 and 1 Corinthians 6:9–11, read alongside Jesus’ affirmation of marriage in Matthew 19:4–6. 1 Corinthians 6:11 also says “such were some of you,” showing that all sinners can be washed and made new. Christians are called to speak truthfully and lovingly, rejecting hatred and mistreatment of anyone. Single Christians, whatever their attractions, are called to the same sexual faithfulness. Some churches and Christians read these passages differently, but this is the historic teaching of the church and the view of this ministry. If this question is personal, speak with a pastor you trust.
 
 **Key verses:** Genesis 2:24; Leviticus 18:22; Matthew 19:4–6; Romans 1:26–27; 1 Corinthians 6:9–11
 
