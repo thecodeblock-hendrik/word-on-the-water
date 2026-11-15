@@ -23,7 +23,7 @@ Email authentication (Part E) was the long pole and is **done for Kit** (2026-11
 
 None of 1.8 is ticked, and one finding needs a decision now.
 
-- **Landing JavaScript is about 157 KB gzipped, over the 100 KB budget**, and it is Next and React, not the chat (the chat is a separate chunk loaded on first click). Options: find out what is in the 157 KB and trim it (check for unused client components, fonts or analytics), or consciously raise the budget with a reason in ADR form. Decide this before running Lighthouse so the gate means something.
+- **Landing JavaScript budget: decided 2026-11-15, [ADR 0010](adr/0010-landing-js-budget.md).** About 161 KB gzipped is mostly React and Next (about 120 KB), so the byte budget is now 165 KB, enforced by the e2e ceiling. LCP, CLS, INP and the Lighthouse scores stay as set and are the real test.
 - Add **Lighthouse CI on a mobile profile** and measure on a deployed preview, because pages render per request (ADR 0007). Targets: LCP under 2.0 s, CLS under 0.05, INP under 200 ms, scores 95 / 100 / 100 / 100.
 - Run **axe on every page** (it covers the landing page, the chat and the Bible reader today; devotional, privacy and thank-you pages are the gap).
 - **ZAP baseline scan** against a preview or staging, no high findings.

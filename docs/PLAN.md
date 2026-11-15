@@ -335,7 +335,7 @@ Not part of the launch. Until it is built the page shows `hello@wordonthewater.n
 - [ ] Playwright e2e on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox: sign-up via Mailpit, prayer form, navigation
 - [ ] `@axe-core/playwright` on every page: zero serious or critical
 - [ ] Lighthouse CI mobile: Performance >= 95, Accessibility 100, Best Practices 100, SEO 100
-- [ ] LCP < 2.0 s, CLS < 0.05, INP < 200 ms, landing JS < 100 KB gzipped
+- [ ] LCP < 2.0 s, CLS < 0.05, INP < 200 ms, landing JS < 165 KB gzipped (budget revised in [ADR 0010](adr/0010-landing-js-budget.md), enforced by the e2e ceiling in `chat.spec.ts`)
 - [ ] Re-measure LCP on a deployed preview because pages render per request (ADR 0007); revisit hash-based CSP if the budget fails
 - [ ] API service coverage >= 85%
 - [ ] ZAP baseline scan against staging: no high findings

@@ -331,8 +331,8 @@ test.describe("with the chat on", () => {
 test.describe("landing page JavaScript", () => {
   test.skip(({ browserName }) => browserName !== "chromium", "measured once, in Chromium");
 
-  // The landing page already ships about 157 KB gzipped (Next and React), over the 100 KB target in
-  // CLAUDE.md; Lighthouse CI (step 1.8) owns that budget. This ceiling stops the chat adding to it:
+  // The landing page already ships about 157 KB gzipped (Next and React), above the old 100 KB
+  // target; ADR 0010 sets the budget at 165 KB. This ceiling enforces it and stops the chat adding to it:
   // its panel is a separate chunk (see "the chat code loads only after the click").
   const CEILING = 165 * 1024;
 

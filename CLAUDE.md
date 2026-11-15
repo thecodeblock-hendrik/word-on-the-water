@@ -127,7 +127,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │   ├── archive/                  ← finished checklists and old notes (continue.md, neon_vercel_checks.md, R2, Sentry)
 │   ├── bible_feature.md, chat.md, PWA_checklist.md, devotional_format.md, landing_page_check.md   ← Bible reader plan, chat scope, PWA steps, devotional file format, landing page UI checklist
 │   ├── design/                   ← landing page document and mockup, bible_mockups.html (reader, picker options), chat_mockups.html (Got Questions chat)
-│   ├── adr/                      ← 0001 to 0009
+│   ├── adr/                      ← 0001 to 0010
 │   ├── runbooks/                 ← deploy.md, incident.md, restore-db.md, rotate-secrets.md, chat.md
 │   └── threat-model.md, privacy.md
 ├── apps/
@@ -201,7 +201,7 @@ Layering rule for the API: `routers → services → models/db`. Routers handle 
 | LCP (mobile, 4G) | < 2.0 s |
 | CLS | < 0.05 |
 | INP | < 200 ms |
-| JS shipped on landing page | < 100 KB gzipped |
+| JS shipped on landing page | < 165 KB gzipped (ADR 0010; React and Next alone are about 120 KB) |
 | Lighthouse Performance / Accessibility / Best Practices / SEO | ≥ 95 / 100 / 100 / 100 |
 
 ### Accessibility
