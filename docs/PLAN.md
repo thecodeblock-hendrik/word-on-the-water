@@ -356,7 +356,7 @@ Step-by-step build checklist: [chat_checks.md](chat_checks.md). Scope, mockups a
 - [x] **K0** Bring the knowledge base into the repo: `apps/api/kb/` with the markdown source, `build_kb.py` (run with `uv run --with scikit-learn`, dev tool only) and the generated `faith_kb.json`; `make kb` and `make kb-check` (fails if the committed JSON is stale)
 - [x] **K1** Load and validate (Pydantic models, ids resolve, no HTML, counts match `meta`); measure the cold start
 - [x] **K2** Retrieval, strict TDD: index, scoring, confidence bands; the evaluation set as tests (own questions and paraphrases at least 95% first, off-topic to no answer, the weather and bread cases, "who is jesus")
-- [ ] **K3** Guards: personal details, crisis phrases, input normalisation; table-driven positive and negative cases
+- [x] **K3** Guards: personal details, crisis phrases, input normalisation; table-driven positive and negative cases
 - [ ] **K4** Chat logic: small talk, "more" and "why", context boost, seen-entry down-ranking, chips, contested note; 20 follow-up sequences
 - [ ] **K5** `POST /v1/chat/messages`: schema (`extra="forbid"`), service token, rate limit, honeypot and minimum time, integration tests, no message text in logs or Sentry (tested), OpenAPI types regenerated
 - [ ] **K6** Web panel: dialog, thread, chips, topic browser, `sessionStorage` history, Clear chat, 375px first, Vitest, lazy loaded; the button change in `landing.ts` and `start.tsx` behind `CHAT_ENABLED` with the contact link as the fallback

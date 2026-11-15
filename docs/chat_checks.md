@@ -71,20 +71,22 @@ Goal: a question returns the right entry, a confidence band, or nothing. Strict 
 
 Goal: unsafe or unusable input never reaches search. Pure functions, table-driven tests.
 
-- [ ] `app/services/chat_guards.py`; every function takes text and returns a typed result, never raises on odd input.
-- [ ] Input normalisation: NFKC, strip control and zero-width characters, collapse whitespace, trim; reject empty and over 300 characters. Tests including emoji, right-to-left text, very long input.
-- [ ] Personal-details check (tests first, positive and negative tables):
-  - [ ] Email addresses, URLs, phone numbers (+27 and 0xx formats, spaced and dashed), long digit runs, card numbers (Luhn), South African 13-digit ID numbers, street-address patterns, "my name is", "I live at", "my number is".
-  - [ ] Negatives that must pass: Bible references ("John 3:16", "Psalm 119:105"), years, "10 commandments", "Genesis 1:1-3", "1 Corinthians 15:3-4".
-  - [ ] Patterns bounded (no nested quantifiers); a test runs a hostile 300-character string and asserts it finishes fast.
-  - [ ] Result carries a reason code only, never the matched text.
-- [ ] Crisis check (runs before everything else except normalisation):
-  - [ ] A reviewed list of phrases and patterns (suicide, self-harm, "end my life", "don't want to be here anymore", abuse, "being hurt", "in danger").
-  - [ ] Negatives that must not trigger: "I am dying to know", "kill time".
-  - [ ] **Decided 2026-11-14:** any question that mentions suicide or self-harm, including theology questions such as "is suicide a sin", gets the crisis reply, not the knowledge base entry (10.13). Test it with several phrasings. The crisis reply may add a pointer to entry 10.13 afterwards (decide in K4).
-  - [ ] Returns the KB `responses.crisis` text plus the "outside South Africa" line; the text is not generated.
-- [ ] Prompt-injection style input (for example "ignore previous instructions") is harmless here (no model); a test documents that it is treated as an ordinary low-confidence question.
-- [ ] Validate: a fuzz test with 1000 random strings never raises and always returns within a bound.
+- [x] `app/services/chat_guards.py`; every function takes text and returns a typed result, never raises on odd input.
+- [x] Input normalisation: NFKC, strip control and zero-width characters, collapse whitespace, trim; reject empty and over 300 characters. Tests including emoji, right-to-left text, very long input.
+- [x] Personal-details check (tests first, positive and negative tables):
+  - [x] Email addresses, URLs, phone numbers (+27 and 0xx formats, spaced and dashed), long digit runs, card numbers (Luhn), South African 13-digit ID numbers, street-address patterns, "my name is", "I live at", "my number is".
+  - [x] Negatives that must pass: Bible references ("John 3:16", "Psalm 119:105"), years, "10 commandments", "Genesis 1:1-3", "1 Corinthians 15:3-4".
+  - [x] Patterns bounded (no nested quantifiers); a test runs a hostile 300-character string and asserts it finishes fast.
+  - [x] Result carries a reason code only, never the matched text.
+- [x] Crisis check (runs before everything else except normalisation):
+  - [x] A reviewed list of phrases and patterns (suicide, self-harm, "end my life", "don't want to be here anymore", abuse, "being hurt", "in danger").
+  - [x] Negatives that must not trigger: "I am dying to know", "kill time".
+  - [x] **Decided 2026-11-14:** any question that mentions suicide or self-harm, including theology questions such as "is suicide a sin", gets the crisis reply, not the knowledge base entry (10.13). Test it with several phrasings. The crisis reply may add a pointer to entry 10.13 afterwards (decide in K4).
+  - [x] The "outside South Africa" line is part of `responses.crisis` in the KB itself (set in `build_kb.py`), so the guard only reports `crisis` and the reply is never assembled in code.
+- [x] Prompt-injection style input (for example "ignore previous instructions") is harmless here (no model); a test documents that it is treated as an ordinary low-confidence question.
+- [x] Validate: a fuzz test with 1000 random strings never raises and always returns within a bound.
+
+- Note (2026-11-15): of the 532 KB questions only "Is suicide an unforgivable sin?" (10.13) is blocked, as decided; a test pins this. Not matched on purpose: "hurt me" (appears in a real question), "I live in" ("I live in fear"), "in danger of hell".
 
 ## K4. Conversation logic (`feat/chat-k4-followups`)
 

@@ -73,7 +73,7 @@
   "responses": {
     "no_answer": "I don't have an answer to that in my knowledge base. Please speak with your local pastor, who can help you with this question.",
     "contested_suffix": "Christians who hold to the Bible's authority disagree on this. Your local pastor can help you think it through.",
-    "crisis": "If you are in danger or thinking about harming yourself, please reach out for help right away. In South Africa you can call the SADAG Suicide Crisis Helpline on 0800 567 567 (free from any network, 24 hours a day) or the LifeLine South Africa National Counselling Line on 0861 322 322 (24 hours a day). If your life is in immediate danger, contact emergency services."
+    "crisis": "If you are in danger or thinking about harming yourself, please reach out for help right away. In South Africa you can call the SADAG Suicide Crisis Helpline on 0800 567 567 (free from any network, 24 hours a day) or the LifeLine South Africa National Counselling Line on 0861 322 322 (24 hours a day). If your life is in immediate danger, contact emergency services. Outside South Africa, please call your local emergency number."
   },
   "entries": [
     {
