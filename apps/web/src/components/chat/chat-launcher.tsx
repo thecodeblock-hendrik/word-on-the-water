@@ -1,50 +1,36 @@
 "use client";
 
-import { lazy, Suspense, useRef, useState, type MouseEvent } from "react";
+import type { MouseEvent, ReactNode, RefObject } from "react";
 
 import { chat } from "@/content/chat";
-
-// The panel is a separate chunk, fetched on the first click, so the landing page JS stays small.
-const ChatPanel = lazy(() =>
-  import("@/components/chat/chat-panel").then((m) => ({ default: m.ChatPanel })),
-);
+import { openChat } from "@/lib/chat/open";
 
 /**
- * The Got Questions button. A mail link without JavaScript; with it, a click opens the chat.
- * Once opened the panel stays mounted, so the conversation is not rebuilt on every open.
+ * A Got Questions link: a mail link without JavaScript; with it, a click asks the page's ChatHost
+ * to open the chat. Safari does not focus a clicked link, so the opener is named explicitly.
  */
 export function ChatLauncher({
   className,
-  bibleLinks = false,
+  children = chat.title,
+  returnFocusTo,
+  onActivate,
 }: {
   className: string;
-  bibleLinks?: boolean;
+  children?: ReactNode;
+  /** Where focus goes when the chat closes, if not this link (a menu item is gone by then). */
+  returnFocusTo?: RefObject<HTMLElement | null>;
+  /** Called when the link opens the chat, for example to close a menu. */
+  onActivate?: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const button = useRef<HTMLAnchorElement>(null);
-
-  function onClick(event: MouseEvent) {
+  function onClick(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
-    setLoaded(true);
-    setOpen(true);
+    openChat(returnFocusTo?.current ?? event.currentTarget);
+    onActivate?.();
   }
 
   return (
-    <>
-      <a ref={button} href={`mailto:${chat.mail}`} onClick={onClick} className={className}>
-        {chat.title}
-      </a>
-      {loaded && (
-        <Suspense fallback={null}>
-          <ChatPanel
-            open={open}
-            onOpenChange={setOpen}
-            bibleLinks={bibleLinks}
-            returnFocusTo={button}
-          />
-        </Suspense>
-      )}
-    </>
+    <a href={`mailto:${chat.mail}`} onClick={onClick} className={className}>
+      {children}
+    </a>
   );
 }

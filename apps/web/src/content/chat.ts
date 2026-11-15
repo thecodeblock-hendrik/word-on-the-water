@@ -11,6 +11,8 @@ export const chat = {
   close: "Close",
   clear: "Clear chat",
   readMore: "Read more",
+  yourChat: "Your chat",
+  hideYourChat: "Hide the Your chat button",
   browse: "Browse by topic",
   browseShort: "Browse topics",
   starterLabel: "Try one of these",

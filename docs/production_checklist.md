@@ -39,7 +39,7 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 
 - [ ] `app/manifest.ts` (`MetadataRoute.Manifest`, read `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md` first): `name`, `short_name` ("Word on the Water" and "WotW"), `description`, `id` and `start_url` `/`, `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang: "en"`, `categories`, and `background_color` and `theme_color` from the design tokens
 - [ ] Icons: 192 and 512 px PNG (`purpose: "any"`), a 512 px maskable icon with the logo inside the safe zone, `app/icon.svg` as favicon, and `app/apple-icon.png` (180 px) for iOS home screens, generated from the inline SVG logo
-- [ ] Manifest `shortcuts` to the sections people return to ("Start here", "Prayer request") and `screenshots` (narrow, 375 px) for the richer Android install sheet
+- [ ] Manifest `shortcuts` to the sections people return to ("Start here"; "Prayer request" is added when that feature is built) and `screenshots` (narrow, 375 px) for the richer Android install sheet
 - [ ] iOS: `metadata.appleWebApp` (`capable`, `title`, `statusBarStyle`) and `viewport` `themeColor` per colour scheme with `viewport-fit=cover`
 - [ ] Tests first: a unit test of the manifest object (required fields, icon sizes and purposes, colours match the tokens); an e2e test that `/manifest.webmanifest` and every icon return 200 with the right content type under the CSP
 - [ ] Installability check: Chrome DevTools, Application panel, no manifest errors; "Install app" on Android Chrome and "Add to Home Screen" on iOS Safari show the right icon, name and splash colours, open standalone and respect safe areas
@@ -169,9 +169,9 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 Scope: [chat.md](chat.md), decision: [ADR 0009](adr/0009-chat-local-knowledge-base.md). No domain or external service is needed, so this part can be done on a preview first.
 
 - [x] **Crisis numbers verified** on the providers' own sites (2026-11-15): SADAG Suicide Crisis Helpline 0800 567 567 (24 hours, sadag.org) and LifeLine South Africa National Counselling Line 0861 322 322 (24 hours, shared-rate call, lifeline.org.za); the text for visitors outside South Africa is "call your local emergency number". Re-check the day before launch.
-- [ ] `make kb-check` is green in CI (committed JSON equals the markdown source).
+- [x] `make kb-check` is green in CI (committed JSON equals the markdown source; it runs in `ci.yml` and was green on PR #112).
 - [x] Privacy notice has the chat section (no storage on the server, thread only in the tab) and the threat model rows C1 to C9 are ticked (2026-11-15).
 - [ ] On a preview with `CHAT_ENABLED=1`: ask the starter questions, a contested one (baptism), an off-topic one, a message with a phone number (rejected) and a crisis phrase (fixed reply); try follow-ups ("tell me more", "why"); press Clear chat; reload (thread survives) and close the tab (thread gone).
-- [ ] Phone check at 375px on a real device: keyboard, safe areas, tap targets, dark and light.
+- [x] Phone check at 375px on a real device: keyboard, safe areas, tap targets, dark and light (done by hand, 2026-11-15, with the keyboard, VoiceOver and TalkBack pass).
 - [ ] Rate limit seen to trip (generic 429) and the Vercel Firewall rule on the chat route is set.
 - [ ] Set `CHAT_ENABLED=1` in Production, redeploy **(Hendrik)**, and check the Got Questions button opens the chat. Rollback is unsetting the variable: the button then is a mail link to `hello@wordonthewater.net`.

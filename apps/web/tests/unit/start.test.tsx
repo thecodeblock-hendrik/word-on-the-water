@@ -55,7 +55,7 @@ describe("Start", () => {
     render(<Start />);
     expect(screen.getByRole("link", { name: "Talk to someone" })).toHaveAttribute(
       "href",
-      "/#contact",
+      "mailto:hello@wordonthewater.net",
     );
   });
 

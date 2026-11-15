@@ -52,7 +52,7 @@ describe("Footer", () => {
       "href",
       "/#believe",
     );
-    expect(about.getByRole("link", { name: "Prayer" })).toHaveAttribute("href", "/#contact");
+    expect(screen.queryByRole("link", { name: "Prayer" })).toBeNull();
   });
 
   it("only links social accounts that exist, and always offers email", () => {

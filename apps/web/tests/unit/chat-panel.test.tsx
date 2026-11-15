@@ -5,6 +5,7 @@ import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ChatPanel } from "@/components/chat/chat-panel";
+import topics from "@/content/chat-topics.json";
 import type { ChatReply } from "@/lib/chat/thread";
 
 const sendChat = vi.hoisted(() => vi.fn());
@@ -300,28 +301,35 @@ describe("the thread in this tab", () => {
 });
 
 describe("browse by topic", () => {
+  /** The theme buttons: just the name, no count of questions. */
+  const themes = (dialog: HTMLElement) =>
+    topics.map((t) => within(dialog).getByRole("button", { name: t.name }));
+
   it("lists the themes, then a theme's questions, and a question sends its id", async () => {
     ok(answer("1.1"));
     const { user, dialog } = await openPanel();
     await user.click(within(dialog).getByRole("button", { name: /Browse by topic/ }));
 
-    expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
-    await user.click(within(dialog).getByRole("button", { name: /^God, \d+ questions$/ }));
+    expect(themes(dialog)).toHaveLength(14);
+    for (const button of themes(dialog))
+      expect(button.textContent).toBe(button.textContent!.trim());
+    expect(dialog.textContent).not.toMatch(/\d+ questions/);
+    await user.click(within(dialog).getByRole("button", { name: "God" }));
     await user.click(within(dialog).getByRole("button", { name: "Does God exist?" }));
 
     await waitFor(() => expect(sendChat).toHaveBeenCalled());
     expect(sendChat.mock.calls[0][0].turn).toEqual({ entry_id: "1.1" });
     expect(await screen.findByText("Short answer 1.1.")).toBeDefined();
-    expect(screen.queryByRole("button", { name: /^God, \d+ questions$/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "God" })).toBeNull();
   });
 
   it("Back goes from the questions to the themes, then to the chat", async () => {
     const { user, dialog } = await openPanel();
     await user.click(within(dialog).getByRole("button", { name: /Browse by topic/ }));
-    await user.click(within(dialog).getByRole("button", { name: /^God, \d+ questions$/ }));
+    await user.click(within(dialog).getByRole("button", { name: "God" }));
 
     await user.click(within(dialog).getByRole("button", { name: /Back/ }));
-    expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
+    expect(themes(dialog)).toHaveLength(14);
     await user.click(within(dialog).getByRole("button", { name: /Back/ }));
     expect(within(dialog).getByRole("button", { name: "Who is Jesus?" })).toBeDefined();
   });
@@ -331,7 +339,7 @@ describe("browse by topic", () => {
     const { user, dialog } = await openPanel();
     await user.type(box(), "bread{Enter}");
     await user.click(await within(dialog).findByRole("button", { name: "Browse topics" }));
-    expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
+    expect(themes(dialog)).toHaveLength(14);
   });
 });
 
@@ -363,5 +371,17 @@ describe("scripture references", () => {
     );
     expect(screen.getByText("Hezekiah 3:1")).toBeDefined();
     expect(screen.queryByRole("link", { name: "Hezekiah 3:1" })).toBeNull();
+  });
+
+  it("tapping a verse remembers the page the chat was on, so the Bible can offer the way back", async () => {
+    ok(reply({ kind: "answer", entry: entry("2.1") }));
+    const { user } = await openPanel(true);
+    await user.type(box(), "who is jesus{Enter}");
+    const link = await screen.findByRole("link", { name: "John 3:16" });
+    link.addEventListener("click", (e) => e.preventDefault());
+    await user.click(link);
+    expect(sessionStorage.getItem("wotw-chat-return")).toBe(
+      `${location.pathname}${location.search}`,
+    );
   });
 });

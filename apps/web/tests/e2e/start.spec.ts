@@ -21,6 +21,6 @@ test("Start here link lands on the section and Talk to someone points at contact
   await expect(page.getByRole("heading", { level: 2, name: "Start here" })).toBeInViewport();
   await expect(page.getByRole("link", { name: "Talk to someone" })).toHaveAttribute(
     "href",
-    "/#contact",
+    "mailto:hello@wordonthewater.net",
   );
 });

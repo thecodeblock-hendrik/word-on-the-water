@@ -12,7 +12,6 @@ export const NAV_LINKS: readonly NavItem[] = [
   { label: "Devotionals", href: "/#coming" },
   { label: "Start here", href: "/#start" },
   { label: "What we believe", href: "/#believe" },
-  { label: "Prayer", href: "/#contact" },
 ];
 
 const BIBLE_LINK: NavItem = { label: "Bible", href: "/bible", match: "/bible", prefetch: false };

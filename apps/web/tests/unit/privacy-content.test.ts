@@ -91,6 +91,10 @@ describe("the privacy policy content", () => {
     }
   });
 
+  it("does not mention a prayer address (the prayer feature comes after launch)", () => {
+    expect(everything(true).toLowerCase()).not.toContain("prayer");
+  });
+
   it("names the registered name that runs the site, not a person, and gives the postal address", () => {
     const who = JSON.stringify(section("who-we-are"));
     expect(who).toContain("run by Word On The Water, the registered name of the ministry");

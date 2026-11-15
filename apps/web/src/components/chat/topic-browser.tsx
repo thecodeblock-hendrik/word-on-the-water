@@ -44,12 +44,11 @@ export function TopicBrowser({
               key={t.number}
               type="button"
               onClick={() => setNumber(t.number)}
-              aria-label={`${t.name}, ${t.entries.length} questions`}
               className={row}
             >
               <span>{t.name}</span>
-              <span aria-hidden="true" className="font-normal text-muted">
-                {t.entries.length}
+              <span aria-hidden="true" className="text-muted">
+                ›
               </span>
             </button>
           ))}

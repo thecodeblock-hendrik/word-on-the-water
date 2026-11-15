@@ -14,9 +14,9 @@ Work from this file, top to bottom, like [PWA_checklist.md](PWA_checklist.md). I
 
 ## Before you start (once)
 
-- [ ] `docs/chat-scope` is merged (the scope, mockups, ADR 0009 and this file are on `main`).
-- [ ] Files in `~/Downloads`: `Christian_Faith_Knowledge_Base.md` (source), `build_kb.py`, `faith_kb (1).json` (expected output). Confirm they are unchanged since 2026-11-14 (the JSON rebuilt from the markdown was identical).
-- [ ] Local stack up: `make up`, `make migrate`; the API tests pass on a clean checkout (`make test`).
+- [x] `docs/chat-scope` is merged (the scope, mockups, ADR 0009 and this file are on `main`).
+- [x] Files in `~/Downloads`: `Christian_Faith_Knowledge_Base.md` (source), `build_kb.py`, `faith_kb (1).json` (expected output). Confirm they are unchanged since 2026-11-14 (the JSON rebuilt from the markdown was identical). Now moot: the source, script and JSON live in `apps/api/kb/` and `make kb-check` guards them in CI.
+- [x] Local stack up: `make up`, `make migrate`; the API tests pass on a clean checkout (`make test`).
 
 ---
 
@@ -152,10 +152,22 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 - [x] Verse chips: parse `key_verses` ("John 3:16", "Romans 3:23–24", "Acts 16:15, 31–34", "1 Corinthians 15:1–4") with the existing `lib/bible` helpers; link to `/bible/web/...` only when `BIBLE_ENABLED` is on and the reference parses; otherwise plain text. Test the odd formats.
 - [x] Entry point: `landing.ts` and `components/sections/start.tsx`: when `CHAT_ENABLED` the ghost button is "Got Questions" and opens the panel (loaded with a dynamic import on first click so the landing JS budget stays under 100 KB); otherwise, and without JavaScript, it stays a mail link to `hello@wordonthewater.net`. Test both.
 - [x] Styling with the existing tokens only (Dawn patrol and Night swell), 44px targets, safe-area insets (`env(safe-area-inset-*)`, `100dvh`), `prefers-reduced-motion`.
-- [ ] CSP: no change expected (no third-party calls); confirm no inline styles or scripts are added (the nonce CSP blocks them).
-- [ ] Validate: `pnpm dev` with `CHAT_ENABLED=1` and the API running; screenshot at 375, 768 and 1280, light and dark, against the mockups; run through the Part L preview checks informally.
-- Done so far (2026-11-15): 6a `lib/chat` (flag, thread, storage), 6b Server Action, 6c panel components, 6d landing button, 6e topic browser (generated `chat-topics.json`, kept in step by `make kb` and a test), 6f verse links. Checked live at 375 and 1280 px, light and dark, against the API: an answer, a did-you-mean and a refused message. Still to do: the 768 px screenshot, a check that the nonce CSP blocks nothing (K7 e2e), and the Part L preview checks.
-- Deviations: (1) a refused message is shown only in the box with its error and is never added to the thread or `sessionStorage`; (2) with the flag off the button stays the existing "Talk to someone" link to `/#contact`, with it on the button is "Got Questions" and a mail link without JavaScript; (3) a verse links to the first part of its reference in the reader (`/bible/web/<book>/<chapter>?v=`), since one reader address holds one passage; every one of the knowledge base's 1,029 key verses is tested to parse; (4) the intro says "our own knowledge base" without "reviewed", since no pastoral review gate remains; (5) a new reply is scrolled to its first line.
+- [x] CSP: no change expected (no third-party calls); confirm no inline styles or scripts are added (the nonce CSP blocks them).
+- [x] Validate: `pnpm dev` with `CHAT_ENABLED=1` and the API running; screenshot at 375, 768 and 1280, light and dark, against the mockups; run through the Part L preview checks informally.
+- Done so far (2026-11-15): 6a `lib/chat` (flag, thread, storage), 6b Server Action, 6c panel components, 6d landing button, 6e topic browser (generated `chat-topics.json`, kept in step by `make kb` and a test), 6f verse links. Checked live at 375 and 1280 px, light and dark, against the API: an answer, a did-you-mean and a refused message. The 768 px check and the nonce CSP check (no violations in the e2e journeys) were done later; the Part L preview checks remain, under K8.
+- Deviations: (1) a refused message is shown only in the box with its error and is never added to the thread or `sessionStorage`; (2) with the flag off the button is "Talk to someone", now a mail link to `hello@wordonthewater.net` (it first stayed a link to `/#contact`, a section that does not exist; changed 2026-11-15), with it on the button is "Got Questions" and a mail link without JavaScript; (3) a verse links to the first part of its reference in the reader (`/bible/web/<book>/<chapter>?v=`), since one reader address holds one passage; every one of the knowledge base's 1,029 key verses is tested to parse; (4) the intro says "our own knowledge base" without "reviewed", since no pastoral review gate remains; (5) a new reply is scrolled to its first line.
+
+- Enhancement 1 (2026-11-15, after testing on an iPhone, branch `feat/chat-enhancements`): Got Questions is also in the menu bar (from `lg`) and in the mobile menu, not only under Start here. One `ChatHost` in the layout holds the single panel; `ChatLauncher` links ask it to open (`lib/chat/open.ts`). The button under Start here is solid with a chat icon and reads "Got Questions?"; the bar and menu say "Got Questions". The bar links no longer wrap at 1024 px (nowrap, tighter gaps, "Subscribe" until `xl`).
+
+- Enhancement 2 (2026-11-15): a floating "Your chat" button in the Bible reader (Option B in the mockups, section 6), shown only to a visitor who left the chat by tapping a verse (a flag in the tab's `sessionStorage`, `lib/chat/return.ts`; never an address, so shared links show nothing). On a phone it rides on the sticky chapter bar so it never covers the buttons; from `lg` it is an edge tab fixed to the right side of the window at mid-height (mockup 6d, option D3), with its own hide button. It stays across chapters and has a Hide button. Tapping it opens the chat in place over the Bible with the thread (no page load, so no flash of the page the chat was on); the browser Back button to the page the chat was on reopens it too. Opening the chat any other way clears it.
+
+- Enhancement 3 (2026-11-15): the Bible reader pages (any page with the chapter bar) have no site footer, on phone and desktop. Below 1024 px the chapter bar is pinned to the bottom of the screen and the reader fills the viewport; from 1024 px the layout is unchanged, only without the footer (a CSS rule on `body:has([data-chapter-nav])`). Effect: no Crossway notice and no Privacy policy link on those pages (they show only the public-domain BSB and WEB); the privacy page is reachable from the home page. Needs revisiting when the ESV is added to the reader.
+
+- Enhancement 4 (2026-11-15): on a phone the way back to the chat is a round ink button (60px, "Your chat" under it) in the middle of the pinned chapter bar, between Previous and Next, rising above the bar (V3 in the mockups, section 6c). It replaces the floating pill below 1024 px, has no hide button there, and the page leaves 2rem more room under the text while it shows. From 1024 px it is the edge tab described under Enhancement 2 (chosen from three mockups, section 6d, because the floating pill looked adrift).
+
+- Enhancement 5 (2026-11-15): the Topics list no longer shows a count of questions beside each topic (nor in its spoken label); each row ends with a small chevron instead.
+
+- Enhancement 6 (2026-11-15): the Prayer option was removed from the site until that feature is built (menu bar, mobile menu, footer and the `prayer@` address in the privacy policy). The e2e and unit tests that counted the header links were updated.
 
 ## K7. End to end and quality (`feat/chat-k7-e2e`)
 
@@ -165,12 +177,12 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 - [x] `@axe-core/playwright`: zero serious or critical violations in both colour schemes, panel open, in answer and crisis states.
 - [x] Bundle check: landing page JS stays under 100 KB gzipped with the flag on and off; the chat chunk loads only after the click.
 - [x] No CSP violations in the console during the journeys.
-- [ ] Real phone: iPhone Safari and Android Chrome. Keyboard opens without hiding the input, safe areas, tap targets, scrolling, dark mode. Note findings in the PR.
-- [ ] Manual accessibility pass: keyboard only, VoiceOver iOS, TalkBack.
+- [x] Real phone: iPhone Safari and Android Chrome. Keyboard opens without hiding the input, safe areas, tap targets, scrolling, dark mode. Done by hand by Hendrik (2026-11-15); the findings led to the enhancements under K6.
+- [x] Manual accessibility pass: keyboard only, VoiceOver iOS, TalkBack. Done by hand by Hendrik (2026-11-15).
 - Done (2026-11-15), `tests/e2e/chat.spec.ts` (39 tests on iPhone SE, iPhone 13, Pixel 7, desktop Chromium and WebKit; Firefox does not launch on this Mac, CI covers it). The main e2e server keeps the chat off, like Production; a second server on port 3102 runs the same build with `CHAT_ENABLED=1`. The stub answers from the one request, so parallel tests stay independent.
 - Finding: the landing page already ships about 157 KB of JavaScript gzipped with the chat off (Next and React), over the 100 KB target in CLAUDE.md. That is not from the chat; its panel is a separate chunk fetched on the first click (tested). The spec pins a ceiling of 165 KB so the chat cannot add to it, and the 100 KB budget stays with Lighthouse CI (step 1.8).
 - Finding: Safari does not focus a button or link on click, so Radix could not return focus to the opener (failed on iPhone and desktop WebKit). The launcher now passes its button to the panel as `returnFocusTo`.
-- Still to do by hand: the real iPhone Safari and Android Chrome check, and the keyboard, VoiceOver and TalkBack pass.
+- The real phone check and the keyboard, VoiceOver and TalkBack pass were done by hand (2026-11-15).
 
 ## K8. Docs and launch readiness (`feat/chat-k8-docs`)
 

@@ -88,7 +88,7 @@ export function privacyPolicy({
             : []),
           {
             term: "Emails you send us",
-            text: `If you email ${CONTACT_EMAIL} or prayer@wordonthewater.net, it is ordinary email: it passes through our email host (Squarespace) to our own mailbox. We keep it only as long as we need to answer you. Please do not send anything you would not want to put in an email.`,
+            text: `If you email ${CONTACT_EMAIL}, it is ordinary email: it passes through our email host (Squarespace) to our own mailbox. We keep it only as long as we need to answer you. Please do not send anything you would not want to put in an email.`,
           },
         ],
       },

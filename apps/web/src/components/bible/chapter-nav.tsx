@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { type Book, type ChapterRef, findBook, neighbours } from "@/lib/bible/books";
 import { chapterPath } from "@/lib/bible/reference";
@@ -13,18 +14,22 @@ const name = (ref: ChapterRef) => `${findBook(ref.book)!.name} ${ref.chapter}`;
 
 /**
  * Previous and next chapter, crossing into the neighbouring book at either end of a book. They are
- * plain links to the whole chapter in the same Bible, so they work without JavaScript. Stuck to the
- * bottom of a phone screen in thumb reach; under the text from lg. At the very start and end of the
+ * plain links to the whole chapter in the same Bible, so they work without JavaScript. Pinned to the
+ * bottom of a phone screen in thumb reach, whatever is scrolled behind it (the page leaves room
+ * for it, see the layout); under the text from lg. At the very start and end of the
  * Bible the missing side is a disabled button.
  */
 export function ChapterNav({
   version,
   book,
   chapter,
+  children,
 }: {
   version: string;
   book: Book;
   chapter: number;
+  /** Sits between Previous and Next on a phone (the Your chat button). */
+  children?: ReactNode;
 }) {
   const { previous, next } = neighbours(book, chapter);
   const href = (ref: ChapterRef) => chapterPath(version, ref.book, ref.chapter);
@@ -32,7 +37,8 @@ export function ChapterNav({
   return (
     <nav
       aria-label="Previous and next chapter"
-      className="sticky bottom-0 z-30 -mx-4 flex gap-2 border-t border-line bg-surface px-4 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:static lg:z-auto lg:mx-auto lg:w-full lg:max-w-[62ch] lg:justify-between lg:border-0 lg:bg-transparent lg:p-0 lg:pb-16"
+      data-chapter-nav
+      className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-surface pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:static lg:z-auto lg:mx-auto lg:w-full lg:max-w-[62ch] lg:justify-between lg:border-0 lg:bg-transparent lg:p-0 lg:pb-16"
     >
       {previous ? (
         <Link
@@ -48,6 +54,7 @@ export function ChapterNav({
           <span aria-hidden="true">←</span> Start of the Bible
         </button>
       )}
+      {children}
       {next ? (
         <Link
           href={href(next)}

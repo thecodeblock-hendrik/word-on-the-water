@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { ArrowKeys } from "@/components/bible/arrow-keys";
+import { ChatReturn } from "@/components/chat/chat-return";
 import { ChapterNav } from "@/components/bible/chapter-nav";
 import { PassagePopover } from "@/components/bible/passage-popover";
 import { PassageSheet } from "@/components/bible/passage-sheet";
@@ -12,6 +13,7 @@ import { RememberVersion } from "@/components/bible/remember-version";
 import { VersionSwitcher } from "@/components/bible/version-switcher";
 import { type Book, type ChapterRef, findBook, neighbours } from "@/lib/bible/books";
 import { isBibleEnabled } from "@/lib/bible/flag";
+import { isChatEnabled } from "@/lib/chat/flag";
 import { getPassage } from "@/lib/bible/get-passage";
 import { parseChapter, versesParam } from "@/lib/bible/params";
 import { chapterPath, passageTitle } from "@/lib/bible/reference";
@@ -98,7 +100,9 @@ export default async function BibleChapterPage(props: Props) {
       </div>
       <div className="min-w-0 lg:pt-8">
         <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
-        <ChapterNav version={version.id} book={book} chapter={passage.chapter} />
+        <ChapterNav version={version.id} book={book} chapter={passage.chapter}>
+          {isChatEnabled() && <ChatReturn />}
+        </ChapterNav>
       </div>
     </div>
   );

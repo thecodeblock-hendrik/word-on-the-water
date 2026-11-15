@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL } from "@/lib/site";
 import type { Scripture } from "@/lib/scripture";
 
 type Link = { label: string; href: string };
@@ -95,7 +96,7 @@ export const start = {
       reference: { book: "Ephesians", chapter: 2, verses: "8–9" } satisfies Scripture,
     },
   ],
-  talk: { label: "Talk to someone", href: "/#contact" } satisfies Link,
+  talk: { label: "Talk to someone", href: `mailto:${CONTACT_EMAIL}` } satisfies Link,
   readOn: "or read the Gospel of Mark, the shortest account of Jesus' life.",
 };
 
@@ -137,7 +138,6 @@ export const footer = {
       links: [
         { label: "Our story", href: "/#about" },
         { label: "Statement of faith", href: "/#believe" },
-        { label: "Prayer", href: "/#contact" },
       ],
     },
   ],

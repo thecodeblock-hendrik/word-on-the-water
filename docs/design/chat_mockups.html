@@ -90,6 +90,81 @@ figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width
 .topic{min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);font-weight:600}
 .topic small{color:var(--muted);font-weight:500}
 .back{color:var(--accent-ink);font:600 15px system-ui}
+
+/* back to the chat from the Bible */
+.bar-back{display:flex;align-items:center;min-height:48px;padding:0 4px 0 4px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.bar-back .go{flex:1;min-height:48px;display:flex;align-items:center;gap:8px;padding:0 12px;font:600 15px system-ui;color:var(--accent-ink)}
+.bar-back .go small{color:var(--muted);font-weight:500;font-size:13px}
+.reader{padding:14px 16px;flex:1;overflow:hidden}
+.pbtn{min-height:44px;border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:0 12px;display:flex;justify-content:space-between;align-items:center;font:600 17px system-ui}
+.vers{display:flex;gap:6px;margin:10px 0 12px}
+.vers span{min-height:36px;padding:0 14px;border:1px solid var(--line);border-radius:18px;display:inline-flex;align-items:center;font:600 13px system-ui;color:var(--muted)}
+.vers span.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vtext{font:18px/1.7 Georgia,"Times New Roman",serif;margin:0}
+.vtext sup{font:700 11px system-ui;color:var(--accent-ink);margin-right:3px}
+.vtext mark{background:rgba(217,112,58,.2);color:inherit}
+.night .vtext mark{background:rgba(79,169,166,.25)}
+.fab{position:absolute;right:14px;bottom:18px;min-height:48px;padding:0 18px;border-radius:24px;background:var(--accent-ink);color:var(--on-accent);box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;gap:8px;align-items:center;font:700 15px system-ui}
+.peek{position:absolute;left:0;right:0;bottom:0;height:54%;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.3);padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.peek h4{margin:2px 0 0;font:700 20px "Barlow Condensed","Arial Narrow",system-ui}
+.peek .acts{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.cmp{border-collapse:collapse;font-size:14px;max-width:1100px;background:#fffdf9;color:#2b2d42}
+.cmp th,.cmp td{border:1px solid #d9d0c3;padding:8px 10px;text-align:left;vertical-align:top}
+.cmp th{background:#f0e8db}
+.rec{background:#e7f3e8}
+
+/* option A revisions: solid return controls */
+.bubble{width:20px;height:20px;flex:none;fill:currentColor}
+.solid-bar{display:flex;align-items:center;min-height:52px;background:var(--accent-ink);color:var(--on-accent);flex:none}
+.solid-bar .go{flex:1;min-height:52px;display:flex;align-items:center;gap:10px;padding:0 16px;font:700 16px system-ui}
+.solid-bar .iconbtn{color:var(--on-accent)}
+.strip{display:flex;align-items:center;min-height:60px;padding:0 4px 0 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.pill{min-height:44px;display:inline-flex;align-items:center;gap:10px;padding:0 18px;border-radius:22px;background:var(--accent-ink);color:var(--on-accent);font:700 15px system-ui;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.mini-bar{display:flex;align-items:center;justify-content:center;gap:8px;height:34px;background:var(--accent-ink);color:var(--on-accent);flex:none;font:700 13px system-ui}
+.tabbtn{position:absolute;left:12px;top:132px;min-height:48px;padding:0 14px;border-radius:24px;background:var(--accent-ink);color:var(--on-accent);box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:8px;font:700 14px system-ui}
+
+/* Your chat between the chapter buttons */
+.chap-bar{display:flex;align-items:center;gap:8px;padding:8px 16px 14px;border-top:1px solid var(--line);background:var(--surface);flex:none;position:relative}
+.cb{flex:1;min-width:0;min-height:48px;border-radius:4px;border:1.5px solid var(--line);display:flex;align-items:center;gap:6px;padding:0 10px;font:600 15px system-ui;background:var(--bg);color:var(--ink)}
+.cb span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cb.prev{justify-content:flex-start}
+.cb.next{justify-content:flex-end;border-color:var(--accent-ink);background:var(--accent-ink);color:var(--on-accent)}
+.cb.chat{justify-content:center;gap:8px;border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.cb.chat.fit{flex:0 0 auto;padding:0 6px 0 14px;gap:6px}
+.cb.chat .hide{width:32px;height:36px;margin-left:2px;border-left:1px solid rgba(128,128,128,.5);display:grid;place-items:center;font-size:15px}
+.cb.two{flex-direction:column;align-items:flex-start;justify-content:center;gap:0;font-size:13px;line-height:1.15;padding:0 8px;overflow:hidden}
+.cb.two .t{display:block;max-width:100%}
+.cb.next.two{align-items:flex-end}
+.cb.two b{font-size:11px;font-weight:600;opacity:.85;white-space:nowrap}
+.mid{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:-30px;color:var(--ink);font:700 11px system-ui}
+.mid .round{width:60px;height:60px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:3px solid var(--surface)}
+.desk .chap-bar{border:0;background:transparent;max-width:680px;margin:0 auto;padding:8px 40px}
+
+/* 6d: desktop ways back to the chat */
+.desk:has(.dnav){height:520px}
+.dnav{display:flex;align-items:center;gap:22px;padding:0 28px;height:64px;border-bottom:1px solid var(--line);background:var(--bg);font:600 15px system-ui;flex:none}
+.dnav .logo{flex:none;font-size:22px}
+.dnav .links{display:flex;gap:22px;flex:1;margin-left:18px;color:var(--ink)}
+.dnav .links span{white-space:nowrap}
+.dnav .gq{color:var(--accent-ink)}
+.dcol{max-width:680px;margin:0 auto;padding:28px 40px 0}
+.dpass{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.dpass .pbtn{width:230px}
+.dchap{display:flex;justify-content:space-between;margin-top:18px}
+.resume{display:flex;align-items:center;gap:14px;padding:12px 8px 12px 16px;margin-bottom:18px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ink);border-radius:10px}
+.resume .ico{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.resume .txt{flex:1;min-width:0;line-height:1.3}
+.resume .txt b{display:block;font-size:15px}
+.resume .txt small{color:var(--muted);font-size:13px}
+.hdr-chat{position:relative;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:22px;background:var(--ink);color:var(--bg);font:700 15px system-ui}
+.hdr-chat .dot{position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.callout{position:absolute;top:70px;left:378px;width:290px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:14px 14px 12px;font-size:14px;line-height:1.4}
+.callout:before{content:"";position:absolute;top:-7px;left:150px;width:12px;height:12px;background:var(--surface);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.callout .acts{display:flex;gap:8px;margin-top:10px}
+.edge{position:absolute;right:0;top:170px;width:48px;display:flex;flex-direction:column;align-items:stretch;background:var(--ink);color:var(--bg);border-radius:14px 0 0 14px;box-shadow:-4px 6px 18px rgba(0,0,0,.28);overflow:hidden}
+.edge .e-open{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px 0;font:700 14px system-ui}
+.edge .e-open .v{writing-mode:vertical-rl;letter-spacing:.04em}
+.edge .e-x{min-height:44px;display:grid;place-items:center;border-top:1px solid rgba(128,128,128,.45);font-size:15px}
 </style>
 </head>
 <body>
@@ -389,6 +464,406 @@ figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width
  </div>
 </div><figcaption>Answer, Night swell.</figcaption></figure>
 </div>
+
+
+<h2>6. Getting back to the chat from the Bible (decision needed)</h2>
+<p class="lead">Tapping a key verse in an answer opens that verse in the Bible reader. Today there is no way back except the browser's Back button, and Back lands on a closed panel. The return control must appear <b>only</b> when the visitor arrived from the chat; someone reading the Bible on their own sees nothing extra.</p>
+<ul class="notes">
+<li><b>How it knows (all options):</b> tapping a verse in the chat sets a flag in <code>sessionStorage</code> for this tab (never a URL parameter, so a shared Bible link never shows a button to a chat the recipient never opened). A visitor who opens the Bible from the menu in a new tab has no flag and sees no control.</li>
+<li><b>Coming back (all options):</b> the thread is already kept in the tab, so returning reopens the chat panel automatically with the conversation and scroll position as they left it. The flag is cleared when they return or dismiss it.</li>
+<li>The browser Back button keeps working and also reopens the panel, because the panel remembers it was open.</li>
+</ul>
+
+<div class="row">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+
+</div><figcaption><b>Baseline: reading the Bible on its own.</b> No return control. This is what every option must leave untouched for visitors who did not come from the chat.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="bar-back"><span class="go" role="link">&lsaquo; Back to your chat <small>Got Questions</small></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+
+</div><figcaption><b>Option A: a return bar under the header.</b> A slim bar, sticky while scrolling: &ldquo;&lsaquo; Back to your chat&rdquo;, with a dismiss X. It stays across chapters until they return or dismiss it.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <span class="fab">&#128172; Your chat</span>
+</div><figcaption><b>Option B: a floating &ldquo;Your chat&rdquo; button.</b> A pill at the bottom right, within thumb reach, over the text. It stays while they read and turn chapters.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="sheet">
+  <div class="chat-h"><strong>Got Questions</strong><span class="iconbtn txt">Clear chat</span><span class="iconbtn">&#10005;</span></div>
+  <div class="thread">
+   <div class="me">What is the gospel?</div>
+   <div class="bot">
+    <p>The gospel is the good news that Jesus Christ died for our sins, was buried and rose again, so that everyone who turns from sin and trusts in him is forgiven and receives eternal life as a free gift.</p>
+    <div><div class="label">Key scriptures</div><div class="chips" style="margin-top:6px"><span class="verse" style="background:var(--accent-ink);color:var(--on-accent)">John 3:16</span><span class="verse">Romans 1:16</span><span class="verse">Romans 3:23&ndash;24</span></div></div>
+   </div>
+  </div>
+  <div class="dim" style="position:absolute"></div>
+  <div class="peek">
+   <div class="grab"></div>
+   <h4>John 3:16 <span style="font:500 13px system-ui;color:var(--muted)">World English Bible</span></h4>
+   <p class="vtext" style="font-size:17px"><sup>16</sup>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</p>
+   <div class="acts"><span class="btn ghost">Read the whole chapter &rarr;</span><span class="btn">Close</span></div>
+  </div>
+ </div>
+</div><figcaption><b>Option C: read the verse inside the chat.</b> Tapping a verse opens a sheet in the chat with the passage text (World English Bible). Nothing is left, so there is nothing to come back from. &ldquo;Read the whole chapter&rdquo; goes to the reader, where it needs Option A or B.</figcaption></figure>
+</div>
+
+<div class="row night">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="bar-back"><span class="go" role="link">&lsaquo; Back to your chat <small>Got Questions</small></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+
+</div><figcaption><b>Option A in Night swell.</b> The bar uses the surface colour and the accent text, so it reads as part of the page, not an alert.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <span class="fab">&#128172; Your chat</span>
+</div><figcaption><b>Option B in Night swell.</b> The pill is solid and has a shadow so it separates from the text behind it.</figcaption></figure>
+</div>
+
+<div class="row wide">
+<figure class="wide"><div class="desk">
+ <div class="site-top"><span class="logo">Word on the Water</span><span style="font-size:15px;display:flex;gap:22px;margin-right:12px"><span>About</span><span>Devotionals</span><span>Bible</span><span>Start here</span><span>What we believe</span><span>Prayer</span><span>Got Questions</span></span><span class="btn primary" style="min-height:40px">Subscribe</span></div>
+ <div class="bar-back" style="padding:0 40px"><span class="go" role="link" style="flex:none">&lsaquo; Back to your chat <small>Got Questions</small></span><span style="flex:1"></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader" style="max-width:680px;margin:0 auto;padding:24px 40px">
+  <div class="pbtn" style="max-width:260px"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+</div><figcaption><b>Option A on desktop.</b> The same bar spans the page under the header and the click reopens the right-hand drawer. Option B would be the same pill at the bottom right; Option C opens the verse inside the drawer.</figcaption></figure>
+</div>
+
+<h3 style="margin:28px 0 8px">Comparison</h3>
+<table class="cmp">
+<tr><th></th><th>A. Return bar</th><th>B. Floating button</th><th>C. Verse inside the chat</th></tr>
+<tr><td><b>Discoverable</b></td><td>Yes: top of the page, labelled, the usual place for a &ldquo;back to&rdquo; link (like iOS&rsquo;s &ldquo;&lsaquo; Safari&rdquo;)</td><td>Yes, but it floats over the text and can look like an ad or a support widget</td><td>Nothing to find: the visitor never leaves</td></tr>
+<tr><td><b>Covers content</b></td><td>Takes about 48px of height, nothing over the text</td><td>Covers text and can collide with previous/next chapter links and the iPhone toolbar</td><td>None in the Bible; a sheet over the chat</td></tr>
+<tr><td><b>Thumb reach on a phone</b></td><td>Top: a stretch on tall phones</td><td>Best</td><td>Best (sheet at the bottom)</td></tr>
+<tr><td><b>Only after a chat visit</b></td><td>Yes (session flag)</td><td>Yes (session flag)</td><td>Not needed for the verse; needed again for the full chapter</td></tr>
+<tr><td><b>Stays across chapters</b></td><td>Yes, until dismissed</td><td>Yes, until dismissed</td><td>No: the full chapter is a normal page</td></tr>
+<tr><td><b>Build size</b></td><td>Small: a flag, one bar in the reader, auto-reopen</td><td>Small, plus overlap handling</td><td>Larger: a way to fetch passage text for the sheet, plus its own states</td></tr>
+<tr><td><b>Accessibility</b></td><td>A real link in the page flow, first after the header; easy for screen readers</td><td>Fixed element, harder to reach by keyboard order and zoom</td><td>A dialog inside the chat, focus trap as today</td></tr>
+<tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Simple, predictable, no overlap, one line of text that says exactly where it goes.</td><td>Not recommended: overlap and the &ldquo;widget&rdquo; look.</td><td>A good later addition for quick look-ups, as the first option does not stop it.</td></tr>
+</table>
+
+<h2>6b. Option A, revised: no &ldquo;Got Questions&rdquo; text, chat icon, solid background</h2>
+<p class="lead">Three versions of the return bar. All three say only &ldquo;Back to your chat&rdquo; with the same chat icon as the Start here button, use the solid accent colour, are at least 44px tall (except A3are at least 44px tall, and appear onlyrsquo;s collapsed strip), and appear only when the visitor arrived from the chat. The icon is decorative; the words carry the meaning.</p>
+<div class="row">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="solid-bar"><span class="go" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A1. Full-width solid bar.</b> The whole bar is the tap target (52px tall), with the dismiss X at the right. The strongest signal, and impossible to miss or mis-tap.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="strip"><span class="pill" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span style="flex:1"></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A2. Solid button on a quiet strip.</b> The strip matches the page; only the pill is solid, so it reads as a button. Lighter than A1, but the pill is a smaller target (44px high, about 200px wide).</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="solid-bar"><span class="go" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A3, reading: the bar is visible.</b> Same solid bar as A1, but it hides when you scroll down to read and comes back when you scroll up. Shown here at the top of the page.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="mini-bar">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A3, scrolled down: it collapses.</b> The bar shrinks to a thin solid strip (34px) that keeps the words and covers nothing. Tapping it returns to the chat; scrolling up brings the full bar back. Saves 18px only, and the strip is below the 44px target size.</figcaption></figure>
+</div>
+
+<div class="row night">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="solid-bar"><span class="go" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A1 in Night swell.</b> A solid teal bar with dark text (the same pairing as the Subscribe button).</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="strip"><span class="pill" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span style="flex:1"></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A2 in Night swell.</b> The teal pill on the dark surface strip.</figcaption></figure>
+</div>
+
+<h3 style="margin:28px 0 8px">Comparison</h3>
+<table class="cmp">
+<tr><th></th><th>A1. Full-width solid bar</th><th>A2. Solid pill on a strip</th><th>A3. Auto-hiding solid bar</th></tr>
+<tr><td><b>Discoverable</b></td><td>Best: a coloured band under the header</td><td>Good: a clear button, but on a plain strip</td><td>Good at the top; the collapsed strip is small but still labelled</td></tr>
+<tr><td><b>Tap target</b></td><td>The whole 52px bar, full width</td><td>44px high, about 200px wide</td><td>Bar as A1; collapsed strip only 34px</td></tr>
+<tr><td><b>Reading space used</b></td><td>52px, always (sticky)</td><td>60px, always (sticky)</td><td>52px at the top; 34px while reading down</td></tr>
+<tr><td><b>Visual weight on a Bible page</b></td><td>Strong: a full band of colour</td><td>Moderate</td><td>Strong at the top, light while reading</td></tr>
+<tr><td><b>Complexity to build</b></td><td>Smallest</td><td>Small</td><td>Larger: scroll direction handling, reduced-motion handling, two states to test</td></tr>
+<tr><td><b>Accessibility notes</b></td><td>A link in the page flow; solid colour pair already used for buttons</td><td>Same</td><td>The collapsed strip is under 44px; changing size on scroll can confuse keyboard and screen reader users</td></tr>
+<tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Clear, the biggest target, nothing hidden or animated.</td><td>A good second choice if A1 feels too heavy.</td><td>Not recommended for now: the extra behaviour is not needed for a bar this thin.</td></tr>
+</table>
+
+<h2>6c. Your chat between the two chapter buttons</h2>
+<p class="lead">The floating pill is replaced by a third button in the pinned chapter bar, between Previous and Next. It appears only after a verse was tapped in the chat. The bar itself is now pinned to the bottom of the screen (fixed in the previous commit). The chat button uses the page&rsquo;s <b>ink</b> colour (dark navy in Dawn patrol, cream in Night swell), so it never matches Next, which uses the accent colour; text and icon keep full contrast on it.</p>
+<ul class="notes">
+<li><b>Colours:</b> Previous is outlined (quiet), Next is solid accent (the main action), Your chat is solid ink. Each button also has its own words, and the chat one an icon, so nothing relies on colour alone.</li>
+<li><b>What the first idea showed:</b> three equal buttons do not work. The bar is 343px wide on a 375px phone, so a third is about 109px, and &ldquo;[icon] Your chat&rdquo; is cut to &ldquo;Your &hellip;&rdquo; (see the first phone). So the chat button is sized to its words, and Previous and Next use two short lines (&ldquo;Previous&rdquo; over the chapter name) so the names still fit.</li>
+</ul>
+
+<div class="row">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb chat"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span></div>
+</div><figcaption><b>Why not three equal buttons.</b> At about 109px each, &ldquo;Your chat&rdquo; is cut off. Shown for the record.</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev two"><b>&larr; Previous</b><span class="t">John 2</span></span><span class="cb chat fit" style="padding:0 16px"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span></span><span class="cb next two"><b>Next &rarr;</b><span class="t">John 4</span></span></div>
+</div><figcaption><b>V1. Chat button sized to its words.</b> Previous and Next share the rest, each with two lines (&ldquo;Previous&rdquo; over &ldquo;John 2&rdquo;). All three 48px tall, like today.</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev two"><b>&larr; Previous</b><span class="t">1 Thessalonians 3</span></span><span class="cb chat fit" style="padding:0 16px"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span></span><span class="cb next two"><b>Next &rarr;</b><span class="t">1 Thessalonians 5</span></span></div>
+</div><figcaption><b>V1, worst case.</b> A long name such as &ldquo;1 Thessalonians 3&rdquo; is cut with an ellipsis on its second line; the button&rsquo;s accessible label still carries the full name.</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev two"><b>&larr; Previous</b><span class="t">John 2</span></span><span class="cb chat fit"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span><span class="hide" aria-label="Hide">&#10005;</span></span><span class="cb next two"><b>Next &rarr;</b><span class="t">John 4</span></span></div>
+</div><figcaption><b>V2. V1 plus a hide X.</b> The chat button carries a separate 36px-wide close segment, so a visitor can hide it for the rest of the visit. The widest chat button, so Previous and Next get the least room.</figcaption></figure>
+</div>
+
+<div class="row">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="mid"><span class="round"><svg class="bubble" style="width:26px;height:26px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span>Your chat</span><span class="cb next"><span class="t">John 4 &rarr;</span></span></div>
+</div><figcaption><b>V3. Raised round centre button.</b> A 60px round chat button rises above the bar with its label under it, like a centre action on many phone tab bars. Previous and Next keep about 120px each. The most noticeable, but it breaks the straight line of the bar and adds about 30px of height.</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb chat fit" style="width:56px;padding:0;justify-content:center" aria-label="Your chat"><svg class="bubble" style="width:26px;height:26px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="cb next"><span class="t">John 4 &rarr;</span></span></div>
+</div><figcaption><b>V4. Icon-only chat button.</b> A 56px square with only the chat icon (its accessible name is &ldquo;Your chat&rdquo;). Gives Previous and Next about 125px each, so names fit on one line. Less obvious without a word, though it is the same icon as the Start here button.</figcaption></figure>
+</div>
+
+<div class="row night">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev two"><b>&larr; Previous</b><span class="t">John 2</span></span><span class="cb chat fit" style="padding:0 16px"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span></span><span class="cb next two"><b>Next &rarr;</b><span class="t">John 4</span></span></div>
+</div><figcaption><b>V1 in Night swell.</b> Next is teal; Your chat is cream with dark text, so the two are clearly different. Previous stays outlined.</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev two"><b>&larr; Previous</b><span class="t">John 2</span></span><span class="cb chat fit"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span><span class="hide" aria-label="Hide">&#10005;</span></span><span class="cb next two"><b>Next &rarr;</b><span class="t">John 4</span></span></div>
+</div><figcaption><b>V2 in Night swell.</b></figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="mid"><span class="round"><svg class="bubble" style="width:26px;height:26px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span>Your chat</span><span class="cb next"><span class="t">John 4 &rarr;</span></span></div>
+</div><figcaption><b>V3 in Night swell.</b></figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb chat fit" style="width:56px;padding:0;justify-content:center" aria-label="Your chat"><svg class="bubble" style="width:26px;height:26px" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="cb next"><span class="t">John 4 &rarr;</span></span></div>
+</div><figcaption><b>V4 in Night swell.</b></figcaption></figure>
+</div>
+
+<div class="row wide">
+<figure class="wide"><div class="desk">
+ <div class="site-top"><span class="logo">Word on the Water</span><span style="font-size:15px;display:flex;gap:22px;margin-right:12px"><span>About</span><span>Devotionals</span><span>Bible</span><span>Start here</span><span>What we believe</span><span>Prayer</span><span>Got Questions</span></span><span class="btn primary" style="min-height:40px">Subscribe</span></div>
+ <div class="reader" style="max-width:680px;margin:0 auto;padding:24px 40px 8px">
+  <div class="pbtn" style="max-width:260px"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+ </div>
+ <div class="chap-bar"><span class="cb prev" style="flex:none"><span class="t">&larr; John 2</span></span><span style="flex:1"></span><span class="cb chat" style="flex:none;padding:0 20px"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="t">Your chat</span></span><span style="flex:1"></span><span class="cb next" style="flex:none"><span class="t">John 4 &rarr;</span></span></div>
+</div><figcaption><b>On desktop (from 1024px)</b> there is room for the full words, so Previous, Your chat and Next sit in one row under the text, with single-line labels as today. The bar is not pinned on desktop (the buttons sit under the text, as now); say if you also want it pinned there.</figcaption></figure>
+</div>
+
+<h3 style="margin:28px 0 8px">Comparison</h3>
+<table class="cmp">
+<tr><th></th><th>V1. Sized to its words</th><th>V2. With a hide X</th><th>V3. Raised round</th><th>V4. Icon only</th></tr>
+<tr><td><b>Obvious</b></td><td>Yes: icon and words</td><td>Yes: icon and words</td><td>Most eye-catching</td><td>Less: icon, no word</td></tr>
+<tr><td><b>Chapter names</b></td><td>Two lines, about 85px each</td><td>Two lines, about 70px each (tightest)</td><td>One line, about 120px</td><td>One line, about 125px</td></tr>
+<tr><td><b>Can be hidden</b></td><td>No (goes away on return or when the tab closes)</td><td>Yes, its own X</td><td>No</td><td>No</td></tr>
+<tr><td><b>Bar height</b></td><td>Unchanged (about 64px)</td><td>Unchanged</td><td>+30px where it rises</td><td>Unchanged</td></tr>
+<tr><td><b>Fits a phone as is</b></td><td>Yes</td><td>Yes, tightly</td><td>Yes</td><td>Yes</td></tr>
+<tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Clear words, nothing cramped.</td><td>Choose this only if you want a way to hide it.</td><td>Not recommended: it breaks the bar&rsquo;s line and adds height.</td><td>A fallback if names must be one line.</td></tr>
+</table>
+<h3 style="margin:24px 0 8px">Questions for you</h3>
+<ul class="notes">
+<li>Which version? (V1 is my recommendation.)</li>
+<li>Do you want a way to hide it (V2), or is it fine that it goes away when you go back to the chat or close the tab?</li>
+<li>Pin the bar on desktop too, or keep it under the text there?</li>
+<li>Chapter names in two lines need the word &ldquo;Previous&rdquo; and &ldquo;Next&rdquo; added to the labels for everyone, not only those who came from the chat, or should the two-line labels only be used while the chat button is there? I would suggest only while it is there, so the bar stays unchanged for everyone else.</li>
+</ul>
+
+<h2>6d. Desktop: replacing the floating pill</h2>
+<p class="lead">From 1024px the &ldquo;Your chat&rdquo; control is currently a pill floating at the bottom right, which looks adrift. Three alternatives that belong to the page. All appear only after a verse was tapped in the chat, and all open the chat in place over the Bible (no page load). Shown on the Bible reader in Dawn patrol.</p>
+<figure class="wide"><div class="desk"><div class="dnav"><span class="logo">Word on the Water</span><div class="links"><span>Devotionals</span><span>Bible</span><span>About</span><span class="gq">Got Questions</span></div><span class="btn primary" style="min-height:44px">Subscribe</span><span class="iconbtn">&#9790;</span></div>
+ <div class="dcol"><div class="resume"><span class="ico"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><div class="txt"><b>Your chat is still open</b><small>3 answers, last: &ldquo;Who is Jesus?&rdquo;</small></div><span class="btn" style="background:var(--ink);border-color:var(--ink);color:var(--bg)">Open chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+  <div class="dpass"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers" style="margin:0"><span class="on">WEB</span><span>BSB</span></div></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+  <div class="dchap"><span class="cb prev" style="flex:none">&larr; John 2</span><span class="cb next" style="flex:none">John 4 &rarr;</span></div>
+ </div>
+</div><figcaption><b>D1. Resume card at the top of the reader.</b> A calm banner in the page flow, above the passage picker, in the reader&rsquo;s 680px column. It says what it is and what is waiting, and has one clear action (Open chat) plus a Dismiss. It scrolls away with the page and covers nothing.</figcaption></figure><figure class="wide"><div class="desk"><div class="dnav"><span class="logo">Word on the Water</span><div class="links"><span>Devotionals</span><span>Bible</span><span>About</span><span class="hdr-chat"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Your chat<i class="dot"></i></span></div><span class="btn primary" style="min-height:44px">Subscribe</span><span class="iconbtn">&#9790;</span></div>
+ <div class="dcol">
+  <div class="dpass"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers" style="margin:0"><span class="on">WEB</span><span>BSB</span></div></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+  <div class="dchap"><span class="cb prev" style="flex:none">&larr; John 2</span><span class="cb next" style="flex:none">John 4 &rarr;</span></div>
+ </div>
+ <div class="callout"><b>Pick up where you left off</b><br>Your chat has 3 answers. Last: &ldquo;Who is Jesus?&rdquo;<div class="acts"><span class="btn" style="background:var(--ink);border-color:var(--ink);color:var(--bg);min-height:44px">Open chat</span><span class="btn" style="min-height:44px">Not now</span></div></div>
+</div><figcaption><b>D2. In the header.</b> The Got Questions link becomes a solid Your chat button with a small notice dot while a conversation is waiting; there is nothing new on the page. A small callout points at it once (Not now hides the callout; the button stays until you open the chat). The header is already where the chat lives, so there is one place to look.</figcaption></figure><figure class="wide"><div class="desk"><div class="dnav"><span class="logo">Word on the Water</span><div class="links"><span>Devotionals</span><span>Bible</span><span>About</span><span class="gq">Got Questions</span></div><span class="btn primary" style="min-height:44px">Subscribe</span><span class="iconbtn">&#9790;</span></div>
+ <div class="dcol">
+  <div class="dpass"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers" style="margin:0"><span class="on">WEB</span><span>BSB</span></div></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+  <div class="dchap"><span class="cb prev" style="flex:none">&larr; John 2</span><span class="cb next" style="flex:none">John 4 &rarr;</span></div>
+ </div>
+ <div class="edge"><div class="e-open"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="v">Your chat</span></div><div class="e-x" aria-label="Hide">&#10005;</div></div>
+</div><figcaption><b>D3. Edge tab.</b> A tab fixed to the right edge of the window, mid-height, where the chat drawer slides in from, so the tab and the drawer are the same object. It does not sit on the text or in a corner, and has its own hide button (44px).</figcaption></figure><h3 style="margin:28px 0 8px">Comparison</h3>
+<table class="cmp">
+<tr><th></th><th>D1. Resume card</th><th>D2. Header button</th><th>D3. Edge tab</th></tr>
+<tr><td><b>Pattern</b></td><td>Inline contextual banner (&ldquo;continue where you left off&rdquo;)</td><td>Navigation item with a notice dot</td><td>Docked drawer handle</td></tr>
+<tr><td><b>Covers content</b></td><td>No, it is part of the page</td><td>No (callout is dismissible)</td><td>Overlaps the window edge only</td></tr>
+<tr><td><b>Always reachable</b></td><td>No, scrolls away (Got Questions in the header still works)</td><td>Yes, header is sticky</td><td>Yes, fixed</td></tr>
+<tr><td><b>Discoverable</b></td><td>Very: words, count and last question</td><td>Good, plus the one-time callout</td><td>Good, icon and vertical words</td></tr>
+<tr><td><b>Can be hidden</b></td><td>Yes (Dismiss)</td><td>No (it is the nav item; it reverts after the chat is opened)</td><td>Yes (own X)</td></tr>
+<tr><td><b>Keyboard and screen reader</b></td><td>Best: a region in page order, first after the header</td><td>Best: a header button, always at the same place</td><td>A fixed button late in tab order; vertical text needs a plain accessible name</td></tr>
+<tr><td><b>Build size</b></td><td>Small: one component in the reader, uses the existing flag</td><td>Smallest: restyles the existing Got Questions link, plus the callout</td><td>Small, plus overlap checks at zoom</td></tr>
+<tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Clearest and covers nothing; it matches the phone bar&rsquo;s purpose without floating.</td><td>Good as an addition to D1 (the dot only, without the callout).</td><td>Fine, but a fixed element is the least tidy.</td></tr>
+</table>
+<h3 style="margin:24px 0 8px">Questions for you</h3>
+<ul class="notes">
+<li>Which one (D1 is my recommendation)? D1 with the dot from D2 on the header link works well together.</li>
+<li>Should it return after Dismiss when you read another chapter, or stay hidden for the tab?</li>
+</ul>
 
 <h2>UX decisions in one place</h2>
 <ul class="notes">

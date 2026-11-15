@@ -11,7 +11,7 @@ vi.mock("@/lib/actions/theme", () => ({ setTheme: vi.fn() }));
 afterEach(cleanup);
 
 describe("Header", () => {
-  it("has a Main nav with the five section links", () => {
+  it("has a Main nav with the four section links", () => {
     render(<Header />);
     const nav = screen.getByRole("navigation", { name: "Main" });
     expect(
@@ -19,7 +19,7 @@ describe("Header", () => {
         .getAllByRole("link")
         .map((l) => l.textContent),
     ).toEqual(NAV_LINKS.map((l) => l.label));
-    expect(NAV_LINKS).toHaveLength(5);
+    expect(NAV_LINKS).toHaveLength(4);
   });
 
   it("has one primary call to action to the subscribe section", () => {

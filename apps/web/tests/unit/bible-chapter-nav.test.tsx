@@ -88,10 +88,10 @@ describe("ChapterNav", () => {
     for (const link of n.getAllByRole("link")) expect(link.className).toMatch(/min-h-12/);
   });
 
-  it("sticks to the bottom of the screen on a phone and sits under the text on a wide screen", () => {
+  it("is pinned to the bottom of the screen on a phone and sits under the text on a wide screen", () => {
     nav("john", 3);
     const bar = screen.getByRole("navigation", { name: "Previous and next chapter" });
-    expect(bar.className).toMatch(/\bsticky\b/);
+    expect(bar.className).toMatch(/\bfixed\b/);
     expect(bar.className).toMatch(/\bbottom-0\b/);
     expect(bar.className).toMatch(/lg:static/);
   });

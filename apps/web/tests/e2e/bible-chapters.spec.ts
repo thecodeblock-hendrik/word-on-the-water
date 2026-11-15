@@ -65,6 +65,23 @@ test.describe("without JavaScript", () => {
   });
 });
 
+test.describe("the reader has no site footer", () => {
+  for (const path of [john3, `${john3}?v=16`, "/bible/web/psalms/119"]) {
+    test(`none on ${path}, and the page still has its header`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByRole("banner")).toBeVisible();
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
+    });
+  }
+
+  test("the footer is still on the home page", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("contentinfo")).toBeVisible();
+  });
+});
+
 test.describe("on a phone or tablet (below 1024px)", () => {
   test.skip(
     ({ viewport }) => (viewport?.width ?? 0) >= 1024,
@@ -94,19 +111,37 @@ test.describe("on a phone or tablet (below 1024px)", () => {
     await expect(page.getByRole("heading", { level: 1, name: "John 4" })).toBeVisible();
   });
 
-  test("at the end of the page the bar rests above the footer and hides no text", async ({
+  const barOf = (page: import("@playwright/test").Page) =>
+    page.getByRole("navigation", { name: "Previous and next chapter" });
+
+  test("scrolling to the end of a chapter leaves the bar at the bottom of the screen, with the credit above it", async ({
     page,
   }) => {
     await page.goto("/bible/bsb/psalms/119");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await page.waitForTimeout(300);
-    const bar = (await page
-      .getByRole("navigation", { name: "Previous and next chapter" })
-      .boundingBox())!;
-    const footer = (await page.getByRole("contentinfo").boundingBox())!;
-    expect(bar.y + bar.height).toBeLessThanOrEqual(footer.y + 1);
+    const height = page.viewportSize()!.height;
+    const bar = (await barOf(page).boundingBox())!;
+    expect(bar.y + bar.height).toBeGreaterThanOrEqual(height - 1);
+    expect(bar.y + bar.height).toBeLessThanOrEqual(height + 1);
+    // Nothing is hidden behind the bar: the last line of the page (the credit) ends above it.
     const credit = (await page.getByText("Berean Standard Bible (BSB), dedicated").boundingBox())!;
     expect(credit.y + credit.height).toBeLessThanOrEqual(bar.y + 1);
+  });
+
+  test("a short passage has the bar at the bottom of the screen, before and after scrolling", async ({
+    page,
+  }) => {
+    await page.goto(`${john3}?v=16`);
+    const height = page.viewportSize()!.height;
+    for (const scroll of [false, true]) {
+      if (scroll)
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(200);
+      const bar = (await barOf(page).boundingBox())!;
+      expect(bar.y + bar.height).toBeGreaterThanOrEqual(height - 1);
+      expect(bar.y + bar.height).toBeLessThanOrEqual(height + 1);
+    }
   });
 
   test("the bar never covers the passage button or the version chip at the top", async ({

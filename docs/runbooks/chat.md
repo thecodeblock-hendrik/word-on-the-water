@@ -5,7 +5,7 @@ Scope: [chat.md](../chat.md). Decision: [ADR 0009](../adr/0009-chat-local-knowle
 ## Turn it off or on
 
 - The switch is `CHAT_ENABLED` (`1` is on, unset or blank is off) on **both** Vercel projects, `wotw-web` and `wotw-api`. Redeploy after changing it.
-- Off: the landing page shows "Talk to someone" (a link to the contact section) and the API answers `503 chat_unavailable`.
+- Off: the landing page shows "Talk to someone" (a mail link to `hello@wordonthewater.net`) and the API answers `503 chat_unavailable`.
 - Turn it off first if a wrong or harmful answer is reported, then fix the KB.
 
 ## Change an answer or add one

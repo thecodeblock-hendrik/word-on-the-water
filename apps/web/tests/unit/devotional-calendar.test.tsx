@@ -12,6 +12,7 @@ const one = bySeriesNumber(1);
 const two = bySeriesNumber(2);
 const three = bySeriesNumber(3);
 const four = bySeriesNumber(4);
+const five = bySeriesNumber(5);
 
 const on = (day: string) => {
   vi.useFakeTimers({ toFake: ["Date"] });
@@ -37,7 +38,9 @@ describe("the landing card follows the calendar", () => {
     ["on the day week 3 is published", "2026-12-12", three],
     ["the day before week 4", "2026-12-18", three],
     ["on the day week 4 is published", "2026-12-19", four],
-    ["after week 4", "2027-01-01", four],
+    ["the day before week 5", "2026-12-25", four],
+    ["on the day week 5 is published", "2026-12-26", five],
+    ["after week 5", "2027-01-01", five],
   ])("%s (%s) shows the right devotional", (_label, day, expected) => {
     on(day);
     render(<Home />);

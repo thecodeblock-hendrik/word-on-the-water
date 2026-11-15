@@ -62,7 +62,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 
 ## D. Prayer request form (PLAN 1.4, UI part)
 
-- [ ] `#contact` section exists (header "Prayer" link and footer already point at it, so they currently go nowhere)
+- [ ] `#contact` section exists, and the "Prayer" link is added back to the menu bar (`nav-links.ts`) and the footer (`landing.ts`); both were removed on 2026-11-15 until this feature is built
 - [ ] Fields: first name (optional), message (required, 2,000 character limit with a live counter), optional email for a reply
 - [ ] Consent checkboxes: "OK to email the prayer team" and "I would like a reply"; the default is a decision for **(Hendrik)** (PLAN 1.4)
 - [ ] Plain note that the request is private and how long it is kept (90 days)
@@ -86,7 +86,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 - [ ] Replace the `mailto:` and placeholder addresses with real ones: `prayer@wordonthewater.net`, `hello@wordonthewater.net` (PLAN 1.6)
 - [ ] Footer: privacy policy link once the page exists
 - [ ] Footer: "full statement of faith" link once a page or URL exists
-- [ ] Header links all land on a real section (`#contact` is the one missing today)
+- [ ] Header links all land on a real section
 - [ ] Active or focus state on the in-page links; smooth scroll respects reduced motion
 - [ ] Anchor targets are not hidden under the sticky header (scroll margin)
 - [ ] 404 and error pages reviewed in both themes
@@ -120,7 +120,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 
 ## H. Installable app and share look (PLAN 1.6, UI part)
 
-- [ ] `app/manifest.ts` with name, short name, colours from the tokens, shortcuts (Start here, Prayer request)
+- [ ] `app/manifest.ts` with name, short name, colours from the tokens, shortcuts (Start here)
 - [ ] Icons: 192 and 512 px, 512 px maskable, `icon.svg`, `apple-icon.png` (180 px), drawn from the inline logo
 - [ ] Narrow 375px screenshots for the Android install sheet
 - [ ] `metadata.appleWebApp` for the iOS home-screen launch
@@ -168,6 +168,6 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 ## L. Final sign-off
 
 - [ ] `pnpm check:placeholders` reports nothing
-- [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and send a prayer request
+- [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and reach `hello@` (no prayer option until that feature is built)
 - [ ] Both themes reviewed end to end on a real phone and a desktop browser
 - [ ] No console errors and no CSP violations on the production domain

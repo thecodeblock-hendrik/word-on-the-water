@@ -27,14 +27,7 @@ describe("navLinks", () => {
 
   it("puts Bible after Devotionals when it is on", () => {
     const labels = navLinks(true).map((l) => l.label);
-    expect(labels).toEqual([
-      "About",
-      "Devotionals",
-      "Bible",
-      "Start here",
-      "What we believe",
-      "Prayer",
-    ]);
+    expect(labels).toEqual(["About", "Devotionals", "Bible", "Start here", "What we believe"]);
     expect(navLinks(true)[2]).toMatchObject({ href: "/bible", match: "/bible" });
   });
 });
@@ -86,20 +79,13 @@ describe("NavLink", () => {
 });
 
 describe("Header with the Bible on", () => {
-  it("lists six links with Bible third", () => {
+  it("lists five links with Bible third", () => {
     render(<Header />);
     const nav = screen.getByRole("navigation", { name: "Main" });
     const labels = within(nav)
       .getAllByRole("link")
       .map((l) => l.textContent);
-    expect(labels).toEqual([
-      "About",
-      "Devotionals",
-      "Bible",
-      "Start here",
-      "What we believe",
-      "Prayer",
-    ]);
+    expect(labels).toEqual(["About", "Devotionals", "Bible", "Start here", "What we believe"]);
     expect(within(nav).getByRole("link", { name: "Bible" })).toHaveAttribute("href", "/bible");
   });
 
@@ -114,7 +100,6 @@ describe("Header with the Bible on", () => {
       "Bible",
       "Start here",
       "What we believe",
-      "Prayer",
     ]);
     expect(menu.getByRole("link", { name: "Bible" })).toHaveAttribute("aria-current", "page");
   });
@@ -124,7 +109,7 @@ describe("Header with the Bible on", () => {
     render(<Header />);
     const nav = screen.getByRole("navigation", { name: "Main" });
     expect(within(nav).queryByRole("link", { name: "Bible" })).not.toBeInTheDocument();
-    expect(within(nav).getAllByRole("link")).toHaveLength(5);
+    expect(within(nav).getAllByRole("link")).toHaveLength(4);
   });
 });
 
