@@ -104,3 +104,26 @@ describe("the privacy policy content", () => {
     expect(findPlaceholders(policy(true))).toEqual([]);
   });
 });
+
+describe("the Got Questions chat in the policy", () => {
+  const withChat = privacyPolicy({ bibleEnabled: false, chatEnabled: true });
+  const item = withChat.sections
+    .find((s) => s.id === "what-we-collect")!
+    .items!.find((i) => i.term === "Got Questions chat");
+
+  it("is described only while the chat is switched on", () => {
+    expect(item).toBeDefined();
+    expect(everything()).not.toContain("Got Questions");
+  });
+
+  it("says nothing is stored or shared, the tab keeps the thread and personal details are refused", () => {
+    expect(item!.text).toMatch(/not stored/i);
+    expect(item!.text).toMatch(/not .*(sent|shared)|no one else/i);
+    expect(item!.text).toMatch(/browser tab/i);
+    expect(item!.text).toMatch(/personal details/i);
+  });
+
+  it("has no draft placeholders", () => {
+    expect(findPlaceholders(withChat)).toEqual([]);
+  });
+});
