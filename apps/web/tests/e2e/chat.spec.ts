@@ -252,13 +252,20 @@ test.describe("with the chat on", () => {
       expect(credit.y + credit.height).toBeLessThanOrEqual(round.y + 1);
     });
 
-    test("on a wide screen it floats at the bottom right and can be hidden", async ({ page }) => {
-      test.skip(page.viewportSize()!.width < 1024, "the floating button is for wide screens");
+    test("on a wide screen it is a tab on the right edge, mid-height, and can be hidden", async ({
+      page,
+    }) => {
+      test.skip(page.viewportSize()!.width < 1024, "the edge tab is for wide screens");
       await readVerse(page);
+      const { width, height } = page.viewportSize()!;
       const back = page.getByRole("button", { name: "Your chat", exact: true });
       const box = (await back.boundingBox())!;
-      expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
-      await page.getByRole("button", { name: /Hide the Your chat button/ }).click();
+      expect(Math.round(box.x + box.width)).toBe(width);
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(Math.abs(box.y + box.height / 2 - height / 2)).toBeLessThan(height / 4);
+      const hide = page.getByRole("button", { name: /Hide the Your chat button/ });
+      expect((await hide.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      await hide.click();
       await expect(back).toHaveCount(0);
     });
   });
