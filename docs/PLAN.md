@@ -334,7 +334,7 @@ Not part of the launch. Until it is built the page shows `hello@wordonthewater.n
 ### 1.8 Quality gates
 - [ ] Playwright e2e on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox: sign-up via Mailpit, prayer form, navigation
 - [x] `@axe-core/playwright` on every page: zero serious or critical (2026-11-15: landing, devotional and not-found in `a11y.spec.ts`; privacy, thank-you, sign-up, chat and the Bible reader in their own specs; light and dark)
-- [ ] Lighthouse CI mobile: Performance >= 95, Accessibility 100, Best Practices 100, SEO 100
+- [ ] Lighthouse CI mobile: Performance >= 95, Accessibility 100, Best Practices 100, SEO 100. Wired 2026-11-15 (`apps/web/lighthouserc.json`, `pnpm lighthouse`, CI job `lighthouse`, 3 runs, median, against the local production build). First reading: landing page 100 / 100 / 96 / 100, LCP 0.9 s, CLS 0, TBT about 20 ms. Best Practices is 96 locally only because `/_vercel/insights` 404s off Vercel (the gate uses 0.95; it must be 100 on a preview). **Open:** the devotional page scores 94 and a simulated LCP of 3.1 s (observed 135 ms); both art images are preloaded without `fetchpriority=high`. Asserted as a warning until fixed. Still to do: measure on a deployed preview, make the job a required check
 - [ ] LCP < 2.0 s, CLS < 0.05, INP < 200 ms, landing JS < 165 KB gzipped (budget revised in [ADR 0010](adr/0010-landing-js-budget.md), enforced by the e2e ceiling in `chat.spec.ts`)
 - [ ] Re-measure LCP on a deployed preview because pages render per request (ADR 0007); revisit hash-based CSP if the budget fails
 - [ ] API service coverage >= 85%

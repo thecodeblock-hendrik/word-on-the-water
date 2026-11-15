@@ -147,3 +147,25 @@ jobs:
           name: playwright-results
           path: apps/web/test-results
           retention-days: 7
+
+  lighthouse:
+    name: Lighthouse (mobile)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: apps/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/web build
+        env: &lighthouse_env
+          API_BASE_URL: http://localhost:8000
+          SERVICE_TOKEN: build-check-service-token-0123456789
+          API_BYPASS_SECRET: build-check-bypass-0123456789
+          CRON_SECRET: build-check-cron-0123456789
+      - run: pnpm --dir apps/web lighthouse
+        env: *lighthouse_env
