@@ -11,6 +11,8 @@ export const chat = {
   close: "Close",
   clear: "Clear chat",
   readMore: "Read more",
+  browse: "Browse by topic",
+  browseShort: "Browse topics",
   starterLabel: "Try one of these",
   verses: "Key scriptures",
   related: "You might also ask",

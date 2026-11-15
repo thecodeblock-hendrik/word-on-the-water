@@ -298,3 +298,39 @@ describe("the thread in this tab", () => {
     vi.restoreAllMocks();
   });
 });
+
+describe("browse by topic", () => {
+  it("lists the themes, then a theme's questions, and a question sends its id", async () => {
+    ok(answer("1.1"));
+    const { user, dialog } = await openPanel();
+    await user.click(within(dialog).getByRole("button", { name: /Browse by topic/ }));
+
+    expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
+    await user.click(within(dialog).getByRole("button", { name: /^God, \d+ questions$/ }));
+    await user.click(within(dialog).getByRole("button", { name: "Does God exist?" }));
+
+    await waitFor(() => expect(sendChat).toHaveBeenCalled());
+    expect(sendChat.mock.calls[0][0].turn).toEqual({ entry_id: "1.1" });
+    expect(await screen.findByText("Short answer 1.1.")).toBeDefined();
+    expect(screen.queryByRole("button", { name: /^God, \d+ questions$/ })).toBeNull();
+  });
+
+  it("Back goes from the questions to the themes, then to the chat", async () => {
+    const { user, dialog } = await openPanel();
+    await user.click(within(dialog).getByRole("button", { name: /Browse by topic/ }));
+    await user.click(within(dialog).getByRole("button", { name: /^God, \d+ questions$/ }));
+
+    await user.click(within(dialog).getByRole("button", { name: /Back/ }));
+    expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
+    await user.click(within(dialog).getByRole("button", { name: /Back/ }));
+    expect(within(dialog).getByRole("button", { name: "Who is Jesus?" })).toBeDefined();
+  });
+
+  it("is also offered after a reply with no answer", async () => {
+    ok(reply({ kind: "no_answer", text: "No answer." }));
+    const { user, dialog } = await openPanel();
+    await user.type(box(), "bread{Enter}");
+    await user.click(await within(dialog).findByRole("button", { name: "Browse topics" }));
+    expect(within(dialog).getAllByRole("button", { name: /^.+, \d+ questions$/ })).toHaveLength(14);
+  });
+});

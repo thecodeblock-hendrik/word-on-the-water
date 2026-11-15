@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { ChatInput } from "@/components/chat/chat-input";
 import { Chip } from "@/components/chat/chip";
+import { TopicBrowser } from "@/components/chat/topic-browser";
 import { MessageList } from "@/components/chat/message-list";
 import { useChat } from "@/components/chat/use-chat";
 import { chat } from "@/content/chat";
@@ -27,6 +28,7 @@ export function ChatPanel({
   const { thread, shown, pending, ask, clear } = useChat();
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [browsing, setBrowsing] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
@@ -50,9 +52,13 @@ export function ChatPanel({
     void send({ message }, message, text);
   }
 
-  const askEntry = (id: string, question: string) => void send({ entry_id: id }, question);
+  const askEntry = (id: string, question: string) => {
+    setBrowsing(false);
+    void send({ entry_id: id }, question);
+  };
   const actions = {
     onAsk: askEntry,
+    onBrowse: () => setBrowsing(true),
     onMore: () => void send({ action: "more" }, "Tell me more"),
     onTerm: (term: string) => void send({ action: "term", term }, term),
   };
@@ -97,24 +103,33 @@ export function ChatPanel({
             </div>
           </div>
           <div ref={scroller} className="flex-1 overflow-y-auto px-4 py-4">
-            {shown.length === 0 && (
-              <div className="grid gap-3">
-                <p>
-                  <strong>{chat.intro}</strong> {chat.introNote}
-                </p>
-                <span className="font-ui text-xs font-semibold uppercase tracking-[.12em] text-muted">
-                  {chat.starterLabel}
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {chat.starters.map((s) => (
-                    <Chip key={s.id} onClick={() => askEntry(s.id, s.question)}>
-                      {s.question}
+            {browsing ? (
+              <TopicBrowser onAsk={askEntry} onBack={() => setBrowsing(false)} />
+            ) : (
+              <>
+                {shown.length === 0 && (
+                  <div className="grid gap-3">
+                    <p>
+                      <strong>{chat.intro}</strong> {chat.introNote}
+                    </p>
+                    <span className="font-ui text-xs font-semibold uppercase tracking-[.12em] text-muted">
+                      {chat.starterLabel}
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {chat.starters.map((s) => (
+                        <Chip key={s.id} onClick={() => askEntry(s.id, s.question)}>
+                          {s.question}
+                        </Chip>
+                      ))}
+                    </div>
+                    <Chip onClick={actions.onBrowse} className="w-fit">
+                      {chat.browse} ›
                     </Chip>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                )}
+                <MessageList thread={shown} pending={pending} actions={actions} />
+              </>
             )}
-            <MessageList thread={shown} pending={pending} actions={actions} />
           </div>
           <ChatInput
             value={text}

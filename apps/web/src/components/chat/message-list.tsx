@@ -8,6 +8,7 @@ type Actions = {
   onAsk: (entryId: string, question: string) => void;
   onMore: () => void;
   onTerm: (term: string) => void;
+  onBrowse: () => void;
 };
 
 function Options({ options, onAsk }: { options: Option[]; onAsk: Actions["onAsk"] }) {
@@ -58,12 +59,15 @@ function Reply({
       {reply.text && <p>{reply.text}</p>}
       {reply.options.length > 0 && <Options options={reply.options} onAsk={actions.onAsk} />}
       {reply.kind === "no_answer" && (
-        <a
-          href={`mailto:${chat.mail}`}
-          className="inline-flex min-h-11 w-fit items-center rounded-full border-[1.5px] border-line bg-surface px-4 font-ui text-[15px] font-medium text-ink"
-        >
-          {chat.emailUs}
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={`mailto:${chat.mail}`}
+            className="inline-flex min-h-11 items-center rounded-full border-[1.5px] border-line bg-surface px-4 font-ui text-[15px] font-medium text-ink"
+          >
+            {chat.emailUs}
+          </a>
+          <Chip onClick={actions.onBrowse}>{chat.browseShort}</Chip>
+        </div>
       )}
     </div>
   );

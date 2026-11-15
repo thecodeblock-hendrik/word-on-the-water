@@ -55,6 +55,7 @@ types-check: types
 
 kb:
 	cd apps/api && uv run python kb/build_kb.py kb/faith_kb.md app/data/faith_kb.json
+	pnpm --dir apps/web build:chat-topics
 
 kb-check:
 	cd apps/api && uv run python kb/build_kb.py kb/faith_kb.md /tmp/faith_kb_check.json && diff -q app/data/faith_kb.json /tmp/faith_kb_check.json
