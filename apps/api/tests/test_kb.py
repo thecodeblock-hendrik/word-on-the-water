@@ -36,15 +36,15 @@ def broken(raw: dict[str, Any], change: Any) -> dict[str, Any]:
 def test_the_committed_knowledge_base_loads() -> None:
     kb = load_kb(DATA)
     assert kb.version == kb.meta.version
-    assert len(kb.entries_by_id) == 203
+    assert len(kb.entries_by_id) == 228
 
 
 def test_counts_match_the_meta_counts() -> None:
     kb = load_kb(DATA)
-    assert len(kb.entries) == kb.meta.counts.entries == 203
+    assert len(kb.entries) == kb.meta.counts.entries == 228
     assert sum(e.contested for e in kb.entries) == kb.meta.counts.contested == 16
     assert len(kb.glossary) == kb.meta.counts.glossary_terms == 39
-    assert len(kb.themes) == kb.meta.counts.themes == 14
+    assert len(kb.themes) == kb.meta.counts.themes == 15
 
 
 def test_every_cross_reference_resolves() -> None:

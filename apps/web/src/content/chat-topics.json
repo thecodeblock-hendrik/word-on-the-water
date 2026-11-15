@@ -894,5 +894,111 @@
         "question": "Should Christians obey the government?"
       }
     ]
+  },
+  {
+    "number": 16,
+    "name": "Bible Characters",
+    "entries": [
+      {
+        "id": "16.1",
+        "question": "Who are the key people in the Bible?"
+      },
+      {
+        "id": "16.2",
+        "question": "Who were Adam and Eve?"
+      },
+      {
+        "id": "16.3",
+        "question": "Who was Noah?"
+      },
+      {
+        "id": "16.4",
+        "question": "Who was Abraham?"
+      },
+      {
+        "id": "16.5",
+        "question": "Who were Isaac and Jacob?"
+      },
+      {
+        "id": "16.6",
+        "question": "Who was Joseph?"
+      },
+      {
+        "id": "16.7",
+        "question": "Who was Moses?"
+      },
+      {
+        "id": "16.8",
+        "question": "Who was Joshua?"
+      },
+      {
+        "id": "16.9",
+        "question": "Who was Deborah?"
+      },
+      {
+        "id": "16.10",
+        "question": "Who was Ruth?"
+      },
+      {
+        "id": "16.11",
+        "question": "Who was Samuel?"
+      },
+      {
+        "id": "16.12",
+        "question": "Who was David?"
+      },
+      {
+        "id": "16.13",
+        "question": "Who was Solomon?"
+      },
+      {
+        "id": "16.14",
+        "question": "Who was Elijah?"
+      },
+      {
+        "id": "16.15",
+        "question": "Who was Esther?"
+      },
+      {
+        "id": "16.16",
+        "question": "Who was Job?"
+      },
+      {
+        "id": "16.17",
+        "question": "Who was Isaiah?"
+      },
+      {
+        "id": "16.18",
+        "question": "Who was Jeremiah?"
+      },
+      {
+        "id": "16.19",
+        "question": "Who was Daniel?"
+      },
+      {
+        "id": "16.20",
+        "question": "Who was Jonah?"
+      },
+      {
+        "id": "16.21",
+        "question": "Who was Mary, the mother of Jesus?"
+      },
+      {
+        "id": "16.22",
+        "question": "Who was John the Baptist?"
+      },
+      {
+        "id": "16.23",
+        "question": "Who was Peter?"
+      },
+      {
+        "id": "16.24",
+        "question": "Who was Paul?"
+      },
+      {
+        "id": "16.25",
+        "question": "Who was John the apostle?"
+      }
+    ]
   }
 ]

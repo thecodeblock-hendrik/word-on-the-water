@@ -22,7 +22,7 @@ This knowledge base answers the questions people most often ask about the Christ
 
 **Review note.** Each answer should be checked by a trusted pastor or theologian before use. Mark changes inline or leave comments on the entry.
 
-**Themes:** 1 God · 2 Jesus Christ · 3 The Gospel and Salvation · 4 The Bible · 5 The Holy Spirit · 6 Creation and Humanity · 7 Prayer and Spiritual Growth · 8 The Church · 9 Suffering and Evil · 10 Death and the Afterlife · 11 Angels, Satan and Spiritual Warfare · 12 End Times · 13 Common Objections · 14 Christian Living · 15 Glossary of Key Terms
+**Themes:** 1 God · 2 Jesus Christ · 3 The Gospel and Salvation · 4 The Bible · 5 The Holy Spirit · 6 Creation and Humanity · 7 Prayer and Spiritual Growth · 8 The Church · 9 Suffering and Evil · 10 Death and the Afterlife · 11 Angels, Satan and Spiritual Warfare · 12 End Times · 13 Common Objections · 14 Christian Living · 15 Glossary of Key Terms · 16 Bible Characters
 
 ## 1. God
 
@@ -2534,9 +2534,313 @@ Short definitions of words used in the answers above, so the chatbot can handle 
 | Sovereignty | God’s rule and control over all things. | Psalm 115:3; Ephesians 1:11 | 1.10 |
 | Trinity | One God existing eternally as Father, Son and Holy Spirit. | Matthew 28:19; 2 Corinthians 13:14 | 1.3 |
 
+## 16. Bible Characters
+
+Short profiles of the people the Bible’s story turns on, so the chatbot can answer “Who was …?” questions. Each one gives the person’s part in the story, what we can learn from them, and how their life points to Jesus.
+
+### 16.1 Who are the key people in the Bible?
+
+**Also asked:** bible characters · main characters in the Bible · important people in the Bible · bible heroes · who are the people in the Bible · famous people in the Bible
+
+**Short answer:** The Bible tells one story through the lives of real people, from Adam and Eve at the beginning to the apostles of the early church. Knowing the main figures helps the whole story make sense, and each of them points in some way to Jesus.
+
+**Explanation:** The first people are Adam and Eve, followed by Noah, who survived the flood. God then chose Abraham, whose family became Israel through Isaac, Jacob and Joseph. Moses led them out of Egypt and Joshua into the promised land, then judges such as Deborah ruled until the time of Ruth and the prophet Samuel. David became Israel’s great king, and his son Solomon built the temple. Prophets such as Elijah, Isaiah, Jeremiah and Daniel spoke for God, while Esther, Job and Jonah show God at work in ordinary lives, hardship and failure. In the New Testament the story turns on Jesus, with Mary his mother, John the Baptist who prepared the way, and the apostles Peter, John and Paul who carried the message across the world. Ask about any of them by name.
+
+**Key verses:** Hebrews 11:1–40; Luke 24:27; Romans 15:4
+
+**Tags:** bible characters, people in the bible, heroes of faith
+
+### 16.2 Who were Adam and Eve?
+
+**Also asked:** adam and eve · adam · eve · tell me about Adam and Eve · the first man and woman · garden of eden · who was the first person in the Bible
+
+**Short answer:** Adam and Eve were the first man and woman, made by God in his image and placed in the garden of Eden. Their choice to disobey God let sin and death into the world, which is why the world is as broken as it is and why Jesus came.
+
+**Explanation:** God formed Adam from the dust, breathed life into him and gave him Eve as his partner. They were to care for creation and walk with God (Genesis 1–2). A serpent tempted Eve to eat the fruit God had forbidden, and Adam ate with her (Genesis 3). Their relationship with God, with each other and with creation was damaged, and they were sent out of the garden, yet God promised that the offspring of the woman would one day defeat the serpent (Genesis 3:15). Christians see that promise fulfilled in Jesus. Paul calls Jesus the “last Adam”: as one man’s disobedience brought death to all, so one man’s obedience brings life (Romans 5:12–19; 1 Corinthians 15:22, 45). Believers hold differing views on how to read Genesis 1–3, covered under the questions on creation.
+
+**Key verses:** Genesis 1:26–28; Genesis 2:7–25; Genesis 3:1–24; Romans 5:12–19; 1 Corinthians 15:21–22, 45
+
+**Tags:** adam, eve, adam and eve, garden of eden, the fall, first humans, bible characters
+
+### 16.3 Who was Noah?
+
+**Also asked:** noah · tell me about Noah · noah’s ark · story of Noah · the flood · who built the ark
+
+**Short answer:** Noah was a righteous man who obeyed God by building an ark when God sent a flood to judge a violent world. He and his family were saved, and God made a promise never again to destroy the earth with a flood.
+
+**Explanation:** The Bible says people had become so wicked that God grieved over his creation, but “Noah found favour in the eyes of the Lord” (Genesis 6:5–8). God told him to build an ark, and Noah did everything God commanded. He took his family and the animals on board and God shut the door. After the waters went down, God made a covenant with Noah and set the rainbow in the sky as its sign (Genesis 9:8–17). The New Testament holds Noah up as a man of faith (Hebrews 11:7), and Peter compares the ark to salvation: Noah’s household was brought safely through the water, as believers are through Christ (1 Peter 3:20–21). Jesus also used the days of Noah to teach that his return will come when people are not ready (Matthew 24:37–39).
+
+**Key verses:** Genesis 6:5–22; Genesis 7:1–5; Genesis 9:8–17; Hebrews 11:7; 1 Peter 3:20–21
+
+**Tags:** noah, the ark, the flood, rainbow, covenant, bible characters
+
+### 16.4 Who was Abraham?
+
+**Also asked:** abraham · abram · tell me about Abraham · father of faith · story of Abraham · who is the father of the Jewish people
+
+**Short answer:** Abraham was the man God called to leave his home and trust him, promising to make him a great nation and to bless all peoples through him. He is the father of Israel and, in the New Testament, the great example of being counted right with God by faith.
+
+**Explanation:** God called Abram (later Abraham) from Ur, promising him land, a great family and blessing for the whole world (Genesis 12:1–3). He was old and childless, yet he believed God, and “it was counted to him as righteousness” (Genesis 15:6). God made a covenant with him, changed his name and, when he was a hundred, gave him a son, Isaac. Later God tested Abraham by asking for Isaac, and Abraham obeyed, trusting God to provide; God stopped him and provided a ram (Genesis 22). Abraham was not flawless: he lied about his wife Sarah and fathered Ishmael through Hagar when he doubted the promise would come. Paul teaches that Abraham was made right with God by faith, before the law, so that all who believe, Jew or not, are his spiritual children (Romans 4; Galatians 3:6–9). The “offspring” through whom the world would be blessed is Christ (Galatians 3:16).
+
+**Key verses:** Genesis 12:1–3; Genesis 15:1–6; Genesis 17:1–8; Genesis 22:1–19; Romans 4:1–5, 16–22; Hebrews 11:8–19
+
+**Tags:** abraham, abram, sarah, isaac, covenant, faith, bible characters
+
+### 16.5 Who were Isaac and Jacob?
+
+**Also asked:** isaac · jacob · israel · tell me about Isaac and Jacob · twelve tribes of Israel · why was Jacob renamed Israel · Jacob and Esau
+
+**Short answer:** Isaac was Abraham’s promised son, and his son Jacob was renamed Israel. Jacob’s twelve sons became the twelve tribes of the nation of Israel, so these two carry God’s promise to Abraham forward.
+
+**Explanation:** Isaac was born to Abraham and Sarah when they were old, and God confirmed the covenant promises to him (Genesis 21; 26). He married Rebekah, and their twin sons were Esau and Jacob. Jacob, whose name means “he grasps the heel” or “deceiver,” tricked his brother out of the birthright and blessing and had to flee (Genesis 25; 27). On the way, at Bethel, God appeared to him in a dream of a ladder to heaven and renewed the promise (Genesis 28:10–22). Years later Jacob wrestled with God through the night and was renamed Israel (Genesis 32:22–32). Of his twelve sons came the twelve tribes, among them Judah, from whom Jesus descended (Genesis 49:10; Matthew 1:2–3). Their story shows God keeping his promises through flawed people, by grace rather than by merit.
+
+**Key verses:** Genesis 21:1–7; Genesis 25:19–34; Genesis 28:10–22; Genesis 32:22–32; Genesis 35:9–12; Romans 9:10–13
+
+**Tags:** isaac, jacob, israel, esau, rebekah, twelve tribes, bible characters
+
+### 16.6 Who was Joseph?
+
+**Also asked:** joseph · joseph in egypt · tell me about Joseph · coat of many colours · story of Joseph · Joseph and his brothers
+
+**Short answer:** Joseph was Jacob’s son, sold into slavery by his jealous brothers, who rose to rule Egypt under Pharaoh and saved many people from famine. He told his brothers that what they meant for evil, God meant for good.
+
+**Explanation:** Jacob loved Joseph most and gave him a special robe; his brothers hated him and sold him to traders who took him to Egypt (Genesis 37). In Egypt he was falsely accused and imprisoned, yet “the Lord was with him” (Genesis 39). Interpreting Pharaoh’s dreams, he warned of seven years of plenty followed by seven of famine, and Pharaoh made him second in command (Genesis 41). When famine brought his brothers to Egypt, Joseph tested them, forgave them and moved the whole family there, which sets up Israel’s later time in Egypt (Genesis 42–47). After Jacob died he told his frightened brothers, “You meant evil against me, but God meant it for good” (Genesis 50:20). Many Christians see in Joseph’s story, of being rejected, suffering and then raised to save the very people who wronged him, a picture of Jesus.
+
+**Key verses:** Genesis 37:3–28; Genesis 39:2–5, 20–23; Genesis 41:37–45; Genesis 45:4–8; Genesis 50:19–21; Romans 8:28
+
+**Tags:** joseph, egypt, pharaoh, coat of many colours, forgiveness, bible characters
+
+### 16.7 Who was Moses?
+
+**Also asked:** moses · tell me about Moses · story of Moses · who led Israel out of Egypt · who gave the Ten Commandments · who parted the Red Sea
+
+**Short answer:** Moses was the prophet God used to rescue Israel from slavery in Egypt, to give them his law at Mount Sinai, and to lead them for forty years towards the promised land. He is the key human figure of the Old Testament and is remembered as the one who spoke with God “face to face.”
+
+**Explanation:** Born to Hebrew parents during a time when Pharaoh ordered Hebrew baby boys killed, Moses was hidden, found by Pharaoh’s daughter and raised in the palace (Exodus 2). At forty he fled Egypt after killing an Egyptian, and spent forty years as a shepherd. God called him from a burning bush, revealed his name (“I AM”) and sent him back to demand Israel’s freedom (Exodus 3–4). After the ten plagues, Israel left Egypt at the Passover, crossed the sea on dry ground and received the law, including the Ten Commandments, at Sinai (Exodus 12–20). Moses was not perfect: he struggled with self-doubt, anger and, at Meribah, disobedience, and he died on Mount Nebo seeing the promised land from a distance (Numbers 20:7–12; Deuteronomy 34). The New Testament sees him as a faithful servant who pointed beyond himself to Jesus, a greater rescuer and the one who brings a better covenant (Hebrews 3:1–6). At the transfiguration, Moses appeared with Jesus (Matthew 17:1–8).
+
+**Key verses:** Exodus 3:1–15; Exodus 12:31–42; Exodus 14:21–31; Exodus 20:1–17; Numbers 12:3–8; Deuteronomy 34:10–12; Hebrews 3:1–6
+
+**Tags:** moses, exodus, ten commandments, passover, red sea, sinai, bible characters
+
+### 16.8 Who was Joshua?
+
+**Also asked:** joshua · tell me about Joshua · joshua and the walls of Jericho · who led Israel into the promised land · battle of Jericho · be strong and courageous
+
+**Short answer:** Joshua was Moses’ assistant and successor, who led Israel across the Jordan into the promised land. He is remembered for the fall of Jericho and for his call to serve the Lord faithfully.
+
+**Explanation:** Joshua served Moses for decades and was one of two spies who trusted God’s promise to give Israel the land (Numbers 13–14). After Moses died, God told him to be “strong and courageous,” promising “I will be with you” (Joshua 1:1–9). Israel crossed the Jordan on dry ground, and the walls of Jericho fell after the people marched around the city in obedience to God’s instructions (Joshua 3; 6). Under Joshua, the tribes took possession of the land and it was divided among them. At the end of his life he challenged the nation, “Choose this day whom you will serve … as for me and my house, we will serve the Lord” (Joshua 24:15). His Hebrew name, Yehoshua, is the same as “Jesus” (“the Lord saves”), and many see Joshua leading God’s people to their rest as a pointer to Jesus leading his people into eternal rest (Hebrews 4:8–9).
+
+**Key verses:** Joshua 1:1–9; Joshua 3:14–17; Joshua 6:1–20; Joshua 24:14–15; Hebrews 4:8–9
+
+**Tags:** joshua, jericho, promised land, jordan, bible characters
+
+### 16.9 Who was Deborah?
+
+**Also asked:** deborah · tell me about Deborah · who was Deborah in the Bible · female judge · woman judge of Israel · Deborah and Barak
+
+**Short answer:** Deborah was a prophet and judge who led Israel at a time of oppression. She called Barak to lead the army, trusted God for victory, and the nation enjoyed forty years of peace.
+
+**Explanation:** In the days of the judges, Israel kept turning from God and was oppressed by the Canaanite king Jabin and his commander Sisera. Deborah, a prophet, judged Israel from under a palm tree and was known for her wisdom (Judges 4:4–5). She summoned Barak with God’s command to gather an army. Barak wanted her with him, so she went and told him the credit for the victory would go to a woman. God threw Sisera’s forces into panic, and Sisera was killed by Jael, the wife of Heber, in her tent (Judges 4–5). Deborah and Barak then sang the song recorded in Judges 5, praising God for the victory. Deborah is an example of a leader who listened to God, acted with courage and gave God the glory. Christians differ on how her example bears on leadership roles for women in the church, a question covered elsewhere.
+
+**Key verses:** Judges 4:4–10; Judges 4:14–16; Judges 5:1–12
+
+**Tags:** deborah, judges, barak, jael, sisera, bible characters
+
+### 16.10 Who was Ruth?
+
+**Also asked:** ruth · tell me about Ruth · book of Ruth · Ruth and Naomi · Ruth and Boaz · where you go I will go
+
+**Short answer:** Ruth was a young widow from Moab who stayed loyal to her mother-in-law Naomi and came to trust Israel’s God. She married Boaz and became the great-grandmother of King David, and so an ancestor of Jesus.
+
+**Explanation:** Naomi’s husband and sons died while the family lived in Moab, leaving her with her two daughters-in-law. When Naomi decided to return to Bethlehem, Ruth refused to leave her: “Where you go I will go … your people shall be my people, and your God my God” (Ruth 1:16–17). In Bethlehem, Ruth gathered leftover grain in the field of Boaz, a relative of Naomi’s late husband, who treated her with kindness and protected her. Boaz acted as their “kinsman-redeemer,” buying back the family land and marrying Ruth (Ruth 4). Their son Obed became the grandfather of David (Ruth 4:17–22). Ruth was a foreigner, yet God included her in the line of the Messiah (Matthew 1:5), a picture of how Christ welcomes people from every nation. Boaz’s redemption of Ruth is also seen as a picture of Jesus redeeming us.
+
+**Key verses:** Ruth 1:16–17; Ruth 2:8–12; Ruth 4:9–17; Matthew 1:5
+
+**Tags:** ruth, naomi, boaz, kinsman redeemer, moab, bible characters
+
+### 16.11 Who was Samuel?
+
+**Also asked:** samuel · tell me about Samuel · hannah and samuel · who anointed David · last judge of Israel · Samuel the prophet
+
+**Short answer:** Samuel was the last of Israel’s judges and a prophet who anointed its first two kings, Saul and David. His mother Hannah had prayed for him and given him to serve God from childhood.
+
+**Explanation:** Hannah, who was unable to have children, prayed for a son and promised to give him to the Lord. Samuel was raised in the sanctuary at Shiloh under the priest Eli, and as a boy he heard God call his name in the night, answering, “Speak, for your servant hears” (1 Samuel 1–3). As an adult he led Israel back to God and judged the nation faithfully (1 Samuel 7). When the people asked for a king to be like other nations, Samuel warned them, but at God’s direction he anointed Saul (1 Samuel 8–10). When Saul disobeyed, God rejected him as king and sent Samuel to Bethlehem to anoint David, a shepherd boy, because “the Lord looks on the heart” (1 Samuel 16:1–13). Samuel stands as a model of someone who listens to God and speaks for him without fear.
+
+**Key verses:** 1 Samuel 1:9–20; 1 Samuel 3:1–10; 1 Samuel 8:4–9; 1 Samuel 16:1–13
+
+**Tags:** samuel, hannah, eli, saul, prophet, bible characters
+
+### 16.12 Who was David?
+
+**Also asked:** david · king david · tell me about David · david and goliath · story of David · who killed Goliath · david and bathsheba
+
+**Short answer:** David was a shepherd boy who became Israel’s greatest king, a man the Bible calls “after God’s own heart.” He wrote many of the Psalms, failed badly, repented, and God promised that the Messiah would come from his family.
+
+**Explanation:** Anointed by Samuel while still a shepherd, David first became known by defeating the giant Goliath with a sling and a stone, trusting in the Lord rather than in armour (1 Samuel 16–17). For years he was hunted by the jealous King Saul but refused to harm him. As king he united the tribes, made Jerusalem his capital and wrote many of the Psalms, including Psalm 23. His greatest failure was committing adultery with Bathsheba and arranging the death of her husband Uriah; when the prophet Nathan confronted him he repented, and Psalm 51 records his prayer (2 Samuel 11–12). God made a lasting covenant with David, promising a descendant who would reign forever (2 Samuel 7:12–16). The New Testament names Jesus as the “Son of David,” the promised king (Matthew 1:1; Luke 1:32–33). David is a reminder that God uses flawed people and forgives those who truly repent.
+
+**Key verses:** 1 Samuel 16:7, 13; 1 Samuel 17:45–50; 2 Samuel 7:12–16; 2 Samuel 12:1–13; Psalm 23; Psalm 51; Acts 13:22
+
+**Tags:** david, goliath, bathsheba, psalms, king david, bible characters
+
+### 16.13 Who was Solomon?
+
+**Also asked:** solomon · king solomon · tell me about Solomon · wisest man in the Bible · who built the temple · solomon’s wisdom
+
+**Short answer:** Solomon was David’s son and Israel’s third king, famous for his God-given wisdom and for building the temple in Jerusalem. His reign began in splendour, but his many foreign wives led his heart away from God.
+
+**Explanation:** When God offered Solomon anything he wished for, he asked for an understanding mind to govern God’s people, and God gave him wisdom, riches and honour besides (1 Kings 3:5–14). He built the temple in Jerusalem, the place of God’s presence, and prayed a long prayer at its dedication (1 Kings 6–8). He is traditionally credited with much of Proverbs, as well as Ecclesiastes and the Song of Solomon. Solomon’s fame brought visitors from far away, including the queen of Sheba (1 Kings 10). But he married many foreign women who turned his heart to other gods, and after his death the kingdom split in two (1 Kings 11). His life warns that great gifts and success do not replace daily obedience. Jesus said that he himself is greater than Solomon (Matthew 12:42).
+
+**Key verses:** 1 Kings 3:5–14; 1 Kings 8:22–30; 1 Kings 11:1–13; Proverbs 1:1–7; Matthew 12:42
+
+**Tags:** solomon, king solomon, temple, wisdom, proverbs, bible characters
+
+### 16.14 Who was Elijah?
+
+**Also asked:** elijah · tell me about Elijah · elijah and the prophets of Baal · elijah on Mount Carmel · who went to heaven in a chariot of fire · still small voice
+
+**Short answer:** Elijah was one of Israel’s greatest prophets, who stood against King Ahab and the worship of Baal. He is remembered for the showdown on Mount Carmel, and for being taken up to heaven in a whirlwind without dying.
+
+**Explanation:** Elijah announced a drought to a nation that had turned to Baal, and God fed him by ravens and through a widow (1 Kings 17). On Mount Carmel he challenged 450 prophets of Baal to prove whose god was real. Baal did not answer, but fire fell from heaven for the Lord and the people declared, “The Lord, he is God” (1 Kings 18). Afterwards, afraid and exhausted, Elijah ran into the desert and asked to die; God cared for him and spoke not in wind or fire but in “a low whisper” (1 Kings 19:1–18). He passed his work to Elisha and was taken up in a whirlwind (2 Kings 2:11). Elijah appeared with Moses at the transfiguration (Matthew 17:1–8), and Jesus said that John the Baptist came in the spirit and power of Elijah (Luke 1:17; Matthew 11:14). The apostle James notes Elijah was “a man with a nature like ours,” and his prayers were effective (James 5:17–18).
+
+**Key verses:** 1 Kings 17:1–6; 1 Kings 18:36–39; 1 Kings 19:9–13; 2 Kings 2:11; James 5:17–18
+
+**Tags:** elijah, elisha, baal, mount carmel, prophet, bible characters
+
+### 16.15 Who was Esther?
+
+**Also asked:** esther · queen esther · tell me about Esther · book of Esther · purim · for such a time as this
+
+**Short answer:** Esther was a Jewish woman who became queen of Persia and risked her life to save her people from a plot to destroy them. Her story shows God at work behind the scenes, even though his name is never mentioned in the book.
+
+**Explanation:** After Queen Vashti was removed, the Persian king Ahasuerus chose Esther, an orphan raised by her cousin Mordecai, as his new queen. She kept her Jewish identity quiet (Esther 2). The king’s official Haman, angry that Mordecai refused to bow to him, tricked the king into ordering all Jews in the empire killed. Mordecai urged Esther to speak up, asking, “Who knows whether you have not come to the kingdom for such a time as this?” (Esther 4:14). She fasted, then went to the king unasked and revealed Haman’s plot. Haman was punished and the Jews were allowed to defend themselves (Esther 7–9). The Jewish festival of Purim celebrates this deliverance. The book is a picture of God’s care and timing, working through ordinary people and events to keep his promises.
+
+**Key verses:** Esther 2:17; Esther 4:13–16; Esther 7:1–6; Esther 9:20–22
+
+**Tags:** esther, mordecai, haman, purim, persia, bible characters
+
+### 16.16 Who was Job?
+
+**Also asked:** job · tell me about Job · book of Job · story of Job · patience of Job · why did Job suffer
+
+**Short answer:** Job was a good and faithful man who lost his children, wealth and health in a single season of terrible suffering. The book of Job does not give a neat explanation, but shows that God is wise, present and worthy of trust in the dark.
+
+**Explanation:** The book opens with Job “blameless and upright,” then records the loss of his children and possessions in a single day, followed by painful sores (Job 1–2). Job’s wife and three friends come to him; the friends insist his suffering must be punishment for hidden sin, which the book shows to be wrong. Job laments honestly and asks God for an answer, yet keeps his faith, declaring, “I know that my Redeemer lives” (Job 19:25). In the end God speaks out of the whirlwind, not explaining the reasons but pointing Job to his power and wisdom as creator (Job 38–41). Job humbly trusts him, and God restores him and rebukes the friends (Job 42). James holds up Job as an example of perseverance, and notes the Lord is full of compassion and mercy (James 5:11).
+
+**Key verses:** Job 1:20–22; Job 19:25–27; Job 38:1–7; Job 42:1–6; James 5:11
+
+**Tags:** job, suffering, patience, redeemer, bible characters
+
+### 16.17 Who was Isaiah?
+
+**Also asked:** isaiah · the prophet isaiah · tell me about Isaiah · book of Isaiah · who prophesied about Jesus · isaiah 53
+
+**Short answer:** Isaiah was a prophet in Jerusalem about 700 years before Christ who warned of judgment and spoke of comfort and hope. His book contains some of the clearest promises of the coming Messiah, including the suffering servant of Isaiah 53.
+
+**Explanation:** Isaiah was called in a vision of the Lord high and lifted up, and answered, “Here I am! Send me” (Isaiah 6:1–8). He prophesied in Judah during the reigns of several kings, calling the nation to turn back to God and warning of exile. His book also looks forward to a child called Immanuel, “God with us” (Isaiah 7:14), a son given whose names include “Mighty God” and “Prince of Peace” (Isaiah 9:6–7), and a servant who “was pierced for our transgressions” and bears the sins of many (Isaiah 53). Chapters 40 to 66 offer comfort and the promise of a new heaven and earth. The New Testament quotes Isaiah more than any other prophet, and the early Christians saw Jesus as the fulfilment of these promises (Matthew 1:22–23; Acts 8:26–35).
+
+**Key verses:** Isaiah 6:1–8; Isaiah 7:14; Isaiah 9:6–7; Isaiah 40:28–31; Isaiah 53:1–6; Acts 8:30–35
+
+**Tags:** isaiah, prophet, messiah, suffering servant, immanuel, bible characters
+
+### 16.18 Who was Jeremiah?
+
+**Also asked:** jeremiah · the prophet jeremiah · tell me about Jeremiah · weeping prophet · jeremiah 29:11 · new covenant jeremiah
+
+**Short answer:** Jeremiah was a prophet who warned Jerusalem of judgment for forty years and was mocked and persecuted for it. He also announced God’s promise of a new covenant and a hopeful future.
+
+**Explanation:** God called Jeremiah as a young man, and though he said “I am only a youth,” God promised, “I am with you to deliver you” (Jeremiah 1:4–10). He preached to a nation that ignored God and refused to listen, was beaten, put in stocks and thrown into a cistern, and lived to see Babylon destroy Jerusalem in 586 BC (Jeremiah 20; 38; 39). He is called the “weeping prophet” for his grief over the people. Yet Jeremiah also promised restoration. His letter to the exiles in Babylon includes the well-known words, “I know the plans I have for you … plans for welfare and not for evil, to give you a future and a hope” (Jeremiah 29:11), a promise to the exiles as a people. Most importantly, he foretold a new covenant, with God’s law written on people’s hearts and sins forgiven (Jeremiah 31:31–34), which Jesus fulfilled at the Last Supper and through his death (Luke 22:20).
+
+**Key verses:** Jeremiah 1:4–10; Jeremiah 20:7–9; Jeremiah 29:4–14; Jeremiah 31:31–34; Luke 22:20
+
+**Tags:** jeremiah, prophet, exile, new covenant, bible characters
+
+### 16.19 Who was Daniel?
+
+**Also asked:** daniel · tell me about Daniel · story of Daniel · Daniel in the lions’ den · who was Daniel in the Bible · what happened to Daniel in Babylon
+
+**Short answer:** Daniel was a young Jewish man taken to Babylon, who rose to high office there while staying faithful to God. He is remembered for the lions’ den, for interpreting dreams, and for visions that look ahead to God’s everlasting kingdom.
+
+**Explanation:** Daniel was among the Israelites carried off to Babylon around 605 BC. With his friends Shadrach, Meshach and Abednego he refused to defile himself with the king’s food, and God gave him wisdom (Daniel 1). He interpreted King Nebuchadnezzar’s dream and was honoured for it (Daniel 2). His three friends were later thrown into a blazing furnace for refusing to worship a golden statue, and God preserved them (Daniel 3). Years later, under the Persian king Darius, Daniel kept praying three times a day despite a law forbidding it. He was thrown to the lions and God shut their mouths (Daniel 6). The second half of the book records Daniel’s visions of world kingdoms and of “one like a son of man” who receives an eternal kingdom (Daniel 7:13–14), a picture Jesus later applied to himself. Daniel shows how to live faithfully as a believer in a culture that does not share your faith.
+
+**Key verses:** Daniel 1:8–17; Daniel 3:16–18; Daniel 6:10–23; Daniel 7:13–14; Daniel 9:3–19; Daniel 12:2–3
+
+**Tags:** daniel, babylon, lions den, shadrach meshach and abednego, exile, bible characters
+
+### 16.20 Who was Jonah?
+
+**Also asked:** jonah · tell me about Jonah · jonah and the whale · jonah and the big fish · story of Jonah · why did Jonah run from God · nineveh
+
+**Short answer:** Jonah was a prophet God sent to warn the city of Nineveh, who ran the other way and was swallowed by a great fish. The book shows God’s mercy reaching even a hated enemy, and how reluctant his own prophet was to share it.
+
+**Explanation:** God told Jonah to go to Nineveh, the capital of Assyria, Israel’s cruel enemy. Jonah boarded a ship for the opposite direction, a storm struck, and he was thrown overboard and swallowed by a great fish, where he prayed for three days before being brought back to land (Jonah 1–2). He then obeyed and preached, and the whole city, king included, repented and God spared them (Jonah 3). Jonah was angry about this because he knew God is “gracious and merciful, slow to anger” (Jonah 4:2). The book ends with God asking Jonah whether he should not care about that great city (Jonah 4:11). Jesus pointed to Jonah’s three days in the fish as a sign of his own death and resurrection, and said Nineveh’s repentance would condemn those who refused to listen to someone greater than Jonah (Matthew 12:39–41).
+
+**Key verses:** Jonah 1:1–3; Jonah 2:1–2, 10; Jonah 3:5–10; Jonah 4:1–2, 10–11; Matthew 12:39–41
+
+**Tags:** jonah, nineveh, big fish, whale, prophet, mercy, bible characters
+
+### 16.21 Who was Mary, the mother of Jesus?
+
+**Also asked:** mary · mary mother of jesus · tell me about Mary · virgin mary · who was Jesus’ mother · mary and joseph
+
+**Short answer:** Mary was the young woman God chose to give birth to Jesus by the power of the Holy Spirit. She is honoured in the Bible as a humble servant of God who trusted his word, and as the mother who watched her Son die and later joined the first believers.
+
+**Explanation:** An angel told Mary, a young woman engaged to Joseph, that she would conceive a son and name him Jesus. She replied, “Behold, I am the servant of the Lord; let it be to me according to your word” (Luke 1:26–38). Her song of praise, the Magnificat, celebrates God lifting up the lowly (Luke 1:46–55). She gave birth in Bethlehem, was present at Jesus’ first miracle at Cana, and stood by the cross, where Jesus entrusted her to the apostle John (Luke 2; John 2:1–11; John 19:25–27). After the resurrection she is among the believers praying in Jerusalem (Acts 1:14). Christians of all traditions honour Mary. Protestants and evangelicals hold that, though blessed, she was a sinner who needed a Saviour like everyone else (Luke 1:47), and that prayer and worship belong to God alone. Catholic and Orthodox Christians give her a larger place in devotion.
+
+**Key verses:** Luke 1:26–38; Luke 1:46–55; Luke 2:1–7; John 2:1–5; John 19:25–27; Acts 1:14
+
+**Tags:** mary, mother of jesus, virgin birth, magnificat, bible characters
+
+### 16.22 Who was John the Baptist?
+
+**Also asked:** john the baptist · baptist · tell me about John the Baptist · who baptised Jesus · forerunner of Jesus · voice in the wilderness
+
+**Short answer:** John the Baptist was the prophet who prepared the way for Jesus by calling people to repent and be baptised. He pointed to Jesus as “the Lamb of God, who takes away the sin of the world,” and he baptised Jesus in the Jordan.
+
+**Explanation:** John was born to the priest Zechariah and Elizabeth, a relative of Mary, after an angel promised their long-awaited son (Luke 1). He lived in the wilderness, wore camel hair and preached repentance, fulfilling Isaiah’s words about a “voice crying in the wilderness: prepare the way of the Lord” (Matthew 3:1–3). Crowds came to be baptised in the Jordan, and John told them to produce fruit that shows a changed heart. When Jesus came, John baptised him and heard the Father’s voice from heaven (Matthew 3:13–17). He told his followers, “He must increase, but I must decrease” (John 3:30). John later challenged King Herod over his unlawful marriage, was imprisoned and was beheaded (Matthew 14:1–12). Jesus said that no one born of women was greater than John (Matthew 11:11).
+
+**Key verses:** Luke 1:13–17; Matthew 3:1–17; John 1:29–34; John 3:27–30; Matthew 11:7–11
+
+**Tags:** john the baptist, baptism, forerunner, repentance, bible characters
+
+### 16.23 Who was Peter?
+
+**Also asked:** peter · simon peter · apostle peter · tell me about Peter · peter who denied jesus · rock of the church · who walked on water
+
+**Short answer:** Peter was a fisherman who became the leader among Jesus’ twelve apostles and a leading voice in the early church. He is remembered for his bold faith, for denying Jesus three times, and for being restored and used by God to preach at Pentecost.
+
+**Explanation:** Jesus called Simon, a fisherman, saying, “Follow me, and I will make you fishers of men” and gave him the name Peter, “rock” (Matthew 4:18–20; John 1:42). Peter declared, “You are the Christ, the Son of the living God” (Matthew 16:13–20). He walked on water towards Jesus until fear made him sink (Matthew 14:28–31). On the night Jesus was arrested he denied knowing him three times and wept bitterly (Luke 22:54–62). After the resurrection Jesus restored him, asking three times “Do you love me?” and told him to feed his sheep (John 21:15–19). At Pentecost, Peter preached and about three thousand people believed (Acts 2). He later took the gospel to non-Jews (Acts 10) and wrote two New Testament letters. Christians differ on what Jesus meant by building his church “on this rock,” but all agree Peter was a key apostle and an example of grace.
+
+**Key verses:** Matthew 4:18–20; Matthew 16:13–19; Luke 22:54–62; John 21:15–19; Acts 2:14–41; Acts 10:34–43
+
+**Tags:** peter, simon peter, apostle, disciples, pentecost, denial, bible characters
+
+### 16.24 Who was Paul?
+
+**Also asked:** paul · saul · apostle paul · tell me about Paul · saul of tarsus · road to damascus · who wrote most of the New Testament
+
+**Short answer:** Paul was a Pharisee who persecuted the church until the risen Jesus met him on the road to Damascus. He became the great apostle to the non-Jewish world, planted churches across the Roman Empire and wrote many of the New Testament letters.
+
+**Explanation:** Born Saul in Tarsus, he was a strict, well-educated Pharisee who approved of Stephen’s killing and tried to destroy the church (Acts 7:58; 8:1–3). On the road to Damascus, Jesus appeared to him in blinding light and asked, “Why are you persecuting me?” He was baptised, and soon preached that Jesus is the Son of God (Acts 9:1–22). Over three missionary journeys he took the gospel to Asia Minor, Greece and Rome, planting churches, enduring beatings, shipwreck, prison and hardship (Acts 13–28; 2 Corinthians 11:23–28). Thirteen New Testament letters carry his name, teaching that people are saved by grace through faith, not by works of the law (Ephesians 2:8–9; Romans 3:21–26). Near the end, from prison in Rome, he wrote that he had “fought the good fight” and finished the race (2 Timothy 4:6–8). Tradition says he was executed in Rome.
+
+**Key verses:** Acts 9:1–19; Philippians 3:4–11; Galatians 2:20; Ephesians 2:8–9; 2 Timothy 4:6–8
+
+**Tags:** paul, saul, apostle paul, damascus road, missionary, epistles, bible characters
+
+### 16.25 Who was John the apostle?
+
+**Also asked:** john · apostle john · john the apostle · tell me about John · disciple whom Jesus loved · who wrote the gospel of John · who wrote Revelation
+
+**Short answer:** John was one of Jesus’ closest disciples, a fisherman who followed him from the start and was at the cross. Christian tradition holds that he wrote the Gospel of John, three letters and the book of Revelation.
+
+**Explanation:** John and his brother James were fishermen who left their boat and their father to follow Jesus (Matthew 4:21–22). With Peter and James, he was with Jesus at the transfiguration and in Gethsemane. Jesus nicknamed the brothers “sons of thunder” a name that fits their zeal (Mark 3:17; Luke 9:54). John is traditionally identified as “the disciple whom Jesus loved,” who leaned against Jesus at the Last Supper and is the only one of the Twelve recorded at the cross, where Jesus entrusted his mother Mary to him (John 13:23; 19:25–27). The Gospel of John was written “that you may believe that Jesus is the Christ, the Son of God” (John 20:31). His letters stress that God is love and that believers must love one another (1 John 4:7–12). Revelation was written while John was exiled on the island of Patmos (Revelation 1:9). He is thought to have been the last of the Twelve to die.
+
+**Key verses:** Mark 1:19–20; John 13:23; John 19:25–27; John 20:30–31; 1 John 4:7–12; Revelation 1:9
+
+**Tags:** john, apostle john, disciple, gospel of john, revelation, patmos, bible characters
+
 ## Sources and doctrinal references
 
-This draft has 203 questions across 14 themes, with 16 entries marked **Contested among evangelicals**. Answers are original summaries of mainstream evangelical teaching; Scripture references are the primary source for every entry.
+This draft has 228 questions across 15 themes, with 16 entries marked **Contested among evangelicals**. Answers are original summaries of mainstream evangelical teaching; Scripture references are the primary source for every entry.
 
 **Doctrinal alignment**
 
@@ -2555,7 +2859,7 @@ This draft has 203 questions across 14 themes, with 16 entries marked **Conteste
 
 **Before publishing**
 
-- [ ] Pastor or theologian review of all 203 entries
+- [ ] Pastor or theologian review of all 228 entries
 - [ ] Confirm the wording of each contested entry is acceptable to your church
 - [ ] Confirm crisis-line wording in 9.11 and 10.13 (SADAG 0800 567 567 and LifeLine SA 0861 322 322 added)
 - [ ] Convert approved entries to JSON for the chatbot

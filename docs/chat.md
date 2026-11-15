@@ -25,7 +25,7 @@ The prayer and contact forms are not part of the launch (decided 2026-11-14), so
 | Per-message cost, provider rate limits and outages | Pure CPU on our API, no third party in the request path |
 | Hard to test | Deterministic: same question, same answer, testable in CI |
 
-The cost: the chat can only answer what the KB contains (203 questions) and understands wording through keyword matching, not meaning. Section 12 keeps an optional, later LLM layer on the table; it is **not** in this scope.
+The cost: the chat can only answer what the KB contains (228 questions) and understands wording through keyword matching, not meaning. Section 12 keeps an optional, later LLM layer on the table; it is **not** in this scope.
 
 ## 3. The knowledge base (what we have)
 
@@ -33,7 +33,7 @@ The cost: the chat can only answer what the KB contains (203 questions) and unde
 
 | Part | Content |
 |---|---|
-| `meta` | title, version, counts (203 entries, 16 contested, 39 glossary terms, 14 themes), doctrinal basis, **status: "Maintained by Word on the Water."** |
+| `meta` | title, version, counts (228 entries, 16 contested, 39 glossary terms, 15 themes), doctrinal basis, **status: "Maintained by Word on the Water."** |
 | `themes` | 14 topics: God, Jesus Christ, The Gospel and Salvation, The Bible, The Holy Spirit, Creation and Humanity, Prayer and Spiritual Growth, The Church, Suffering and Evil, Death and the Afterlife, Angels/Satan/Spiritual Warfare, End Times, Common Objections, Christian Living |
 | `responses` | fixed texts: `no_answer`, `contested_suffix`, `crisis` (SADAG 0800 567 567 and LifeLine 0861 322 322) |
 | `entries[]` | `id` (e.g. `3.1`), `theme`, `question`, `also_asked[]` (paraphrases), `short_answer`, `explanation`, `contested` (bool), `key_verses[]` (references only, no quotes), `tags[]`, `related[]` (up to 5 ids, computed by `build_kb.py`), `glossary_terms[]`, `search_text`, `answer_guidance` (contested entries only) |
@@ -64,7 +64,7 @@ question (<= 300 chars)
 ```
 
 Retrieval (in-process, no database, no embeddings service):
-- Index built once when the API process starts (203 entries, tens of milliseconds): lowercased words with light stemming and stop words removed, from `question` and `also_asked` (weight 3), `tags` (2), `short_answer` (1), `explanation` (0.5), plus glossary terms and aliases mapped to their entries.
+- Index built once when the API process starts (228 entries, tens of milliseconds): lowercased words with light stemming and stop words removed, from `question` and `also_asked` (weight 3), `tags` (2), `short_answer` (1), `explanation` (0.5), plus glossary terms and aliases mapped to their entries.
 - Score = BM25-style keyword score + a strong bonus for a near-exact match of the whole question against `question` or `also_asked`.
 - Confidence band thresholds are tuned on the evaluation set (below), not guessed.
 
@@ -92,7 +92,7 @@ A follow-up is understood from what was just shown, not from keywords alone.
 
 ### 6.1 Principles
 - One purpose: ask a question, get a clear answer, keep going.
-- A blank box intimidates a newcomer, so the empty state offers starter questions and **Browse by topic** (the 14 themes, each opening its questions).
+- A blank box intimidates a newcomer, so the empty state offers starter questions and **Browse by topic** (the 15 themes, each opening its questions).
 - Honest labelling: "Answers come from our reviewed knowledge base. This is not a pastor." (never "AI", because it is not).
 - Plain language; the KB is already written that way. Scripture shown as references that link to the Bible reader (WEB text) when `BIBLE_ENABLED` is on; plain text otherwise.
 - Accessible: dialog with focus trap, Escape closes, new answers announced through `aria-live="polite"`, Enter sends, Shift+Enter adds a line, 44px targets, visible labels, contrast in both colour schemes, `prefers-reduced-motion` respected.
