@@ -139,6 +139,32 @@ figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width
 .mid{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:-30px;color:var(--ink);font:700 11px system-ui}
 .mid .round{width:60px;height:60px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:3px solid var(--surface)}
 .desk .chap-bar{border:0;background:transparent;max-width:680px;margin:0 auto;padding:8px 40px}
+
+/* 6d: desktop ways back to the chat */
+.desk:has(.dnav){height:520px}
+.dnav{display:flex;align-items:center;gap:22px;padding:0 28px;height:64px;border-bottom:1px solid var(--line);background:var(--bg);font:600 15px system-ui;flex:none}
+.dnav .logo{flex:none;font-size:22px}
+.dnav .links{display:flex;gap:22px;flex:1;margin-left:18px;color:var(--ink)}
+.dnav .links span{white-space:nowrap}
+.dnav .gq{color:var(--accent-ink)}
+.dcol{max-width:680px;margin:0 auto;padding:28px 40px 0}
+.dpass{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.dpass .pbtn{width:230px}
+.dchap{display:flex;justify-content:space-between;margin-top:18px}
+.resume{display:flex;align-items:center;gap:14px;padding:12px 8px 12px 16px;margin-bottom:18px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ink);border-radius:10px}
+.resume .ico{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.resume .txt{flex:1;min-width:0;line-height:1.3}
+.resume .txt b{display:block;font-size:15px}
+.resume .txt small{color:var(--muted);font-size:13px}
+.hdr-chat{position:relative;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:22px;background:var(--ink);color:var(--bg);font:700 15px system-ui}
+.hdr-chat .dot{position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.callout{position:absolute;top:70px;left:378px;width:290px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:14px 14px 12px;font-size:14px;line-height:1.4}
+.callout:before{content:"";position:absolute;top:-7px;left:150px;width:12px;height:12px;background:var(--surface);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.callout .acts{display:flex;gap:8px;margin-top:10px}
+.edge{position:absolute;right:0;top:170px;width:48px;display:flex;flex-direction:column;align-items:stretch;background:var(--ink);color:var(--bg);border-radius:14px 0 0 14px;box-shadow:-4px 6px 18px rgba(0,0,0,.28);overflow:hidden}
+.edge .e-open{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px 0;font:700 14px system-ui}
+.edge .e-open .v{writing-mode:vertical-rl;letter-spacing:.04em}
+.edge .e-x{min-height:44px;display:grid;place-items:center;border-top:1px solid rgba(128,128,128,.45);font-size:15px}
 </style>
 </head>
 <body>
@@ -797,6 +823,46 @@ figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width
 <li>Do you want a way to hide it (V2), or is it fine that it goes away when you go back to the chat or close the tab?</li>
 <li>Pin the bar on desktop too, or keep it under the text there?</li>
 <li>Chapter names in two lines need the word &ldquo;Previous&rdquo; and &ldquo;Next&rdquo; added to the labels for everyone, not only those who came from the chat, or should the two-line labels only be used while the chat button is there? I would suggest only while it is there, so the bar stays unchanged for everyone else.</li>
+</ul>
+
+<h2>6d. Desktop: replacing the floating pill</h2>
+<p class="lead">From 1024px the &ldquo;Your chat&rdquo; control is currently a pill floating at the bottom right, which looks adrift. Three alternatives that belong to the page. All appear only after a verse was tapped in the chat, and all open the chat in place over the Bible (no page load). Shown on the Bible reader in Dawn patrol.</p>
+<figure class="wide"><div class="desk"><div class="dnav"><span class="logo">Word on the Water</span><div class="links"><span>Devotionals</span><span>Bible</span><span>About</span><span class="gq">Got Questions</span></div><span class="btn primary" style="min-height:44px">Subscribe</span><span class="iconbtn">&#9790;</span></div>
+ <div class="dcol"><div class="resume"><span class="ico"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><div class="txt"><b>Your chat is still open</b><small>3 answers, last: &ldquo;Who is Jesus?&rdquo;</small></div><span class="btn" style="background:var(--ink);border-color:var(--ink);color:var(--bg)">Open chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+  <div class="dpass"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers" style="margin:0"><span class="on">WEB</span><span>BSB</span></div></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+  <div class="dchap"><span class="cb prev" style="flex:none">&larr; John 2</span><span class="cb next" style="flex:none">John 4 &rarr;</span></div>
+ </div>
+</div><figcaption><b>D1. Resume card at the top of the reader.</b> A calm banner in the page flow, above the passage picker, in the reader&rsquo;s 680px column. It says what it is and what is waiting, and has one clear action (Open chat) plus a Dismiss. It scrolls away with the page and covers nothing.</figcaption></figure><figure class="wide"><div class="desk"><div class="dnav"><span class="logo">Word on the Water</span><div class="links"><span>Devotionals</span><span>Bible</span><span>About</span><span class="hdr-chat"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Your chat<i class="dot"></i></span></div><span class="btn primary" style="min-height:44px">Subscribe</span><span class="iconbtn">&#9790;</span></div>
+ <div class="dcol">
+  <div class="dpass"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers" style="margin:0"><span class="on">WEB</span><span>BSB</span></div></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+  <div class="dchap"><span class="cb prev" style="flex:none">&larr; John 2</span><span class="cb next" style="flex:none">John 4 &rarr;</span></div>
+ </div>
+ <div class="callout"><b>Pick up where you left off</b><br>Your chat has 3 answers. Last: &ldquo;Who is Jesus?&rdquo;<div class="acts"><span class="btn" style="background:var(--ink);border-color:var(--ink);color:var(--bg);min-height:44px">Open chat</span><span class="btn" style="min-height:44px">Not now</span></div></div>
+</div><figcaption><b>D2. In the header.</b> The Got Questions link becomes a solid Your chat button with a small notice dot while a conversation is waiting; there is nothing new on the page. A small callout points at it once (Not now hides the callout; the button stays until you open the chat). The header is already where the chat lives, so there is one place to look.</figcaption></figure><figure class="wide"><div class="desk"><div class="dnav"><span class="logo">Word on the Water</span><div class="links"><span>Devotionals</span><span>Bible</span><span>About</span><span class="gq">Got Questions</span></div><span class="btn primary" style="min-height:44px">Subscribe</span><span class="iconbtn">&#9790;</span></div>
+ <div class="dcol">
+  <div class="dpass"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers" style="margin:0"><span class="on">WEB</span><span>BSB</span></div></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+  <div class="dchap"><span class="cb prev" style="flex:none">&larr; John 2</span><span class="cb next" style="flex:none">John 4 &rarr;</span></div>
+ </div>
+ <div class="edge"><div class="e-open"><svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg><span class="v">Your chat</span></div><div class="e-x" aria-label="Hide">&#10005;</div></div>
+</div><figcaption><b>D3. Edge tab.</b> A tab fixed to the right edge of the window, mid-height, where the chat drawer slides in from, so the tab and the drawer are the same object. It does not sit on the text or in a corner, and has its own hide button (44px).</figcaption></figure><h3 style="margin:28px 0 8px">Comparison</h3>
+<table class="cmp">
+<tr><th></th><th>D1. Resume card</th><th>D2. Header button</th><th>D3. Edge tab</th></tr>
+<tr><td><b>Pattern</b></td><td>Inline contextual banner (&ldquo;continue where you left off&rdquo;)</td><td>Navigation item with a notice dot</td><td>Docked drawer handle</td></tr>
+<tr><td><b>Covers content</b></td><td>No, it is part of the page</td><td>No (callout is dismissible)</td><td>Overlaps the window edge only</td></tr>
+<tr><td><b>Always reachable</b></td><td>No, scrolls away (Got Questions in the header still works)</td><td>Yes, header is sticky</td><td>Yes, fixed</td></tr>
+<tr><td><b>Discoverable</b></td><td>Very: words, count and last question</td><td>Good, plus the one-time callout</td><td>Good, icon and vertical words</td></tr>
+<tr><td><b>Can be hidden</b></td><td>Yes (Dismiss)</td><td>No (it is the nav item; it reverts after the chat is opened)</td><td>Yes (own X)</td></tr>
+<tr><td><b>Keyboard and screen reader</b></td><td>Best: a region in page order, first after the header</td><td>Best: a header button, always at the same place</td><td>A fixed button late in tab order; vertical text needs a plain accessible name</td></tr>
+<tr><td><b>Build size</b></td><td>Small: one component in the reader, uses the existing flag</td><td>Smallest: restyles the existing Got Questions link, plus the callout</td><td>Small, plus overlap checks at zoom</td></tr>
+<tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Clearest and covers nothing; it matches the phone bar&rsquo;s purpose without floating.</td><td>Good as an addition to D1 (the dot only, without the callout).</td><td>Fine, but a fixed element is the least tidy.</td></tr>
+</table>
+<h3 style="margin:24px 0 8px">Questions for you</h3>
+<ul class="notes">
+<li>Which one (D1 is my recommendation)? D1 with the dot from D2 on the header link works well together.</li>
+<li>Should it return after Dismiss when you read another chapter, or stay hidden for the tab?</li>
 </ul>
 
 <h2>UX decisions in one place</h2>
