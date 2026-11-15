@@ -52,20 +52,20 @@ Goal: the API loads the JSON once, validated, and fails safely.
 
 Goal: a question returns the right entry, a confidence band, or nothing. Strict TDD against an evaluation set.
 
-- [ ] Evaluation set first (`tests/chat_eval/`):
-  - [ ] `own_questions.py` builds cases from the KB itself: every `question` and `also_asked` (532 cases) must retrieve its entry; require at least 95% first and 99% in the top three.
-  - [ ] `real_world.yaml` about 40 hand-written wordings people would really type (typos, short forms, "is baptism needed", "who is jesus", "why did jesus die"). Each lists acceptable entry ids.
-  - [ ] `off_topic.yaml` about 20 off-topic questions (weather, bread, football, code, tax) that must end in no answer. Include the two prototype failures: "what is the weather today" and "how do I bake bread".
-  - [ ] Run it once against a stub that returns nothing: it must fail.
-- [ ] `app/services/kb_search.py`:
-  - [ ] Tokeniser: lowercase, Unicode normalise (curly quotes), light stemming, small stop-word list that keeps question words that carry meaning.
-  - [ ] Index built once at load: per entry, weighted terms from `question` and `also_asked` (3), `tags` (2), `short_answer` (1), `explanation` (0.5); glossary terms and aliases map to their entries. BM25 style scoring, no external library.
-  - [ ] Near-exact bonus: a strong score when the whole normalised question matches `question` or an `also_asked` (token-set match), so "who is jesus" works although "jesus" is in most entries.
-  - [ ] Coverage rule: share of the question's meaningful words found in the best entry. Off-topic queries match one stray word, so low coverage must cap the band.
-  - [ ] `search(query, context) -> Result(entry_id, score, coverage, band, alternatives)` with bands `high`, `medium` (top three as "did you mean"), `low` (no answer).
-- [ ] Tune the thresholds on the evaluation set, not by feel. Write the chosen values and the reasoning in a docstring and in the PR. Record the final first-hit and top-three rates.
-- [ ] Performance test: a search over the whole index completes in a few milliseconds (assert a generous bound, no flaky timing).
-- [ ] Validate: a small script prints the top three for ten sample questions.
+- [x] Evaluation set first (`tests/chat_eval/`):
+  - [x] `own_questions.py` builds cases from the KB itself: every `question` and `also_asked` (532 cases) must retrieve its entry; require at least 95% first and 99% in the top three.
+  - [x] `real_world.py` (plain Python, so no YAML dependency) about 48 hand-written wordings people would really type (typos, short forms, "is baptism needed", "who is jesus", "why did jesus die"). Each lists acceptable entry ids.
+  - [x] `off_topic.py` 31 off-topic questions (weather, bread, football, code, tax) that must end in no answer. Include the two prototype failures: "what is the weather today" and "how do I bake bread".
+  - [x] Run it once against a stub that returns nothing: it must fail.
+- [x] `app/services/kb_search.py`:
+  - [x] Tokeniser: lowercase, Unicode normalise (curly quotes), light stemming, small stop-word list that keeps question words that carry meaning.
+  - [x] Index built once at load: per entry, weighted terms from `question` and `also_asked` (3), `tags` (2), `short_answer` (1), `explanation` (0.5); glossary terms and aliases map to their entries. BM25 style scoring, no external library.
+  - [x] Near-exact bonus: a strong score when the whole normalised question matches `question` or an `also_asked` (token-set match), so "who is jesus" works although "jesus" is in most entries.
+  - [x] Coverage rule: share of the question's meaningful words found in the best entry. Off-topic queries match one stray word, so low coverage must cap the band.
+  - [x] `search(query, context) -> Result(entry_id, score, coverage, band, alternatives)` with bands `high`, `medium` (top three as "did you mean"), `low` (no answer).
+- [x] Tune the thresholds on the evaluation set, not by feel. Write the chosen values and the reasoning in a docstring and in the PR. Record the final first-hit and top-three rates. Recorded 2026-11-15: own questions 99.4% first and 100% top three; real world 44/48 first and 47/48 top three; all 31 off-topic questions reach no answer; every own question is band high. Known limit: matching is by words, so a wording with no shared word ("is the bible true") needs the paraphrase added to the entry's Also asked line in the markdown.
+- [x] Performance test: a search over the whole index completes in a few milliseconds (assert a generous bound, no flaky timing).
+- [x] Validate: a small script prints the top three for ten sample questions.
 
 ## K3. Guards (`feat/chat-k3-guards`)
 
