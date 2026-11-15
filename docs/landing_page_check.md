@@ -62,7 +62,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 
 ## D. Prayer request form (PLAN 1.4, UI part)
 
-- [ ] `#contact` section exists (header "Prayer" link and footer already point at it, so they currently go nowhere)
+- [ ] `#contact` section exists, and the "Prayer" link is added back to the menu bar (`nav-links.ts`) and the footer (`landing.ts`); both were removed on 2026-11-15 until this feature is built
 - [ ] Fields: first name (optional), message (required, 2,000 character limit with a live counter), optional email for a reply
 - [ ] Consent checkboxes: "OK to email the prayer team" and "I would like a reply"; the default is a decision for **(Hendrik)** (PLAN 1.4)
 - [ ] Plain note that the request is private and how long it is kept (90 days)

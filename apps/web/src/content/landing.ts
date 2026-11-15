@@ -137,7 +137,6 @@ export const footer = {
       links: [
         { label: "Our story", href: "/#about" },
         { label: "Statement of faith", href: "/#believe" },
-        { label: "Prayer", href: "/#contact" },
       ],
     },
   ],

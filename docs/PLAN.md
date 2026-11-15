@@ -298,7 +298,7 @@ Left to do (this is the only list; the old `continue.md` is archived):
 - [x] Local only: two backup tests fail because `pg_dump` is not installed (CI runs them); the local web and API servers need a restart to pick up the webhook route. Checked 2026-11-14: `libpq` is installed but `/opt/homebrew/opt/libpq/bin` is not on the PATH; with it on the PATH both backup tests pass. Done 2026-11-14: the PATH line is in `~/.zshrc` and both backup tests pass from a fresh shell. No local servers were running, so there is nothing to restart
 
 ### 1.4 Prayer request form (deferred past launch, decided 2026-11-14)
-Not part of the launch. Until it is built the page shows `prayer@wordonthewater.net` as a mail link. Keep the steps below as the plan for later.
+Not part of the launch. Until it is built the page has no prayer option at all (the Prayer link was removed from the menu bar, mobile menu and footer, and `prayer@` is no longer named on the page or in the privacy policy, 2026-11-15). Keep the steps below as the plan for later.
 - [ ] `crypto.py`: AES-256-GCM envelope encryption, `key_id` per row, rotation supported
 - [ ] Encryption key in secret manager; key rotation documented in runbook
 - [ ] `POST /v1/prayer-requests` (202), text <= 2,000, `share_with_team` and `wants_reply` consent flags

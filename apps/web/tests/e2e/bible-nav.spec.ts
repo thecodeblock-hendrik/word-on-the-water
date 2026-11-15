@@ -6,14 +6,14 @@ test.describe("desktop header", () => {
   test.skip(({ isMobile }) => isMobile, "the bar is only shown from 1024px");
 
   for (const width of [1024, 1100, 1280]) {
-    test(`six links, the button and the theme toggle fit on one row at ${width}px`, async ({
+    test(`five links, the button and the theme toggle fit on one row at ${width}px`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 800 });
       await page.goto(reader);
       const nav = page.getByRole("navigation", { name: "Main" });
       const links = nav.getByRole("link");
-      await expect(links).toHaveCount(6);
+      await expect(links).toHaveCount(5);
 
       const boxes = await links.evaluateAll((els) =>
         els.map((el) => {
@@ -88,7 +88,6 @@ test.describe("mobile menu", () => {
       "Bible",
       "Start here",
       "What we believe",
-      "Prayer",
     ]);
     const bible = menu.getByRole("link", { name: "Bible" });
     await expect(bible).toHaveAttribute("aria-current", "page");

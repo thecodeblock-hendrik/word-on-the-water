@@ -18,7 +18,7 @@ This file is both the project plan and the instructions for anyone (human or Cla
 
 1. Landing page sections: hero (Mark 4:41 + logo), About / who it's for, What's coming (weekly devotional, teaching series, audio) with a sample "surf report" devotional, Start here (the gospel in 4 steps), statement of faith, founder bio, footer with ESV copyright notice.
 2. **Email sign-up** (first name optional, email required) with double opt-in.
-3. **Prayer request / contact form** (**deferred past the launch, decided 2026-11-14**; until then the page shows `prayer@` and `hello@` as mail links) (the mockup shows `mailto:` links; we replace them with a private, spam-protected form that stores the request and notifies the prayer inbox (`prayer@wordonthewater.net`)).
+3. **Prayer request / contact form** (**deferred past the launch, decided 2026-11-14**; the prayer option is removed from the page until then (no menu or footer link, no `prayer@` address shown), and `hello@` stays the contact address) (the mockup shows `mailto:` links; we replace them with a private, spam-protected form that stores the request and notifies the prayer inbox (`prayer@wordonthewater.net`)).
 4. **Got Questions chat** (built behind `CHAT_ENABLED`, step 1.10): the "Talk to someone" button in the Start here section becomes "Got Questions" and opens a chat (drawer on desktop, full-height sheet on phones). Questions about the Christian faith are answered from our own reviewed knowledge base (203 entries, JSON generated from markdown), with follow-ups. No LLM, no web search, nothing stored on the server. Plan: [chat.md](docs/chat.md), build checklist: [chat_checks.md](docs/chat_checks.md); decision: ADR 0009.
 
 **Out of scope for Phase 1** but designed for: devotional library, teaching series, audio/podcast, public user accounts, admin CMS, search, newsletter sending.
@@ -444,7 +444,7 @@ Monorepo, local Docker services, Makefile and env setup; Vercel team, two projec
 
 ### Phase 1 — Landing page (first public release)
 All mockup sections as responsive mobile-first components; final colour scheme with light and dark; email sign-up through Kit with double opt-in (Kit hosts confirm and unsubscribe), plus the Kit webhook mirror; prayer request form (encrypted storage, team notification, optional reply) and contact form; privacy policy, ESV copyright notice and `security.txt`; SEO metadata, OG image, sitemap and manifest; retention job; full test suite with Lighthouse and axe budgets met and ZAP baseline clean; Vercel Pro, domain, Firewall rules, SPF/DKIM/DMARC, production deploy and a tested backup restore.
-- **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and see the `prayer@` and `hello@` addresses (the prayer and contact forms are deferred past launch); no high security findings.
+- **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and reach `hello@` (the prayer and contact forms are deferred past launch, and the prayer option is not on the page until they are built); no high security findings.
 
 ### Phase 2 — Devotionals and admin
 Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email as Kit broadcasts created from published devotionals, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](docs/FLUTTER.md), option B) and Web Push for the weekly devotional.
