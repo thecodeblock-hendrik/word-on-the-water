@@ -36,17 +36,17 @@ Goal: the markdown source, the build script and the generated JSON live in the r
 
 Goal: the API loads the JSON once, validated, and fails safely.
 
-- [ ] Tests first (`tests/test_kb.py`):
-  - [ ] Every `related`, glossary `entries` and `see_also` id resolves; ids are unique.
-  - [ ] `meta.counts` equals the real counts (203 entries, 16 contested, 39 glossary terms, 14 themes).
-  - [ ] Every entry has a non-empty `short_answer` and `explanation`; contested entries have `answer_guidance`.
-  - [ ] No field of any entry contains an HTML tag or `javascript:`.
-  - [ ] A corrupt fixture (missing field, unknown id, wrong type) raises a clear error.
-- [ ] `app/schemas/kb.py` or `app/services/kb_models.py`: Pydantic v2 models (`extra="forbid"`) for meta, theme, entry, glossary term, responses.
-- [ ] `app/services/kb.py`: `load_kb()` reads `app/data/faith_kb.json` once (module-level cache), validates, exposes `entries_by_id`, `themes`, `glossary`, `responses`, `version`. No network, no database.
-- [ ] Failure behaviour: if validation fails, the app still starts (health stays up), the chat reports unavailable, and the error is logged with the class only. Test it.
-- [ ] Validate: measure import and load time and memory (`uv run python -X importtime ...` or a simple timer); record the numbers in the PR. Target: load well under 200 ms.
-- [ ] `make lint typecheck test` green; mypy strict.
+- [x] Tests first (`tests/test_kb.py`):
+  - [x] Every `related` id, glossary `entries` id and entry `glossary_terms` name resolves; ids are unique. Glossary `see_also` is not checked: its only value is the non-id text `Introduction`.
+  - [x] `meta.counts` equals the real counts (203 entries, 16 contested, 39 glossary terms, 14 themes).
+  - [x] Every entry has a non-empty `short_answer` and `explanation`; contested entries have `answer_guidance`.
+  - [x] No field of any entry contains an HTML tag or `javascript:`.
+  - [x] A corrupt fixture (missing field, unknown id, wrong type) raises a clear error.
+- [x] `app/schemas/kb.py` or `app/services/kb_models.py`: Pydantic v2 models (`extra="forbid"`) for meta, theme, entry, glossary term, responses.
+- [x] `app/services/kb.py`: `load_kb()` reads `app/data/faith_kb.json` once (module-level cache), validates, exposes `entries_by_id`, `themes`, `glossary`, `responses`, `version`. No network, no database.
+- [x] Failure behaviour: if validation fails, the app still starts (health stays up), the chat reports unavailable, and the error is logged with the class only. Test it.
+- [x] Validate: measure import and load time and memory (`uv run python -X importtime ...` or a simple timer); record the numbers in the PR. Target: load well under 200 ms. Measured 2026-11-15: load 4 to 11 ms, peak 1.6 MB; the 150 ms import is pydantic and structlog, shared with the app.
+- [x] `make lint typecheck test` green; mypy strict.
 
 ## K2. Retrieval (`feat/chat-k2-search`)
 

@@ -354,7 +354,7 @@ Step-by-step build checklist: [chat_checks.md](chat_checks.md). Scope, mockups a
 - [x] Prototype check (scratchpad only): keyword scoring finds the right entry first 96.2% and in the top three 99.6% of the time on the knowledge base's own 532 questions and paraphrases (optimistic: the words are in the index); off-topic questions need an "enough of the question's words matched" rule. `build_kb.py` rebuilt from `Christian_Faith_Knowledge_Base.md` gives JSON identical to `faith_kb (1).json`
 - [x] Pastoral review is not a launch requirement (decided 2026-11-15); `SIGNOFF.md` removed
 - [x] **K0** Bring the knowledge base into the repo: `apps/api/kb/` with the markdown source, `build_kb.py` (run with `uv run --with scikit-learn`, dev tool only) and the generated `faith_kb.json`; `make kb` and `make kb-check` (fails if the committed JSON is stale)
-- [ ] **K1** Load and validate (Pydantic models, ids resolve, no HTML, counts match `meta`); measure the cold start
+- [x] **K1** Load and validate (Pydantic models, ids resolve, no HTML, counts match `meta`); measure the cold start
 - [ ] **K2** Retrieval, strict TDD: index, scoring, confidence bands; the evaluation set as tests (own questions and paraphrases at least 95% first, off-topic to no answer, the weather and bread cases, "who is jesus")
 - [ ] **K3** Guards: personal details, crisis phrases, input normalisation; table-driven positive and negative cases
 - [ ] **K4** Chat logic: small talk, "more" and "why", context boost, seen-entry down-ranking, chips, contested note; 20 follow-up sequences
