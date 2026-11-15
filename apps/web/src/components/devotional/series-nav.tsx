@@ -20,7 +20,7 @@ function NavCard({ link, align }: { link: SeriesLink; align?: "right" }) {
       {body}
     </Link>
   ) : (
-    <div className={`${className} opacity-55`}>{body}</div>
+    <div className={`${className} border-dashed`}>{body}</div>
   );
 }
 

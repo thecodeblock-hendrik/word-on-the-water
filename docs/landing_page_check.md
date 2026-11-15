@@ -157,7 +157,7 @@ Needs the API endpoint first. See PLAN.md 1.3 for the backend work.
 
 - [ ] Lighthouse CI mobile: Performance 95+, Accessibility 100, Best Practices 100, SEO 100
 - [ ] LCP under 2.0 s, CLS under 0.05, INP under 200 ms
-- [ ] Landing JS under 100 KB gzipped (the Turnstile and form code count)
+- [ ] Landing JS under 165 KB gzipped, ADR 0010 (the Turnstile and form code count)
 - [ ] LCP measured on a deployed preview, not only locally (pages render per request, ADR 0007)
 - [ ] Real mid-range Android phone check
 - [ ] Install test: Android Chrome "Install app" and iOS Safari "Add to Home Screen" (icon, name, splash colours, standalone launch)

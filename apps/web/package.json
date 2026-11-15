@@ -17,7 +17,8 @@
     "check:devotionals": "NODE_NO_WARNINGS=1 node scripts/check-devotionals.mts",
     "build:chat-topics": "NODE_NO_WARNINGS=1 node scripts/build-chat-topics.mts",
     "build:bible": "NODE_NO_WARNINGS=1 node scripts/build-bible.mts",
-    "broadcast:devotional": "NODE_NO_WARNINGS=1 node --env-file-if-exists=../../.env scripts/broadcast-devotional.mts"
+    "broadcast:devotional": "NODE_NO_WARNINGS=1 node --env-file-if-exists=../../.env scripts/broadcast-devotional.mts",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@next/env": "^16.4.6",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "0.16.1",
     "@playwright/test": "1.64.1",
     "@tailwindcss/turbopack": "^4",
     "@testing-library/jest-dom": "^7.0.1",
