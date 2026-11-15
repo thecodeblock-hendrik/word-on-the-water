@@ -361,7 +361,7 @@ Step-by-step build checklist: [chat_checks.md](chat_checks.md). Scope, mockups a
 - [x] **K5** `POST /v1/chat/messages`: schema (`extra="forbid"`), service token, rate limit, honeypot and minimum time, integration tests, no message text in logs or Sentry (tested), OpenAPI types regenerated
 - [x] **K6** Web panel: dialog, thread, chips, topic browser, `sessionStorage` history, Clear chat, 375px first, Vitest, lazy loaded; the button change in `landing.ts` and `start.tsx` behind `CHAT_ENABLED` with the contact link as the fallback
 - [ ] **K7** E2E on the six browser projects against a stub API, axe in both schemes, bundle size check, real phone keyboard and safe-area check
-- [ ] **K8** Threat model (C1 to C9 are drafted), privacy notice, runbook entry (update the knowledge base, kill switch), verify the SADAG and LifeLine numbers, then enable in Production **(Hendrik)** (launch steps: Part L of [production_checklist.md](production_checklist.md))
+- [ ] **K8** Threat model (C1 to C9 are drafted), privacy notice, runbook entry (update the knowledge base, kill switch), verify the SADAG and LifeLine numbers, then enable in Production **(Hendrik)** (launch steps: Part L of [production_checklist.md](production_checklist.md)) (docs, privacy notice, threat model, runbook and the number check are done 2026-11-15; the preview walk-through and enabling in Production remain)
 
 **Exit gate Phase 1**
 - [ ] Steps 1.3, 1.6, 1.7 and 1.8 above are ticked (1.4 and 1.5 are deferred past launch) and the 1.8 budgets are met

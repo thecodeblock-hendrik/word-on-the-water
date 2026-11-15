@@ -18,8 +18,8 @@ Designed to comply with the **GDPR** and **POPIA** by default: collect the minim
 | Page analytics and Core Web Vitals | Understand reading and speed | Vercel Web Analytics and Speed Insights: cookieless, no personal profile | Legitimate interest; no consent banner is needed because nothing is stored on the device |
 | Theme preference (light or dark) | Show the chosen theme without a flash | One first-party cookie on the visitor's device (planned, step 1.1) | Strictly necessary for a feature the visitor asked for |
 | Last Bible and passage read | Open the Bible reader in the Bible you used last, at the passage you were reading (John 3:16 on a first visit) | Two first-party cookies (`bible-version` and `bible-passage`, for example `web` and `romans.8.28-30`, a year each, no personal data) | Strictly necessary for a feature the visitor asked for |
-| Chat questions (Got Questions, planned) | Answer a question about the faith | Not stored. The text is matched in memory on our API against a local knowledge base, never sent to a third party, and never written to logs or error reports; only a count, the outcome and the matched entry id are logged. Personal details are rejected before use | Consent (the visitor asks the question); data minimised by design |
-| Chat thread in the browser (planned) | Let a visitor ask follow-up questions | The visitor's own tab (`sessionStorage`), gone when the tab closes or when they press Clear chat; never sent to us except the new message and the ids of entries already shown | Strictly necessary for a feature the visitor asked for |
+| Chat questions (Got Questions, behind `CHAT_ENABLED`) | Answer a question about the faith | Not stored. The text is matched in memory on our API against a local knowledge base, never sent to a third party, and never written to logs or error reports; only the outcome kind, the matched entry id and the time taken are logged (a test proves no message text reaches logs or Sentry). Personal details are rejected before use | Consent (the visitor asks the question); data minimised by design |
+| Chat thread in the browser | Let a visitor ask follow-up questions | The visitor's own tab (`sessionStorage`), gone when the tab closes or when they press Clear chat; never sent to us except the new message and the ids of entries already shown | Strictly necessary for a feature the visitor asked for |
 | Bot check result | Block automated submissions | Cloudflare Turnstile, loaded only when a visitor reaches or uses the sign-up form (not on every page view); Cloudflare receives the visitor's IP address and browser signals to judge the check | Legitimate interest in security |
 | Error reports | Fix faults | Sentry with `sendDefaultPii: false` and scrubbing (planned, step 0.10) | Legitimate interest; no personal data is sent |
 
@@ -78,3 +78,7 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 5. **A data processing agreement** accepted with each provider listed above.
 
 Keep this file in step with the code: when a feature adds a field, a service or a retention rule, update it in the same change.
+
+## Chat notice (the line shown with the chat)
+
+"Please don't share personal details." above the question box, and in the public policy ([privacy page](../apps/web/src/content/privacy.ts), shown only while the chat is on): the questions you type are matched against our own written answers on our server, are not stored, not sent to anyone else and not written to our logs; we keep only a count; messages that look like personal details are refused; the conversation lives only in your browser tab and is gone when you close it or press Clear chat.

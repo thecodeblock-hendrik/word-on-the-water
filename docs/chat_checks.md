@@ -174,13 +174,14 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 
 ## K8. Docs and launch readiness (`feat/chat-k8-docs`)
 
-- [ ] Threat model: rows C1 to C9 set to Done with the test that proves each.
-- [ ] `privacy.md`: chat rows set from "planned" to current; short notice text for the page ("not stored, not shared").
-- [ ] Runbook `docs/runbooks/chat.md`: how to update the knowledge base (edit the markdown, `make kb`, PR, bump version and review date), how to turn the chat off (unset `CHAT_ENABLED`), how to read the outcome counts, where the KB source lives.
-- [ ] `CLAUDE.md`: planned items become built (layout, API table, frontend section, commands `make kb` and `make kb-check`); PLAN.md 1.10 ticks; ADR 0009 status stays accepted.
-- [ ] Verify the crisis numbers on the providers' own sites (SADAG 0800 567 567, LifeLine 0861 322 322) and record the date.
+- [x] Threat model: rows C1 to C9 set to Done with the test that proves each.
+- [x] `privacy.md`: chat rows set from "planned" to current; short notice text for the page ("not stored, not shared").
+- [x] Runbook `docs/runbooks/chat.md`: how to update the knowledge base (edit the markdown, `make kb`, PR, bump version and review date), how to turn the chat off (unset `CHAT_ENABLED`), how to read the outcome counts, where the KB source lives.
+- [x] `CLAUDE.md`: planned items become built (layout, API table, frontend section, commands `make kb` and `make kb-check`); PLAN.md 1.10 ticks; ADR 0009 status stays accepted.
+- [x] Verify the crisis numbers on the providers' own sites (SADAG 0800 567 567, LifeLine 0861 322 322) and record the date. Verified 2026-11-15 on sadag.org (24-hour Suicide Crisis Helpline 0800 567 567) and lifeline.org.za (National Counselling Line 0861 322 322, 24 hours, shared-rate call). Checked through search results, not a call; re-check the day before launch.
 - [ ] Walk through Part L of [production_checklist.md](production_checklist.md) on a preview with `CHAT_ENABLED=1`.
 - [ ] **(Hendrik)** Set `CHAT_ENABLED=1` in Production, redeploy, check the button. Rollback: unset the variable and redeploy.
+- Also done: the public privacy policy describes the chat while `CHAT_ENABLED` is on (`privacy.ts`, tested). `docs/runbooks/chat.md` has the switch, the KB change steps and what is logged. Still open: the preview walk-through (needs the branch pushed) and **(Hendrik)** enabling it in Production.
 
 ## After launch
 
