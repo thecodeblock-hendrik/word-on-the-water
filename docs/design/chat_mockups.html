@@ -112,6 +112,16 @@ figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width
 .cmp th,.cmp td{border:1px solid #d9d0c3;padding:8px 10px;text-align:left;vertical-align:top}
 .cmp th{background:#f0e8db}
 .rec{background:#e7f3e8}
+
+/* option A revisions: solid return controls */
+.bubble{width:20px;height:20px;flex:none;fill:currentColor}
+.solid-bar{display:flex;align-items:center;min-height:52px;background:var(--accent-ink);color:var(--on-accent);flex:none}
+.solid-bar .go{flex:1;min-height:52px;display:flex;align-items:center;gap:10px;padding:0 16px;font:700 16px system-ui}
+.solid-bar .iconbtn{color:var(--on-accent)}
+.strip{display:flex;align-items:center;min-height:60px;padding:0 4px 0 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.pill{min-height:44px;display:inline-flex;align-items:center;gap:10px;padding:0 18px;border-radius:22px;background:var(--accent-ink);color:var(--on-accent);font:700 15px system-ui;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.mini-bar{display:flex;align-items:center;justify-content:center;gap:8px;height:34px;background:var(--accent-ink);color:var(--on-accent);flex:none;font:700 13px system-ui}
+.tabbtn{position:absolute;left:12px;top:132px;min-height:48px;padding:0 14px;border-radius:24px;background:var(--accent-ink);color:var(--on-accent);box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:8px;font:700 14px system-ui}
 </style>
 </head>
 <body>
@@ -529,6 +539,101 @@ figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width
 <tr><td><b>Build size</b></td><td>Small: a flag, one bar in the reader, auto-reopen</td><td>Small, plus overlap handling</td><td>Larger: a way to fetch passage text for the sheet, plus its own states</td></tr>
 <tr><td><b>Accessibility</b></td><td>A real link in the page flow, first after the header; easy for screen readers</td><td>Fixed element, harder to reach by keyboard order and zoom</td><td>A dialog inside the chat, focus trap as today</td></tr>
 <tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Simple, predictable, no overlap, one line of text that says exactly where it goes.</td><td>Not recommended: overlap and the &ldquo;widget&rdquo; look.</td><td>A good later addition for quick look-ups, as the first option does not stop it.</td></tr>
+</table>
+
+<h2>6b. Option A, revised: no &ldquo;Got Questions&rdquo; text, chat icon, solid background</h2>
+<p class="lead">Three versions of the return bar. All three say only &ldquo;Back to your chat&rdquo; with the same chat icon as the Start here button, use the solid accent colour, are at least 44px tall (except A3are at least 44px tall, and appear onlyrsquo;s collapsed strip), and appear only when the visitor arrived from the chat. The icon is decorative; the words carry the meaning.</p>
+<div class="row">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="solid-bar"><span class="go" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A1. Full-width solid bar.</b> The whole bar is the tap target (52px tall), with the dismiss X at the right. The strongest signal, and impossible to miss or mis-tap.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="strip"><span class="pill" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span style="flex:1"></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A2. Solid button on a quiet strip.</b> The strip matches the page; only the pill is solid, so it reads as a button. Lighter than A1, but the pill is a smaller target (44px high, about 200px wide).</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="solid-bar"><span class="go" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A3, reading: the bar is visible.</b> Same solid bar as A1, but it hides when you scroll down to read and comes back when you scroll up. Shown here at the top of the page.</figcaption></figure>
+
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="mini-bar">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A3, scrolled down: it collapses.</b> The bar shrinks to a thin solid strip (34px) that keeps the words and covers nothing. Tapping it returns to the chat; scrolling up brings the full bar back. Saves 18px only, and the strip is below the 44px target size.</figcaption></figure>
+</div>
+
+<div class="row night">
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="solid-bar"><span class="go" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A1 in Night swell.</b> A solid teal bar with dark text (the same pairing as the Subscribe button).</figcaption></figure>
+<figure><div class="phone">
+ <div class="status"><span>9:41</span><span>5G 100%</span></div>
+ <div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>
+ <div class="strip"><span class="pill" role="link">&lsaquo; <svg class="bubble" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg> Back to your chat</span><span style="flex:1"></span><span class="iconbtn" aria-label="Dismiss">&#10005;</span></div>
+ <div class="reader">
+  <div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div>
+  <div class="vers"><span class="on">WEB</span><span>BSB</span></div>
+  <p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p>
+
+ </div>
+
+</div><figcaption><b>A2 in Night swell.</b> The teal pill on the dark surface strip.</figcaption></figure>
+</div>
+
+<h3 style="margin:28px 0 8px">Comparison</h3>
+<table class="cmp">
+<tr><th></th><th>A1. Full-width solid bar</th><th>A2. Solid pill on a strip</th><th>A3. Auto-hiding solid bar</th></tr>
+<tr><td><b>Discoverable</b></td><td>Best: a coloured band under the header</td><td>Good: a clear button, but on a plain strip</td><td>Good at the top; the collapsed strip is small but still labelled</td></tr>
+<tr><td><b>Tap target</b></td><td>The whole 52px bar, full width</td><td>44px high, about 200px wide</td><td>Bar as A1; collapsed strip only 34px</td></tr>
+<tr><td><b>Reading space used</b></td><td>52px, always (sticky)</td><td>60px, always (sticky)</td><td>52px at the top; 34px while reading down</td></tr>
+<tr><td><b>Visual weight on a Bible page</b></td><td>Strong: a full band of colour</td><td>Moderate</td><td>Strong at the top, light while reading</td></tr>
+<tr><td><b>Complexity to build</b></td><td>Smallest</td><td>Small</td><td>Larger: scroll direction handling, reduced-motion handling, two states to test</td></tr>
+<tr><td><b>Accessibility notes</b></td><td>A link in the page flow; solid colour pair already used for buttons</td><td>Same</td><td>The collapsed strip is under 44px; changing size on scroll can confuse keyboard and screen reader users</td></tr>
+<tr class="rec"><td><b>Recommendation</b></td><td><b>Choose this.</b> Clear, the biggest target, nothing hidden or animated.</td><td>A good second choice if A1 feels too heavy.</td><td>Not recommended for now: the extra behaviour is not needed for a bar this thin.</td></tr>
 </table>
 
 <h2>UX decisions in one place</h2>
