@@ -94,19 +94,38 @@ test.describe("on a phone or tablet (below 1024px)", () => {
     await expect(page.getByRole("heading", { level: 1, name: "John 4" })).toBeVisible();
   });
 
-  test("at the end of the page the bar rests above the footer and hides no text", async ({
+  const barOf = (page: import("@playwright/test").Page) =>
+    page.getByRole("navigation", { name: "Previous and next chapter" });
+
+  test("scrolling on to the footer does not move the bar: it stays at the bottom of the screen", async ({
     page,
   }) => {
     await page.goto("/bible/bsb/psalms/119");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await page.waitForTimeout(300);
-    const bar = (await page
-      .getByRole("navigation", { name: "Previous and next chapter" })
-      .boundingBox())!;
+    const height = page.viewportSize()!.height;
+    const bar = (await barOf(page).boundingBox())!;
+    expect(bar.y + bar.height).toBeGreaterThanOrEqual(height - 1);
+    expect(bar.y + bar.height).toBeLessThanOrEqual(height + 1);
+    // The footer is reachable: its last line ends above the bar, so the bar hides nothing.
     const footer = (await page.getByRole("contentinfo").boundingBox())!;
-    expect(bar.y + bar.height).toBeLessThanOrEqual(footer.y + 1);
-    const credit = (await page.getByText("Berean Standard Bible (BSB), dedicated").boundingBox())!;
-    expect(credit.y + credit.height).toBeLessThanOrEqual(bar.y + 1);
+    expect(footer.y + footer.height).toBeLessThanOrEqual(bar.y + 1);
+  });
+
+  test("a short passage has the bar at the bottom of the screen too, with the footer scrolled under it", async ({
+    page,
+  }) => {
+    await page.goto(`${john3}?v=16`);
+    const height = page.viewportSize()!.height;
+    const bar = (await barOf(page).boundingBox())!;
+    expect(bar.y + bar.height).toBeGreaterThanOrEqual(height - 1);
+    expect(bar.y + bar.height).toBeLessThanOrEqual(height + 1);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(300);
+    const after = (await barOf(page).boundingBox())!;
+    expect(after.y + after.height).toBeGreaterThanOrEqual(height - 1);
+    const footer = (await page.getByRole("contentinfo").boundingBox())!;
+    expect(footer.y + footer.height).toBeLessThanOrEqual(after.y + 1);
   });
 
   test("the bar never covers the passage button or the version chip at the top", async ({
