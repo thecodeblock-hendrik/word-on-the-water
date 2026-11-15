@@ -333,7 +333,7 @@ Not part of the launch. Until it is built the page shows `hello@wordonthewater.n
 
 ### 1.8 Quality gates
 - [ ] Playwright e2e on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox: sign-up via Mailpit, prayer form, navigation
-- [ ] `@axe-core/playwright` on every page: zero serious or critical
+- [x] `@axe-core/playwright` on every page: zero serious or critical (2026-11-15: landing, devotional and not-found in `a11y.spec.ts`; privacy, thank-you, sign-up, chat and the Bible reader in their own specs; light and dark)
 - [ ] Lighthouse CI mobile: Performance >= 95, Accessibility 100, Best Practices 100, SEO 100
 - [ ] LCP < 2.0 s, CLS < 0.05, INP < 200 ms, landing JS < 165 KB gzipped (budget revised in [ADR 0010](adr/0010-landing-js-budget.md), enforced by the e2e ceiling in `chat.spec.ts`)
 - [ ] Re-measure LCP on a deployed preview because pages render per request (ADR 0007); revisit hash-based CSP if the budget fails
