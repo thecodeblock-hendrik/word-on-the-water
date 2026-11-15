@@ -168,8 +168,6 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 
 Scope: [chat.md](chat.md), decision: [ADR 0009](adr/0009-chat-local-knowledge-base.md). No domain or external service is needed, so this part can be done on a preview first.
 
-- [ ] **Pastoral review done and recorded** (reviewer, date, knowledge base version) in the repo. Without it `CHAT_ENABLED` stays unset in Production.
-- [ ] The knowledge base `meta.status` no longer says "Draft for pastoral review", and `meta.version` matches the sign-off.
 - [ ] **Crisis numbers verified** on the providers' own sites: SADAG Suicide Crisis Helpline 0800 567 567 and LifeLine South Africa 0861 322 322, plus the line for visitors outside South Africa.
 - [ ] `make kb-check` is green in CI (committed JSON equals the markdown source).
 - [ ] Privacy notice has the chat section (no storage on the server, thread only in the tab) and the threat model rows C1 to C9 are ticked.

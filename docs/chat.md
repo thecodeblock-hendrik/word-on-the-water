@@ -33,7 +33,7 @@ The cost: the chat can only answer what the KB contains (203 questions) and unde
 
 | Part | Content |
 |---|---|
-| `meta` | title, version, counts (203 entries, 16 contested, 39 glossary terms, 14 themes), doctrinal basis, **status: "Draft for pastoral review. Do not deploy until reviewed."** |
+| `meta` | title, version, counts (203 entries, 16 contested, 39 glossary terms, 14 themes), doctrinal basis, **status: "Maintained by Word on the Water."** |
 | `themes` | 14 topics: God, Jesus Christ, The Gospel and Salvation, The Bible, The Holy Spirit, Creation and Humanity, Prayer and Spiritual Growth, The Church, Suffering and Evil, Death and the Afterlife, Angels/Satan/Spiritual Warfare, End Times, Common Objections, Christian Living |
 | `responses` | fixed texts: `no_answer`, `contested_suffix`, `crisis` (SADAG 0800 567 567 and LifeLine 0861 322 322) |
 | `entries[]` | `id` (e.g. `3.1`), `theme`, `question`, `also_asked[]` (paraphrases), `short_answer`, `explanation`, `contested` (bool), `key_verses[]` (references only, no quotes), `tags[]`, `related[]` (up to 5 ids, computed by `build_kb.py`), `glossary_terms[]`, `search_text`, `answer_guidance` (contested entries only) |
@@ -42,7 +42,7 @@ The cost: the chat can only answer what the KB contains (203 questions) and unde
 Checked: every `related` and glossary entry id exists; every entry has both a short answer and an explanation; an answer averages 474 characters (longest 775), so answers fit on a phone screen without scrolling.
 
 Points to settle before launch (also in section 13):
-1. **Pastoral review is a launch gate.** The file says so itself. `CHAT_ENABLED` stays off in Production until a pastor or elder signs the KB off, and the sign-off (name, date, KB version) is recorded in the repo.
+1. **No pastoral review gate (decided 2026-11-15).** The file used to say "Draft for pastoral review"; that status text is replaced. The no-answer, crisis and contested replies still point to a local pastor.
 2. **Content origin.** Confirmed original text (we own it). The doctrinal basis only names GotQuestions.org and Bible.org as the beliefs it agrees with.
 3. **Crisis numbers are South African** (the audience is mainly South Africa, decided). Verify both numbers on the providers' own sites before launch; the reply adds a line telling visitors elsewhere to call their local emergency number.
 4. **The markdown source is still to come.** Hendrik will provide it. `build_kb.py` reads it and generates the JSON; the markdown is the editable source of truth and is committed with the script.
@@ -364,7 +364,7 @@ Privacy (GDPR, POPIA)
 - Feedback buttons, if added later, store only an entry id and up or down, never text.
 
 Quality and governance
-- Test first (see section 10). The pastoral sign-off is a recorded launch gate, not a note.
+- Test first (see section 10). There is no pastoral review gate (decided 2026-11-15).
 - Threat model additions: input abuse, KB tampering through the repo or build (mitigated by PR review and `kb-check`), reliance on advice (disclaimer, pastor referrals, crisis path).
 - Accessibility pass with keyboard, VoiceOver iOS and TalkBack before launch, like the other quality gates.
 
@@ -373,7 +373,6 @@ Quality and governance
 - A plain keyword search over this KB works well when the visitor's wording resembles a stored question (96% first, 99.6% top 3 on the KB's own paraphrases) but is not meaning-aware, and needs a "do enough of the question's words match" rule to refuse off-topic questions. Both are covered by tests in step K2.
 - The 16 contested entries need the contested note on every answer; it is a data flag (`contested`), so a test can enforce it.
 - Two crisis-related entries (9.11 depression and 10.13 suicide) already contain the South African numbers inside the `explanation`. The chat also runs its own crisis check, so these two entries should be shown with the same tappable numbers, not only buried in text.
-- The KB is a draft by its own statement; launch is blocked on the pastoral review. With launch on 28 November, the review should be requested now.
 
 ## 10. Build plan (small steps, tests first, one PR per step)
 
@@ -385,7 +384,7 @@ Quality and governance
 - **K5 Endpoint.** `POST /v1/chat/messages`: schema, service token, rate limit, honeypot, integration tests against real Redis, the no-leak test for logs and Sentry, OpenAPI types regenerated.
 - **K6 Web panel.** Dialog, thread, chips, topic browser, `sessionStorage` history, Clear chat, mobile first at 375px, Vitest tests, lazy loaded, the button change in `landing.ts` and `start.tsx` behind `CHAT_ENABLED` with the contact fallback.
 - **K7 E2E and quality.** Playwright on the six projects against a stub API, axe in both schemes, bundle size check, a real phone check of the keyboard and safe areas.
-- **K8 Docs and launch.** ADR 0009, threat model, privacy notice, runbook (update the KB, kill switch), pastoral sign-off recorded, then enable in Production **(Hendrik)**.
+- **K8 Docs and launch.** ADR 0009, threat model, privacy notice, runbook (update the KB, kill switch), then enable in Production **(Hendrik)**.
 
 Definition of done follows `PLAN.md`.
 
@@ -479,7 +478,7 @@ Decided (2026-11-14):
 - **JSON used:** `faith_kb (1).json`.
 
 Still open:
-1. **Q5 Reviewer.** Which pastor or elder reviews the KB before 28 November? The sign-off (name, date, KB version) is recorded in the repo and gates `CHAT_ENABLED` in Production.
+1. **Q5 Reviewer.** Dropped (2026-11-15): no pastoral review is required.
 2. **Q6 Panel and placement.** Right-hand drawer on desktop (as drawn) or a centred dialog? Only the Start here section, or also the header and the end of each devotional? Default if unanswered: drawer, Start here only.
 3. **Q7 Label.** "Got Questions" (as asked) or "Got questions?" Default: "Got Questions".
 4. **Q8 Pastor referral.** `no_answer` tells people to speak to a local pastor. Add the `hello@` mail link for people with no church? Default: yes (there is no contact form at launch).

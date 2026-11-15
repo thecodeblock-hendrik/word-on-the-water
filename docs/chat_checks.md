@@ -15,7 +15,6 @@ Work from this file, top to bottom, like [PWA_checklist.md](PWA_checklist.md). I
 ## Before you start (once)
 
 - [ ] `docs/chat-scope` is merged (the scope, mockups, ADR 0009 and this file are on `main`).
-- [ ] Hendrik has named the pastor or elder who will review the knowledge base (Q5 in chat.md). Not needed to start building, needed before launch; ask now.
 - [ ] Files in `~/Downloads`: `Christian_Faith_Knowledge_Base.md` (source), `build_kb.py`, `faith_kb (1).json` (expected output). Confirm they are unchanged since 2026-11-14 (the JSON rebuilt from the markdown was identical).
 - [ ] Local stack up: `make up`, `make migrate`; the API tests pass on a clean checkout (`make test`).
 
@@ -30,7 +29,6 @@ Goal: the markdown source, the build script and the generated JSON live in the r
 - [x] Generate `apps/api/app/data/faith_kb.json` (the committed output the API loads).
 - [x] Test first: `tests/test_kb_build.py` rebuilds from the markdown into a temp file and compares with the committed JSON (ignoring `meta.generated`). It must fail before the JSON exists.
 - [x] Makefile: `make kb` (rebuild the committed JSON) and `make kb-check` (rebuild into a temp file, fail on any difference). Add `kb-check` to CI next to `types-check`.
-- [x] `apps/api/kb/SIGNOFF.md`: the pastoral review record, empty template (reviewer, role, date, knowledge base version, scope reviewed, signature line). Status line says "NOT REVIEWED".
 - [x] Validate: `make kb` leaves `git status` clean; editing one word in the markdown makes `make kb-check` fail; reverting makes it pass.
 - [x] Docs: PLAN.md 1.10 K0 ticked; the bundle includes the JSON (check `apps/api/vercel.json` does not exclude `app/data`).
 
@@ -163,10 +161,9 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 
 - [ ] Threat model: rows C1 to C9 set to Done with the test that proves each.
 - [ ] `privacy.md`: chat rows set from "planned" to current; short notice text for the page ("not stored, not shared").
-- [ ] Runbook `docs/runbooks/chat.md`: how to update the knowledge base (edit the markdown, `make kb`, PR, bump version and review date), how to turn the chat off (unset `CHAT_ENABLED`), how to read the outcome counts, where the sign-off lives.
+- [ ] Runbook `docs/runbooks/chat.md`: how to update the knowledge base (edit the markdown, `make kb`, PR, bump version and review date), how to turn the chat off (unset `CHAT_ENABLED`), how to read the outcome counts, where the KB source lives.
 - [ ] `CLAUDE.md`: planned items become built (layout, API table, frontend section, commands `make kb` and `make kb-check`); PLAN.md 1.10 ticks; ADR 0009 status stays accepted.
 - [ ] Verify the crisis numbers on the providers' own sites (SADAG 0800 567 567, LifeLine 0861 322 322) and record the date.
-- [ ] Pastoral sign-off recorded in `apps/api/kb/SIGNOFF.md` (reviewer, date, version); KB `meta.status` updated from "Draft for pastoral review"; `make kb-check` still green.
 - [ ] Walk through Part L of [production_checklist.md](production_checklist.md) on a preview with `CHAT_ENABLED=1`.
 - [ ] **(Hendrik)** Set `CHAT_ENABLED=1` in Production, redeploy, check the button. Rollback: unset the variable and redeploy.
 

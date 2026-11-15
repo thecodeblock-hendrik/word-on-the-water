@@ -171,7 +171,7 @@ kb = {
     "meta": {
         "title": "Christian Faith Knowledge Base",
         "version": "0.1-draft",
-        "status": "Draft for pastoral review. Do not deploy until reviewed.",
+        "status": "Maintained by Word on the Water.",
         "doctrinal_basis": "Broad evangelical, aligned with the GotQuestions.org Statement of Faith and the Bible.org Doctrinal Statement.",
         "scripture_note": "Answers give references, not long quotations. Use the public-domain World English Bible (eBible.org) for quoting.",
         "counts": {

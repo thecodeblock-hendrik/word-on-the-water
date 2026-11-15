@@ -18,7 +18,7 @@ No AI model and no web search in v1. Answers come from our own reviewed knowledg
 - **Follow-ups:** buttons that send knowledge base ids (read more, related questions, glossary terms) plus short free-text follow-ups resolved against the last entry shown.
 - **History:** kept only in the visitor's browser (`sessionStorage`, gone when the tab closes, with a Clear chat button). The server is stateless: a request carries the new message plus `last_entry_id` and up to 20 `seen_entry_ids`, validated against the knowledge base. Nothing is stored or logged on the server.
 - **Safety:** a deterministic crisis check runs first and returns the knowledge base's crisis text (South African numbers, plus a line for visitors elsewhere); messages containing personal details are rejected before use; rate limits per hashed address; `CHAT_ENABLED` is a kill switch and defaults to off.
-- **Launch gate:** the knowledge base is marked "Draft for pastoral review. Do not deploy until reviewed." A recorded pastoral sign-off (reviewer, date, knowledge base version) is required before `CHAT_ENABLED` is turned on in Production.
+- **No review gate (decided 2026-11-15):** a pastoral review of the knowledge base is not a launch requirement. The no-answer, crisis and contested replies point people to a local pastor.
 
 ## Consequences
 - No new processor, cookie or third party; the privacy notice only gains a short chat section.
