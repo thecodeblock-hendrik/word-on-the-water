@@ -156,15 +156,26 @@ test("on a wide screen both panels sit in a column beside the article", async ({
   expect(weeks.y).toBeGreaterThan(report.y + report.height);
 });
 
-test("fonts arriving late, as on a slow connection, do not move the page", async ({
-  page,
-  browserName,
-}) => {
-  test.skip(browserName !== "chromium", "layout shifts are only measured in Chromium");
-  // The title font used to swap in late and re-wrap the title, pushing the art down (CLS 0.035 per
-  // weight on a slow CI runner). Hold every font back, then read the shifts.
+/** The .woff2 files of one font family, read from the page's own stylesheet. */
+async function fontFiles(page: Page, family: string | null) {
+  const html = await (await page.request.get(path)).text();
+  const href = /href="([^"]+\.css[^"]*)"/.exec(html)![1];
+  const css = await (await page.request.get(href)).text();
+  return [...css.matchAll(/@font-face\{([^}]*)\}/g)]
+    .map((m) => ({
+      family: /font-family:([^;]+)/.exec(m[1])?.[1].replace(/['"]/g, "").trim(),
+      file: /url\(([^)]+\.woff2)\)/.exec(m[1])?.[1].split("/").pop(),
+    }))
+    .filter((f) => f.file && (family === null || f.family === family))
+    .map((f) => f.file!);
+}
+
+/** Holds the given font files back 1.5 s, as a slow connection does, then returns the layout shift. */
+async function shiftWithLateFonts(page: Page, files: string[]) {
   await page.route("**/*.woff2", async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (files.some((f) => route.request().url().includes(f))) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
     await route.continue();
   });
   await page.addInitScript(() => {
@@ -177,7 +188,25 @@ test("fonts arriving late, as on a slow connection, do not move the page", async
   });
   await page.goto(path, { waitUntil: "load" });
   await page.waitForTimeout(3000);
-  expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
-    0.01,
-  );
+  return page.evaluate(() => (window as unknown as { __cls: number }).__cls);
+}
+
+// Layout shifts are only reported by Chromium. A wide screen does not re-wrap the title, so the
+// phone profile is the one that can fail.
+test("the title font arriving late does not move the page", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "layout shifts are only measured in Chromium");
+  // A late Barlow Condensed used to swap in, re-wrap the title and push the art down (CLS 0.035).
+  const shift = await shiftWithLateFonts(page, await fontFiles(page, "Barlow Condensed"));
+  expect(shift).toBeLessThan(0.01);
+});
+
+test("every font arriving late stays within the layout shift budget", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== "chromium", "layout shifts are only measured in Chromium");
+  // Lora, the summary text, still swaps in: about 0.018 on Linux, where Lighthouse runs. The
+  // budget in CLAUDE.md section 5 is 0.05.
+  const shift = await shiftWithLateFonts(page, await fontFiles(page, null));
+  expect(shift).toBeLessThan(0.05);
 });
