@@ -12,7 +12,7 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ## Part A. Gate: is the rest done?
 
-- [ ] PLAN.md steps 1.3, 1.6, 1.7 and 1.8 are all ticked (sign-up, legal and SEO, retention, quality gates). The prayer form (1.4) and contact form (1.5) are deferred past launch (decided 2026-11-14).
+- [ ] PLAN.md steps 1.3, 1.6, 1.7, 1.8 and 1.11 are all ticked (sign-up, legal and SEO, retention, quality gates, final landing page review). The prayer form (1.4) and contact form (1.5) are deferred past launch (decided 2026-11-14).
 - [ ] Budgets met on a deployed preview: Lighthouse mobile (Performance 95, Accessibility 100, Best Practices 100, SEO 100), LCP under 2.0 s, CLS under 0.05, INP under 200 ms, landing JS under 165 KB gzipped ([ADR 0010](adr/0010-landing-js-budget.md)).
 - [ ] No unresolved high or critical finding in CodeQL, the dependency audits or gitleaks.
 - [ ] **Privacy policy:** the responsible name (the registered name, Word On The Water) and the postal address (PO Box 6055, Port Elizabeth, Eastern Cape 6001, the same one Kit prints) are filled in (2026-11-14). Still to do: read the whole page once, update `PRIVACY_UPDATED` if you change anything, and fill the two social handles so that `pnpm check:placeholders` passes.
@@ -152,8 +152,7 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 
 - [ ] Subscribe with a real address, confirm through the Kit email, land on `/thank-you`; Kit shows `active` and our mirror shows the same.
 - [ ] Unsubscribe through the Kit link; our mirror shows `unsubscribed`.
-- [ ] Deferred past launch (forms not built): the `prayer@` and `hello@` mail links on the page open a mail to the right address. When the prayer form ships, send one and check the prayer inbox receives it (the text only if the consent box was ticked).
-- [ ] Send a contact message: it arrives in `hello@`.
+- [ ] The `hello@wordonthewater.net` mail links on the page ("Talk to someone" while the chat is off, the privacy policy) open a mail to the right address, and a message sent to it arrives. The prayer and contact forms and the `prayer@` address are not on the page at launch; their smoke tests (a prayer request reaches the prayer inbox, text only if the consent box was ticked; a contact message reaches `hello@`) belong to PLAN.md 1.4 and 1.5.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
 - [ ] `https://wordonthewater.net/privacy` loads; the footer link on any page and the "privacy policy" link beside the sign-up button both reach it, and a new sign-up shows consent version `v2` in the database.
@@ -168,7 +167,7 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 
 ## Part J. Exit gate and after launch
 
-- [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and reach `prayer@` and `hello@` through the mail links (the forms are deferred).
+- [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and reach `hello@` through the mail link (the forms and the `prayer@` address are deferred, PLAN.md 1.4 and 1.5).
 - [ ] All Part A budgets met and no high security findings.
 - [ ] Part K is complete: the first weekly email reached a real inbox (not spam), from `hello@`, with the banner, the unsubscribe link and a working "Read it on the website" link.
 - [ ] Alerts are set up and each one has been seen to fire once ([runbooks/alerts.md](runbooks/alerts.md)).
