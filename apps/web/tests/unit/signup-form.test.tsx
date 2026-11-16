@@ -145,6 +145,46 @@ describe("SignupForm answers", () => {
     expect(screen.getByLabelText(signup.nameLabel)).toHaveValue("Ann");
   });
 
+  it("moves focus to a bad email, so a screen reader reads the field and its error", async () => {
+    answer({
+      status: "error",
+      fieldErrors: { email: "Enter a valid email address." },
+      values: { email: "a@b", firstName: "Ann" },
+    });
+    render(<SignupForm {...props} />);
+    fireEvent.change(screen.getByLabelText(signup.emailLabel), { target: { value: "a@b" } });
+    submit();
+    const email = await screen.findByLabelText(signup.emailLabel);
+    await waitFor(() => expect(email).toHaveFocus());
+  });
+
+  it("moves focus to the first name when only that is wrong", async () => {
+    answer({
+      status: "error",
+      fieldErrors: { firstName: "Use 80 characters or fewer." },
+      values: { email: "a@b.co", firstName: "x".repeat(81) },
+    });
+    render(<SignupForm {...props} />);
+    fireEvent.change(screen.getByLabelText(signup.emailLabel), { target: { value: "a@b.co" } });
+    submit();
+    const name = await screen.findByLabelText(signup.nameLabel);
+    await waitFor(() => expect(name).toHaveFocus());
+    expect(screen.getByLabelText(signup.emailLabel)).not.toHaveFocus();
+  });
+
+  it("leaves focus alone after a general error, which is announced instead", async () => {
+    answer({
+      status: "error",
+      message: "Too many sign-ups from here. Please try again in an hour.",
+    });
+    render(<SignupForm {...props} />);
+    fireEvent.change(screen.getByLabelText(signup.emailLabel), { target: { value: "a@b.co" } });
+    submit();
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Too many sign-ups"));
+    expect(screen.getByLabelText(signup.emailLabel)).not.toHaveFocus();
+    expect(screen.getByLabelText(signup.nameLabel)).not.toHaveFocus();
+  });
+
   it("announces a general error and resets the widget, because a Turnstile token is used once", async () => {
     const reset = vi.fn();
     (window as unknown as { turnstile: { reset: () => void } }).turnstile = { reset };
