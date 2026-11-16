@@ -53,7 +53,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       data-theme={theme}
       className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}
     >
-      <body className="flex min-h-dvh flex-col has-[[data-chapter-nav]]:pb-[calc(3.6rem+var(--chat-extra,0rem)+max(.5rem,env(safe-area-inset-bottom)))] has-[[data-chat-return]]:[--chat-extra:2rem] lg:has-[[data-chapter-nav]]:pb-0 [&:has([data-chapter-nav])>footer]:hidden">
+      <body className="flex min-h-dvh flex-col has-[[data-chapter-nav]]:pb-[calc(3.6rem+var(--chat-extra,0rem)+max(.5rem,env(safe-area-inset-bottom)))] has-[[data-chat-return]]:[--chat-extra:5.2rem] lg:has-[[data-chapter-nav]]:pb-0 [&:has([data-chapter-nav])>footer]:hidden">
         <CspNonce />
         <LogoSprite />
         <SkipLink />

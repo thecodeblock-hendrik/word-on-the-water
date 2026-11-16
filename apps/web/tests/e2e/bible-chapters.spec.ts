@@ -225,3 +225,31 @@ test.describe("tablet width on a desktop browser", () => {
     await expect(page).toHaveURL(john3);
   });
 });
+
+// The widest labels in the Bible, in the neighbours a reader sees: Song of Solomon 8, 2 Thessalonians
+// 3 and 1 Corinthians 14. Plain (non-mobile) windows, so the widths are exact.
+const LONG_NAMES = [
+  "/bible/bsb/song-of-solomon/7",
+  "/bible/bsb/2-thessalonians/2",
+  "/bible/bsb/1-corinthians/15",
+];
+
+for (const width of [320, 360, 375, 390, 412]) {
+  test(`the chapter buttons keep book and number on one line at ${width}px`, async ({
+    browser,
+  }) => {
+    const page = await (await browser.newContext({ viewport: { width, height: 800 } })).newPage();
+    for (const path of LONG_NAMES) {
+      await page.goto(path);
+      const links = page
+        .getByRole("navigation", { name: "Previous and next chapter" })
+        .getByRole("link");
+      for (const link of await links.all()) {
+        const label = `${path}: ${await link.innerText()}`;
+        expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
+        expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
+        expect(await link.innerText(), label).not.toMatch(/[←→]/);
+      }
+    }
+  });
+}

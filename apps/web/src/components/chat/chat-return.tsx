@@ -12,8 +12,8 @@ const nothing = () => null;
  * The way back to the chat in the Bible reader (it opens the chat over the page, no navigation),
  * shown only to a visitor who came from the chat (a
  * flag in this tab, so a shared link shows nothing). On a phone it is a round button in the middle
- * of the pinned chapter bar, between Previous and Next, rising above the bar with "Your chat" under
- * it. From lg, where the chapter buttons sit under the text, it is a tab fixed to the
+ * above the pinned chapter bar, between Previous and Next, with "Your chat" under it. It takes no
+ * width from the bar, so a long book name keeps its room. From lg, where the chapter buttons sit under the text, it is a tab fixed to the
  * right edge at mid-height like a drawer handle (the chat opens from there), which can be hidden.
  */
 export function ChatReturn() {
@@ -22,7 +22,7 @@ export function ChatReturn() {
   return (
     <div
       data-chat-return
-      className="-mt-8 flex flex-none items-center gap-1 lg:fixed lg:right-0 lg:top-1/2 lg:z-30 lg:mt-0 lg:w-12 lg:-translate-y-1/2 lg:flex-col lg:items-stretch lg:gap-0 lg:overflow-hidden lg:rounded-l-2xl lg:bg-ink lg:shadow-menu"
+      className="absolute bottom-full left-1/2 mb-1 flex -translate-x-1/2 flex-none items-center gap-1 lg:fixed lg:bottom-auto lg:left-auto lg:right-0 lg:top-1/2 lg:z-30 lg:mb-0 lg:w-12 lg:translate-x-0 lg:-translate-y-1/2 lg:flex-col lg:items-stretch lg:gap-0 lg:overflow-hidden lg:rounded-l-2xl lg:bg-ink lg:shadow-menu"
     >
       <button
         type="button"
@@ -37,7 +37,9 @@ export function ChatReturn() {
             />
           </svg>
         </span>
-        <span className="lg:[writing-mode:vertical-rl]">{chat.yourChat}</span>
+        <span className="max-lg:rounded-full max-lg:bg-surface max-lg:px-2 max-lg:py-0.5 lg:[writing-mode:vertical-rl]">
+          {chat.yourChat}
+        </span>
       </button>
       <button
         type="button"
