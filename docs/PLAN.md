@@ -374,15 +374,20 @@ Step-by-step build checklist: [chat_checks.md](archive/chat_checks.md). Scope, m
 - [x] Enhancements after testing on a phone (2026-11-15, details in [chat_checks.md](archive/chat_checks.md) under K6): Got Questions in the menu bar and mobile menu, a "Your chat" way back from the Bible reader (round button between Previous and Next on phones, an edge tab on the right from `lg`) that opens the chat in place over the Bible, no site footer on the Bible reader pages, no question counts beside the topics, and "Talk to someone" is a mail link to `hello@` while the chat is off
 
 ### 1.11 Landing page final review (from the retired landing page checklist)
-The page is built and tested; these checks were never ticked off and some may already be true. Do each at 375px first, then wider, in light and dark; tick or fix. Reading the copy is **(Hendrik)**.
-- [ ] Sign-up form at 375px with the on-screen keyboard open: the consent line, the pending state that blocks a double submit, errors announced, calm messages for 429 and server errors (the form is built in 1.3; this is the visual check)
-- [ ] Header links all land on a real section; anchor targets are not hidden under the sticky header (scroll margin); the in-page links have a focus state; smooth scroll respects reduced motion
-- [ ] The 404 and error pages reviewed in both themes
-- [ ] Each section compared with `docs/design/A. Night swell@2x.png` and `B. Dawn patrol@2x.png`; spacing, heading sizes and button styles consistent; devotional text in Lora at a `62ch` measure and at least 16px
-- [ ] Text contrast checked for both schemes (the axe tests cover most of it)
-- [ ] Checked at 320, 375, 414, 768, 1024 and 1280 wide, portrait and landscape on a phone, and the devotional page at 820 and 1440; notch and home-indicator safe areas on a real iPhone
-- [ ] Keyboard-only pass over the menu, theme toggle, sign-up form and skip link, with a visible focus in both themes; form errors reachable by a screen reader and focus moved to the first error (VoiceOver and TalkBack are in 1.8)
-- [ ] Devotional pages: Article JSON-LD and the devotional archive page (also under 1.2b and 2.3)
+Checked against the code and the tests on 2026-11-16: what is proven is ticked with its evidence; what needs a person, a real phone or a fix stays open. Two defects were found (marked **found**). Reading the copy is **(Hendrik)**.
+- [x] Sign-up form, automated checks: the consent line beside a 44px button with the privacy link (unit), the pending state (`busy` disables the button and sets `aria-busy`, unit), the calm messages for 429, a refused spam check and a general error, announced in `role="alert"` and the success in `role="status"` (e2e), and axe clean with an error shown, in light and dark (e2e)
+- [ ] Sign-up form on a real phone at 375px with the on-screen keyboard open, light and dark (no emulator shows the on-screen keyboard) **(Hendrik)**
+- [ ] **Found: a field error is not announced and focus does not move to it.** A bad email returns only a field error (`parseSignup`, `src/lib/signup.ts`), shown in a plain `<p>` (`FieldError`) that is linked with `aria-describedby` and `aria-invalid` but is not a live region, and nothing moves focus to the first invalid field, so a screen reader user hears nothing after submitting a bad address (CLAUDE.md section 5 asks for `aria-live`). Fix test first: announce the error (live region or focus the first invalid field) and cover it in the sign-up e2e spec and the unit test
+- [x] Header links all land on a real section (`#about`, `#coming`, `#start`, `#believe` and the Subscribe button's `#subscribe` all exist); anchor targets are clear of the sticky header (`scroll-padding-top: 5rem` on `html`, e2e on About and What we believe); every interactive element has a 3px `:focus-visible` outline; smooth scroll is switched off by `prefers-reduced-motion` (`globals.css`; by code, no browser test)
+- [x] The 404 page: status, heading and axe in light and dark (`a11y.spec.ts`, `shell.spec.ts`)
+- [ ] **Found: the error page's "Try again" button fails contrast in the light theme.** `src/app/error.tsx` styles it by hand (`bg-accent text-bg`, 3.02:1, AA needs 4.5:1 at 16px; dark passes at 5.83:1) instead of using the shared `Button` (`accent-ink`, 4.95:1), and the page has no test. Fix test first: use the shared `Button`, then add the error page to the axe spec in both themes
+- [x] Devotional and body text: Lora at 17px with a 1.65 line height (`typography.spec.ts`) and the devotional article at `max-w-[62ch]`
+- [ ] Each section compared with `docs/design/A. Night swell@2x.png` and `B. Dawn patrol@2x.png`; spacing, heading sizes and button styles consistent (a visual judgement, not automated) **(Hendrik)**
+- [x] Text contrast in both schemes: axe reports no serious or critical problem on the landing page, a devotional, the 404, the privacy and thank-you pages, the sign-up band, the chat and the Bible reader, in light and dark (the error page is the open item above)
+- [x] No sideways scroll at 320, 375, 414, 768, 820, 1024, 1280 and 1440 wide, light and dark, on the landing page, a devotional and the privacy page (measured 2026-11-16; the e2e overflow spec covers 320 to 414)
+- [ ] Landscape on a phone, and the notch and home-indicator safe areas on a real iPhone **(Hendrik)**
+- [x] Keyboard-only pass (measured 2026-11-16, phone and desktop, light and dark): the skip link is the first stop, every focus stop has a visible outline, and the menu, the theme toggle (works with Enter) and the sign-up fields are reachable
+- [ ] Devotional pages: Article JSON-LD (only the home page has `Organization` and `WebSite` data) and the devotional archive page (also under 1.2b and 2.3)
 - [ ] Optional later: add a point on the Holy Spirit or Jesus' return to the statement of faith
 
 **Exit gate Phase 1**
