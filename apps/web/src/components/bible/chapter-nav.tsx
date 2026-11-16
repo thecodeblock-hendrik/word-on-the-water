@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 
 import { type Book, type ChapterRef, findBook, neighbours } from "@/lib/bible/books";
 import { chapterPath } from "@/lib/bible/reference";
@@ -25,13 +24,10 @@ export function ChapterNav({
   version,
   book,
   chapter,
-  children,
 }: {
   version: string;
   book: Book;
   chapter: number;
-  /** Sits between Previous and Next on a phone (the Your chat button). */
-  children?: ReactNode;
 }) {
   const { previous, next } = neighbours(book, chapter);
   const href = (ref: ChapterRef) => chapterPath(version, ref.book, ref.chapter);
@@ -55,7 +51,6 @@ export function ChapterNav({
           <span className="min-w-0 truncate">Start of the Bible</span>
         </button>
       )}
-      {children}
       {next ? (
         <Link
           href={href(next)}

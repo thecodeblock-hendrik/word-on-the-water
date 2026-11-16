@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { PassageText } from "@/components/bible/passage-text";
 import type { Book } from "@/lib/bible/books";
@@ -12,13 +13,15 @@ type Props = {
   book: Book;
   /** True when the verses in the address could not be read and the whole chapter is shown. */
   invalidVerses?: boolean;
+  /** Placed in the heading, beside the version name and title (the Your chat tab). */
+  aside?: ReactNode;
 };
 
 const note =
   "max-w-[62ch] rounded-md border border-line bg-surface px-4 py-3 font-ui text-[.95rem]";
 
 /** One chapter or a few verses, with the version, a note when verses are missing, and the credit. */
-export function Reader({ passage, version, book, invalidVerses = false }: Props) {
+export function Reader({ passage, version, book, invalidVerses = false, aside }: Props) {
   const { range, fallback } = passage;
   const chapterHref = `/bible/${version.id}/${book.slug}/${passage.chapter}`;
 
@@ -27,7 +30,7 @@ export function Reader({ passage, version, book, invalidVerses = false }: Props)
       aria-labelledby="passage-title"
       className="mx-auto grid max-w-[62ch] gap-6 pb-8 pt-8 lg:pt-0"
     >
-      <header className="grid gap-3">
+      <header className="relative grid gap-3 has-[[data-chat-return]]:max-lg:min-h-[7.5rem] has-[[data-chat-return]]:max-lg:content-start has-[[data-chat-return]]:max-lg:pr-7">
         <p className="font-display text-[.88rem] font-semibold uppercase tracking-[.18em] text-accent-ink">
           {version.name}
         </p>
@@ -51,6 +54,7 @@ export function Reader({ passage, version, book, invalidVerses = false }: Props)
             </Link>
           </p>
         )}
+        {aside}
       </header>
 
       {fallback && (

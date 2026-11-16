@@ -15,22 +15,24 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("ChatReturn, the floating Your chat button in the Bible", () => {
+describe("ChatReturn, the Your chat tab in the Bible", () => {
   it("is not there when the visitor did not come from the chat", () => {
     render(<ChatReturn />);
     expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
 
-  it("is a round ink button of 60px with its words under it, marked so the page can leave room", async () => {
+  it("is an ink tab that fills the heading on a phone, not a round button", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
-    const link = await screen.findByRole("button", { name: /^your chat$/i });
-    const round = link.querySelector("span");
-    expect(round?.className).toMatch(/\bbg-ink\b/);
-    expect(round?.className).toMatch(/size-\[60px\]/);
-    expect(round?.className).toMatch(/rounded-full/);
-    expect(link).toHaveTextContent("Your chat");
-    expect(link.closest("[data-chat-return]")).not.toBeNull();
+    const button = await screen.findByRole("button", { name: /^your chat$/i });
+    const tab = button.closest("[data-chat-return]")!;
+    expect(tab.className).toMatch(/max-lg:absolute/);
+    expect(tab.className).toMatch(/max-lg:inset-y-0/);
+    expect(tab.className).toMatch(/\bbg-ink\b/);
+    expect(tab.className).toMatch(/max-lg:w-11/);
+    expect(tab.querySelector(".rounded-full")).toBeNull();
+    expect(tab.innerHTML).not.toMatch(/size-\[60px\]/);
+    expect(button).toHaveTextContent("Your chat");
   });
 
   it("opens the chat over the page without leaving it, and clears the way back", async () => {

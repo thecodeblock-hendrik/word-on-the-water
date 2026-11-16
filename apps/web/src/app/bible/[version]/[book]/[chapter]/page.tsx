@@ -99,10 +99,14 @@ export default async function BibleChapterPage(props: Props) {
         <VersionSwitcher state={state} />
       </div>
       <div className="min-w-0 lg:pt-8">
-        <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
-        <ChapterNav version={version.id} book={book} chapter={passage.chapter}>
-          {isChatEnabled() && <ChatReturn />}
-        </ChapterNav>
+        <Reader
+          passage={passage}
+          version={version}
+          book={book}
+          invalidVerses={invalidVerses}
+          aside={isChatEnabled() && <ChatReturn />}
+        />
+        <ChapterNav version={version.id} book={book} chapter={passage.chapter} />
       </div>
     </div>
   );

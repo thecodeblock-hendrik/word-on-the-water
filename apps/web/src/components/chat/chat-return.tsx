@@ -10,11 +10,12 @@ const nothing = () => null;
 
 /**
  * The way back to the chat in the Bible reader (it opens the chat over the page, no navigation),
- * shown only to a visitor who came from the chat (a
- * flag in this tab, so a shared link shows nothing). On a phone it is a round button in the middle
- * above the pinned chapter bar, between Previous and Next, with "Your chat" under it. It takes no
- * width from the bar, so a long book name keeps its room. From lg, where the chapter buttons sit under the text, it is a tab fixed to the
- * right edge at mid-height like a drawer handle (the chat opens from there), which can be hidden.
+ * shown only to a visitor who came from the chat (a flag in this tab, so a shared link shows
+ * nothing). It is rendered inside the passage heading (`Reader`'s `aside`). On a phone it is an ink
+ * tab on the right edge of the screen, from the version name down to the verses line: always at the
+ * top, never over the text (the heading keeps room for it), and no space taken from the chapter bar.
+ * From lg, where the chapter buttons sit under the text, it is a tab fixed to the right edge at
+ * mid-height like a drawer handle, which can be hidden.
  */
 export function ChatReturn() {
   const url = useSyncExternalStore(subscribeChatReturn, chatReturnUrl, nothing);
@@ -22,24 +23,20 @@ export function ChatReturn() {
   return (
     <div
       data-chat-return
-      className="absolute bottom-full left-1/2 mb-1 flex -translate-x-1/2 flex-none items-center gap-1 lg:fixed lg:bottom-auto lg:left-auto lg:right-0 lg:top-1/2 lg:z-30 lg:mb-0 lg:w-12 lg:translate-x-0 lg:-translate-y-1/2 lg:flex-col lg:items-stretch lg:gap-0 lg:overflow-hidden lg:rounded-l-2xl lg:bg-ink lg:shadow-menu"
+      className="flex flex-col items-stretch overflow-hidden rounded-l-xl bg-ink text-bg shadow-menu max-lg:absolute max-lg:inset-y-0 max-lg:-right-4 max-lg:w-11 lg:fixed lg:right-0 lg:top-1/2 lg:z-30 lg:w-12 lg:-translate-y-1/2 lg:rounded-l-2xl"
     >
       <button
         type="button"
         onClick={() => openChat(null)}
-        className="flex flex-col items-center gap-0.5 font-ui text-[11px] font-bold leading-none text-ink lg:min-h-[150px] lg:justify-center lg:gap-2.5 lg:py-3 lg:text-sm lg:tracking-wide lg:text-bg lg:hover:bg-accent-ink"
+        className="flex flex-1 flex-col items-center justify-center gap-2 py-3 font-ui text-sm font-bold tracking-wide hover:bg-accent-ink lg:min-h-[150px] lg:gap-2.5"
       >
-        <span className="grid size-[60px] place-items-center rounded-full border-[3px] border-surface bg-ink text-bg shadow-menu lg:size-auto lg:border-0 lg:bg-transparent lg:shadow-none">
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="size-7 flex-none lg:size-5">
-            <path
-              d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"
-              fill="currentColor"
-            />
-          </svg>
-        </span>
-        <span className="max-lg:rounded-full max-lg:bg-surface max-lg:px-2 max-lg:py-0.5 lg:[writing-mode:vertical-rl]">
-          {chat.yourChat}
-        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="size-5 flex-none">
+          <path
+            d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"
+            fill="currentColor"
+          />
+        </svg>
+        <span className="[writing-mode:vertical-rl]">{chat.yourChat}</span>
       </button>
       <button
         type="button"
