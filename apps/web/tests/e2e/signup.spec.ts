@@ -90,6 +90,7 @@ test.describe("the sign-up form", () => {
 
     await expect(band.getByText("Enter a valid email address.")).toBeVisible();
     await expect(band.getByLabel("Email")).toHaveAttribute("aria-invalid", "true");
+    await expect(band.getByLabel("Email")).toBeFocused();
     await expect(band.getByLabel("Email")).toHaveValue("a@b");
     await expect(band.getByLabel("First name (optional)")).toHaveValue("Ann");
   });

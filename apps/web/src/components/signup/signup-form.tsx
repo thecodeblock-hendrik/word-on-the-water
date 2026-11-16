@@ -53,6 +53,14 @@ export function SignupForm({ source, renderedAt, idempotencyKey, siteKey }: Prop
     }
   }, [state]);
 
+  // A field error is a plain paragraph, so nothing announces it. Moving focus to the first invalid
+  // field makes a screen reader read the label, the invalid state and the linked error together.
+  useEffect(() => {
+    if (state.status === "error" && state.fieldErrors) {
+      form.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+    }
+  }, [state]);
+
   if (!siteKey) return <p className="font-ui text-on-deep-muted">{signup.unavailable}</p>;
 
   if (state.status === "success") {
