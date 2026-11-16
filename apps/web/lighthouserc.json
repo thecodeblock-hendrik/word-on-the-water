@@ -9,7 +9,8 @@
       ],
       "numberOfRuns": 3,
       "settings": {
-        "chromeFlags": "--no-sandbox --headless=new"
+        "chromeFlags": "--no-sandbox --headless=new",
+        "throttlingMethod": "devtools"
       }
     },
     "assert": {
@@ -66,7 +67,7 @@
           "matchingUrlPattern": "/devotionals/",
           "assertions": {
             "categories:performance": [
-              "warn",
+              "error",
               {
                 "minScore": 0.95
               }
@@ -90,7 +91,7 @@
               }
             ],
             "largest-contentful-paint": [
-              "warn",
+              "error",
               {
                 "maxNumericValue": 2000
               }
