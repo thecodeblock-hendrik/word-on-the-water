@@ -4,7 +4,7 @@
 
 Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
-**Scope (Phase 1):** installable, full-screen, with the right icon, name and colours. **Not in scope:** offline reading and a service worker (Phase 3), Web Push (Phase 2 gate), a native app (see [FLUTTER.md](FLUTTER.md)).
+**Scope (Phase 1):** installable, full-screen, with the right icon, name and colours. **Not in scope:** offline reading and a service worker (Phase 3), Web Push (planned after the PWA, [web_push.md](web_push.md)), a native app (see [FLUTTER.md](FLUTTER.md)).
 
 **How it works in one paragraph:** a phone offers to install a site that is served over HTTPS and has a web app manifest (name, start page, `display: standalone`, colours and icons of 192 and 512 px, one of them maskable). Android Chrome shows an "Install app" prompt. iPhone Safari has no prompt: Share, then Add to Home Screen, and it uses the 180 px apple icon. The installed app is the live website, so every deploy updates it with no store review.
 
@@ -19,7 +19,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 - [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
 - [ ] Start page: `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
 - [x] Orientation: **no lock** (decided 2026-11-16). Leave `orientation` out of the manifest, so the default (`any`) applies. A portrait lock fails WCAG 1.3.4 (technique failure F97), which this project targets at level AA, and nothing here needs a fixed orientation; users with a mounted device, for example on a wheelchair, can be blocked by a lock. `CLAUDE.md` section 5 and Part C of the production checklist say the same
-- [ ] **Open: offline.** Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
+- [ ] **Open: offline** (now shared with Web Push: [web_push.md](web_push.md) needs the same single service worker file, so decide the two together). Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
 - [ ] **Open: iOS launch screen.** Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
 - [ ] **Open: desktop install sheet.** Chrome shows only screenshots with `form_factor: "wide"` on desktop, and step 4 plans narrow ones only. Decide whether one wide screenshot is worth adding (optional)
 
@@ -101,7 +101,7 @@ HTTPS is needed. Use a Vercel preview deployment (the best test, the real produc
 
 ## 10. Later (not Phase 1)
 
-- [ ] Phase 2 gate: Web Push for the weekly devotional (a service worker, a push subscription store, a send job; on iPhone push only works for a site added to the home screen on iOS 16.4 or newer)
+- [ ] Web Push for the weekly devotional, planned after the PWA (decided 2026-11-16): the design and steps are in [web_push.md](web_push.md); it needs a service worker, a subscription store and a send job, and on iPhone it only works for a site added to the home screen on iOS 16.4 or newer
 - [ ] Phase 3 (or earlier, see the offline decision in step 1): offline reading of recent devotionals and the last Bible chapters: `public/sw.js` served with `Cache-Control: no-cache` and its own CSP header, a cache and update strategy, an offline page, and a test that a published devotional still opens with the network off
 - [ ] Phase 3: an "Install" button inside the page that uses the `beforeinstallprompt` event on Android (iPhone needs written instructions instead)
 - [ ] Revisit the native Flutter app at the Phase 2 gate ([FLUTTER.md](FLUTTER.md), option B)

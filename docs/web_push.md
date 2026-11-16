@@ -1,6 +1,6 @@
 # Web Push plan
 
-**Status (2026-11-16): proposal, not decided, nothing built.** It depends on the PWA ([PWA_checklist.md](PWA_checklist.md)): push needs the service worker and, on iPhone, an installed home screen app. [CLAUDE.md](../CLAUDE.md) and [PLAN.md](PLAN.md) 2.5 treat Web Push as a Phase 2 gate decision; this document is the plan for taking that decision, and changing the phase needs your confirmation (see "Open questions"). Anything that changes the security posture needs an ADR first (CLAUDE.md section 14): ADR 0011 is step W0 below.
+**Status (2026-11-16): design decided, nothing built.** Hendrik answered the design questions on 2026-11-16 (section 12). Web Push is **planned after the PWA** ([PWA_checklist.md](PWA_checklist.md)), not a Phase 2 gate decision any more: push needs a service worker and, on iPhone, an installed home screen app, and it **shares one service worker with the PWA's offline decision**. [CLAUDE.md](../CLAUDE.md) and [PLAN.md](PLAN.md) 2.5 say so. Anything that changes the security posture needs an ADR first (CLAUDE.md section 14): ADR 0011 is still to write (step W0 below).
 
 **Goal:** tell people who opt in that this week's devotional is out, with one short notification, from our own code, at no cost. It adds a channel next to the weekly Kit email; it does not replace it.
 
@@ -35,11 +35,13 @@ So on iPhone the order is: PWA installed, then the notification button appears.
 | Where the sending code lives | **FastAPI** (`apps/api`), with Next as the BFF for subscribe and unsubscribe | The database, Redis, cron and the outbox pattern are already there ([CLAUDE.md](../CLAUDE.md) sections 3 and 8). Next's own guide sends from Node with an in-memory store and says to use a database in production; we deviate on purpose |
 | Library | **`pywebpush`** (2.5.0, released 2026-08-30, Python 3.10 or later, has `webpush_async()`), on top of `py-vapid` and `http-ece` | Established and keeps encryption and VAPID out of our own code. One maintainer, and it pulls in `aiohttp` and `requests` (we use `httpx`): step W1 proves it installs and runs inside the Vercel Python function size and runtime. Fallback: the smaller `webpush` package (1.0.6, built on `cryptography` and `PyJWT`) or a small implementation on `cryptography` |
 | Storage | Postgres tables (section 4), anonymous: **no link to the Kit subscriber or an email address** | Data minimisation under GDPR and POPIA, and no account system exists |
-| Trigger | A **cron route on the web project** finds a devotional whose `publishAt` is today and posts it to the API | The devotionals are markdown files in `apps/web/content`; the API project cannot see them. The API then fans out. Idempotent on the devotional slug, so a double run sends nothing twice |
+| Scope | **Only "the new devotional is out"** (decided) | Keeps consent simple and the channel trusted; no notices about series or audio in v1 |
+| Trigger | **Manual first, then automatic** (decided). For the first month you run `pnpm push:devotional <folder> --send` yourself, after a `--dry-run`. Later a **cron route on the web project** finds a devotional whose `publishAt` is today and posts it to the API, switched on with `PUSH_AUTO_SEND=1` | Nothing goes out by accident, like the weekly email draft. The devotionals are markdown files in `apps/web/content`; the API project cannot see them, so the web side hands the devotional to the API, which fans out. Idempotent on the devotional slug, so a double run, or a manual send followed by the cron, sends nothing twice |
 | Fan-out | Resumable batches from a cron, plus an immediate best-effort start after the trigger | The same pattern as the Kit job (`kit_jobs.py`): a failure never loses the send, and the daily cron (Hobby) or 5-minute cron (Pro) finishes it |
-| Send time | **One fixed UTC time** for everyone (proposal: 04:00 UTC, which is 06:00 in South Africa) | Per-person local time needs a stored timezone, which is extra personal data. See open question 2 |
-| Opt-in UX | The visitor taps a button; no prompt on page load. Shown after value: on `/thank-you`, at the end of a devotional, and as a menu row | A prompt on first load is widely discouraged (people refuse what they were not asked for), and iOS requires a tap anyway |
-| Kill switch | `WEB_PUSH_ENABLED` on both projects; unset hides the button and the API answers 503 | Same shape as `CHAT_ENABLED` |
+| Send time | **One fixed time** for everyone (decided). Automatic: **03:00 UTC, which is 05:00 South African time** (UTC+2, no daylight saving). Manual: when you run the command, about **08:00 South African time (06:00 UTC)** | Per-person local time needs a stored timezone, which is extra personal data. On Vercel Hobby a daily cron may fire anywhere inside its hour; Pro runs it at the exact minute, and Pro is planned for launch ([Vercel docs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)). Vercel's newer Schedules (beta) add timezone support and may replace Cron Jobs ([PLAN.md](PLAN.md) 1.7) |
+| Opt-in UX | The visitor taps a button; no prompt on page load. Shown after value: on `/thank-you`, at the end of a devotional, and as a menu row, not on the landing page hero (decided) | A prompt on first load is widely discouraged (people refuse what they were not asked for), and iOS requires a tap anyway |
+| Service worker | **One `sw.js`**, shared with the PWA's offline decision (decided) | Two service workers cannot share a scope, so offline caching and push are one file and are decided together ([PWA_checklist.md](PWA_checklist.md) step 1). Because the file is needed for push anyway, the minimal offline fallback page costs little; it is recommended, and still your call there |
+| Kill switches | `WEB_PUSH_ENABLED` on both projects (unset hides the button and the API answers 503) and `PUSH_AUTO_SEND` (unset means manual only) | Same shape as `CHAT_ENABLED`; the second one lets the cron be off while subscriptions work |
 
 ---
 
@@ -73,7 +75,7 @@ The browser never calls FastAPI directly (ADR 0001). The cron route on the web p
 | `id` | UUID v7, as everywhere |
 | `endpoint_hash` | SHA-256 of the endpoint, **unique**: the lookup key, so unsubscribe and idempotent subscribe never expose or log the endpoint |
 | `endpoint` | The URL we POST to, at most 2048 characters |
-| `p256dh`, `auth` | The subscription keys. Without our VAPID private key they cannot send, but they are the message encryption secrets; encrypt them at rest with the application-layer scheme of [ADR 0006](adr/0006-prayer-encryption.md) (`key_id` per row). See open question 5 |
+| `p256dh`, `auth` | The subscription keys. Without our VAPID private key they cannot send, but they are the message encryption secrets; encrypt them at rest with the application-layer scheme of [ADR 0006](adr/0006-prayer-encryption.md) (`key_id` per row); decided 2026-11-16 |
 | `platform` | `desktop`, `android`, `ios` or `other`, from the browser's own client hints at subscribe time; nothing finer |
 | `consent_text_version`, `consent_at`, `source` | Evidence of consent, as in `subscribers` |
 | `status`, `failure_count`, `last_success_at` | `active`, `expired`, `disabled`; used by the sender and the retention job |
@@ -142,8 +144,8 @@ Pydantic schemas use `extra="forbid"` and strict limits (CLAUDE.md section 6.3).
 
 - **Runbook** `docs/runbooks/web_push.md` (W8): the switch, key handling and rotation, the allowlist, reading the counts, what a failed send looks like.
 - **Cost:** no per-message charge from anyone. The only usage is a few seconds of function time a week.
-- **Cron:** a daily trigger at the send time works on Hobby; on Pro the 5-minute drain finishes interrupted sends.
-- **Manual command** `pnpm push:devotional <folder> --dry-run|--send`, like `pnpm broadcast:devotional`: preview the notification and send on purpose. Whether the cron sends on its own is open question 3.
+- **Cron:** the automatic trigger runs daily at 03:00 UTC (05:00 South African time). On Hobby it may fire anywhere inside that hour; on Pro it runs at the exact minute, and the 5-minute drain finishes interrupted sends.
+- **Manual command** `pnpm push:devotional <folder> --dry-run|--send`, like `pnpm broadcast:devotional`: preview the notification and send on purpose, about 08:00 South African time. This is the only way a notification goes out for the first month; `PUSH_AUTO_SEND=1` then turns on the 05:00 cron.
 
 ---
 
@@ -164,28 +166,35 @@ Tests first, real Postgres and Redis, mock only the third party (here, the push 
 
 One branch per section, as in [PWA_checklist.md](PWA_checklist.md). Not started; tick as done.
 
-- [ ] **W0 Decide.** Answer the open questions below; write ADR 0011 (channel, library, data held, processors, SSRF controls); update CLAUDE.md and PLAN.md 2.5 to match
+- [ ] **W0 Decide.** The design questions are answered (section 12) and CLAUDE.md and PLAN.md 2.5 are updated to match; still to do: write ADR 0011 (channel, library, data held, processors, SSRF controls)
 - [ ] **W1 Spike.** Install `pywebpush` in `apps/api`, send one encrypted push to a real browser endpoint from a Vercel Python function; check the function size, cold start and that redirects can be refused (or pre-resolve the host ourselves). Decide library or fallback
 - [ ] **W2 Data.** Migration and models (section 4); retention additions; tests
 - [ ] **W3 Subscribe API.** Schemas, validation, SSRF allowlist, rate limit, idempotency, flag; OpenAPI types regenerated
 - [ ] **W4 Send.** Broadcast creation, resumable fan-out, `/cron/push-drain`, error handling per section 6; a fake push service for the tests
 - [ ] **W5 Service worker.** `sw.js`, headers and CSP, registration; works with the PWA's manifest and scope
 - [ ] **W6 Client.** `NotifyButton`, states, iOS handling, the three placements, copy; e2e
-- [ ] **W7 Trigger.** The web cron route (`vercel.json` crons on the web project), `pnpm push:devotional`, the dry run
+- [ ] **W7 Trigger.** `pnpm push:devotional` with the dry run and the send first; then the web cron route (`vercel.json` crons on the web project, 03:00 UTC) behind `PUSH_AUTO_SEND`
 - [ ] **W8 Docs.** [privacy.md](privacy.md) and the public privacy page, [threat-model.md](threat-model.md), the runbook, [production_checklist.md](production_checklist.md) items
 - [ ] **W9 Prove it.** The by-hand matrix on a preview, then enable `WEB_PUSH_ENABLED` in Production **(Hendrik)**
 - [ ] **Later:** per-person send time; "new series" notices (only if you decide to); Declarative Web Push once other browsers support it
 
 ---
 
-## 12. Open questions for Hendrik
+## 12. Decisions and what is still open
 
-1. **Scope.** Only "the new devotional is out", or also occasional notices (a new series, audio)? I recommend only the devotional in v1: it keeps consent simple and the channel trusted.
-2. **Send time.** One fixed UTC time (simple, no extra data) or each person's local morning (needs a stored timezone)? I recommend fixed. The email says "Saturday at dawn"; 04:00 UTC is 06:00 in South Africa.
-3. **Automatic or on purpose.** Send by cron when the devotional publishes, or only when you run `pnpm push:devotional --send` (like the weekly email draft, so nothing goes out by accident)? I recommend manual for the first month, then automatic.
-4. **Where to ask.** `/thank-you`, the end of each devotional and a menu row. Anything to add or drop? Not on the landing page hero.
-5. **Encrypt the subscription keys at rest** with the ADR 0006 scheme? It costs a little complexity and protects the keys if the database leaks; I recommend yes.
-6. **When.** Before launch (28 November) is not realistic, since the PWA is not built. Confirm it moves from "Phase 2 gate decision" to "planned after the PWA", and whether it shares the service worker with the offline decision in [PWA_checklist.md](PWA_checklist.md) step 1.
+**Decided by Hendrik, 2026-11-16**
+
+1. **Scope:** only "the new devotional is out" in v1.
+2. **Send time:** one fixed time, not per person. Automatic at about 05:00 South African time (03:00 UTC).
+3. **Manual to start:** you send it yourself, at about 08:00 South African time (06:00 UTC); the automatic send comes later.
+4. **Where to ask:** `/thank-you`, the end of each devotional and a menu row; not on the landing page hero.
+5. **Encrypt the subscription keys at rest** with the ADR 0006 scheme.
+6. **Timing:** planned after the PWA (no longer a Phase 2 gate decision), and it shares one service worker with the PWA's offline decision.
+
+**Still open**
+
+- **Notification wording.** Use the devotional's `title` and `summary` (cut to 80 and 160 characters), or add optional `pushTitle` and `pushBody` fields to the front matter ([devotional_format.md](devotional_format.md)) for the weeks the summary reads badly as a notification? I lean to title and summary by default with the optional override; decide at W7.
+- **The offline fallback page** in the shared service worker: now or in Phase 3. It is the open offline decision in [PWA_checklist.md](PWA_checklist.md) step 1, which this plan now depends on.
 
 ---
 

@@ -124,7 +124,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 ├── docs/
 │   ├── PLAN.md, production_checklist.md, FLUTTER.md   ← the two lists to follow (everything outstanding that is not about launch is in PLAN.md; launch-day steps, including the domain and Kit webhook guide, are in production_checklist.md), native app assessment
 │   ├── archive/                  ← finished and retired documents: chat.md (scope) and chat_checks.md, landing_page_check.md, kit_setup.md (email DNS), kit_webhook_checks.md, secret_key_instructions.md, threat_plan.md, next-step notes, old checklists
-│   ├── bible_feature.md, PWA_checklist.md, web_push.md, devotional_format.md   ← Bible reader plan, PWA steps, Web Push plan (a proposal, not decided), devotional file format
+│   ├── bible_feature.md, PWA_checklist.md, web_push.md, devotional_format.md   ← Bible reader plan, PWA steps, Web Push plan (decided 2026-11-16, planned after the PWA), devotional file format
 │   ├── design/                   ← landing page document and mockup, bible_mockups.html (reader, picker options), chat_mockups.html (Got Questions chat)
 │   ├── adr/                      ← 0001 to 0010
 │   ├── runbooks/                 ← deploy.md, incident.md, restore-db.md, rotate-secrets.md, chat.md
@@ -191,7 +191,7 @@ Layering rule for the API: `routers → services → models/db`. Routers handle 
   - Icons: 192 and 512 px PNG, a 96 px icon for the shortcut, a 512 px maskable icon (logo inside the safe zone), `app/icon.svg`, and `app/apple-icon.png` (180 px) for iOS.
   - `export const viewport` with `themeColor` per colour scheme (light and dark media queries) and `viewport-fit=cover`; `metadata.appleWebApp` for the iOS home-screen launch.
   - When the colour scheme changes, the manifest, theme colours and icons change with it (only tokens should drive them).
-  - Offline reading (service worker) and Web Push are Phase 2 and 3 decisions, not Phase 1.
+  - Offline reading (service worker) is Phase 3 and Web Push is planned after the PWA ([web_push.md](docs/web_push.md)); they share one service worker, so they are decided together. Neither is Phase 1.
 
 ### Performance budgets (enforced in CI with Lighthouse CI on a mobile profile)
 
@@ -446,7 +446,7 @@ All mockup sections as responsive mobile-first components; final colour scheme w
 - **Exit criteria:** a visitor on a mid-range phone can read the page, subscribe and confirm, and reach `hello@` (the prayer and contact forms are deferred past launch, and the prayer option is not on the page until they are built); no high security findings.
 
 ### Phase 2 — Devotionals and admin
-Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email as Kit broadcasts created from published devotionals, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](docs/FLUTTER.md), option B) and Web Push for the weekly devotional.
+Admin login (passkey/magic link + 2FA), RBAC, admin UI for prayer requests (with audit log), devotional authoring and publishing, devotional archive and detail pages (ISR), weekly email as Kit broadcasts created from published devotionals, RSS feed, basic search (Postgres full-text). Decision gate: revisit the native Flutter app ([FLUTTER.md](docs/FLUTTER.md), option B). Web Push is planned separately, after the PWA ([web_push.md](docs/web_push.md)).
 
 ### Phase 3 — Teaching series and audio
 Series pages, audio upload to Vercel Blob (or R2) with signed URLs, podcast RSS feed, embedded player, offline-friendly PWA caching of recent devotionals. If the Phase 2 gate chose it, the Flutter app for iOS and Android is built here.
@@ -534,3 +534,4 @@ Local runs read the root `.env` written by `make setup` (Vercel Development has 
 - **Prayer and contact forms are not part of the launch (2026-11-14):** steps 1.4 and 1.5 move after launch. The page has no prayer option (the Prayer link was removed from the menus and footer on 2026-11-15, and `prayer@` is no longer named on the page or in the privacy policy); `hello@wordonthewater.net` is the contact address. The contact form, `PRAYER_INBOX` and `CONTACT_INBOX` work, and the prayer encryption, wait until they are built. The Phase 1 exit criteria and the launch checklist no longer include sending a prayer request.
 - **Got Questions chat from a local knowledge base (2026-11-14):** the first design (an LLM on OpenRouter with a web search limited to GotQuestions.org, Bible.org and BibleProject) was dropped because of POPIA and GDPR exposure of faith questions, copyright in the three sites' text, hallucination and third-party cost. v1 answers only from our own original knowledge base (`faith_kb.json`, built by `build_kb.py` from markdown), with follow-ups, history in the visitor's tab only and nothing stored on the server. No pastoral review gate (decided 2026-11-15); the crisis text uses South African numbers (verify before launch). A later LLM that only rephrases retrieved entries needs its own ADR first (ADR 0009, [chat.md](docs/archive/chat.md)).
 - **PWA has no orientation lock (2026-11-16):** the manifest leaves `orientation` out, because a portrait lock fails WCAG 1.3.4 (we target 2.2 AA) and nothing needs it. Open before building: a minimal offline fallback page now or in Phase 3, iOS launch screens, a wide desktop screenshot ([PWA_checklist.md](docs/PWA_checklist.md) step 1).
+- **Web Push planned after the PWA (2026-11-16):** self-built and free (standard Web Push with our own VAPID keys, sent from FastAPI, Next as the BFF), one notification a week for a new devotional only, one fixed send time (about 05:00 South African time automatic, about 08:00 when sent by hand, manual for the first month), anonymous subscriptions with the keys encrypted at rest, and one service worker shared with the PWA's offline decision. No longer a Phase 2 gate decision. ADR 0011 is still to write ([web_push.md](docs/web_push.md)).
