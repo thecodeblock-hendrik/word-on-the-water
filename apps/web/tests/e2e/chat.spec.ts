@@ -213,7 +213,7 @@ test.describe("with the chat on", () => {
       await expect(fresh.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
-    test("on a phone it is a round button between Previous and Next, not covering either", async ({
+    test("on a phone it is a round button centred above the bar, covering neither Previous nor Next", async ({
       page,
     }) => {
       test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
@@ -224,9 +224,10 @@ test.describe("with the chat on", () => {
         .boundingBox())!;
       const prev = (await bar.getByRole("link", { name: /Previous chapter/ }).boundingBox())!;
       const next = (await bar.getByRole("link", { name: /Next chapter/ }).boundingBox())!;
-      expect(prev.x + prev.width).toBeLessThanOrEqual(round.x);
-      expect(round.x + round.width).toBeLessThanOrEqual(next.x);
-      // Centred in the bar, rising above it, and 44px or more to tap.
+      // Clear of both chapter buttons, so it takes no room from their book names.
+      expect(round.y + round.height).toBeLessThanOrEqual(prev.y);
+      expect(round.y + round.height).toBeLessThanOrEqual(next.y);
+      // Centred between them, above the bar, and 44px or more to tap.
       const width = page.viewportSize()!.width;
       expect(Math.abs(round.x + round.width / 2 - width / 2)).toBeLessThan(8);
       const barBox = (await bar.boundingBox())!;
@@ -251,6 +252,35 @@ test.describe("with the chat on", () => {
         .boundingBox())!;
       expect(credit.y + credit.height).toBeLessThanOrEqual(round.y + 1);
     });
+
+    for (const width of [320, 360, 375, 390]) {
+      test(`with Your chat showing, the chapter buttons keep book and number on one line at ${width}px`, async ({
+        browser,
+      }) => {
+        const context = await browser.newContext({
+          baseURL: CHAT,
+          viewport: { width, height: 800 },
+        });
+        await context.addInitScript(() => sessionStorage.setItem("wotw-chat-return", "/"));
+        const page = await context.newPage();
+        for (const path of [
+          "/bible/bsb/song-of-solomon/7",
+          "/bible/bsb/2-thessalonians/2",
+          "/bible/bsb/1-corinthians/15",
+        ]) {
+          await page.goto(path);
+          await expect(page.locator("[data-chat-return]")).toBeVisible();
+          const nav = page.getByRole("navigation", { name: "Previous and next chapter" });
+          for (const link of await nav.getByRole("link").all()) {
+            const label = `${path}: ${await link.innerText()}`;
+            expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
+            expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
+            expect(await link.innerText(), label).not.toMatch(/[←→]/);
+          }
+        }
+        await context.close();
+      });
+    }
 
     test("on a wide screen it is a tab on the right edge, mid-height, and can be hidden", async ({
       page,

@@ -4,8 +4,10 @@ import type { ReactNode } from "react";
 import { type Book, type ChapterRef, findBook, neighbours } from "@/lib/bible/books";
 import { chapterPath } from "@/lib/bible/reference";
 
+// The label is one line: the font scales down only on the narrowest phones (16px from about 375px
+// wide), and `truncate` on the label is the last resort, never a second line.
 const button =
-  "flex min-h-12 flex-1 items-center gap-2 rounded-sm border-[1.5px] px-4 font-ui text-[16px] font-semibold lg:flex-none";
+  "flex min-h-12 min-w-0 flex-1 items-center rounded-sm border-[1.5px] px-3 font-ui text-[clamp(13.5px,4.3vw,16px)] font-semibold lg:flex-none lg:px-4 lg:text-[16px]";
 const outlined = "border-line bg-bg text-ink hover:border-accent";
 const filled = "border-accent-ink bg-accent-ink text-bg hover:brightness-110";
 const dead = "cursor-not-allowed border-line bg-bg text-muted opacity-60";
@@ -46,12 +48,11 @@ export function ChapterNav({
           aria-label={`Previous chapter: ${name(previous)}`}
           className={`${button} ${outlined} justify-start`}
         >
-          <span aria-hidden="true">←</span>
-          {name(previous)}
+          <span className="min-w-0 truncate">{name(previous)}</span>
         </Link>
       ) : (
         <button type="button" disabled className={`${button} ${dead} justify-start`}>
-          <span aria-hidden="true">←</span> Start of the Bible
+          <span className="min-w-0 truncate">Start of the Bible</span>
         </button>
       )}
       {children}
@@ -61,12 +62,11 @@ export function ChapterNav({
           aria-label={`Next chapter: ${name(next)}`}
           className={`${button} ${filled} justify-end`}
         >
-          {name(next)}
-          <span aria-hidden="true">→</span>
+          <span className="min-w-0 truncate">{name(next)}</span>
         </Link>
       ) : (
         <button type="button" disabled className={`${button} ${dead} justify-end`}>
-          End of the Bible <span aria-hidden="true">→</span>
+          <span className="min-w-0 truncate">End of the Bible</span>
         </button>
       )}
     </nav>

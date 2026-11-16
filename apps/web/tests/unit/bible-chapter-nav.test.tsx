@@ -23,6 +23,20 @@ describe("ChapterNav", () => {
     expect(next).toHaveTextContent("John 4");
   });
 
+  it("shows only the book and chapter on each button, with no arrows", () => {
+    const n = nav("john", 3);
+    expect(n.getByRole("link", { name: /^Previous chapter/ }).textContent).toBe("John 2");
+    expect(n.getByRole("link", { name: /^Next chapter/ }).textContent).toBe("John 4");
+    cleanup();
+    expect(nav("genesis", 1).getByRole("button", { name: /Start of the Bible/ }).textContent).toBe(
+      "Start of the Bible",
+    );
+    cleanup();
+    expect(
+      nav("revelation", 22).getByRole("button", { name: /End of the Bible/ }).textContent,
+    ).toBe("End of the Bible");
+  });
+
   it("puts previous before next in reading order", () => {
     const links = nav("john", 3).getAllByRole("link");
     expect(links.map((l) => l.getAttribute("href"))).toEqual([
