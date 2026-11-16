@@ -28,6 +28,9 @@ export default defineConfig({
         // Absolute links in the pages (canonical, prev and next) point back at this server.
         SITE_URL: `http://localhost:${port}`,
         BIBLE_ENABLED: "1",
+        // This server stands in for Production, where the chat is off. Say so, or a CHAT_ENABLED in
+        // the shell or the root .env (the dev setup) turns it on here and not in CI.
+        CHAT_ENABLED: "0",
         API_BASE_URL: "http://localhost:3101",
         SERVICE_TOKEN: "e2e-service-token-0123456789",
         // Cloudflare's always-pass test site key.
