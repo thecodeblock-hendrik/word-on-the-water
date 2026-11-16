@@ -38,7 +38,7 @@ Goal: the API loads the JSON once, validated, and fails safely.
 
 - [x] Tests first (`tests/test_kb.py`):
   - [x] Every `related` id, glossary `entries` id and entry `glossary_terms` name resolves; ids are unique. Glossary `see_also` is not checked: its only value is the non-id text `Introduction`.
-  - [x] `meta.counts` equals the real counts (203 entries, 16 contested, 39 glossary terms, 14 themes).
+  - [x] `meta.counts` equals the real counts (228 entries, 16 contested, 39 glossary terms, 15 themes (25 Bible character entries added 2026-11-15)).
   - [x] Every entry has a non-empty `short_answer` and `explanation`; contested entries have `answer_guidance`.
   - [x] No field of any entry contains an HTML tag or `javascript:`.
   - [x] A corrupt fixture (missing field, unknown id, wrong type) raises a clear error.

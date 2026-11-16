@@ -98,7 +98,7 @@ def test_tell_me_more_expands_then_offers_related(chat: Chat) -> None:
     assert answered(more) == "3.1" and more.expand
     again = v.says("tell me more")
     assert again.kind == "clarify"
-    assert option_ids(again) == ["2.14", "3.11", "3.2", "2.1", "3.19"]
+    assert option_ids(again) == ["2.14", "3.11", "3.2", "3.19", "2.1"]
 
 
 def test_chips_send_ids_and_related_lists_the_related_questions(chat: Chat) -> None:
@@ -106,7 +106,7 @@ def test_chips_send_ids_and_related_lists_the_related_questions(chat: Chat) -> N
     assert answered(v.send(entry_id="3.1")) == "3.1"
     related = v.send(action="related")
     assert related.kind == "clarify"
-    assert option_ids(related) == ["2.14", "3.11", "3.2", "2.1", "3.19"]
+    assert option_ids(related) == ["2.14", "3.11", "3.2", "3.19", "2.1"]
     assert answered(v.send(entry_id="2.14")) == "2.14"
 
 

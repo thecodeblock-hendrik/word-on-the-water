@@ -38,8 +38,8 @@ describe("the committed chat-topics.json", () => {
     expect(topics).toEqual(buildTopics(kb));
   });
 
-  it("covers all 14 themes and every question", () => {
-    expect(topics).toHaveLength(14);
+  it("covers all 15 themes and every question", () => {
+    expect(topics).toHaveLength(15);
     expect(topics.flatMap((t) => t.entries)).toHaveLength(kb.entries.length);
   });
 });

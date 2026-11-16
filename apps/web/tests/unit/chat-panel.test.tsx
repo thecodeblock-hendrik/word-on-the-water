@@ -310,7 +310,7 @@ describe("browse by topic", () => {
     const { user, dialog } = await openPanel();
     await user.click(within(dialog).getByRole("button", { name: /Browse by topic/ }));
 
-    expect(themes(dialog)).toHaveLength(14);
+    expect(themes(dialog)).toHaveLength(15);
     for (const button of themes(dialog))
       expect(button.textContent).toBe(button.textContent!.trim());
     expect(dialog.textContent).not.toMatch(/\d+ questions/);
@@ -329,7 +329,7 @@ describe("browse by topic", () => {
     await user.click(within(dialog).getByRole("button", { name: "God" }));
 
     await user.click(within(dialog).getByRole("button", { name: /Back/ }));
-    expect(themes(dialog)).toHaveLength(14);
+    expect(themes(dialog)).toHaveLength(15);
     await user.click(within(dialog).getByRole("button", { name: /Back/ }));
     expect(within(dialog).getByRole("button", { name: "Who is Jesus?" })).toBeDefined();
   });
@@ -339,7 +339,7 @@ describe("browse by topic", () => {
     const { user, dialog } = await openPanel();
     await user.type(box(), "bread{Enter}");
     await user.click(await within(dialog).findByRole("button", { name: "Browse topics" }));
-    expect(themes(dialog)).toHaveLength(14);
+    expect(themes(dialog)).toHaveLength(15);
   });
 });
 
