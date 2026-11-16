@@ -23,18 +23,29 @@ describe("ChapterNav", () => {
     expect(next).toHaveTextContent("John 4");
   });
 
-  it("shows only the book and chapter on each button, with no arrows", () => {
+  it("puts a left arrow before the previous place and a right arrow after the next, hidden from screen readers", () => {
     const n = nav("john", 3);
-    expect(n.getByRole("link", { name: /^Previous chapter/ }).textContent).toBe("John 2");
-    expect(n.getByRole("link", { name: /^Next chapter/ }).textContent).toBe("John 4");
+    const previous = n.getByRole("link", { name: /^Previous chapter/ });
+    const next = n.getByRole("link", { name: /^Next chapter/ });
+    expect(previous.textContent).toBe("←John 2");
+    expect(next.textContent).toBe("John 4→");
+    expect(previous.querySelector("[aria-hidden='true']")?.textContent).toBe("←");
+    expect(next.querySelector("[aria-hidden='true']")?.textContent).toBe("→");
     cleanup();
     expect(nav("genesis", 1).getByRole("button", { name: /Start of the Bible/ }).textContent).toBe(
-      "Start of the Bible",
+      "←Start of the Bible",
     );
     cleanup();
     expect(
       nav("revelation", 22).getByRole("button", { name: /End of the Bible/ }).textContent,
-    ).toBe("End of the Bible");
+    ).toBe("End of the Bible→");
+  });
+
+  it("keeps the name on one line: the arrow never shrinks and the name is the part that can truncate", () => {
+    const link = nav("john", 3).getByRole("link", { name: /^Previous chapter/ });
+    expect(link.querySelector("[aria-hidden='true']")?.className).toMatch(/flex-none/);
+    expect(link.querySelector(".truncate")?.textContent).toBe("John 2");
+    expect(link.className).toMatch(/min-w-0/);
   });
 
   it("puts previous before next in reading order", () => {

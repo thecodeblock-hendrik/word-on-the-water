@@ -312,7 +312,13 @@ test.describe("with the chat on", () => {
             const label = `${path}: ${await link.innerText()}`;
             expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
             expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-            expect(await link.innerText(), label).not.toMatch(/[←→]/);
+            const isPrevious = (await link.getAttribute("aria-label"))!.startsWith("Previous");
+            expect(await link.innerText(), label).toMatch(isPrevious ? /^←/ : /→$/);
+            // The whole name is shown: the part that can truncate is not truncated.
+            expect(
+              await link.locator(".truncate").evaluate((el) => el.scrollWidth <= el.clientWidth),
+              `${label}: the name is cut off`,
+            ).toBe(true);
           }
         }
         await context.close();
