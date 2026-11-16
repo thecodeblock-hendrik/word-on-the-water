@@ -242,8 +242,12 @@ test.describe("with the chat on", () => {
       test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
       await readVerse(page);
       await page.goto("/bible/web/psalms/119");
-      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-      await page.waitForTimeout(300);
+      // The button, and the room the page keeps for it, appear when the page hydrates: scroll only
+      // after that, or the page grows below the point just scrolled to (seen on a slow CI runner).
+      await expect(page.getByRole("button", { name: "Your chat", exact: true })).toBeVisible();
+      await page.evaluate(() =>
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+      );
       const round = (await page
         .getByRole("button", { name: "Your chat", exact: true })
         .boundingBox())!;
