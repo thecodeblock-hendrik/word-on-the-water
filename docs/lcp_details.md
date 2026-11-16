@@ -1,6 +1,6 @@
 # Devotional page LCP investigation
 
-Started 2026-11-16 on branch `fix/devotional-lcp`. Part of PLAN.md 1.8 (Lighthouse CI, LCP under 2.0 s). Status: **real LCP fixed by not preloading Barlow (committed); the simulated LCP of about 3.1 s is still open.**
+Started 2026-11-16 on branch `fix/devotional-lcp`. Part of PLAN.md 1.8 (Lighthouse CI, LCP under 2.0 s). Status: **resolved locally: real LCP fixed (Barlow not preloaded) and CI now measures with real (devtools) throttling. Still to confirm on CI and a deployed preview.**
 
 ## The problem
 
@@ -33,6 +33,9 @@ Started 2026-11-16 on branch `fix/devotional-lcp`. Part of PLAN.md 1.8 (Lighthou
 8. **`fetchpriority="high"` instead of `priority`: worse, reverted.** It also removes the preload links and eager loading, so both art images became `loading="lazy"`: real LCP 2.87 s, simulated unchanged at 3.09 s. `priorityHinted` is not what drives the simulated figure.
 9. **The art is not the cause of any shift.** The figure has a fixed `aspect-[4/3] sm:aspect-[21/9]` box and the images are `absolute inset-0`. The audit's "750 x 1200" is the optimizer's output for the 2833 x 4533 portrait source (the files are named `.png` but are JPEG), cropped by `object-cover`; it costs bytes, not layout.
 
+10. **Why the simulated figure cannot be fixed (2026-11-16).** For an image LCP the simulation counts every request that started before the observed LCP (98 ms locally), here 332 KB of fonts and scripts. Blocking tests (simulated, 2 runs): the 70 KB JS chunk gave -0.4 s, all JS -0.85 s, the 3 Barlow fonts -0.23 s, favicon and `_rsc` nothing: about 0.0055 s per KB at the throttled 1.47 Mbps. Reaching 2.0 s means removing about 200 KB of JS and fonts, which the design and the 165 KB JS budget (ADR 0010) do not allow. The landing page, with a text LCP, counts only render-blocking requests and scores 0.9 s with nearly the same bytes.
+11. **Decision: `lighthouserc.json` uses `throttlingMethod: "devtools"`** (real throttling) and the devotional performance and LCP asserts are `error`. `pnpm lighthouse` with `DEVOTIONAL_TODAY`, `BIBLE_ENABLED` and `CHAT_ENABLED` unset: both pages perf 0.99, LCP 1.63 s, CLS 0.0001 to 0.0002, TBT about 50 ms, spread under 15 ms in 3 runs.
+
 ## Retracted (do not rely on)
 
 - "Turning off the Lora preload fixes it (2.4 s to 1.4 s)": **invalid.** A stray `next start` (pid 7143) kept port 3200 because `pkill -f "next start"` does not match its process name, and it served a `.next` folder rebuilt under it. A clean re-test gave no change: simulated 0.94 and 3.09 s, real 2.4 s. The change was reverted.
@@ -44,14 +47,15 @@ Started 2026-11-16 on branch `fix/devotional-lcp`. Part of PLAN.md 1.8 (Lighthou
 - Never rebuild while a server runs on the same `.next`.
 - `pnpm lighthouse` starts its own server on 3200: stop yours first.
 
-## Next checks (one at a time, clean server each)
+## Next checks
 
-1. Done: font preloads (finding 7), `fetchpriority` (finding 8), art dimensions (finding 9).
-2. Re-measure on a deployed preview (HTTP/2, no 6-connection limit). Earlier preview readings: simulated LCP 2.4 to 3.1 s, observed 0.8 to 1.3 s.
-3. Find what else the simulation counts before the observed LCP (scripts, favicon, CPU layout); finding 6 says fonts and scripts together gave 2.1 s.
-4. If the simulated figure cannot be brought under 2.0 s: keep the devotional LCP assert at `warn`, record the real-throttling evidence, and make the job required for the landing page and the other metrics. Otherwise tighten to `error`, make the CI job required and tick PLAN.md 1.8.
+1. Done: font preloads, `fetchpriority`, art dimensions, the simulation (findings 7 to 11).
+2. Push the branch: confirm the `lighthouse` CI job passes with devtools throttling and is not noisy on a shared runner (several runs).
+3. Re-measure on a deployed preview (HTTP/2). Expect best practices 100 and SEO 69 only because previews send `x-robots-tag: noindex`.
+4. Then make the CI job a required check (branch protection, Hendrik) and tick PLAN.md 1.8's Lighthouse line. The LCP, INP and JS budget line stays open until INP is measured.
 
 ## Housekeeping
 
 - `docs/next_steps.md` was moved to `docs/archive/next_steps.md` by someone other than this session; it shows as deleted and untracked in `git status`. Not staged here.
-- The only code change on the branch is the Barlow `preload: false` (finding 7).
+- Code changes on the branch: Barlow `preload: false` (finding 7) and the devtools throttling in `apps/web/lighthouserc.json` (finding 11).
+- Run measurements with the shell flags unset (`env -u DEVOTIONAL_TODAY -u BIBLE_ENABLED -u CHAT_ENABLED`): the shell exports them, which also fails 20 unit tests.
