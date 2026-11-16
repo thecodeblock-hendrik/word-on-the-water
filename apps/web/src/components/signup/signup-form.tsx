@@ -22,7 +22,8 @@ type Props = {
   siteKey: string | undefined;
 };
 
-const label = "block font-ui text-sm font-medium text-on-deep";
+// The margin keeps the field's 5px focus ring (3px plus a 2px offset) off the label.
+const label = "mb-2 block font-ui text-sm font-medium text-on-deep";
 
 /**
  * The email sign-up. The Server Action sends it to the API; the API checks the spam trap, the time
