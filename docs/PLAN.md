@@ -338,7 +338,7 @@ Not part of the launch. Until it is built the page shows `hello@wordonthewater.n
 - [ ] LCP < 2.0 s, CLS < 0.05, INP < 200 ms, landing JS < 165 KB gzipped (budget revised in [ADR 0010](adr/0010-landing-js-budget.md), enforced by the e2e ceiling in `chat.spec.ts`)
 - [ ] Re-measure LCP on a deployed preview because pages render per request (ADR 0007); revisit hash-based CSP if the budget fails
 - [ ] API service coverage >= 85%
-- [ ] ZAP baseline scan against staging: no high findings
+- [x] ZAP baseline scan: no high findings. Workflow `zap.yml` added 2026-11-16 (weekly, on demand and on a PR that changes it): scans a local production build, because staging needs Vercel Pro, and fails on any High finding; the report is kept as the `zap-reports` artifact. ZAP image pinned by digest. First local scan (2026-11-16): 0 High, 1 Medium (Absence of Anti-CSRF Tokens, low confidence, the sign-up form: Server Actions check the request origin instead of using form tokens), 4 Low or Info groups, 61 rules passed. Proven on GitHub (PR #117 run): 10 URLs, 7 alert groups, all Low or Info, no High or Medium (the Medium from the local run did not recur; spider coverage varies a little). Open: repeat against staging after the move to Pro (production_checklist.md)
 - [ ] Manual pass: keyboard only, VoiceOver iOS, TalkBack
 - [ ] Real device check on a mid-range Android phone
 - [x] E2E stubs keep state per key, not one global slot, because the tests run fully parallel (the Kit webhook spec failed on CI that way; fixed in PR #92, 2026-11-14)

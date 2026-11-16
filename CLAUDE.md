@@ -376,7 +376,7 @@ Settings via `pydantic-settings`, failing fast at startup if required secrets ar
 | E2E | **Playwright** on mobile viewports (iPhone 13/SE, Pixel 7) + desktop Chromium/WebKit/Firefox | Sign-up flow end to end using Mailpit, prayer form, navigation |
 | Accessibility | `@axe-core/playwright` | Zero serious/critical violations |
 | Performance | Lighthouse CI (mobile) | Budgets in §5 |
-| Security | ZAP baseline scan against staging (weekly + pre-release) | No high findings |
+| Security | ZAP baseline scan (weekly, `zap.yml`; against staging once there is one) | No high findings |
 
 Rule: write tests first (red, green, refactor) for all logic; a bug fix comes with a test that fails before the fix. `docs/PLAN.md` has the full testing approach and definition of done.
 
@@ -388,7 +388,7 @@ Environments: **local** (Docker Compose for data services, Mailpit catches email
 
 Deployment is done by **Vercel's Git integration**; GitHub Actions does not build or upload the app. Monorepo settings: each Vercel project has its Root Directory set and an "Ignored Build Step" (`npx turbo-ignore` or a `git diff` check) so a docs-only change doesn't redeploy both apps.
 
-`ci.yml` on every PR and push to `main`: **API** (ruff, format check, mypy, migrations, pytest with an 85% coverage gate on `services/`, against Postgres, Valkey and Mailpit service containers), **Web** (eslint, prettier, tsc, Vitest, build), **types** (`make types-check` fails if the generated API types are stale) and **e2e** (Playwright on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox). `security.yml` runs gitleaks, pip-audit, Bandit, pnpm audit and OSV-Scanner (also weekly). `codeql.yml` covers TypeScript and Python. `neon-preview-cleanup.yml` deletes a PR's Neon preview branch when the PR closes (Free plan limit of 10 branches). Planned: Lighthouse CI, axe and ZAP (step 1.8). All actions are pinned to commit SHAs and workflows default to read-only permissions.
+`ci.yml` on every PR and push to `main`: **API** (ruff, format check, mypy, migrations, pytest with an 85% coverage gate on `services/`, against Postgres, Valkey and Mailpit service containers), **Web** (eslint, prettier, tsc, Vitest, build), **types** (`make types-check` fails if the generated API types are stale) and **e2e** (Playwright on iPhone SE/13, Pixel 7, desktop Chromium/WebKit/Firefox). `security.yml` runs gitleaks, pip-audit, Bandit, pnpm audit and OSV-Scanner (also weekly). `codeql.yml` covers TypeScript and Python. `neon-preview-cleanup.yml` deletes a PR's Neon preview branch when the PR closes (Free plan limit of 10 branches). `zap.yml` runs a ZAP baseline scan of a local production build weekly and on demand and fails on a High finding (against staging once there is one). Lighthouse CI is the `lighthouse` job in `ci.yml` (real throttling) and axe runs in the e2e suite. All actions are pinned to commit SHAs and workflows default to read-only permissions.
 
 **Branch protection on `main`:** pull request required, 10 required checks, 1 approving review, no force-push or deletion, linear history, conversations resolved. Admins are not enforced, so the owner merges with `gh pr merge --admin` once checks are green (a solo owner cannot approve their own PR).
 
