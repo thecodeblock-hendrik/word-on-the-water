@@ -155,3 +155,29 @@ test("on a wide screen both panels sit in a column beside the article", async ({
   expect(weeks.x).toBe(report.x);
   expect(weeks.y).toBeGreaterThan(report.y + report.height);
 });
+
+test("fonts arriving late, as on a slow connection, do not move the page", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== "chromium", "layout shifts are only measured in Chromium");
+  // The title font used to swap in late and re-wrap the title, pushing the art down (CLS 0.035 per
+  // weight on a slow CI runner). Hold every font back, then read the shifts.
+  await page.route("**/*.woff2", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await route.continue();
+  });
+  await page.addInitScript(() => {
+    const w = window as unknown as { __cls: number };
+    w.__cls = 0;
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries() as unknown as { value: number; hadRecentInput: boolean }[])
+        if (!e.hadRecentInput) w.__cls += e.value;
+    }).observe({ type: "layout-shift", buffered: true });
+  });
+  await page.goto(path, { waitUntil: "load" });
+  await page.waitForTimeout(3000);
+  expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(
+    0.01,
+  );
+});
