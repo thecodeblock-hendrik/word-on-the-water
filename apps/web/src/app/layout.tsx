@@ -28,7 +28,7 @@ const barlowCondensed = Barlow_Condensed({
   subsets: ["latin"],
   weight: ["600", "700"],
   variable: "--font-barlow-condensed",
-  display: "swap",
+  display: "optional",
 });
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora", display: "swap" });
 
