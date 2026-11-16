@@ -1,6 +1,6 @@
 # Web Push plan
 
-**Status (2026-11-16): design decided, nothing built.** Hendrik answered the design questions on 2026-11-16 (section 12). Web Push is **planned after the PWA** ([PWA_checklist.md](PWA_checklist.md)), not a Phase 2 gate decision any more: push needs a service worker and, on iPhone, an installed home screen app, and it **shares one service worker with the PWA's offline decision**. [CLAUDE.md](../CLAUDE.md) and [PLAN.md](PLAN.md) 2.5 say so. Anything that changes the security posture needs an ADR first (CLAUDE.md section 14): ADR 0011 is still to write (step W0 below).
+**Status (2026-11-16): design decided, nothing built.** Hendrik answered the design questions on 2026-11-16 (section 12). Web Push is **planned after the PWA** ([PWA_checklist.md](PWA_checklist.md)), not a Phase 2 gate decision any more: push needs a service worker and, on iPhone, an installed home screen app, and it **shares one service worker with the PWA's offline decision**. [CLAUDE.md](../CLAUDE.md) and [PLAN.md](PLAN.md) 2.5 say so. Anything that changes the security posture needs an ADR first (CLAUDE.md section 14): [ADR 0011](adr/0011-web-push.md) is drafted (proposed) and becomes accepted when spike W1 confirms the library.
 
 **Goal:** tell people who opt in that this week's devotional is out, with one short notification, from our own code, at no cost. It adds a channel next to the weekly Kit email; it does not replace it.
 
@@ -166,7 +166,7 @@ Tests first, real Postgres and Redis, mock only the third party (here, the push 
 
 One branch per section, as in [PWA_checklist.md](PWA_checklist.md). Not started; tick as done.
 
-- [ ] **W0 Decide.** The design questions are answered (section 12) and CLAUDE.md and PLAN.md 2.5 are updated to match; still to do: write ADR 0011 (channel, library, data held, processors, SSRF controls)
+- [ ] **W0 Decide.** The design questions are answered (section 12) and CLAUDE.md and PLAN.md 2.5 are updated to match; [ADR 0011](adr/0011-web-push.md) (channel, library, data held, processors, SSRF controls) is drafted and becomes accepted after W1
 - [ ] **W1 Spike.** Install `pywebpush` in `apps/api`, send one encrypted push to a real browser endpoint from a Vercel Python function; check the function size, cold start and that redirects can be refused (or pre-resolve the host ourselves). Decide library or fallback
 - [ ] **W2 Data.** Migration and models (section 4); retention additions; tests
 - [ ] **W3 Subscribe API.** Schemas, validation, SSRF allowlist, rate limit, idempotency, flag; OpenAPI types regenerated
