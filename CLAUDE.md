@@ -187,8 +187,8 @@ Layering rule for the API: `routers → services → models/db`. Routers handle 
 - Images: `next/image`, AVIF/WebP, explicit sizes, lazy below the fold. Logo as inline SVG using `--logo-ring`/`--logo-wave` tokens as in the mockup.
 - Forms on mobile: correct `type`/`inputmode`/`autocomplete` (`email`, `given-name`), visible labels (not placeholder-only — fix from mockup), inline errors announced via `aria-live`.
 - **Installable PWA (Phase 1):** the site must feel like an app on a phone. Read `node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md` and `.../03-file-conventions/01-metadata/manifest.md` first. The step-by-step build is in [PWA_checklist.md](docs/PWA_checklist.md).
-  - `app/manifest.ts` returning `MetadataRoute.Manifest`: `name`, `short_name`, `description`, `id`, `start_url` and `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang`, `categories`, `background_color` and `theme_color` from the tokens, `shortcuts` (Start here) and narrow `screenshots`.
-  - Icons: 192 and 512 px PNG, a 512 px maskable icon (logo inside the safe zone), `app/icon.svg`, and `app/apple-icon.png` (180 px) for iOS.
+  - `app/manifest.ts` returning `MetadataRoute.Manifest`: `name`, `short_name`, `description`, `id`, `start_url` and `scope` `/`, `display: "standalone"`, `orientation: "portrait"`, `lang`, `categories`, `background_color` and `theme_color` from the tokens, `shortcuts` (Start here) and narrow `screenshots` (the landing page and a devotional).
+  - Icons: 192 and 512 px PNG, a 96 px icon for the shortcut, a 512 px maskable icon (logo inside the safe zone), `app/icon.svg`, and `app/apple-icon.png` (180 px) for iOS.
   - `export const viewport` with `themeColor` per colour scheme (light and dark media queries) and `viewport-fit=cover`; `metadata.appleWebApp` for the iOS home-screen launch.
   - When the colour scheme changes, the manifest, theme colours and icons change with it (only tokens should drive them).
   - Offline reading (service worker) and Web Push are Phase 2 and 3 decisions, not Phase 1.

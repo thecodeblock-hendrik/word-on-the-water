@@ -1,5 +1,7 @@
 # PWA checklist
 
+**Status (2026-11-16): not started.** Nothing is built: `manifest.ts`, the icons, `scripts/make-icons.mts` and both tests do not exist, and `apps/web/public` is empty. Launch is Saturday 28 November 2026 and this is the largest unbuilt launch item, so start it early, on a branch. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
+
 Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
 **Scope (Phase 1):** installable, full-screen, with the right icon, name and colours. **Not in scope:** offline reading and a service worker (Phase 3), Web Push (Phase 2 gate), a native app (see [FLUTTER.md](FLUTTER.md)).
@@ -16,12 +18,13 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 - [ ] App names: `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
 - [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
 - [ ] Start page: `/` for everyone, with a shortcut to Start here (the Bible shortcut only once `BIBLE_ENABLED` is on in production)
-- [ ] Orientation: portrait only, or leave it open (the Bible reader is fine in landscape on a tablet)
+- [ ] Orientation: `portrait`, as already written in [CLAUDE.md](../CLAUDE.md) section 5 and in Part C of the production checklist; confirm it, or change all three together (the Bible reader would be fine in landscape on a tablet, but it is off at launch)
 
 ## 2. Icons
 
 - [ ] Export the logo as a standalone SVG with no CSS variables (fixed colours), in `apps/web/src/app/icon.svg`
 - [ ] Generate `icon-192.png` and `icon-512.png` (`purpose: "any"`) from it into `apps/web/public/icons/`
+- [ ] Generate `icon-96.png` for the Start here shortcut (step 4)
 - [ ] Generate `icon-maskable-512.png` with the logo inside the central 80% safe zone and a full-bleed background colour
 - [ ] Generate `apple-icon.png` at 180 px (`apps/web/src/app/apple-icon.png`), full-bleed with no transparency (iOS fills transparent areas with black)
 - [ ] Keep `favicon.ico` as it is
@@ -46,7 +49,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 ## 4. Shortcuts and screenshots
 
 - [ ] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" only behind the same `BIBLE_ENABLED` flag
-- [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of the Bible reader, taken from the real site in Dawn patrol (Android shows these on the richer install sheet)
+- [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader only when `BIBLE_ENABLED` is on in production, which it is not at launch
 - [ ] Add `label` and `type: "image/png"` to every screenshot
 - [ ] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`
 - [ ] Commit: `feat(web): manifest shortcuts and screenshots`
@@ -61,7 +64,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 ## 6. Security headers and CSP
 
 - [ ] Confirm the nonce CSP in `src/proxy.ts` does not block the manifest or icons (they are same-origin, so `default-src 'self'` and `img-src 'self' data:` cover them)
-- [ ] Confirm `/manifest.webmanifest` and `/icons/*` are not caught by the proxy matcher in a way that breaks them (check the matcher)
+- [ ] The proxy matcher (checked 2026-11-16) skips only `api/`, `_next/static/`, `_next/image` and `favicon.ico`, so `/manifest.webmanifest`, `/icons/*` and the apple icon go through the proxy and get a nonce and CSP headers. That does no harm; decide whether to add them to the exclusion (fewer per-request runs) or accept it. The e2e test below proves they load either way
 - [ ] Write the e2e test `tests/e2e/pwa.spec.ts` first: `/manifest.webmanifest` returns 200 with a manifest content type, every icon and screenshot URL in it returns 200 with an `image/png` type, and no CSP violation is logged on the page (the `link rel="manifest"` and apple icon are in the head)
 - [ ] Run it on all six projects with `make e2e` (Firefox runs in CI only on the current macOS beta)
 - [ ] Commit: `test(web): manifest and icons load under the CSP`
@@ -78,16 +81,17 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 HTTPS is needed. Use a Vercel preview deployment (the best test, the real production build) or an ngrok tunnel to `pnpm start`. For `pnpm dev` over Wi-Fi, `DEV_ORIGINS` in the root `.env` is enough to open the site but it is plain HTTP, so install does not work there.
 
 - [ ] Deploy a preview (open the PR; Deployment Protection may ask you to log in) **(Hendrik: Vercel preview settings)**
+- [ ] Previews are behind Deployment Protection. Next adds `crossorigin="use-credentials"` to the manifest link on Vercel previews (checked in Next 16.4.6, `metadata-elements.js`), so the manifest loads while you are logged in. The icons, and the apple icon iOS fetches, are probably requested without your login and may show as missing. Not confirmed: if they do, test with the protection bypass or on the real domain once it is live (production checklist, Part G) before blaming the icons
 - [ ] **Android Chrome:** the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
 - [ ] **iPhone Safari:** Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
 - [ ] The theme colour of the browser bar follows light and dark
-- [ ] Links, the menu, the Bible picker sheet and the chapter bar all work in the installed window (there is no browser Back button on iPhone, so every page must have a way back inside the page)
+- [ ] Links, the menu, the sign-up form and the `/thank-you` page work in the installed window; with `CHAT_ENABLED` on in that preview, Got Questions opens and closes; with `BIBLE_ENABLED` on, the Bible picker sheet, the chapter bar and the Your chat button work too (there is no browser Back button on iPhone, so every page must have a way back inside the page)
 - [ ] Rotate the phone and check nothing breaks
 - [ ] Note any problem in the PR
 
 ## 9. Docs and PLAN.md
 
-- [ ] Tick the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 as each is verified
+- [ ] Tick the matching items in Part C of [production_checklist.md](production_checklist.md) as each is verified (the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 moved there, so PLAN.md has nothing to tick)
 - [ ] Add a line to the README: how to install the site on a phone (two sentences)
 - [ ] Update `CLAUDE.md` (the status line and the repository layout: `manifest.ts`, `apple-icon.png`, `public/icons`, `scripts/make-icons.mts`)
 - [ ] Open the PR with phone screenshots (install prompt and the home screen icon) and merge only when every check is green

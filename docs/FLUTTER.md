@@ -2,7 +2,7 @@
 
 Assessment written 2026-10-31, at the end of Phase 0 (step 0.9 done, Phase 1 not started). Vercel, Neon and FastAPI stay as they are.
 
-**Decision (2026-10-31): option B long term.** The current plan continues unchanged with Next.js, made installable as a PWA (`app/manifest.ts`, PLAN.md 1.6). The Flutter app is revisited at the Phase 2 gate (PLAN.md 2.5). Until then, this document is reference only.
+**Decision (2026-10-31): option B long term.** The current plan continues unchanged with Next.js, made installable as a PWA (`app/manifest.ts`, production_checklist.md Part C). The Flutter app is revisited at the Phase 2 gate (PLAN.md 2.5). Until then, this document is reference only.
 
 ## Short answer
 
@@ -19,7 +19,7 @@ Assessment written 2026-10-31, at the end of Phase 0 (step 0.9 done, Phase 1 not
 |---|---|---|
 | Reads well on any phone, fast first load | Yes: mobile-first, server-rendered | Native app yes; Flutter web is slow to start |
 | Found through Google, shareable links | Yes | Native no; Flutter web weak |
-| Home-screen icon | PWA (`manifest.ts`, planned in 1.6) | Yes |
+| Home-screen icon | PWA (`manifest.ts`, production_checklist.md Part C) | Yes |
 | Offline devotionals at the beach | PWA service worker (planned for Phase 3) | Yes, simpler and more reliable |
 | Push notifications ("this week's devotional") | Web Push: iOS only after "Add to Home Screen" | Yes (APNs and FCM) |
 | In the App Store and Google Play | No | Yes |
@@ -106,7 +106,7 @@ Phase 1 grows by roughly a third to a half, mostly from the API security redesig
 
 ## Option B (recommended): Next.js website + Flutter app, both on FastAPI
 
-- **Phase 1 unchanged:** the Next.js landing page, forms, SEO, budgets and BFF stay as planned. Make the site more mobile-ready with `manifest.ts`, icons and theme colour in 1.6, and an install prompt.
+- **Phase 1 unchanged:** the Next.js landing page, forms, SEO, budgets and BFF stay as planned. Make the site more mobile-ready with `manifest.ts`, icons and theme colour (production_checklist.md Part C), and an install prompt.
 - **Phase 2 or 3:** add `apps/mobile` (Flutter for iOS and Android) for devotionals, audio, offline reading and push. Only the app's endpoints become public with attestation (sections 2, 6, 7, 8 and 9 above apply to the app only). The website keeps the BFF.
 - **Email links** open the website, or the app when it is installed (universal and app links served by Next.js).
 - **Cost:** two front ends to maintain, but each does what it is good at, and nothing finished is thrown away.
