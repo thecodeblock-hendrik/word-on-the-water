@@ -74,7 +74,7 @@ Set for **Preview and Production only**. Development is empty: local work uses t
 | api | `SERVICE_TOKEN`, `CRON_SECRET`, `IP_HASH_SALT` | Random, 32 bytes hex |
 | api | `TURNSTILE_SECRET_KEY` | The widget secret for the environment: Preview widget in Preview, Production widget in Production. A widget refuses any hostname not on its list (error 110200), so the Production widget works only on `wordonthewater.net` |
 | api | `KIT_API_KEY`, `KIT_FORM_ID` | Preview uses the Kit test form; Production the real form |
-| api | `KIT_WEBHOOK_SECRET` | Production only, set when the webhook is registered at launch ([kit_webhook_checks.md](../kit_webhook_checks.md)) |
+| api | `KIT_WEBHOOK_SECRET` | Production only, set when the webhook is registered at launch ([production_checklist.md](../production_checklist.md), Part H) |
 | api | `EMAIL_PROVIDER` | Unset until Postmark is set up (step 1.x). Never `console` outside local: the factory refuses it, since it would log email contents |
 | api | `NEON_*`, `UPSTASH_*` | Managed by the integrations; `REDIS_URL` falls back to `UPSTASH_REDIS_URL` |
 | web | `SERVICE_TOKEN` | Same value as the API in the same environment |
@@ -154,4 +154,4 @@ Vercel Instant Rollback to the previous production deployment (`vercel rollback`
 
 ## Kit webhook
 
-Kit cannot pass the API project's Deployment Protection, so it calls the web project: `POST https://wordonthewater.net/api/webhooks/kit` forwards the raw body and `X-Kit-Signature` to `/v1/webhooks/kit` and adds the bypass secret server-side. Previews are behind the login wall too, so the webhook is registered for production only, at launch. Check the chain with `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'`: 503 means the forwarder reached the API but no `KIT_WEBHOOK_SECRET` is set; 401 means the secret is set and the unsigned call was refused; 502 means the API was unreachable. Steps: [kit_webhook_checks.md](../kit_webhook_checks.md).
+Kit cannot pass the API project's Deployment Protection, so it calls the web project: `POST https://wordonthewater.net/api/webhooks/kit` forwards the raw body and `X-Kit-Signature` to `/v1/webhooks/kit` and adds the bypass secret server-side. Previews are behind the login wall too, so the webhook is registered for production only, at launch. Check the chain with `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'`: 503 means the forwarder reached the API but no `KIT_WEBHOOK_SECRET` is set; 401 means the secret is set and the unsigned call was refused; 502 means the API was unreachable. Steps: [production_checklist.md](../production_checklist.md), Parts G and H.

@@ -56,7 +56,7 @@ Real calls with the preview key against the one Kit account (the preview and liv
 ## Operational findings (preview, 2026-11-08)
 - A Turnstile widget refuses every hostname not on its list (error 110200, "domain not allowed"). The production widget lists only `wordonthewater.net` and `www.wordonthewater.net`, so production sign-up cannot be tested on a `*.vercel.app` address.
 - Kit webhooks are account-wide: sign-ups through the preview test form also send events to the production endpoint. The API ignores people it has no record of.
-- Registering the webhook and the Kit form redirect need the live domain, so they are launch-time steps (`docs/production_checklist.md`, Part H; the guide is `docs/kit_webhook_checks.md`).
+- Registering the webhook and the Kit form redirect need the live domain, so they are launch-time steps (`docs/production_checklist.md`, Part H; the step-by-step is in the same Part H and in Part G of that checklist).
 
 ## Consequences
 - A Kit outage never loses a sign-up: both calls run from the outbox with retries; a repeat of either is harmless.

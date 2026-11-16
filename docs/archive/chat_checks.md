@@ -1,6 +1,6 @@
 # chat_checks.md - build checklist for the Got Questions chat
 
-Work from this file, top to bottom, like [PWA_checklist.md](PWA_checklist.md). It turns [chat.md](chat.md) (scope, decisions, mockups in [design/chat_mockups.html](design/chat_mockups.html)) and [ADR 0009](adr/0009-chat-local-knowledge-base.md) into steps. PLAN.md step 1.10 holds the one-line status of each step; tick the matching box there when a step here is done.
+Work from this file, top to bottom, like [PWA_checklist.md](../PWA_checklist.md). It turns [chat.md](chat.md) (scope, decisions, mockups in [design/chat_mockups.html](../design/chat_mockups.html)) and [ADR 0009](../adr/0009-chat-local-knowledge-base.md) into steps. PLAN.md step 1.10 holds the one-line status of each step; tick the matching box there when a step here is done.
 
 ## Rules for every step
 
@@ -9,7 +9,7 @@ Work from this file, top to bottom, like [PWA_checklist.md](PWA_checklist.md). I
 - **Definition of done** (from PLAN.md): new behaviour has tests that failed first; `make lint typecheck test` pass (and `make e2e` for UI steps); negative and security cases are covered; anything touching Redis is tested against the real local service; tests are deterministic; the result is checked in the running system (curl, browser at 375px).
 - **Never** log or store a visitor's message. No emojis in code or logs. Python only through `uv`. Read `node_modules/next/dist/docs/` before Next.js work.
 - **Vercel Hobby build quota:** every non-docs push builds web and API. Push once per step, avoid experiment pushes. Docs-only branches use the `docs/` prefix and do not deploy.
-- **Order:** K0 to K8 in order. K1 to K5 are API only; K6 and K7 are web. The chat stays off in Production (`CHAT_ENABLED` unset) until Part L of [production_checklist.md](production_checklist.md) is complete.
+- **Order:** K0 to K8 in order. K1 to K5 are API only; K6 and K7 are web. The chat stays off in Production (`CHAT_ENABLED` unset) until Part L of [production_checklist.md](../production_checklist.md) is complete.
 - Fallback everywhere the chat cannot be used (flag off, no JavaScript, API down): a mail link to `hello@wordonthewater.net`. There is no contact form at launch (1.5 is deferred).
 
 ## Before you start (once)
@@ -134,7 +134,7 @@ Goal: `POST /v1/chat/messages`, safe and rate limited, following the new-endpoin
 
 ## K6. Web panel (`feat/chat-k6-panel`)
 
-Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile first at 375px, behind `CHAT_ENABLED`.
+Goal: the UI from [design/chat_mockups.html](../design/chat_mockups.html), mobile first at 375px, behind `CHAT_ENABLED`.
 
 - [x] Read `node_modules/next/dist/docs/` for Server Actions and dynamic imports in this Next version.
 - [x] `CHAT_ENABLED` is read on the server only (never `NEXT_PUBLIC_`), by `src/lib/chat/flag.ts`, the same way as `BIBLE_ENABLED` (it is not in `env.ts`, which holds the API settings).
@@ -191,7 +191,7 @@ Goal: the UI from [design/chat_mockups.html](design/chat_mockups.html), mobile f
 - [x] Runbook `docs/runbooks/chat.md`: how to update the knowledge base (edit the markdown, `make kb`, PR, bump version and review date), how to turn the chat off (unset `CHAT_ENABLED`), how to read the outcome counts, where the KB source lives.
 - [x] `CLAUDE.md`: planned items become built (layout, API table, frontend section, commands `make kb` and `make kb-check`); PLAN.md 1.10 ticks; ADR 0009 status stays accepted.
 - [x] Verify the crisis numbers on the providers' own sites (SADAG 0800 567 567, LifeLine 0861 322 322) and record the date. Verified 2026-11-15 on sadag.org (24-hour Suicide Crisis Helpline 0800 567 567) and lifeline.org.za (National Counselling Line 0861 322 322, 24 hours, shared-rate call). Checked through search results, not a call; re-check the day before launch.
-- [ ] Walk through Part L of [production_checklist.md](production_checklist.md) on a preview with `CHAT_ENABLED=1`.
+- [ ] Walk through Part L of [production_checklist.md](../production_checklist.md) on a preview with `CHAT_ENABLED=1`.
 - [ ] **(Hendrik)** Set `CHAT_ENABLED=1` in Production, redeploy, check the button. Rollback: unset the variable and redeploy.
 - Also done: the public privacy policy describes the chat while `CHAT_ENABLED` is on (`privacy.ts`, tested). `docs/runbooks/chat.md` has the switch, the KB change steps and what is logged. Still open: the preview walk-through (needs the branch pushed) and **(Hendrik)** enabling it in Production.
 
