@@ -5,8 +5,8 @@ import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { NavLink } from "@/components/layout/nav-link";
 import { navLinks } from "@/components/layout/nav-links";
+import { SubscribeCta } from "@/components/layout/subscribe-cta";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { buttonClasses } from "@/components/ui/button";
 import { chat } from "@/content/chat";
 import { setTheme } from "@/lib/actions/theme";
 import { isBibleEnabled } from "@/lib/bible/flag";
@@ -44,13 +44,7 @@ export function Header() {
             <ChatLauncher className="inline-flex min-h-11 items-center font-medium text-ink hover:text-accent-ink" />
           )}
         </nav>
-        <Link
-          href="/#subscribe"
-          className={`${buttonClasses("primary")} ml-auto max-[419px]:px-4 lg:ml-0`}
-        >
-          <span className="hidden min-[520px]:max-lg:inline xl:inline">Get the devotional</span>
-          <span className="min-[520px]:max-lg:hidden xl:hidden">Subscribe</span>
-        </Link>
+        <SubscribeCta />
         <div className="hidden text-ink lg:block">
           <ThemeToggle saveTheme={setTheme} />
         </div>
