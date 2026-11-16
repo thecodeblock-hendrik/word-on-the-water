@@ -1,0 +1,67 @@
+name: ZAP baseline
+
+# OWASP ZAP baseline (passive) scan of a local production build. Fails on any High finding;
+# everything else is kept in the report artifact. Runs weekly, on demand, and on a pull request
+# that changes this file. Staging (Vercel Pro) is not available yet, so the target is the build.
+
+on:
+  schedule:
+    - cron: "41 5 * * 3"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/zap.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap:
+    name: ZAP baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      API_BASE_URL: http://localhost:8000
+      SERVICE_TOKEN: build-check-service-token-0123456789
+      API_BYPASS_SECRET: build-check-bypass-0123456789
+      CRON_SECRET: build-check-cron-0123456789
+      # Pinned by digest, like the actions. Update it with a deliberate change.
+      ZAP_IMAGE: ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: apps/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/web build
+      - name: Start the site
+        run: |
+          DEVOTIONAL_TODAY=2026-12-05 SITE_URL=http://localhost:3200 \
+            pnpm --dir apps/web start -p 3200 > site.log 2>&1 &
+          curl --retry 30 --retry-delay 2 --retry-connrefused -fsS -o /dev/null http://localhost:3200/
+      - name: Scan
+        run: |
+          mkdir zap-out && chmod 777 zap-out
+          docker run --rm --network host -v "$PWD/zap-out:/zap/wrk:rw" "$ZAP_IMAGE" \
+            zap-baseline.py -t http://localhost:3200 -J zap.json -r zap.html -I -m 1
+      - name: Fail on High findings
+        run: |
+          jq -r '.site[].alerts[] | "\(.riskdesc)\t\(.name)\t\(.instances | length)"' zap-out/zap.json | sort
+          test "$(jq '[.site[].alerts[] | select((.riskcode | tonumber) >= 3)] | length' zap-out/zap.json)" -eq 0
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: zap-reports
+          path: |
+            zap-out/zap.html
+            zap-out/zap.json
+            site.log
+          retention-days: 14
