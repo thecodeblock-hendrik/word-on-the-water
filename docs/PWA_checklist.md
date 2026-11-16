@@ -17,7 +17,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 - [ ] Source of the icon: use the existing inline SVG logo (the ring, wave and cross in the header) **(Hendrik: confirm, or supply a master SVG or a 1024 px PNG)**
 - [ ] App names: `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
 - [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
-- [ ] Start page: `/` for everyone, with a shortcut to Start here (the Bible shortcut only once `BIBLE_ENABLED` is on in production)
+- [ ] Start page: `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
 - [x] Orientation: **no lock** (decided 2026-11-16). Leave `orientation` out of the manifest, so the default (`any`) applies. A portrait lock fails WCAG 1.3.4 (technique failure F97), which this project targets at level AA, and nothing here needs a fixed orientation; users with a mounted device, for example on a wheelchair, can be blocked by a lock. `CLAUDE.md` section 5 and Part C of the production checklist say the same
 - [ ] **Open: offline.** Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
 - [ ] **Open: iOS launch screen.** Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
@@ -51,8 +51,8 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 4. Shortcuts and screenshots
 
-- [ ] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" only behind the same `BIBLE_ENABLED` flag
-- [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader only when `BIBLE_ENABLED` is on in production, which it is not at launch
+- [ ] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" (`/bible`; the reader is on in Production since 2026-11-16)
+- [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader (it is on in Production since 2026-11-16)
 - [ ] Add `label` and `type: "image/png"` to every screenshot
 - [ ] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`
 - [ ] Commit: `feat(web): manifest shortcuts and screenshots`
@@ -88,7 +88,7 @@ HTTPS is needed. Use a Vercel preview deployment (the best test, the real produc
 - [ ] **Android Chrome:** the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
 - [ ] **iPhone Safari:** Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
 - [ ] The theme colour of the browser bar follows light and dark
-- [ ] Links, the menu, the sign-up form and the `/thank-you` page work in the installed window; with `CHAT_ENABLED` on in that preview, Got Questions opens and closes; with `BIBLE_ENABLED` on, the Bible picker sheet, the chapter bar and the Your chat button work too (there is no browser Back button on iPhone, so every page must have a way back inside the page)
+- [ ] Links, the menu, the sign-up form and the `/thank-you` page work in the installed window; Got Questions opens and closes, and the Bible picker sheet, the chapter bar and the Your chat button work too (both features are on in Production, and in previews, where their Vercel variables are also set) (there is no browser Back button on iPhone, so every page must have a way back inside the page)
 - [ ] Rotate the phone and check nothing breaks
 - [ ] Note any problem in the PR
 
