@@ -68,11 +68,11 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 
 These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`. The MX records (the `hello@` and `prayer@` forwards) are never changed. There must be only **one** SPF record: edit the existing one, never add a second.
 
-- [x] SPF: no change needed for Kit (done 2026-11-15, [kit_setup.md](kit_setup.md)): Kit's return-path CNAME `ckespa` covers its SPF, so the existing `v=spf1 include:mailgun.org ~all` stays as it is. Never add a second SPF record.
-- [x] DKIM for Kit: done 2026-11-15, two CNAMEs (`cka._domainkey`, `cka2._domainkey`) in Squarespace DNS, signed as `d=wordonthewater.net`. DKIM for Postmark waits for the prayer and contact forms (steps in [kit_setup.md](kit_setup.md)).
+- [x] SPF: no change needed for Kit (done 2026-11-15, [kit_setup.md](archive/kit_setup.md)): Kit's return-path CNAME `ckespa` covers its SPF, so the existing `v=spf1 include:mailgun.org ~all` stays as it is. Never add a second SPF record.
+- [x] DKIM for Kit: done 2026-11-15, two CNAMEs (`cka._domainkey`, `cka2._domainkey`) in Squarespace DNS, signed as `d=wordonthewater.net`. DKIM for Postmark waits for the prayer and contact forms (steps in [kit_setup.md](archive/kit_setup.md)).
 - [x] Return-path for Kit: done 2026-11-15 (`ckespa` CNAME). Postmark's return-path comes with Postmark, after launch.
 - [ ] DMARC at `_dmarc.wordonthewater.net`: found 2026-11-14 already published as `p=reject; adkim=s; aspf=s` with reports to Mailgun and a second address, not the `p=none` this list assumed. Until Kit and Postmark are signed with DKIM for `wordonthewater.net`, their mail from `hello@` is very likely rejected (a Kit confirmation never reached Gmail). Decided 2026-11-15: keep `p=reject` and leave the record untouched (it belongs to the Squarespace email forwarding preset); Kit's DKIM aligns with `adkim=s`, and a test passed SPF, DKIM and DMARC. The report addresses are Squarespace's and Mailgun's, not a person's, so reports are not read by us.
-- [x] Kit: sending domain `wordonthewater.net` verified, default sender `hello@wordonthewater.net`; a test broadcast reached the Gmail inbox with SPF, DKIM and DMARC all PASS (2026-11-15, [kit_setup.md](kit_setup.md)). **Still to do:** a real sign-up through the live form with a fresh address (confirmation arrives, link works), the confirmation email branded, and delete the test and SPIKE draft broadcasts in Kit.
+- [x] Kit: sending domain `wordonthewater.net` verified, default sender `hello@wordonthewater.net`; a test broadcast reached the Gmail inbox with SPF, DKIM and DMARC all PASS (2026-11-15, [kit_setup.md](archive/kit_setup.md)). **Still to do:** a real sign-up through the live form with a fresh address (confirmation arrives, link works), the confirmation email branded, and delete the test and SPIKE draft broadcasts in Kit.
 - Postmark (sender signature, DNS records, the test to `hello@` and `prayer@`) is not part of the launch: the prayer and contact forms are deferred, and Kit sends every launch email. The steps moved to PLAN.md 1.4.
 
 ---
@@ -185,7 +185,7 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 How it works is in [devotional_format.md](devotional_format.md), "The weekly email (Kit)", and what was proven is in [ADR 0008](adr/0008-kit-subscriptions.md), "Broadcast spike". In short: `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a **draft** in Kit; nothing is sent until you schedule it in Kit. The command runs on your own machine from the root `.env`, not on Vercel.
 
 **One-time, before the first broadcast**
-- [x] Part E is done for Kit (2026-11-15, [kit_setup.md](kit_setup.md)): sending domain authenticated (DKIM signed as `wordonthewater.net`), SPF covered by the return-path CNAME, and `p=reject` kept.
+- [x] Part E is done for Kit (2026-11-15, [kit_setup.md](archive/kit_setup.md)): sending domain authenticated (DKIM signed as `wordonthewater.net`), SPF covered by the return-path CNAME, and `p=reject` kept.
 - [ ] Prove delivery from `hello@`: create a draft with `--tag <id>` for a tag that only you carry, send it, and check it lands in the inbox, not spam. In Gmail, "Show original" must say SPF, DKIM and DMARC pass. (The spike sent from a Gmail address as a workaround and landed in spam; that workaround is not needed once DKIM is set.)
 - [ ] Read the test on a phone in the Mail app and the Gmail app, with dark mode on and off, and in Outlook if you can: the banner shows, the dark panels hold, quotes and "Paddle Out" are styled, and the dashes, quotes and © are correct.
 - [ ] **Banner address.** The email loads the series banner (`art-night-swell-email.jpg`, 1200 x 677, 52 KB) from `SERIES_IMAGE_BASE` in `apps/web/src/lib/devotionals/kit-broadcast.ts`, which is the public repository on `main`. That works before launch but is not meant for heavy hotlinking: decide whether to keep it for a small list or point `EMAIL_IMAGE_BASE` at the live site's content address once Part G is done. Every new series needs its own email banner in its folder (crop the art wide, resize to 1200 px, JPEG under 100 KB).
@@ -210,7 +210,7 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 
 ## Part L. Got Questions chat (only if it launches with the site)
 
-Scope: [chat.md](chat.md), decision: [ADR 0009](adr/0009-chat-local-knowledge-base.md). No domain or external service is needed, so this part can be done on a preview first.
+Scope: [chat.md](archive/chat.md), decision: [ADR 0009](adr/0009-chat-local-knowledge-base.md). No domain or external service is needed, so this part can be done on a preview first.
 
 - [x] **Crisis numbers verified** on the providers' own sites (2026-11-15): SADAG Suicide Crisis Helpline 0800 567 567 (24 hours, sadag.org) and LifeLine South Africa National Counselling Line 0861 322 322 (24 hours, shared-rate call, lifeline.org.za); the text for visitors outside South Africa is "call your local emergency number". Re-check the day before launch.
 - [x] `make kb-check` is green in CI (committed JSON equals the markdown source; it runs in `ci.yml` and was green on PR #112).

@@ -2,7 +2,7 @@
 
 # Turn the Bible reader on for the latest preview
 
-The Bible reader (BSB and WEB, public domain) is built but hidden: its pages return 404 until the web project has `BIBLE_ENABLED=1`. This checklist turns it on for **preview deployments only**. Production stays off until the launch steps in [bible_feature.md](bible_feature.md) (B8 compliance gate, B9 launch).
+The Bible reader (BSB and WEB, public domain) is built but hidden: its pages return 404 until the web project has `BIBLE_ENABLED=1`. This checklist turns it on for **preview deployments only**. Production stays off until the launch steps in [bible_feature.md](../bible_feature.md) (B8 compliance gate, B9 launch).
 
 The flag is read from the server's environment on every request, so no code change is needed. A new variable only reaches a **new deployment**, so the redeploy in Part 2 is required.
 
@@ -74,4 +74,4 @@ Locally the same flag is `BIBLE_ENABLED=1` in the root `.env` (do not `export` i
 
 ## Part 6. Tell Claude Code
 
-- [ ] Send the alias you used, so it can check the deployment and tick the preview step in [bible_feature.md](bible_feature.md).
+- [ ] Send the alias you used, so it can check the deployment and tick the preview step in [bible_feature.md](../bible_feature.md).

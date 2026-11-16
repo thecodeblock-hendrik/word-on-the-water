@@ -1,6 +1,6 @@
 # Next steps: Monday 16 November 2026
 
-Written 2026-11-15 evening. Launch is **Saturday 28 November 2026**, 12 days away. Advice on order only: the step lists and ticks stay in [PLAN.md](PLAN.md) and [production_checklist.md](production_checklist.md). The longer view is in [next_steps.md](next_steps.md).
+Written 2026-11-15 evening. Launch is **Saturday 28 November 2026**, 12 days away. Advice on order only: the step lists and ticks stay in [PLAN.md](../PLAN.md) and [production_checklist.md](../production_checklist.md). The longer view is in [next_steps.md](next_steps.md).
 
 ## Where things stand
 
@@ -14,7 +14,7 @@ Written 2026-11-15 evening. Launch is **Saturday 28 November 2026**, 12 days awa
 1. **PR #115 (about 20 minutes, you).** Read the entries in `apps/api/kb/faith_kb.md` under `## 16. Bible Characters`, especially Mary (16.21), Adam and Eve (16.2), Deborah (16.9) and Peter (16.23). Tell me any wording changes; merge once the checks are green and you are happy.
 2. **Devotional LCP (1.8).** Use a Lighthouse trace to see what the devotional page loads that the landing page does not (two art images, the series nav, the verse card), then fix and re-measure on a preview. Tried and ruled out: `fetchpriority="high"` alone. Eager loading gave about 2.4 s under real throttling but left the simulated 3.1 s. When it passes, change the devotional assertions in `apps/web/lighthouserc.json` from warnings to errors.
 3. **Make the `lighthouse` job a required check on `main`** (GitHub branch protection; yours to switch on, or tell me and I will give the steps).
-4. **Start the PWA conversion (Part C, [PWA_checklist.md](PWA_checklist.md)) on a branch.** It is the largest unbuilt launch item and the Phase 1 exit criteria count it. Manifest, icons and theme colours first.
+4. **Start the PWA conversion (Part C, [PWA_checklist.md](../PWA_checklist.md)) on a branch.** It is the largest unbuilt launch item and the Phase 1 exit criteria count it. Manifest, icons and theme colours first.
 5. **Chat go-live walk-through (Part L).** With `CHAT_ENABLED=1` now in your local `.env`, try the chat locally first (starter questions, a contested one, an off-topic one, a phone number, a crisis phrase, Clear chat, the new Bible Characters theme in Browse by topic). Then set the flag on both Vercel projects (Preview scope) and repeat on a preview.
 
 ## Yours to do (short, no coding)

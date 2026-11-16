@@ -1,6 +1,6 @@
 # Threat plan
 
-Work plan to close every threat in [threat-model.md](threat-model.md) that is not yet *Done*. Work top to bottom, one section per branch and PR (CLAUDE.md section 14). Tick a box only when the work is validated, and update the Status column in the threat model in the same PR.
+Work plan to close every threat in [threat-model.md](../threat-model.md) that is not yet *Done*. Work top to bottom, one section per branch and PR (CLAUDE.md section 14). Tick a box only when the work is validated, and update the Status column in the threat model in the same PR.
 
 Threats already *Done* (S1, S2, S4, T2, T3, T4, I4, I5, I6, E1, E3, D2, D5) need no work. Their only follow-up is the re-check in section 9.
 
@@ -58,7 +58,7 @@ Deadline: before step 1.3 starts collecting anything.
 
 - [x] Retention job (daily cron, 2026-11-14): unconfirmed subscribers 7 days, prayer requests 90 days, contact messages 12 months, audit logs 1 year, and the outbox (it holds recipients' addresses) 7 days sent and 30 days failed. Each deletion is tested with time-shifted fixtures (`apps/api/tests/integration/test_retention.py`). Kit's own unconfirmed subscribers are a monthly dashboard task, because Kit's API cannot delete one (docs/privacy.md).
 
-Moved to [production_checklist.md](production_checklist.md) because they are only needed just before launch: **D1 (final)** Firewall rate-limit rules and Attack Challenge Mode, **D4** Vercel Pro, **S5** SPF, DKIM, DMARC, return-paths and the Kit sending domain (and the later move to `quarantine`), the end-to-end test of the `hello@` and `prayer@` forwards, the tested restore from backup, and the ZAP baseline scan.
+Moved to [production_checklist.md](../production_checklist.md) because they are only needed just before launch: **D1 (final)** Firewall rate-limit rules and Attack Challenge Mode, **D4** Vercel Pro, **S5** SPF, DKIM, DMARC, return-paths and the Kit sending domain (and the later move to `quarantine`), the end-to-end test of the `hello@` and `prayer@` forwards, the tested restore from backup, and the ZAP baseline scan.
 
 ## 7. Owner actions (E4)
 
@@ -67,7 +67,7 @@ Not verifiable from the repository. Hendrik ticks these and notes the date.
 - [ ] Two-factor on GitHub, Vercel, Neon, Upstash, Kit, Postmark.
 - [ ] Recovery codes stored offline.
 
-Moved to [production_checklist.md](production_checklist.md): two-factor and the registrar lock on Squarespace, and the Vercel audit log (needs Pro).
+Moved to [production_checklist.md](../production_checklist.md): two-factor and the registrar lock on Squarespace, and the Vercel audit log (needs Pro).
 
 ## 8. Phase 2 gate (not now)
 
@@ -84,7 +84,7 @@ Run at each phase gate and after any change to the area.
 - [ ] T4: CI security workflows green; Dependabot PRs reviewed.
 - [ ] E1: `app_runtime` cannot run DDL (try `CREATE TABLE` as that role).
 
-Moved to [production_checklist.md](production_checklist.md): T3 (CSP enforced in production) and I5 (`/docs` and `/openapi.json` return 404 in production).
+Moved to [production_checklist.md](../production_checklist.md): T3 (CSP enforced in production) and I5 (`/docs` and `/openapi.json` return 404 in production).
 
 ## Residual risks accepted for Phase 1
 

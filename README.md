@@ -5,7 +5,7 @@ Christian ministry web app publishing devotionals and Bible teaching for surfers
 - Plan and progress (the one document to follow): [PLAN.md](docs/PLAN.md)
 - Launch-time steps, kept apart until the site goes public: [production_checklist.md](docs/production_checklist.md)
 - Architecture and rules: [CLAUDE.md](CLAUDE.md)
-- Adding a devotional: [devotional format](docs/devotional_format.md). Landing page checklist: [landing_page_check.md](docs/landing_page_check.md)
+- Adding a devotional: [devotional format](docs/devotional_format.md). Landing page review: step 1.11 in [docs/PLAN.md](docs/PLAN.md)
 - Decisions: [docs/adr](docs/adr). Security: [threat model](docs/threat-model.md), [privacy](docs/privacy.md), [SECURITY.md](SECURITY.md). Operations: [docs/runbooks](docs/runbooks)
 
 ## Status
@@ -60,4 +60,4 @@ make down        # stop services
 
 In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, `pnpm build:bible` regenerates the Bible data, and `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a Kit draft for the weekly email (never sends; steps in [devotional format](docs/devotional_format.md)).
 
-Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `CHAT_ENABLED=1` shows the Got Questions chat (see [docs/chat.md](docs/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` the first two in your shell: the unit tests read them and fail.
+Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `CHAT_ENABLED=1` shows the Got Questions chat (see [docs/chat.md](docs/archive/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` the first two in your shell: the unit tests read them and fail.

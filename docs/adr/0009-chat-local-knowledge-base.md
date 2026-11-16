@@ -1,6 +1,6 @@
 # 0009. Got Questions chat from a local knowledge base
 
-Status: accepted as scope on 2026-11-14 (nothing built yet; the plan is [chat.md](../chat.md), PLAN.md step 1.10, mockups in [design/chat_mockups.html](../design/chat_mockups.html)).
+Status: accepted as scope on 2026-11-14 (nothing built yet; the plan is [chat.md](../archive/chat.md), PLAN.md step 1.10, mockups in [design/chat_mockups.html](../design/chat_mockups.html)).
 
 ## Context
 The "New to faith? Start here" section needs a way for a newcomer to ask questions about the Christian faith and ask follow-ups. The first design used an LLM (OpenRouter, `nvidia/nemotron-3.5-super-vl:free`) with a web search tool limited to GotQuestions.org, Bible.org and BibleProject, under a strict system prompt.
