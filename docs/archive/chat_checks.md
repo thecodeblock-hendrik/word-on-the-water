@@ -199,3 +199,4 @@ Goal: the UI from [design/chat_mockups.html](../design/chat_mockups.html), mobil
 
 - [ ] Review outcome counts weekly for the first month: share of `no_answer` and `clarify`; add or reword entries by pull request (`make kb`, `make kb-check`).
 - [ ] Optional later (separate scope): thumbs up or down per answer storing only an entry id, ESV links once Crossway approves, type-ahead suggestions, an LLM that only rephrases retrieved entries (needs its own ADR first).
+- Enhancement 4 changed again (2026-11-16): on a phone the way back is now a 44px ink tab in the passage heading (right screen edge, from the version name to the verses line, mockup New E), not the round button above the chapter bar.
