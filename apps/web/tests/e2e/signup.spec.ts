@@ -44,6 +44,24 @@ test.describe("the sign-up form", () => {
     }
   });
 
+  test("the focus ring of a field does not run through its label", async ({ page }) => {
+    const band = await readyForm(page);
+    for (const [name, id] of [
+      ["Email", "signup-email"],
+      ["First name (optional)", "signup-name"],
+    ]) {
+      const field = band.getByLabel(name);
+      await field.focus();
+      const ring = await field.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset);
+      });
+      const label = (await band.locator(`label[for="${id}"]`).boundingBox())!;
+      const box = (await field.boundingBox())!;
+      expect(box.y - (label.y + label.height), name).toBeGreaterThanOrEqual(ring);
+    }
+  });
+
   test("the trap field is never reachable by keyboard or announced", async ({ page }) => {
     await page.goto("/");
     const trap = page.locator("#subscribe input[name='website']");
