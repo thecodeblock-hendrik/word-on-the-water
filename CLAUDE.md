@@ -124,7 +124,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 ├── docs/
 │   ├── PLAN.md, production_checklist.md, FLUTTER.md   ← the two lists to follow (everything outstanding that is not about launch is in PLAN.md; launch-day steps, including the domain and Kit webhook guide, are in production_checklist.md), native app assessment
 │   ├── archive/                  ← finished and retired documents: chat.md (scope) and chat_checks.md, landing_page_check.md, kit_setup.md (email DNS), kit_webhook_checks.md, secret_key_instructions.md, threat_plan.md, next-step notes, old checklists
-│   ├── bible_feature.md, PWA_checklist.md, devotional_format.md   ← Bible reader plan, PWA steps, devotional file format
+│   ├── bible_feature.md, PWA_checklist.md, web_push.md, devotional_format.md   ← Bible reader plan, PWA steps, Web Push plan (a proposal, not decided), devotional file format
 │   ├── design/                   ← landing page document and mockup, bible_mockups.html (reader, picker options), chat_mockups.html (Got Questions chat)
 │   ├── adr/                      ← 0001 to 0010
 │   ├── runbooks/                 ← deploy.md, incident.md, restore-db.md, rotate-secrets.md, chat.md

@@ -430,7 +430,7 @@ Checked against the code and the tests on 2026-11-16: what is proven is ticked w
 
 ### 2.5 Mobile app decision gate
 - [ ] Revisit the native app (`docs/FLUTTER.md`, option B: keep this Next.js site and add a Flutter app for iOS and Android on the same FastAPI) once devotionals exist **(Hendrik)**
-- [ ] Until then, consider Web Push for the weekly devotional (Next PWA guide; iOS only for sites added to the home screen, iOS 16.4+)
+- [ ] Until then, consider Web Push for the weekly devotional (Next PWA guide; iOS only for sites added to the home screen, iOS 16.4+). The plan, the design and the open questions are in [web_push.md](web_push.md) (a proposal, 2026-11-16)
 
 **Exit gate Phase 2**
 - [ ] Editor publishes a devotional and it goes out by email; prayer team reviews requests with a full audit trail
