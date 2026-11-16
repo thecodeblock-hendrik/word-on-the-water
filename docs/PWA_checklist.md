@@ -18,7 +18,10 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 - [ ] App names: `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
 - [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
 - [ ] Start page: `/` for everyone, with a shortcut to Start here (the Bible shortcut only once `BIBLE_ENABLED` is on in production)
-- [ ] Orientation: `portrait`, as already written in [CLAUDE.md](../CLAUDE.md) section 5 and in Part C of the production checklist; confirm it, or change all three together (the Bible reader would be fine in landscape on a tablet, but it is off at launch)
+- [x] Orientation: **no lock** (decided 2026-11-16). Leave `orientation` out of the manifest, so the default (`any`) applies. A portrait lock fails WCAG 1.3.4 (technique failure F97), which this project targets at level AA, and nothing here needs a fixed orientation; users with a mounted device, for example on a wheelchair, can be blocked by a lock. `CLAUDE.md` section 5 and Part C of the production checklist say the same
+- [ ] **Open: offline.** Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
+- [ ] **Open: iOS launch screen.** Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
+- [ ] **Open: desktop install sheet.** Chrome shows only screenshots with `form_factor: "wide"` on desktop, and step 4 plans narrow ones only. Decide whether one wide screenshot is worth adding (optional)
 
 ## 2. Icons
 
@@ -34,11 +37,11 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 3. Manifest (test first)
 
-- [ ] Write the unit test `tests/unit/manifest.test.ts` first and see it fail: required fields exist, `display` is `standalone`, `start_url` and `scope` are `/`, icons include 192 and 512 `any` and a 512 `maskable`, `theme_color` and `background_color` equal the token values in `src/lib/theme.ts` and `tokens.css`
+- [ ] Write the unit test `tests/unit/manifest.test.ts` first and see it fail: required fields exist, `display` is `standalone`, there is no `orientation` member, `start_url` and `scope` are `/`, icons include 192 and 512 `any` and a 512 `maskable`, `theme_color` and `background_color` equal the token values in `src/lib/theme.ts` and `tokens.css`
 - [ ] Create `apps/web/src/app/manifest.ts` returning `MetadataRoute.Manifest`:
   - [ ] `name`, `short_name`, `description` (one plain sentence), `lang: "en"`
   - [ ] `id: "/"`, `start_url: "/"`, `scope: "/"`
-  - [ ] `display: "standalone"`, `orientation` as decided above
+  - [ ] `display: "standalone"` and no `orientation` member (step 1)
   - [ ] `background_color` and `theme_color` from the tokens (import the values, never retype hex codes)
   - [ ] `categories: ["lifestyle", "education"]` (check the allowed list; keep only well-known values)
   - [ ] `icons` for the four PNGs above, with the correct `sizes`, `type` and `purpose`
@@ -56,7 +59,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 5. iOS and the viewport
 
-- [ ] In `layout.tsx` add `metadata.appleWebApp`: `capable: true`, `title: "Word on the Water"`, `statusBarStyle: "default"` (try `black-translucent` only if the header handles the status bar area)
+- [ ] In `layout.tsx` add `metadata.appleWebApp`: `capable: true`, `title: "Word on the Water"`, `statusBarStyle: "default"` (try `black-translucent` only if the header handles the status bar area). Checked in Next 16.4.6: `capable: true` emits `mobile-web-app-capable`, and Safari 26 opens any site added to the home screen as a web app anyway, so `capable` is optional
 - [ ] Confirm the existing `viewport` already has `viewportFit: "cover"` and `themeColor` per colour scheme (it does); keep the safe-area padding on the header, the Bible sheet and the chapter bar
 - [ ] Check that links to other sites open in the browser and not inside the installed window (the ESV link, social links); same-site links stay inside
 - [ ] Commit: `feat(web): iOS home screen metadata`
@@ -99,6 +102,6 @@ HTTPS is needed. Use a Vercel preview deployment (the best test, the real produc
 ## 10. Later (not Phase 1)
 
 - [ ] Phase 2 gate: Web Push for the weekly devotional (a service worker, a push subscription store, a send job; on iPhone push only works for a site added to the home screen on iOS 16.4 or newer)
-- [ ] Phase 3: offline reading of recent devotionals and the last Bible chapters: `public/sw.js` served with `Cache-Control: no-cache` and its own CSP header, a cache and update strategy, an offline page, and a test that a published devotional still opens with the network off
+- [ ] Phase 3 (or earlier, see the offline decision in step 1): offline reading of recent devotionals and the last Bible chapters: `public/sw.js` served with `Cache-Control: no-cache` and its own CSP header, a cache and update strategy, an offline page, and a test that a published devotional still opens with the network off
 - [ ] Phase 3: an "Install" button inside the page that uses the `beforeinstallprompt` event on Android (iPhone needs written instructions instead)
 - [ ] Revisit the native Flutter app at the Phase 2 gate ([FLUTTER.md](FLUTTER.md), option B)
