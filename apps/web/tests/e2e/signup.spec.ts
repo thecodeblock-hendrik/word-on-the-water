@@ -176,6 +176,19 @@ test.describe("/thank-you", () => {
     expect(violations).toEqual([]);
   });
 
+  test("has no Subscribe button, and the menu stays at the right edge", async ({ page }) => {
+    await page.goto("/thank-you");
+    const header = page.getByRole("banner");
+    await expect(header.getByRole("link", { name: /subscribe|get the devotional/i })).toHaveCount(
+      0,
+    );
+    const width = page.viewportSize()!.width;
+    if (width < 1024) {
+      const menu = (await header.getByRole("button", { name: "Menu" }).boundingBox())!;
+      expect(menu.x + menu.width).toBeGreaterThanOrEqual(width - 24);
+    }
+  });
+
   test("has no serious axe problem, in light and dark", async ({ page }) => {
     for (const scheme of ["light", "dark"] as const) {
       await page.emulateMedia({ colorScheme: scheme });
