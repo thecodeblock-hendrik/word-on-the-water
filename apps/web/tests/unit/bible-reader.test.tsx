@@ -142,20 +142,6 @@ describe("Reader", () => {
     );
   });
 
-  it("shows the aside inside the heading, so it can sit beside the version name and title", () => {
-    const { container } = render(
-      <Reader
-        passage={passage({ range: { from: 16, to: 18 } })}
-        version={bsb}
-        book={john}
-        aside={<span data-testid="aside" />}
-      />,
-    );
-    const header = container.querySelector("header")!;
-    expect(header.className).toMatch(/\brelative\b/);
-    expect(within(header).getByTestId("aside")).toBeInTheDocument();
-  });
-
   it("marks the text as English and gives the article an accessible name", () => {
     const { container } = render(<Reader passage={passage()} version={bsb} book={john} />);
     expect(container.querySelector("[lang='en']")).not.toBeNull();

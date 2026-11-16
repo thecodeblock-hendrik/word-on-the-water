@@ -250,9 +250,9 @@ for (const width of [320, 360, 375, 390, 412]) {
         const label = `${path}: ${await link.innerText()}`;
         expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
         expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-        const isPrevious = (await link.getAttribute("aria-label"))!.startsWith("Previous");
-        expect(await link.innerText(), label).toMatch(isPrevious ? /^←/ : /→$/);
-        // The whole name is shown: the part that can truncate is not truncated.
+        await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
+        // The full name is what shows (the short form is only for the chat button), and it all fits.
+        expect(await link.locator(".truncate").innerText(), label).toMatch(/[a-z]{4,}/);
         expect(
           await link.locator(".truncate").evaluate((el) => el.scrollWidth <= el.clientWidth),
           `${label}: the name is cut off`,

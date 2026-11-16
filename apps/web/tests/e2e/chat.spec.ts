@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type Locator, type Page, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { gzipSync } from "node:zlib";
 
 const CHAT = "http://localhost:3102";
@@ -29,14 +29,6 @@ const ask = async (page: Page, text: string) => {
   await page.getByRole("textbox", { name: "Your question" }).fill(text);
   await page.keyboard.press("Enter");
 };
-
-/** The right edge of the text itself (not the box, which is full width). */
-const textRight = (locator: Locator) =>
-  locator.evaluate((el) => {
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    return Math.max(...[...range.getClientRects()].map((r) => r.right));
-  });
 
 test.describe("with the chat off (the flag unset)", () => {
   test("the button stays the contact link and no chat code is requested", async ({ page }) => {
@@ -221,51 +213,102 @@ test.describe("with the chat on", () => {
       await expect(fresh.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
-    test("on a phone it is a tab on the right edge, level with the heading, clear of the text and the bar", async ({
+    test("on a phone it is a round button between Previous and Next, inside a bump the bar's top line follows", async ({
       page,
     }) => {
-      test.skip(page.viewportSize()!.width >= 1024, "the heading tab is for phones");
+      test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
       await readVerse(page);
-      const tab = (await page
-        .getByRole("button", { name: "Your chat", exact: true })
-        .boundingBox())!;
-      const header = page.locator("article header");
-      const top = (await header.locator("p").first().boundingBox())!;
-      const last = (await header.locator("p").last().boundingBox())!;
-      // From the version name down to the verses line, flush with the screen edge.
-      expect(Math.abs(tab.y - top.y)).toBeLessThanOrEqual(1);
-      expect(Math.abs(tab.y + tab.height - (last.y + last.height))).toBeLessThanOrEqual(1);
-      expect(Math.round(tab.x + tab.width)).toBe(page.viewportSize()!.width);
-      expect(tab.width).toBeGreaterThanOrEqual(44);
-      // Nothing of the heading runs under it, and it is not in the chapter bar any more.
-      expect(await textRight(header.getByRole("heading", { level: 1 }))).toBeLessThanOrEqual(tab.x);
-      expect(
-        await textRight(header.getByRole("link", { name: "Show full chapter" })),
-      ).toBeLessThanOrEqual(tab.x);
+      const button = page.getByRole("button", { name: "Your chat", exact: true });
+      const round = (await button.locator("span").first().boundingBox())!;
       const bar = page.getByRole("navigation", { name: "Previous and next chapter" });
-      await expect(bar.getByRole("button", { name: "Your chat" })).toHaveCount(0);
+      const barBox = (await bar.boundingBox())!;
+      const prev = (await bar.getByRole("link", { name: /Previous chapter/ }).boundingBox())!;
+      const next = (await bar.getByRole("link", { name: /Next chapter/ }).boundingBox())!;
+      for (const [link, text] of [
+        [/Previous chapter/, "John 2"],
+        [/Next chapter/, "John 4"],
+      ] as const) {
+        expect(await bar.getByRole("link", { name: link }).locator(".truncate").innerText()).toBe(
+          text,
+        );
+      }
+      const bump = (await bar.locator("svg[data-chat-bump]").boundingBox())!;
+      const width = page.viewportSize()!.width;
+
+      // Between the two chapter buttons and clear of both, centred, 44px or more to tap.
+      expect(Math.abs(round.x + round.width / 2 - width / 2)).toBeLessThan(4);
+      expect(round.x).toBeGreaterThanOrEqual(prev.x + prev.width);
+      expect(round.x + round.width).toBeLessThanOrEqual(next.x);
+      expect(round.width).toBeGreaterThanOrEqual(44);
+      expect(round.height).toBeGreaterThanOrEqual(44);
+      // Rises out of the bar, and the bump encloses it and meets the bar's top line.
+      expect(round.y).toBeLessThan(barBox.y);
+      expect(round.y + round.height).toBeGreaterThan(barBox.y + 20);
+      expect(bump.y).toBeLessThan(round.y);
+      expect(bump.x).toBeLessThan(round.x);
+      expect(bump.x + bump.width).toBeGreaterThan(round.x + round.width);
+      expect(Math.abs(bump.y + bump.height - (barBox.y + 1.5))).toBeLessThanOrEqual(2);
+      // Neither chapter button is covered by it.
+      for (const point of [
+        { x: prev.x + prev.width / 2, y: prev.y + prev.height / 2 },
+        { x: next.x + next.width / 2, y: next.y + next.height / 2 },
+      ]) {
+        const hit = await page.evaluate(
+          ({ x, y }) => document.elementFromPoint(x, y)?.closest("a")?.getAttribute("href"),
+          point,
+        );
+        expect(hit).toMatch(/^\/bible\/web\/john\/\d+$/);
+      }
       await expect(page.getByRole("button", { name: /Hide the Your chat button/ })).toBeHidden();
     });
 
-    test("it stays at the top: scrolling the passage leaves no button over the text", async ({
+    test("at the end of a long chapter the passage credit is clear of the bump", async ({
       page,
     }) => {
-      test.skip(page.viewportSize()!.width >= 1024, "the heading tab is for phones");
+      test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
       await readVerse(page);
       await page.goto("/bible/web/psalms/119");
-      const back = page.getByRole("button", { name: "Your chat", exact: true });
-      await expect(back).toBeVisible();
+      // The bump, and the room the page keeps for it, appear when the page hydrates: scroll only
+      // after that, or the page grows below the point just scrolled to (seen on a slow CI runner).
+      await expect(page.getByRole("button", { name: "Your chat", exact: true })).toBeVisible();
       await page.evaluate(() =>
         window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
       );
-      await expect(back).not.toBeInViewport();
+      const bump = (await page.locator("svg[data-chat-bump]").boundingBox())!;
       const credit = (await page
         .getByText("World English Bible (WEB), public domain")
         .boundingBox())!;
-      const bar = (await page
-        .getByRole("navigation", { name: "Previous and next chapter" })
-        .boundingBox())!;
-      expect(credit.y + credit.height).toBeLessThanOrEqual(bar.y + 1);
+      expect(credit.y + credit.height).toBeLessThanOrEqual(bump.y + 1);
+    });
+
+    test("on a phone the chapter buttons use the short names, and are named for what is shown", async ({
+      browser,
+    }) => {
+      const open = async (chatReturn: boolean) => {
+        const context = await browser.newContext({
+          baseURL: CHAT,
+          viewport: { width: 375, height: 800 },
+        });
+        if (chatReturn) {
+          await context.addInitScript(() => sessionStorage.setItem("wotw-chat-return", "/"));
+        }
+        const page = await context.newPage();
+        await page.goto("/bible/web/matthew/16");
+        return page;
+      };
+      const withChat = await open(true);
+      await expect(withChat.locator("[data-chat-return]")).toBeVisible();
+      await expect(
+        withChat.getByRole("link", { name: "Previous chapter: Matt 15", exact: true }),
+      ).toBeVisible();
+      await expect(
+        withChat.getByRole("link", { name: "Next chapter: Matt 17", exact: true }),
+      ).toBeVisible();
+      const without = await open(false);
+      await expect(
+        without.getByRole("link", { name: "Previous chapter: Matthew 15", exact: true }),
+      ).toBeVisible();
+      await expect(without.locator("[data-chat-return]")).toHaveCount(0);
     });
 
     for (const scheme of ["light", "dark"] as const) {
@@ -299,21 +342,16 @@ test.describe("with the chat on", () => {
         ]) {
           await page.goto(path);
           await expect(page.locator("[data-chat-return]")).toBeVisible();
-          const tabX = (await page.locator("[data-chat-return]").boundingBox())!.x;
-          const tab = page.locator("[data-chat-return]");
-          expect(
-            await tab.evaluate((el) => el.scrollHeight <= el.clientHeight),
-            `${path}: the tab clips its label`,
-          ).toBe(true);
-          const title = page.locator("article header").getByRole("heading", { level: 1 });
-          expect(await textRight(title), `${path}: title under the tab`).toBeLessThanOrEqual(tabX);
           const nav = page.getByRole("navigation", { name: "Previous and next chapter" });
           for (const link of await nav.getByRole("link").all()) {
             const label = `${path}: ${await link.innerText()}`;
             expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
             expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-            const isPrevious = (await link.getAttribute("aria-label"))!.startsWith("Previous");
-            expect(await link.innerText(), label).toMatch(isPrevious ? /^←/ : /→$/);
+            await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
+            // The chat button is in the bar, so the names are the standard short forms, and they show.
+            const shown = await link.locator(".truncate").innerText();
+            expect(shown, label).toMatch(/^(\d )?[A-Z][A-Za-z]+ \d+$/);
+            expect(shown, label).not.toMatch(/Solomon|Thessalonians|Corinthians|Deuteronomy/);
             // The whole name is shown: the part that can truncate is not truncated.
             expect(
               await link.locator(".truncate").evaluate((el) => el.scrollWidth <= el.clientWidth),
