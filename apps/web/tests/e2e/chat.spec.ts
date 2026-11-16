@@ -30,7 +30,7 @@ const ask = async (page: Page, text: string) => {
   await page.keyboard.press("Enter");
 };
 
-test.describe("with the chat off (like Production)", () => {
+test.describe("with the chat off (the flag unset)", () => {
   test("the button stays the contact link and no chat code is requested", async ({ page }) => {
     const bodies: string[] = [];
     page.on("response", async (r) => {
