@@ -94,6 +94,6 @@ Use that **only for tests, never for an email you will send**: GitHub is not an 
 |---|---|---|
 | `The email banner at ... answered 404` | The banner is not merged or deployed yet | Merge, wait for the deploy, run again |
 | `The email banner could not be reached` | The site address does not answer | Check the site is live; before launch see "Before the site is live" |
-| `... is not an image` | The address answers with a page, not a picture | Check the file name in `series.yml` and in `public/email` |
+| `... is not an image` | The address answers with a page, not a picture. Until launch this is what you get from `wordonthewater.net`, which still shows the old Squarespace page (seen on 2026-11-17) | After launch, check the file name in `series.yml` and in `public/email`. Before launch, see "Before the site is live" |
 | `Choose the audience: --tag <id> or --all` | No audience given | Add `--tag 25869858` or `--all` |
 | `KIT_API_KEY_PREVIEW is not set` | The key is missing from the root `.env` | Add it; `--live` uses `KIT_API_KEY` (both are the same Kit account) |
