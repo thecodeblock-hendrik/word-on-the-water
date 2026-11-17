@@ -6,5 +6,11 @@ allowBuilds:
   sharp: false
   unrs-resolver: false
 
+# Accepted until 2026-12-15, with the same entry in osv-scanner.toml (remove both together).
+# picomatch ReDoS: no patched version exists and it is dev tooling only.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-fc5q-39xc-vjpf
+
 overrides:
   basic-ftp: ">=6.2.4"
