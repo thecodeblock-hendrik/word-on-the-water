@@ -15,6 +15,7 @@
     "e2e:fast": "playwright test --project=pixel-7 --project=desktop-chromium",
     "check:placeholders": "NODE_NO_WARNINGS=1 node scripts/check-placeholders.mts",
     "make:icons": "NODE_NO_WARNINGS=1 node scripts/make-icons.mts",
+    "make:screenshots": "NODE_NO_WARNINGS=1 node scripts/make-screenshots.mts",
     "check:devotionals": "NODE_NO_WARNINGS=1 node scripts/check-devotionals.mts",
     "build:chat-topics": "NODE_NO_WARNINGS=1 node scripts/build-chat-topics.mts",
     "build:bible": "NODE_NO_WARNINGS=1 node scripts/build-bible.mts",

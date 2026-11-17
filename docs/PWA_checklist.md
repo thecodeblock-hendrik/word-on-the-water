@@ -51,11 +51,11 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 4. Shortcuts and screenshots
 
-- [ ] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" (`/bible`; the reader is on in Production since 2026-11-16)
-- [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader (it is on in Production since 2026-11-16)
-- [ ] Add `label` and `type: "image/png"` to every screenshot
-- [ ] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`
-- [ ] Commit: `feat(web): manifest shortcuts and screenshots`
+- [x] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" (`/bible`; the reader is on in Production since 2026-11-16)
+- [x] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader (it is on in Production since 2026-11-16)
+- [x] Add `label` and `type: "image/png"` to every screenshot
+- [x] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`
+- [x] Commit: `feat(web): manifest shortcuts and screenshots` (2026-11-17: shortcuts Start here and Bible, the Bible entries only while `BIBLE_ENABLED=1` (read when the manifest is built); three 750 x 1624 screenshots in `public/screenshots`, made by `pnpm make:screenshots` against a local production build with `DEVOTIONAL_TODAY=2026-11-28 BIBLE_ENABLED=1`; the Prayer request shortcut waits for 1.4; review page: `docs/design/pwa_screenshots.html`). Retake the screenshots if the landing page, the devotional page or the reader changes visibly
 
 ## 5. iOS and the viewport
 

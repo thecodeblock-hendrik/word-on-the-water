@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { isBibleEnabled } from "@/lib/bible/flag";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
 import { THEME_COLORS } from "@/lib/theme";
 
@@ -9,6 +10,8 @@ import { THEME_COLORS } from "@/lib/theme";
  * No `orientation` on purpose: a lock fails WCAG 1.3.4.
  */
 export default function manifest(): MetadataRoute.Manifest {
+  const bible = isBibleEnabled();
+  const shortcutIcon = [{ src: "/icons/icon-96.png", sizes: "96x96", type: "image/png" }];
   return {
     id: "/",
     name: SITE_NAME,
@@ -31,5 +34,27 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
     ],
+    shortcuts: [
+      { name: "Start here", short_name: "Start here", url: "/#start", icons: shortcutIcon },
+      ...(bible
+        ? [{ name: "Bible", short_name: "Bible", url: "/bible", icons: shortcutIcon }]
+        : []),
+    ],
+    screenshots: [
+      shot("landing.png", "The landing page"),
+      shot("devotional.png", "A devotional"),
+      ...(bible ? [shot("bible.png", "The Bible reader")] : []),
+    ],
+  };
+}
+
+/** A phone screenshot from scripts/make-screenshots.mts (375 x 812 at 2x). */
+function shot(file: string, label: string) {
+  return {
+    src: `/screenshots/${file}`,
+    sizes: "750x1624",
+    type: "image/png",
+    form_factor: "narrow" as const,
+    label,
   };
 }
