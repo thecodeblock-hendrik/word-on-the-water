@@ -23,6 +23,22 @@ describe("parseSeries", () => {
     expect(s.outline[1].date).toBe("2026-12-12");
   });
 
+  it("reads the optional email banner file name, and has none by default", () => {
+    expect(parseSeries(source, "advent").emailBanner).toBeUndefined();
+    expect(parseSeries(source + "emailBanner: advent-banner.jpg\n", "advent").emailBanner).toBe(
+      "advent-banner.jpg",
+    );
+  });
+
+  it.each(["../advent.jpg", "dir/advent.jpg", "advent.png", "Advent Banner.jpg", ""])(
+    "rejects the email banner %j, which must be a plain .jpg file name",
+    (name) => {
+      expect(() => parseSeries(source + `emailBanner: "${name}"\n`, "advent")).toThrow(
+        /emailBanner/,
+      );
+    },
+  );
+
   it("rejects a missing field and an unknown field", () => {
     expect(() => parseSeries(source.replace("tagline: waiting for the light\n", ""), "a")).toThrow(
       /tagline/,

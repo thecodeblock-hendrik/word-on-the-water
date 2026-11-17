@@ -1,6 +1,7 @@
 title: Advent
 tagline: Waiting for the light
 artAlt: Surfers sitting in a dark lineup, a watchtower on the headland, the first light of dawn on the horizon.
+emailBanner: advent-banner.jpg
 # The planned weeks. Once a week's devotional.md exists, its own title, passage and date are used instead.
 outline:
   - { number: 1, title: More Than Watchmen, passage: "Psalm 130:5–6; Isaiah 9:2", date: 2026-11-28 }

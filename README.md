@@ -5,7 +5,7 @@ Christian ministry web app publishing devotionals and Bible teaching for surfers
 - Plan and progress (the one document to follow): [PLAN.md](docs/PLAN.md)
 - Launch-time steps, kept apart until the site goes public: [production_checklist.md](docs/production_checklist.md)
 - Architecture and rules: [CLAUDE.md](CLAUDE.md)
-- Adding a devotional: [devotional format](docs/devotional_format.md). Landing page review: step 1.11 in [docs/PLAN.md](docs/PLAN.md)
+- Adding a devotional: [devotional format](docs/devotional_format.md); the weekly Kit email: [kit_email_devotional.md](docs/kit_email_devotional.md). Landing page review: step 1.11 in [docs/PLAN.md](docs/PLAN.md)
 - Decisions: [docs/adr](docs/adr). Security: [threat model](docs/threat-model.md), [privacy](docs/privacy.md), [SECURITY.md](SECURITY.md). Operations: [docs/runbooks](docs/runbooks)
 
 ## Status

@@ -14,6 +14,11 @@ const seriesSchema = z
     title: z.string().min(1),
     tagline: z.string().min(1),
     artAlt: z.string().min(1),
+    /** The weekly email's header image: a file name in public/email (see docs/kit_email_devotional.md). */
+    emailBanner: z
+      .string()
+      .regex(/^[a-z0-9-]+\.jpg$/, "must be a plain lower-case .jpg file name")
+      .optional(),
     outline: z.array(outlineEntry).min(1),
   })
   .refine((s) => s.outline.every((o, i) => o.number === i + 1), {
