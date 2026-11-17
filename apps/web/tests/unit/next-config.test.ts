@@ -8,6 +8,12 @@ describe("next.config images", () => {
   });
 });
 
+describe("next.config image cache", () => {
+  it("keeps optimized images for a year, because their URLs carry a content hash", () => {
+    expect(nextConfig.images?.minimumCacheTTL).toBe(31_536_000);
+  });
+});
+
 describe("next.config local images", () => {
   it("only lets the optimizer touch content images, without query strings", () => {
     expect(nextConfig.images?.localPatterns).toEqual([{ pathname: "/content/**", search: "" }]);
