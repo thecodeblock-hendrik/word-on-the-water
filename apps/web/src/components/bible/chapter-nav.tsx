@@ -8,7 +8,7 @@ import { chapterPath } from "@/lib/bible/reference";
 // about 420px wide, 12.5px at the narrowest), and `truncate` on the name is the last resort, never
 // a second line. Measured on every book: no name is cut off from 320px up.
 const button =
-  "flex min-h-12 min-w-0 flex-1 items-center gap-1 rounded-sm border-[1.5px] px-2.5 font-ui text-[clamp(12.5px,3.8vw,16px)] font-semibold lg:flex-none lg:gap-1.5 lg:px-4 lg:text-[16px]";
+  "flex min-h-12 min-w-0 flex-1 items-center gap-1 rounded-sm border-[1.5px] px-2 font-ui text-[clamp(12.5px,3.8vw,16px)] font-semibold lg:flex-none lg:gap-1.5 lg:px-4 lg:text-[16px]";
 const outlined = "border-line bg-bg text-ink hover:border-accent";
 const filled = "border-accent-ink bg-accent-ink text-bg hover:brightness-110";
 const dead = "cursor-not-allowed border-line bg-bg text-muted opacity-60";
