@@ -83,9 +83,9 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 HTTPS is needed. Use a Vercel preview deployment (the best test, the real production build) or an ngrok tunnel to `pnpm start`. For `pnpm dev` over Wi-Fi, `DEV_ORIGINS` in the root `.env` is enough to open the site but it is plain HTTP, so install does not work there.
 
-- [ ] Deploy a preview (open the PR; Deployment Protection may ask you to log in) **(Hendrik: Vercel preview settings)**
+- [x] Deploy a preview (PR #136, 2026-11-17)
 - [ ] Previews are behind Deployment Protection. Next adds `crossorigin="use-credentials"` to the manifest link on Vercel previews (checked in Next 16.4.6, `metadata-elements.js`), so the manifest loads while you are logged in. The icons, and the apple icon iOS fetches, are probably requested without your login and may show as missing. Not confirmed: if they do, test with the protection bypass or on the real domain once it is live (production checklist, Part G) before blaming the icons
-- [ ] **Android Chrome:** the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
+- [ ] **Android Chrome:** (2026-11-17: on a phone, the icon and name looked good; the platform and the other points below are still to confirm) the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
 - [ ] **iPhone Safari:** Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
 - [ ] The theme colour of the browser bar follows light and dark
 - [ ] Links, the menu, the sign-up form and the `/thank-you` page work in the installed window; Got Questions opens and closes, and the Bible picker sheet, the chapter bar and the Your chat button work too (both features are on in Production, and in previews, where their Vercel variables are also set) (there is no browser Back button on iPhone, so every page must have a way back inside the page)
