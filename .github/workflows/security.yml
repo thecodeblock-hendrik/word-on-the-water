@@ -55,7 +55,9 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm audit --audit-level high
+      # GHSA-fc5q-39xc-vjpf (picomatch ReDoS): no patched version exists and it is dev tooling only.
+      # Same acceptance and expiry (2026-12-15) as osv-scanner.toml: remove this flag with that entry.
+      - run: pnpm audit --audit-level high --ignore GHSA-fc5q-39xc-vjpf
 
   osv:
     name: OSV-Scanner (all lockfiles)
