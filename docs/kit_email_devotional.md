@@ -87,8 +87,8 @@ Most of this is also in Part K of [production_checklist.md](production_checklist
 - **Keys** in the root `.env` (never in the repo, chat or Vercel): `KIT_API_KEY_PREVIEW` is used by default; add `--live` to use `KIT_API_KEY`. Both belong to the **same Kit account**, so a draft appears in your live Kit account either way. Run `pnpm install` once in `apps/web`.
 - **Sending domain:** Kit's DKIM for `wordonthewater.net` was set on 2026-11-15 (Part E). Because the domain publishes DMARC `p=reject`, mail from `hello@` is only accepted by inboxes when it is authenticated. Delivery from `hello@` is **not yet proven end to end**: see the delivery test in section 6.
 - **Kit account settings:** timezone Harare (UTC+2, set 2026-11-14), default sender `hello@wordonthewater.net`, and the postal address Kit prints in the footer.
-- **A test tag** that only your own test subscriber carries (section 7).
-- **Clean up the spike leftovers** in Kit before real subscribers arrive, so the first `--all` goes only to real people: the test subscriber(s), the `spike-test` tag, the empty "Imported November 14th…" tag and the old sent test broadcasts (the API cannot delete a sent broadcast; Part K says to clear them in the Kit dashboard). Listed in Part K.
+- **A test tag** that only your own test subscriber carries: `spike-test`, id 25869858, already set up (section 7).
+- **Clean up the spike leftovers** in Kit before real subscribers arrive, so the first `--all` goes only to real people: extra test subscribers (keep your own address, which carries the test tag), the empty "Imported November 14th…" tag (**keep the `spike-test` tag**, it is the test audience) and the old sent test broadcasts (the API cannot delete a sent broadcast; Part K says to clear them in the Kit dashboard). Listed in Part K.
 
 ## 6. Each week, step by step
 
@@ -109,9 +109,9 @@ Steps:
 1. **Merge the devotional to `main`** and wait for the Vercel deploy. The devotional page and the banner must both be live before the next step. (The email itself can be made days earlier; only the website link needs the page, and the page appears on its publish date.)
 2. **Create a test draft.** In `apps/web`:
    ```
-   pnpm broadcast:devotional advent-02-the-long-wait --tag <test tag id>
+   pnpm broadcast:devotional advent-02-the-long-wait --tag 25869858
    ```
-   It checks the banner, creates the draft, and prints `Draft <id> created ...`. It also prints that nothing was scheduled or sent.
+   (`25869858` is the test tag, section 7.) It checks the banner, creates the draft, and prints `Draft <id> created ...`. It also prints that nothing was scheduled or sent.
 3. **Open the draft in Kit:** Broadcasts, then "Devotional: advent-02-the-long-wait". Check the subject, the preview text and the sender.
 4. **Test it.** See "Testing" below. Read it **on your phone**, in light and dark mode, and check: the banner shows, the dark panels hold, quotes and Paddle Out are styled, dashes, quotes and the © are correct, "Read it on the website" opens the devotional, and Kit's unsubscribe line and postal address are at the bottom.
 5. **If anything is wrong,** fix the markdown (or add a new banner file), merge, and run the command again. **A draft can be deleted in Kit. A sent email cannot be taken back from readers' inboxes**, and the API refuses to delete one (Kit answers "Broadcast has already been sent"); treat every send as permanent.
@@ -126,7 +126,7 @@ Steps:
 
 Be clear about what has and has not been proven:
 
-- **Proven (2026-11-14): a real send to a tag only you carry.** Make the draft with `--tag <test tag id>`, then send or schedule that draft in Kit. Only your own test subscriber carries the tag, so only you receive it. The catch: it is a real send, so it stays in Kit as a sent broadcast forever. Use it for the **first** test and for anything you need to see exactly as a subscriber would.
+- **Proven (2026-11-14): a real send to a tag only you carry.** Make the draft with `--tag 25869858`, then send or schedule that draft in Kit. Only your own address carries the tag, so only you receive it (in your Gmail inbox). The catch: it is a real send, so it stays in Kit as a sent broadcast forever. Use it for the **first** test and for anything you need to see exactly as a subscriber would.
 - **Not verified: Kit's own "send test email" button** on the draft screen. Kit's API has no test send, and the button has not been confirmed in our account. If your draft screen offers it, use it for the weekly test: it avoids sending a real broadcast. If it does not, use the tag method.
 - **Delivery test (once, before launch, Part K):** send a tag-limited draft to your Gmail, open "Show original" and confirm **SPF, DKIM and DMARC all pass** and that it lands in the inbox and not spam. Until this is done, delivery from `hello@` is unproven (the spike had to use a Gmail sender and landed in spam).
 - **Mail apps:** read it in the Mail app and the Gmail app, light and dark, and in Outlook if you can.
@@ -138,20 +138,21 @@ Kit groups subscribers with **tags**. The command makes you choose an audience o
 - `--tag <id>` sends only to people carrying that tag. Use it for tests.
 - `--all` sends to every subscriber. Use it for the real send. It needs **no id**.
 
-You do **not** look the id up each week: a tag's id never changes, so use the same test tag every time.
+You do **not** look the id up each week: a tag's id never changes, so use the same test tag, 25869858, every time.
 
-**Current state (checked 2026-11-17):**
+**The test tag (set up 2026-11-17):** `spike-test`, id **25869858**. Your own address (the one active subscriber in the account) carries it, so a draft aimed at it goes to you and nobody else. This is the permanent way to send test devotionals to your own inbox:
 
-| Tag | Id | Subscribers |
-|---|---|---|
-| `spike-test` | `25869858` | None. The one subscriber in the account (your test address, active) carries no tags |
-| `Imported November 14th, 2026 at 11:41 AM` | `25869740` | None (an import leftover) |
+```
+pnpm broadcast:devotional advent-02-the-long-wait --tag 25869858
+```
 
-Because `spike-test` has nobody on it, a draft aimed at it reaches **nobody**, which is safe but also means it cannot be used to test yet. Part K plans to delete the spike tags, so the lasting fix is:
+Checked 2026-11-17 from the subscriber's side: the subscriber is active and its tags are exactly `spike-test`. The other tag in the account, `Imported November 14th, 2026 at 11:41 AM` (id `25869740`), is an empty import leftover and is not used.
 
-1. In Kit, create a tag called `devotional-test` and add it to **your own** subscriber (open the subscriber in Kit and add the tag).
-2. Get its id (below) and write it into the table above and into the example command in section 6.
-3. Only ever give that tag to people you want to receive test emails.
+Keep these in mind:
+
+- **Only ever give this tag to people you want to receive test emails.** If a real subscriber is tagged by mistake they get the tests.
+- **Do not delete the tag** during the cleanup in section 5. You may rename it in Kit (for example to `devotional-test`); the id stays the same, so nothing else changes.
+- Kit's own list of a tag's subscribers says **0** for this tag even though you carry it (the same quirk found in the spike, ADR 0008). Trust the subscriber's own page in Kit, not that list.
 
 **List every tag and its id** (from the repository root; this only reads, and does not show the key):
 
@@ -168,7 +169,7 @@ The banner address is on `wordonthewater.net`, which is not live until launch (P
 
 ```
 EMAIL_IMAGE_BASE=https://raw.githubusercontent.com/thecodeblock-hendrik/word-on-the-water/main/apps/web/public/email \
-  pnpm broadcast:devotional advent-02-the-long-wait --tag <test tag id>
+  pnpm broadcast:devotional advent-02-the-long-wait --tag 25869858
 ```
 
 Use this **only for tests, never for an email you will send**: GitHub is not an image host and that address is not ours to keep. (It also only works once `public/email/advent-banner.jpg` is merged to `main`.) Real emails use the default address, after the site is live.
@@ -191,7 +192,7 @@ Use this **only for tests, never for an email you will send**: GitHub is not an 
 ## 10. The rules, in one list
 
 - The command only makes drafts. You schedule in Kit.
-- Always choose an audience: `--tag <id>` for tests, `--all` for the real send.
+- Always choose an audience: `--tag 25869858` for tests, `--all` for the real send.
 - An email image address never changes: no branch, no preview address, no hash, no overwrite. New banner means a new file name.
 - Never use `EMAIL_IMAGE_BASE` for an email you will send.
 - A sent email cannot be taken back. Test first, on your phone.
@@ -201,7 +202,7 @@ Use this **only for tests, never for an email you will send**: GitHub is not an 
 ## 11. Per-week checklist (copy for each issue)
 
 - [ ] Devotional merged and deployed; banner address loads in a browser
-- [ ] Test draft made with `--tag <test tag id>`; subject, preview text and sender right
+- [ ] Test draft made with `--tag 25869858`; subject, preview text and sender right
 - [ ] Test read on a phone, light and dark: banner, panels, quotes, link, unsubscribe line
 - [ ] Real draft made with `--all`; test draft deleted if it was not sent
 - [ ] Scheduled in Kit after 02:00 Harare on the publish day
