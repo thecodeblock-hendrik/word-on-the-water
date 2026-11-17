@@ -12,7 +12,7 @@ Christian ministry web app publishing devotionals and Bible teaching for surfers
 
 Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress and the site is **not public yet**: `wordonthewater.net` still points at the old Squarespace site. The planned launch date is **Saturday 28 November 2026**.
 
-Built: the landing page with its real copy, light and dark themes, the devotional pages (five Advent devotionals, the first on the launch date), a Bible reader (BSB and WEB, switched on in Production), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; mail from `hello@` needs Kit's DKIM first (launch checklist, Parts E and K). The Got Questions chat (step 1.10) is built and tested behind `CHAT_ENABLED` (answers from a local knowledge base, nothing stored on the server); it is switched on in Production. Next: the manual passes in 1.8, the final landing page review (1.11) and the launch steps in `docs/production_checklist.md`, where the PWA is the biggest unbuilt item; the prayer request form (1.4) and contact form (1.5) come after launch, and the page has no prayer option until then. The PWA and everything that needs the live domain are launch-time steps.
+Built: the landing page with its real copy, light and dark themes, the devotional pages (five Advent devotionals, the first on the launch date), a Bible reader (BSB and WEB, switched on in Production), an installable PWA (icons, manifest, shortcuts, screenshots; no offline mode yet), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; mail from `hello@` needs Kit's DKIM first (launch checklist, Parts E and K). The Got Questions chat (step 1.10) is built and tested behind `CHAT_ENABLED` (answers from a local knowledge base, nothing stored on the server); it is switched on in Production. Next: the manual passes in 1.8, the final landing page review (1.11) and the PWA install checks on a preview and the launch steps in `docs/production_checklist.md`; the prayer request form (1.4) and contact form (1.5) come after launch, and the page has no prayer option until then. Everything that needs the live domain is a launch-time step.
 
 ## Stack
 
@@ -26,6 +26,10 @@ Built: the landing page with its real copy, light and dark themes, the devotiona
 Vercel builds and deploys straight from the GitHub repo (no containers). Docker is used only locally for Postgres, Redis and Mailpit.
 
 The browser only talks to Next.js, which calls FastAPI server-side with a service token. Kit's webhooks reach the API through a forwarder route on the web project (`/api/webhooks/kit`).
+
+## Install on a phone
+
+On Android Chrome, open the site and choose Install app. On iPhone, open it in Safari, tap Share, then Add to Home Screen.
 
 ## Quick start
 
@@ -58,6 +62,6 @@ make kit-webhook URL=https://<site>/api/webhooks/kit   # register the Kit webhoo
 make down        # stop services
 ```
 
-In `apps/web`: `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, `pnpm build:bible` regenerates the Bible data, and `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a Kit draft for the weekly email (never sends; steps in [devotional format](docs/devotional_format.md)).
+In `apps/web`: `pnpm make:icons` and `pnpm make:screenshots` rebuild the app icons and the manifest screenshots, `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, `pnpm build:bible` regenerates the Bible data, and `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a Kit draft for the weekly email (never sends; steps in [devotional format](docs/devotional_format.md)).
 
 Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `CHAT_ENABLED=1` shows the Got Questions chat (see [docs/chat.md](docs/archive/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` the first two in your shell: the unit tests read them and fail.

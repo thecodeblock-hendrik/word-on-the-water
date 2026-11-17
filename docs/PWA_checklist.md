@@ -1,6 +1,6 @@
 # PWA checklist
 
-**Status (2026-11-16): not started.** Nothing is built: `manifest.ts`, the icons, `scripts/make-icons.mts` and both tests do not exist, and `apps/web/public` is empty. Launch is Saturday 28 November 2026 and this is the largest unbuilt launch item, so start it early, on a branch. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
+**Status (2026-11-17): built, waiting for the install checks.** Sections 1 to 6 and the docs of section 9 are done on PR #136 (icons, manifest, shortcuts, screenshots, iOS settings, e2e test). Android and the iPhone icon and name were checked on the preview on 2026-11-17; the desktop install (7) and the rest of the iPhone checks (8) were not reported and are still open, so repeat them on the live domain at launch (production checklist, Part C). Launch is Saturday 28 November 2026. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
 
 Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
@@ -14,90 +14,90 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 1. Decisions to confirm first
 
-- [ ] Source of the icon: use the existing inline SVG logo (the ring, wave and cross in the header) **(Hendrik: confirm, or supply a master SVG or a 1024 px PNG)**
-- [ ] App names: `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
-- [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
-- [ ] Start page: `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
+- [x] Source of the icon (decided 2026-11-17: the existing logo, from `logo.tsx`): use the existing inline SVG logo (the ring, wave and cross in the header) **(Hendrik: confirm, or supply a master SVG or a 1024 px PNG)**
+- [x] App names (decided 2026-11-17): `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
+- [x] Icon background colour (decided 2026-11-17: Night swell navy `#0f2233`, one icon for both schemes): Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
+- [x] Start page (decided 2026-11-17): `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
 - [x] Orientation: **no lock** (decided 2026-11-16). Leave `orientation` out of the manifest, so the default (`any`) applies. A portrait lock fails WCAG 1.3.4 (technique failure F97), which this project targets at level AA, and nothing here needs a fixed orientation; users with a mounted device, for example on a wheelchair, can be blocked by a lock. `CLAUDE.md` section 5 and Part C of the production checklist say the same
-- [ ] **Open: offline** (now shared with Web Push: [web_push.md](web_push.md) needs the same single service worker file, so decide the two together). Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
-- [ ] **Open: iOS launch screen.** Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
-- [ ] **Open: desktop install sheet.** Chrome shows only screenshots with `form_factor: "wide"` on desktop, and step 4 plans narrow ones only. Decide whether one wide screenshot is worth adding (optional)
+- [x] **Decided 2026-11-17: no offline page now**; decide it together with Web Push and Phase 3 (the service worker is shared). Was open: offline (now shared with Web Push: [web_push.md](web_push.md) needs the same single service worker file, so decide the two together). Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
+- [x] **Decided 2026-11-17: skip iOS launch screens for now.** Was open: iOS launch screen. Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
+- [x] **Decided 2026-11-17: no wide desktop screenshot.** Was open: desktop install sheet. Chrome shows only screenshots with `form_factor: "wide"` on desktop, and step 4 plans narrow ones only. Decide whether one wide screenshot is worth adding (optional)
 
 ## 2. Icons
 
-- [ ] Export the logo as a standalone SVG with no CSS variables (fixed colours), in `apps/web/src/app/icon.svg`
-- [ ] Generate `icon-192.png` and `icon-512.png` (`purpose: "any"`) from it into `apps/web/public/icons/`
-- [ ] Generate `icon-96.png` for the Start here shortcut (step 4)
-- [ ] Generate `icon-maskable-512.png` with the logo inside the central 80% safe zone and a full-bleed background colour
-- [ ] Generate `apple-icon.png` at 180 px (`apps/web/src/app/apple-icon.png`), full-bleed with no transparency (iOS fills transparent areas with black)
-- [ ] Keep `favicon.ico` as it is
-- [ ] Put the generation in a small script (`apps/web/scripts/make-icons.mts`, run with pnpm) so the icons can be rebuilt when the logo changes; commit the PNGs it produces
-- [ ] Check each icon by eye on a light and a dark background, and in the maskable preview at https://maskable.app
-- [ ] Commit: `feat(web): app icons`
+- [x] Export the logo as a standalone SVG with no CSS variables (fixed colours), in `apps/web/src/app/icon.svg`
+- [x] Generate `icon-192.png` and `icon-512.png` (`purpose: "any"`) from it into `apps/web/public/icons/`
+- [x] Generate `icon-96.png` for the Start here shortcut (step 4)
+- [x] Generate `icon-maskable-512.png` with the logo inside the central 80% safe zone and a full-bleed background colour
+- [x] Generate `apple-icon.png` at 180 px (`apps/web/src/app/apple-icon.png`), full-bleed with no transparency (iOS fills transparent areas with black)
+- [x] Keep `favicon.ico` as it is
+- [x] Put the generation in a small script (`apps/web/scripts/make-icons.mts`, run with pnpm) so the icons can be rebuilt when the logo changes; commit the PNGs it produces
+- [x] Check each icon by eye on a light and a dark background, and in the maskable preview at https://maskable.app
+- [x] Commit: `feat(web): app icons` (2026-11-17: master `src/app/icon.svg` on the Night swell navy with the logo's own paths; `pnpm make:icons` renders every PNG with sharp; `tests/unit/icons.test.ts` checks sizes, no transparency, the maskable safe zone and fixed colours. The maskable icon scales the mark to 66% so even the wave tail stays inside the safe circle. Checked by eye; the maskable.app preview is still worth one look)
 
 ## 3. Manifest (test first)
 
-- [ ] Write the unit test `tests/unit/manifest.test.ts` first and see it fail: required fields exist, `display` is `standalone`, there is no `orientation` member, `start_url` and `scope` are `/`, icons include 192 and 512 `any` and a 512 `maskable`, `theme_color` and `background_color` equal the token values in `src/lib/theme.ts` and `tokens.css`
-- [ ] Create `apps/web/src/app/manifest.ts` returning `MetadataRoute.Manifest`:
-  - [ ] `name`, `short_name`, `description` (one plain sentence), `lang: "en"`
-  - [ ] `id: "/"`, `start_url: "/"`, `scope: "/"`
-  - [ ] `display: "standalone"` and no `orientation` member (step 1)
-  - [ ] `background_color` and `theme_color` from the tokens (import the values, never retype hex codes)
-  - [ ] `categories: ["lifestyle", "education"]` (check the allowed list; keep only well-known values)
-  - [ ] `icons` for the four PNGs above, with the correct `sizes`, `type` and `purpose`
-- [ ] Open `http://localhost:3000/manifest.webmanifest` and read the JSON
-- [ ] The unit test passes
-- [ ] Commit: `feat(web): web app manifest`
+- [x] Write the unit test `tests/unit/manifest.test.ts` first and see it fail: required fields exist, `display` is `standalone`, there is no `orientation` member, `start_url` and `scope` are `/`, icons include 192 and 512 `any` and a 512 `maskable`, `theme_color` and `background_color` equal the token values in `src/lib/theme.ts` and `tokens.css`
+- [x] Create `apps/web/src/app/manifest.ts` returning `MetadataRoute.Manifest`:
+  - [x] `name`, `short_name`, `description` (one plain sentence), `lang: "en"`
+  - [x] `id: "/"`, `start_url: "/"`, `scope: "/"`
+  - [x] `display: "standalone"` and no `orientation` member (step 1)
+  - [x] `background_color` and `theme_color` from the tokens (import the values, never retype hex codes)
+  - [x] `categories: ["lifestyle", "education"]` (check the allowed list; keep only well-known values)
+  - [x] `icons` for the four PNGs above, with the correct `sizes`, `type` and `purpose`
+- [x] Open `http://localhost:3000/manifest.webmanifest` and read the JSON
+- [x] The unit test passes
+- [x] Commit: `feat(web): web app manifest` (2026-11-17: `src/app/manifest.ts`, `tests/unit/manifest.test.ts` with 7 tests incl. that every listed icon exists with the size it claims; served as `application/manifest+json` and linked from the head; theme and background colour are both Night swell navy, one pair for both schemes)
 
 ## 4. Shortcuts and screenshots
 
-- [ ] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" (`/bible`; the reader is on in Production since 2026-11-16)
-- [ ] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader (it is on in Production since 2026-11-16)
-- [ ] Add `label` and `type: "image/png"` to every screenshot
-- [ ] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`
-- [ ] Commit: `feat(web): manifest shortcuts and screenshots`
+- [x] `shortcuts`: "Start here" (`/#start`) with a short name and a 96 px icon (long-pressing the icon on Android lists it); "Prayer request" is added when that feature is built; add "Bible" (`/bible`; the reader is on in Production since 2026-11-16)
+- [x] `screenshots`: at least one narrow (`form_factor: "narrow"`, 375 x 812 or similar, PNG) of the landing page and one of a devotional, taken from the real site in Dawn patrol (Android shows these on the richer install sheet); add one of the Bible reader (it is on in Production since 2026-11-16)
+- [x] Add `label` and `type: "image/png"` to every screenshot
+- [x] Extend the unit test: shortcut URLs are inside `scope`, every screenshot has `sizes` and `type`
+- [x] Commit: `feat(web): manifest shortcuts and screenshots` (2026-11-17: shortcuts Start here and Bible, the Bible entries only while `BIBLE_ENABLED=1` (read when the manifest is built); three 750 x 1624 screenshots in `public/screenshots`, made by `pnpm make:screenshots` against a local production build with `DEVOTIONAL_TODAY=2026-11-28 BIBLE_ENABLED=1`; the Prayer request shortcut waits for 1.4; review page: `docs/design/pwa_screenshots.html`). Retake the screenshots if the landing page, the devotional page or the reader changes visibly
 
 ## 5. iOS and the viewport
 
-- [ ] In `layout.tsx` add `metadata.appleWebApp`: `capable: true`, `title: "Word on the Water"`, `statusBarStyle: "default"` (try `black-translucent` only if the header handles the status bar area). Checked in Next 16.4.6: `capable: true` emits `mobile-web-app-capable`, and Safari 26 opens any site added to the home screen as a web app anyway, so `capable` is optional
-- [ ] Confirm the existing `viewport` already has `viewportFit: "cover"` and `themeColor` per colour scheme (it does); keep the safe-area padding on the header, the Bible sheet and the chapter bar
-- [ ] Check that links to other sites open in the browser and not inside the installed window (the ESV link, social links); same-site links stay inside
-- [ ] Commit: `feat(web): iOS home screen metadata`
+- [x] In `layout.tsx` add `metadata.appleWebApp`: `capable: true`, `title: "Word on the Water"`, `statusBarStyle: "default"` (try `black-translucent` only if the header handles the status bar area). Checked in Next 16.4.6: `capable: true` emits `mobile-web-app-capable`, and Safari 26 opens any site added to the home screen as a web app anyway, so `capable` is optional
+- [x] Confirm the existing `viewport` already has `viewportFit: "cover"` and `themeColor` per colour scheme (it does); keep the safe-area padding on the header, the Bible sheet and the chapter bar
+- [x] Check that links to other sites open in the browser and not inside the installed window (the ESV link, social links); same-site links stay inside
+- [x] Commit: `feat(web): iOS home screen metadata` (2026-11-17: `appleWebApp` is in `siteMetadata` (`src/lib/seo.ts`) with `capable: true`, `statusBarStyle: "default"` and the title **"WotW"**, not the full name as first written, because iOS cuts a label under the icon at about 11 characters and this matches the manifest short name; change it in one place if you prefer the long name. Rendered head checked on a production build: `viewport-fit=cover`, a `theme-color` per scheme, `mobile-web-app-capable`, the title and the status bar style. No link in the code uses `target="_blank"`, so outside links are left to the installed app, which shows them in the browser's own view; confirm on a phone in step 8. The header needs no top inset with the `default` status bar; the footer, chapter bar and sheets already pad for the bottom)
 
 ## 6. Security headers and CSP
 
-- [ ] Confirm the nonce CSP in `src/proxy.ts` does not block the manifest or icons (they are same-origin, so `default-src 'self'` and `img-src 'self' data:` cover them)
-- [ ] The proxy matcher (checked 2026-11-16) skips only `api/`, `_next/static/`, `_next/image` and `favicon.ico`, so `/manifest.webmanifest`, `/icons/*` and the apple icon go through the proxy and get a nonce and CSP headers. That does no harm; decide whether to add them to the exclusion (fewer per-request runs) or accept it. The e2e test below proves they load either way
-- [ ] Write the e2e test `tests/e2e/pwa.spec.ts` first: `/manifest.webmanifest` returns 200 with a manifest content type, every icon and screenshot URL in it returns 200 with an `image/png` type, and no CSP violation is logged on the page (the `link rel="manifest"` and apple icon are in the head)
-- [ ] Run it on all six projects with `make e2e` (Firefox runs in CI only on the current macOS beta)
-- [ ] Commit: `test(web): manifest and icons load under the CSP`
+- [x] Confirm the nonce CSP in `src/proxy.ts` does not block the manifest or icons (they are same-origin, so `default-src 'self'` and `img-src 'self' data:` cover them)
+- [x] The proxy matcher (decided 2026-11-17: leave the matcher as it is; the extra run happens only at install time and does no harm) (checked 2026-11-16) skips only `api/`, `_next/static/`, `_next/image` and `favicon.ico`, so `/manifest.webmanifest`, `/icons/*` and the apple icon go through the proxy and get a nonce and CSP headers. That does no harm; decide whether to add them to the exclusion (fewer per-request runs) or accept it. The e2e test below proves they load either way
+- [x] Write the e2e test `tests/e2e/pwa.spec.ts` first: `/manifest.webmanifest` returns 200 with a manifest content type, every icon and screenshot URL in it returns 200 with an `image/png` type, and no CSP violation is logged on the page (the `link rel="manifest"` and apple icon are in the head)
+- [x] Run it on all six projects with `make e2e` (the five that run locally pass; Firefox runs in CI) (Firefox runs in CI only on the current macOS beta)
+- [x] Commit: `test(web): manifest and icons load under the CSP` (2026-11-17: `tests/e2e/pwa.spec.ts`, 5 tests: the head links, the manifest and its content type, every icon, shortcut icon and screenshot is a loading PNG, every shortcut opens a page, and the page loads every icon with no CSP violation. A mutation check (pointing one icon at a missing file) made it fail with 404, so it does catch a broken manifest)
 
 ## 7. Check it in the browser (desktop)
 
 - [ ] `pnpm build && pnpm start` and open the site in Chrome
 - [ ] DevTools, Application, Manifest: no errors or warnings, the icons and the maskable preview show, "Installability" says the page can be installed
-- [ ] Click the install icon in the address bar, install, and check it opens in its own window with the right name and icon
+- [ ] (Desktop Chrome was opened on the preview on 2026-11-17 and only the Turnstile error was reported; the Manifest panel result and the desktop install were not reported, so these four stay unticked) Click the install icon in the address bar, install, and check it opens in its own window with the right name and icon
 - [ ] Uninstall it again
 
 ## 8. Check it on a real phone
 
 HTTPS is needed. Use a Vercel preview deployment (the best test, the real production build) or an ngrok tunnel to `pnpm start`. For `pnpm dev` over Wi-Fi, `DEV_ORIGINS` in the root `.env` is enough to open the site but it is plain HTTP, so install does not work there.
 
-- [ ] Deploy a preview (open the PR; Deployment Protection may ask you to log in) **(Hendrik: Vercel preview settings)**
+- [x] Deploy a preview (PR #136, 2026-11-17)
 - [ ] Previews are behind Deployment Protection. Next adds `crossorigin="use-credentials"` to the manifest link on Vercel previews (checked in Next 16.4.6, `metadata-elements.js`), so the manifest loads while you are logged in. The icons, and the apple icon iOS fetches, are probably requested without your login and may show as missing. Not confirmed: if they do, test with the protection bypass or on the real domain once it is live (production checklist, Part G) before blaming the icons
-- [ ] **Android Chrome:** the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
-- [ ] **iPhone Safari:** Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
+- [x] **Android Chrome:** (2026-11-17: passed on an Android emulator, reported by Hendrik) the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
+- [ ] **iPhone Safari:** (2026-11-17: the icon and the "WotW" label looked good on an iPhone; the rest was not reported, so not ticked) Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
 - [ ] The theme colour of the browser bar follows light and dark
 - [ ] Links, the menu, the sign-up form and the `/thank-you` page work in the installed window; Got Questions opens and closes, and the Bible picker sheet, the chapter bar and the Your chat button work too (both features are on in Production, and in previews, where their Vercel variables are also set) (there is no browser Back button on iPhone, so every page must have a way back inside the page)
 - [ ] Rotate the phone and check nothing breaks
-- [ ] Note any problem in the PR
+- [x] Note any problem in the PR (2026-11-17: Chrome showed a Cloudflare Turnstile error 110200, "domain not allowed", on the per-deployment preview address `wotw-<hash>-thecodeblock.vercel.app`. It is the sign-up widget, not the PWA: this branch changes no sign-up code, and the preview already uses the preview widget key. Open: whether the preview widget lists that host, a Cloudflare dashboard check; production needs only `wordonthewater.net` and `www`, checked in Part G)
 
 ## 9. Docs and PLAN.md
 
-- [ ] Tick the matching items in Part C of [production_checklist.md](production_checklist.md) as each is verified (the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 moved there, so PLAN.md has nothing to tick)
-- [ ] Add a line to the README: how to install the site on a phone (two sentences)
-- [ ] Update `CLAUDE.md` (the status line and the repository layout: `manifest.ts`, `apple-icon.png`, `public/icons`, `scripts/make-icons.mts`)
-- [ ] Open the PR with phone screenshots (install prompt and the home screen icon) and merge only when every check is green
+- [x] Tick the matching items in Part C of [production_checklist.md](production_checklist.md) as each is verified (the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 moved there, so PLAN.md has nothing to tick)
+- [x] Add a line to the README: how to install the site on a phone (two sentences)
+- [x] Update `CLAUDE.md` (the status line and the repository layout: `manifest.ts`, `apple-icon.png`, `public/icons`, `scripts/make-icons.mts`)
+- [ ] Open the PR with phone screenshots (PR #136 is open; the phone screenshots come from steps 7 and 8) (install prompt and the home screen icon) and merge only when every check is green
 
 ## 10. Later (not Phase 1)
 

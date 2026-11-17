@@ -30,6 +30,16 @@ describe("the site-wide metadata", () => {
   });
 });
 
+describe("the iOS home screen settings", () => {
+  it("opens as a web app, labelled with the short name and a status bar that keeps the header clear", () => {
+    expect(siteMetadata.appleWebApp).toEqual({
+      capable: true,
+      title: "WotW",
+      statusBarStyle: "default",
+    });
+  });
+});
+
 describe("page metadata", () => {
   it("the home page is its own canonical address", () => {
     expect(homeMetadata.alternates?.canonical).toBe("/");

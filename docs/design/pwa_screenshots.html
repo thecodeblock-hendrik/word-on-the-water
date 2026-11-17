@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PWA screenshots and icons</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0; padding: 24px 16px 64px; background: #f4f1ea; color: #1b2430; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  h2 { font-size: 1.05rem; margin: 40px 0 12px; }
+  p { margin: 0 0 12px; max-width: 60ch; color: #4a5560; }
+  .row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  figure { margin: 0; }
+  figcaption { font-size: .85rem; margin-top: 6px; color: #4a5560; }
+  .shot img { width: 280px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.2); display: block; }
+  .icons img { display: block; background: repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 0 0 / 16px 16px; }
+  .round img { border-radius: 50%; }
+  .square img { border-radius: 22%; }
+</style>
+</head>
+<body>
+<h1>PWA screenshots and icons</h1>
+<p>These are the real files the manifest lists, so what you see is what the Android install sheet shows. Regenerate with <code>pnpm make:screenshots</code> and <code>pnpm make:icons</code> in <code>apps/web</code>.</p>
+
+<h2>Screenshots (narrow, 750 x 1624, Dawn patrol)</h2>
+<div class="row shot">
+  <figure><img src="../../apps/web/public/screenshots/landing.png" alt="The landing page"><figcaption>The landing page</figcaption></figure>
+  <figure><img src="../../apps/web/public/screenshots/devotional.png" alt="A devotional"><figcaption>A devotional</figcaption></figure>
+  <figure><img src="../../apps/web/public/screenshots/bible.png" alt="The Bible reader"><figcaption>The Bible reader</figcaption></figure>
+</div>
+
+<h2>Icons</h2>
+<div class="row icons">
+  <figure><img src="../../apps/web/public/icons/icon-512.png" width="192" alt="512 any"><figcaption>icon-512 (any)</figcaption></figure>
+  <figure class="round"><img src="../../apps/web/public/icons/icon-maskable-512.png" width="192" alt="maskable, circle crop"><figcaption>maskable, circle crop</figcaption></figure>
+  <figure class="square"><img src="../../apps/web/public/icons/icon-maskable-512.png" width="192" alt="maskable, squircle crop"><figcaption>maskable, squircle crop</figcaption></figure>
+  <figure class="square"><img src="../../apps/web/src/app/apple-icon.png" width="120" alt="apple icon"><figcaption>apple-icon (iOS, 180 px)</figcaption></figure>
+  <figure><img src="../../apps/web/public/icons/icon-96.png" width="96" alt="shortcut icon"><figcaption>icon-96 (shortcuts)</figcaption></figure>
+</div>
+</body>
+</html>
