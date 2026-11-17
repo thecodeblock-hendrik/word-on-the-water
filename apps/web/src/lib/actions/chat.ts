@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 import { apiFetch } from "@/lib/api-client";
 import { isChatEnabled } from "@/lib/chat/flag";
-import { submitChat, type ChatInput, type ChatResult } from "@/lib/chat/submit";
+import { submitChat, warmApi, type ChatInput, type ChatResult } from "@/lib/chat/submit";
 import { clientIpFrom } from "@/lib/signup";
 
 /** The chat's Server Action: hands one turn to the API. Nothing is stored or logged here. */
@@ -13,4 +13,9 @@ export async function sendChat(input: ChatInput): Promise<ChatResult> {
     return { ok: false, message: "Got Questions is not available right now." };
   }
   return submitChat(input, clientIpFrom(await headers()), apiFetch);
+}
+
+/** Called when the chat opens: this wakes the web function that will carry the first question, and the API behind it. */
+export async function warmChat(): Promise<void> {
+  if (isChatEnabled()) await warmApi(apiFetch);
 }

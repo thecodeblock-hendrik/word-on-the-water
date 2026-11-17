@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { submitChat, type ChatInput } from "@/lib/chat/submit";
+import { submitChat, warmApi, type ChatInput } from "@/lib/chat/submit";
 
 const reply = {
   kind: "no_answer",
@@ -76,5 +76,20 @@ describe("submitChat", () => {
   it("never puts the message in an error result", async () => {
     const result = await submitChat(input, undefined, respond(429));
     expect(JSON.stringify(result)).not.toContain("Jesus");
+  });
+});
+
+describe("warmApi", () => {
+  it("makes one cheap health call so the API function is awake before the first question", async () => {
+    const post = respond(200, { status: "ok" });
+
+    await warmApi(post);
+
+    expect(post).toHaveBeenCalledOnce();
+    expect(post).toHaveBeenCalledWith("/health/live", {});
+  });
+
+  it("never fails, because nobody is waiting for the answer", async () => {
+    await expect(warmApi(vi.fn().mockRejectedValue(new Error("down")))).resolves.toBeUndefined();
   });
 });

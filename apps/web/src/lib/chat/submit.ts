@@ -59,3 +59,15 @@ export async function submitChat(
   const parsed = parseReply(await response.json().catch(() => null));
   return parsed.success ? { ok: true, reply: parsed.data } : wrong;
 }
+
+/**
+ * Wakes the API function with a cheap call. Both functions sleep when idle and the first request
+ * after a pause is slow; calling this when the chat opens moves that wait out of the first question.
+ */
+export async function warmApi(post: Post): Promise<void> {
+  try {
+    await post("/health/live", {});
+  } catch {
+    // Nobody waits for this, and a real question will report any failure.
+  }
+}

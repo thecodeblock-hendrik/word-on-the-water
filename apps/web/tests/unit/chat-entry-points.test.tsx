@@ -8,7 +8,7 @@ import { Header } from "@/components/layout/header";
 import { Start } from "@/components/sections/start";
 
 vi.mock("@/lib/actions/theme", () => ({ setTheme: vi.fn() }));
-vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn() }));
+vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn(), warmChat: vi.fn() }));
 
 beforeEach(() => vi.stubEnv("CHAT_ENABLED", "1"));
 afterEach(() => {

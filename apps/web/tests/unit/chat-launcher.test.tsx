@@ -6,10 +6,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatHost } from "@/components/chat/chat-host";
 import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { Start } from "@/components/sections/start";
+import { warmChat } from "@/lib/actions/chat";
 
-vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn() }));
+vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn(), warmChat: vi.fn() }));
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.mocked(warmChat).mockClear();
+});
 
 describe("ChatLauncher", () => {
   it("is a mail link before any script runs", () => {
@@ -41,6 +45,27 @@ describe("ChatLauncher", () => {
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(link).toHaveFocus();
+  });
+
+  it("wakes the servers on the first open, once, so the first question is not slow", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <ChatLauncher className="x" />
+        <ChatHost />
+      </>,
+    );
+    expect(warmChat).not.toHaveBeenCalled();
+    const link = screen.getByRole("link", { name: "Got Questions" });
+
+    await user.click(link);
+    await screen.findByRole("dialog", { name: "Got Questions" });
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    await user.click(link);
+    await screen.findByRole("dialog", { name: "Got Questions" });
+
+    expect(warmChat).toHaveBeenCalledOnce();
   });
 
   it("does not load the chat until the first click", () => {
