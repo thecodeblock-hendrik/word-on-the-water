@@ -5,10 +5,10 @@ import {
   audienceFromArgs,
   BROADCAST_SENDER,
   broadcastDraft,
+  checkBannerReachable,
   createBroadcastDraft,
-  EMAIL_ART,
+  EMAIL_IMAGE_BASE,
   emailSeries,
-  SERIES_IMAGE_BASE,
 } from "@/lib/devotionals/kit-broadcast";
 import { loadDevotionals } from "@/lib/devotionals/load";
 import { loadSeries } from "@/lib/devotionals/series-load";
@@ -91,17 +91,23 @@ describe("audienceFromArgs", () => {
 describe("emailSeries", () => {
   const [advent] = loadSeries();
 
-  it("gives the series line, the email image address and the art's alt text", () => {
+  it("serves the banner from the site's own fixed address, never from a branch", () => {
+    expect(EMAIL_IMAGE_BASE).toBe("https://wordonthewater.net/email");
     expect(emailSeries(advent, 1)).toEqual({
       position: "Advent · 1 of 5",
-      image: { url: `${SERIES_IMAGE_BASE}/advent/${EMAIL_ART}`, alt: advent.artAlt },
+      image: { url: "https://wordonthewater.net/email/advent-banner.jpg", alt: advent.artAlt },
     });
   });
 
-  it("takes another image base, for a preview branch or the live site", () => {
+  it("takes another image base, to test before the site is live (never to send)", () => {
     expect(emailSeries(advent, 2, "https://example.test/s").image?.url).toBe(
-      `https://example.test/s/advent/${EMAIL_ART}`,
+      "https://example.test/s/advent-banner.jpg",
     );
+  });
+
+  it("has no header image for a series without an email banner", () => {
+    const plain = { ...advent, emailBanner: undefined };
+    expect(emailSeries(plain, 1)).toEqual({ position: "Advent · 1 of 5" });
   });
 
   it("puts the series header into the draft's content", () => {
@@ -109,5 +115,34 @@ describe("emailSeries", () => {
     const withSeries = broadcastDraft(devotional, { siteUrl: SITE, audience: "all", series });
     expect(withSeries.content).toBe(devotionalEmailHtml(devotional, { siteUrl: SITE, series }));
     expect(withSeries.content).toContain(series.image!.url);
+  });
+});
+
+describe("checkBannerReachable", () => {
+  const URL_ = "https://wordonthewater.net/email/advent-banner.jpg";
+  const respond = (status: number, type = "image/jpeg") =>
+    vi.fn().mockResolvedValue(new Response("x", { status, headers: { "content-type": type } }));
+
+  it("passes for an image that loads", async () => {
+    const fetchImpl = respond(200);
+    await expect(checkBannerReachable(URL_, fetchImpl)).resolves.toBeUndefined();
+    expect(fetchImpl).toHaveBeenCalledWith(URL_, expect.objectContaining({ method: "HEAD" }));
+  });
+
+  it("refuses to go on when the banner is missing, naming the address and the likely cause", async () => {
+    await expect(checkBannerReachable(URL_, respond(404))).rejects.toThrow(
+      /advent-banner\.jpg answered 404[\s\S]*(merged|deploy)/,
+    );
+  });
+
+  it("refuses an address that answers with something other than an image", async () => {
+    await expect(checkBannerReachable(URL_, respond(200, "text/html"))).rejects.toThrow(
+      /not an image/,
+    );
+  });
+
+  it("refuses when the address cannot be reached at all", async () => {
+    const down = vi.fn().mockRejectedValue(new Error("getaddrinfo ENOTFOUND"));
+    await expect(checkBannerReachable(URL_, down)).rejects.toThrow(/could not be reached/);
   });
 });

@@ -7,26 +7,46 @@ const KIT_URL = "https://api.kit.com/v4";
 /** The public contact address, as in the footer and the Kit account's default sender. */
 export const BROADCAST_SENDER = "hello@wordonthewater.net";
 
-/** The email-sized banner in each series folder (1200 px wide, under 100 KB). */
-export const EMAIL_ART = "art-night-swell-email.jpg";
-
 /**
- * Where email images are fetched from: the public repository, which works before the site is live.
- * At launch this moves to the site's own content address (production_checklist.md).
+ * Where email images are fetched from: plain files in apps/web/public/email, served by the live
+ * site at a fixed address. An email lives in inboxes for years, so an image address must never
+ * move or change: no branch, no hash, and a changed banner gets a new file name.
  */
-export const SERIES_IMAGE_BASE =
-  "https://raw.githubusercontent.com/thecodeblock-hendrik/word-on-the-water/main/apps/web/content/series";
+export const EMAIL_IMAGE_BASE = "https://wordonthewater.net/email";
 
-/** The series line and header image for a devotional's email. */
+/** The series line and, when the series has an email banner, its header image. */
 export function emailSeries(
   series: Series,
   number: number,
-  imageBase: string = SERIES_IMAGE_BASE,
+  imageBase: string = EMAIL_IMAGE_BASE,
 ): EmailSeries {
-  return {
-    position: seriesPosition(series, number),
-    image: { url: `${imageBase}/${series.slug}/${EMAIL_ART}`, alt: series.artAlt },
-  };
+  const position = seriesPosition(series, number);
+  if (!series.emailBanner) return { position };
+  return { position, image: { url: `${imageBase}/${series.emailBanner}`, alt: series.artAlt } };
+}
+
+/**
+ * Stops a draft whose banner would not show: an email cannot be fixed after it is sent. Run before
+ * the draft is created, so a missing or unmerged image fails here and not in a reader's inbox.
+ */
+export async function checkBannerReachable(
+  url: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetchImpl(url, { method: "HEAD" });
+  } catch {
+    throw new Error(`The email banner could not be reached at ${url}. Is the site live?`);
+  }
+  if (!response.ok) {
+    throw new Error(
+      `The email banner at ${url} answered ${response.status}. Merge and deploy the banner first.`,
+    );
+  }
+  if (!response.headers.get("content-type")?.startsWith("image/")) {
+    throw new Error(`The email banner at ${url} is not an image (it answered with another type).`);
+  }
 }
 
 /** A tag id, or "all" for every subscriber on purpose: there is no default audience. */
