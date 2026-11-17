@@ -22,6 +22,20 @@ describe("BOOKS", () => {
     for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
   });
 
+  it("has a standard short name for every book, unique and short enough for a narrow button", () => {
+    const shorts = BOOKS.map((b) => b.short);
+    expect(new Set(shorts).size).toBe(66);
+    for (const book of BOOKS) {
+      expect(book.short.length, book.name).toBeLessThanOrEqual(book.name.length);
+      expect(book.short.length, book.name).toBeLessThanOrEqual(8);
+    }
+    expect(findBook("matthew")!.short).toBe("Matt");
+    expect(findBook("1-thessalonians")!.short).toBe("1 Thess");
+    expect(findBook("song-of-solomon")!.short).toBe("Song");
+    expect(findBook("psalms")!.short).toBe("Ps");
+    expect(findBook("john")!.short).toBe("John");
+  });
+
   it("has 1,189 chapters in total", () => {
     expect(BOOKS.reduce((sum, b) => sum + b.chapters, 0)).toBe(1189);
   });

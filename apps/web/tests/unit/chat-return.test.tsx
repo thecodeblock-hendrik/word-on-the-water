@@ -15,22 +15,26 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("ChatReturn, the floating Your chat button in the Bible", () => {
+describe("ChatReturn, the Your chat tab in the Bible", () => {
   it("is not there when the visitor did not come from the chat", () => {
     render(<ChatReturn />);
     expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
 
-  it("is a round ink button of 60px with its words under it, marked so the page can leave room", async () => {
+  it("is a round ink button of 56px with its words under it, in a bump the bar's top line follows", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
-    const link = await screen.findByRole("button", { name: /^your chat$/i });
-    const round = link.querySelector("span");
+    const button = await screen.findByRole("button", { name: /^your chat$/i });
+    const round = button.querySelector("span");
     expect(round?.className).toMatch(/\bbg-ink\b/);
-    expect(round?.className).toMatch(/size-\[60px\]/);
+    expect(round?.className).toMatch(/max-lg:size-14/);
     expect(round?.className).toMatch(/rounded-full/);
-    expect(link).toHaveTextContent("Your chat");
-    expect(link.closest("[data-chat-return]")).not.toBeNull();
+    expect(button).toHaveTextContent("Your chat");
+    const root = button.closest("[data-chat-return]")!;
+    const bump = root.querySelector("svg[data-chat-bump]");
+    expect(bump).not.toBeNull();
+    expect(bump?.getAttribute("aria-hidden")).toBe("true");
+    expect(bump?.querySelectorAll("path").length).toBe(2);
   });
 
   it("opens the chat over the page without leaving it, and clears the way back", async () => {

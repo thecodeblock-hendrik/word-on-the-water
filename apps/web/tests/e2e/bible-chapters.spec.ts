@@ -227,11 +227,13 @@ test.describe("tablet width on a desktop browser", () => {
 });
 
 // The widest labels in the Bible, in the neighbours a reader sees: Song of Solomon 8, 2 Thessalonians
-// 3 and 1 Corinthians 14. Plain (non-mobile) windows, so the widths are exact.
+// 3, 1 Thessalonians 5, Deuteronomy 34 and 1 Corinthians 14. Plain (non-mobile) windows, so the widths are exact.
 const LONG_NAMES = [
   "/bible/bsb/song-of-solomon/7",
   "/bible/bsb/2-thessalonians/2",
   "/bible/bsb/1-corinthians/15",
+  "/bible/bsb/1-thessalonians/4",
+  "/bible/bsb/deuteronomy/33",
 ];
 
 for (const width of [320, 360, 375, 390, 412]) {
@@ -248,7 +250,13 @@ for (const width of [320, 360, 375, 390, 412]) {
         const label = `${path}: ${await link.innerText()}`;
         expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
         expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-        expect(await link.innerText(), label).not.toMatch(/[←→]/);
+        await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
+        // The full name is what shows (the short form is only for the chat button), and it all fits.
+        expect(await link.locator(".truncate").innerText(), label).toMatch(/[a-z]{4,}/);
+        expect(
+          await link.locator(".truncate").evaluate((el) => el.scrollWidth <= el.clientWidth),
+          `${label}: the name is cut off`,
+        ).toBe(true);
       }
     }
   });

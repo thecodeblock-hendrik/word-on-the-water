@@ -213,49 +213,117 @@ test.describe("with the chat on", () => {
       await expect(fresh.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
-    test("on a phone it is a round button centred above the bar, covering neither Previous nor Next", async ({
+    test("on a phone it is a round button between Previous and Next, inside a bump the bar's top line follows", async ({
       page,
     }) => {
       test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
       await readVerse(page);
+      const button = page.getByRole("button", { name: "Your chat", exact: true });
+      const round = (await button.locator("span").first().boundingBox())!;
       const bar = page.getByRole("navigation", { name: "Previous and next chapter" });
-      const round = (await page
-        .getByRole("button", { name: "Your chat", exact: true })
-        .boundingBox())!;
+      const barBox = (await bar.boundingBox())!;
       const prev = (await bar.getByRole("link", { name: /Previous chapter/ }).boundingBox())!;
       const next = (await bar.getByRole("link", { name: /Next chapter/ }).boundingBox())!;
-      // Clear of both chapter buttons, so it takes no room from their book names.
-      expect(round.y + round.height).toBeLessThanOrEqual(prev.y);
-      expect(round.y + round.height).toBeLessThanOrEqual(next.y);
-      // Centred between them, above the bar, and 44px or more to tap.
+      for (const [link, text] of [
+        [/Previous chapter/, "John 2"],
+        [/Next chapter/, "John 4"],
+      ] as const) {
+        expect(await bar.getByRole("link", { name: link }).locator(".truncate").innerText()).toBe(
+          text,
+        );
+      }
+      const bump = (await bar.locator("svg[data-chat-bump]").boundingBox())!;
       const width = page.viewportSize()!.width;
-      expect(Math.abs(round.x + round.width / 2 - width / 2)).toBeLessThan(8);
-      const barBox = (await bar.boundingBox())!;
-      expect(round.y).toBeLessThan(barBox.y);
+
+      // Between the two chapter buttons and clear of both, centred, 44px or more to tap.
+      expect(Math.abs(round.x + round.width / 2 - width / 2)).toBeLessThan(4);
+      expect(round.x).toBeGreaterThanOrEqual(prev.x + prev.width);
+      expect(round.x + round.width).toBeLessThanOrEqual(next.x);
       expect(round.width).toBeGreaterThanOrEqual(44);
+      expect(round.height).toBeGreaterThanOrEqual(44);
+      // Rises out of the bar, and the bump encloses it and meets the bar's top line.
+      expect(round.y).toBeLessThan(barBox.y);
+      expect(round.y + round.height).toBeGreaterThan(barBox.y + 20);
+      expect(bump.y).toBeLessThan(round.y);
+      expect(bump.x).toBeLessThan(round.x);
+      expect(bump.x + bump.width).toBeGreaterThan(round.x + round.width);
+      expect(Math.abs(bump.y + bump.height - (barBox.y + 1.5))).toBeLessThanOrEqual(2);
+      // Neither chapter button is covered by it.
+      for (const point of [
+        { x: prev.x + prev.width / 2, y: prev.y + prev.height / 2 },
+        { x: next.x + next.width / 2, y: next.y + next.height / 2 },
+      ]) {
+        const hit = await page.evaluate(
+          ({ x, y }) => document.elementFromPoint(x, y)?.closest("a")?.getAttribute("href"),
+          point,
+        );
+        expect(hit).toMatch(/^\/bible\/web\/john\/\d+$/);
+      }
       await expect(page.getByRole("button", { name: /Hide the Your chat button/ })).toBeHidden();
     });
 
-    test("at the end of a long chapter its words and the passage credit do not overlap", async ({
+    test("at the end of a long chapter the passage credit is clear of the bump", async ({
       page,
     }) => {
       test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
       await readVerse(page);
       await page.goto("/bible/web/psalms/119");
-      // The button, and the room the page keeps for it, appear when the page hydrates: scroll only
+      // The bump, and the room the page keeps for it, appear when the page hydrates: scroll only
       // after that, or the page grows below the point just scrolled to (seen on a slow CI runner).
       await expect(page.getByRole("button", { name: "Your chat", exact: true })).toBeVisible();
       await page.evaluate(() =>
         window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
       );
-      const round = (await page
-        .getByRole("button", { name: "Your chat", exact: true })
-        .boundingBox())!;
+      const bump = (await page.locator("svg[data-chat-bump]").boundingBox())!;
       const credit = (await page
         .getByText("World English Bible (WEB), public domain")
         .boundingBox())!;
-      expect(credit.y + credit.height).toBeLessThanOrEqual(round.y + 1);
+      expect(credit.y + credit.height).toBeLessThanOrEqual(bump.y + 1);
     });
+
+    test("on a phone the chapter buttons use the short names, and are named for what is shown", async ({
+      browser,
+    }) => {
+      const open = async (chatReturn: boolean) => {
+        const context = await browser.newContext({
+          baseURL: CHAT,
+          viewport: { width: 375, height: 800 },
+        });
+        if (chatReturn) {
+          await context.addInitScript(() => sessionStorage.setItem("wotw-chat-return", "/"));
+        }
+        const page = await context.newPage();
+        await page.goto("/bible/web/matthew/16");
+        return page;
+      };
+      const withChat = await open(true);
+      await expect(withChat.locator("[data-chat-return]")).toBeVisible();
+      await expect(
+        withChat.getByRole("link", { name: "Previous chapter: Matt 15", exact: true }),
+      ).toBeVisible();
+      await expect(
+        withChat.getByRole("link", { name: "Next chapter: Matt 17", exact: true }),
+      ).toBeVisible();
+      const without = await open(false);
+      await expect(
+        without.getByRole("link", { name: "Previous chapter: Matthew 15", exact: true }),
+      ).toBeVisible();
+      await expect(without.locator("[data-chat-return]")).toHaveCount(0);
+    });
+
+    for (const scheme of ["light", "dark"] as const) {
+      test(`the Bible reader with the Your chat tab showing has no serious accessibility problem in ${scheme}`, async ({
+        page,
+      }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        await readVerse(page);
+        await expect(page.getByRole("button", { name: "Your chat", exact: true })).toBeVisible();
+        const scan = await new AxeBuilder({ page }).analyze();
+        expect(
+          scan.violations.filter((v) => v.impact === "serious" || v.impact === "critical"),
+        ).toEqual([]);
+      });
+    }
 
     for (const width of [320, 360, 375, 390]) {
       test(`with Your chat showing, the chapter buttons keep book and number on one line at ${width}px`, async ({
@@ -279,7 +347,16 @@ test.describe("with the chat on", () => {
             const label = `${path}: ${await link.innerText()}`;
             expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
             expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-            expect(await link.innerText(), label).not.toMatch(/[←→]/);
+            await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
+            // The chat button is in the bar, so the names are the standard short forms, and they show.
+            const shown = await link.locator(".truncate").innerText();
+            expect(shown, label).toMatch(/^(\d )?[A-Z][A-Za-z]+ \d+$/);
+            expect(shown, label).not.toMatch(/Solomon|Thessalonians|Corinthians|Deuteronomy/);
+            // The whole name is shown: the part that can truncate is not truncated.
+            expect(
+              await link.locator(".truncate").evaluate((el) => el.scrollWidth <= el.clientWidth),
+              `${label}: the name is cut off`,
+            ).toBe(true);
           }
         }
         await context.close();

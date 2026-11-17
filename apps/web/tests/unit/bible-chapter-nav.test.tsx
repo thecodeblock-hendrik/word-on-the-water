@@ -15,26 +15,50 @@ const nav = (slug: string, chapter: number, version = "bsb") => {
 describe("ChapterNav", () => {
   it("links to the chapters before and after, named for screen readers and showing the place", () => {
     const n = nav("john", 3);
-    const previous = n.getByRole("link", { name: "Previous chapter: John 2" });
-    const next = n.getByRole("link", { name: "Next chapter: John 4" });
+    const previous = n.getByRole("link", { name: /^Previous chapter: John 2/ });
+    const next = n.getByRole("link", { name: /^Next chapter: John 4/ });
     expect(previous).toHaveAttribute("href", "/bible/bsb/john/2");
     expect(next).toHaveAttribute("href", "/bible/bsb/john/4");
     expect(previous).toHaveTextContent("John 2");
     expect(next).toHaveTextContent("John 4");
   });
 
-  it("shows only the book and chapter on each button, with no arrows", () => {
+  it("puts a left arrow before the previous place and a right arrow after the next, hidden from screen readers", () => {
     const n = nav("john", 3);
-    expect(n.getByRole("link", { name: /^Previous chapter/ }).textContent).toBe("John 2");
-    expect(n.getByRole("link", { name: /^Next chapter/ }).textContent).toBe("John 4");
+    const previous = n.getByRole("link", { name: /^Previous chapter/ });
+    const next = n.getByRole("link", { name: /^Next chapter/ });
+    const arrows = (el: HTMLElement) =>
+      [...el.querySelectorAll("[aria-hidden='true']")].map((a) => a.textContent);
+    expect(arrows(previous)).toEqual(["←"]);
+    expect(arrows(next)).toEqual(["→"]);
+    const order = (el: HTMLElement) => [...el.children].map((c) => c.getAttribute("aria-hidden"));
+    expect(order(previous).slice(1)).toEqual(["true", null]);
+    expect(order(next).slice(1)).toEqual([null, "true"]);
     cleanup();
     expect(nav("genesis", 1).getByRole("button", { name: /Start of the Bible/ }).textContent).toBe(
-      "Start of the Bible",
+      "←Start of the Bible",
     );
     cleanup();
     expect(
       nav("revelation", 22).getByRole("button", { name: /End of the Bible/ }).textContent,
-    ).toBe("End of the Bible");
+    ).toBe("End of the Bible→");
+  });
+
+  it("keeps the name on one line: the arrow never shrinks and the name is the part that can truncate", () => {
+    const link = nav("john", 3).getByRole("link", { name: /^Previous chapter/ });
+    expect(link.querySelector("[aria-hidden='true']")?.className).toMatch(/flex-none/);
+    expect(link.querySelector(".truncate")).not.toBeNull();
+    expect(link.className).toMatch(/min-w-0/);
+  });
+
+  it("shows the full name, and the standard short name only on a phone while Your chat is showing", () => {
+    const link = nav("1-thessalonians", 5).getByRole("link", { name: /^Previous chapter/ });
+    const [full, short] = [...link.querySelectorAll(".truncate > span")] as HTMLElement[];
+    expect(full.textContent).toBe("1 Thessalonians 4");
+    expect(full.className).toMatch(/group-has-\[\[data-chat-return\]\]\/nav:max-lg:hidden/);
+    expect(short.textContent).toBe("1 Thess 4");
+    expect(short.className).toMatch(/^hidden /);
+    expect(short.className).toMatch(/group-has-\[\[data-chat-return\]\]\/nav:max-lg:inline/);
   });
 
   it("puts previous before next in reading order", () => {
@@ -63,7 +87,7 @@ describe("ChapterNav", () => {
 
   it("names the first chapter of a book you step into, with its full name", () => {
     expect(
-      nav("1-john", 5).getByRole("link", { name: "Next chapter: 2 John 1" }),
+      nav("1-john", 5).getByRole("link", { name: /^Next chapter: 2 John 1/ }),
     ).toBeInTheDocument();
   });
 
@@ -71,14 +95,14 @@ describe("ChapterNav", () => {
     const n = nav("genesis", 1);
     expect(n.queryByRole("link", { name: /^Previous chapter/ })).not.toBeInTheDocument();
     expect(n.getByRole("button", { name: /Start of the Bible/ })).toBeDisabled();
-    expect(n.getByRole("link", { name: "Next chapter: Genesis 2" })).toBeInTheDocument();
+    expect(n.getByRole("link", { name: /^Next chapter: Genesis 2/ })).toBeInTheDocument();
   });
 
   it("has no next link at Revelation 22, only a disabled place-holder, and still links back", () => {
     const n = nav("revelation", 22);
     expect(n.queryByRole("link", { name: /^Next chapter/ })).not.toBeInTheDocument();
     expect(n.getByRole("button", { name: /End of the Bible/ })).toBeDisabled();
-    expect(n.getByRole("link", { name: "Previous chapter: Revelation 21" })).toBeInTheDocument();
+    expect(n.getByRole("link", { name: /^Previous chapter: Revelation 21/ })).toBeInTheDocument();
   });
 
   it("stays in the chosen Bible and goes to the whole chapter, never a verse range", () => {
