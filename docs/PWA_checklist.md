@@ -66,11 +66,11 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 6. Security headers and CSP
 
-- [ ] Confirm the nonce CSP in `src/proxy.ts` does not block the manifest or icons (they are same-origin, so `default-src 'self'` and `img-src 'self' data:` cover them)
-- [ ] The proxy matcher (checked 2026-11-16) skips only `api/`, `_next/static/`, `_next/image` and `favicon.ico`, so `/manifest.webmanifest`, `/icons/*` and the apple icon go through the proxy and get a nonce and CSP headers. That does no harm; decide whether to add them to the exclusion (fewer per-request runs) or accept it. The e2e test below proves they load either way
-- [ ] Write the e2e test `tests/e2e/pwa.spec.ts` first: `/manifest.webmanifest` returns 200 with a manifest content type, every icon and screenshot URL in it returns 200 with an `image/png` type, and no CSP violation is logged on the page (the `link rel="manifest"` and apple icon are in the head)
-- [ ] Run it on all six projects with `make e2e` (Firefox runs in CI only on the current macOS beta)
-- [ ] Commit: `test(web): manifest and icons load under the CSP`
+- [x] Confirm the nonce CSP in `src/proxy.ts` does not block the manifest or icons (they are same-origin, so `default-src 'self'` and `img-src 'self' data:` cover them)
+- [x] The proxy matcher (decided 2026-11-17: leave the matcher as it is; the extra run happens only at install time and does no harm) (checked 2026-11-16) skips only `api/`, `_next/static/`, `_next/image` and `favicon.ico`, so `/manifest.webmanifest`, `/icons/*` and the apple icon go through the proxy and get a nonce and CSP headers. That does no harm; decide whether to add them to the exclusion (fewer per-request runs) or accept it. The e2e test below proves they load either way
+- [x] Write the e2e test `tests/e2e/pwa.spec.ts` first: `/manifest.webmanifest` returns 200 with a manifest content type, every icon and screenshot URL in it returns 200 with an `image/png` type, and no CSP violation is logged on the page (the `link rel="manifest"` and apple icon are in the head)
+- [x] Run it on all six projects with `make e2e` (the five that run locally pass; Firefox runs in CI) (Firefox runs in CI only on the current macOS beta)
+- [x] Commit: `test(web): manifest and icons load under the CSP` (2026-11-17: `tests/e2e/pwa.spec.ts`, 5 tests: the head links, the manifest and its content type, every icon, shortcut icon and screenshot is a loading PNG, every shortcut opens a page, and the page loads every icon with no CSP violation. A mutation check (pointing one icon at a missing file) made it fail with 404, so it does catch a broken manifest)
 
 ## 7. Check it in the browser (desktop)
 
