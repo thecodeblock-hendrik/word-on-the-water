@@ -1,6 +1,6 @@
 # PWA checklist
 
-**Status (2026-11-16): not started.** Nothing is built: `manifest.ts`, the icons, `scripts/make-icons.mts` and both tests do not exist, and `apps/web/public` is empty. Launch is Saturday 28 November 2026 and this is the largest unbuilt launch item, so start it early, on a branch. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
+**Status (2026-11-17): built, waiting for the install checks.** Sections 1 to 6 and the docs of section 9 are done on PR #136 (icons, manifest, shortcuts, screenshots, iOS settings, e2e test). What is left is the desktop check (7) and the real phone checks (8) on the PR preview, then the merge. Launch is Saturday 28 November 2026. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
 
 Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
@@ -19,9 +19,9 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 - [x] Icon background colour (decided 2026-11-17: Night swell navy `#0f2233`, one icon for both schemes): Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
 - [x] Start page (decided 2026-11-17): `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
 - [x] Orientation: **no lock** (decided 2026-11-16). Leave `orientation` out of the manifest, so the default (`any`) applies. A portrait lock fails WCAG 1.3.4 (technique failure F97), which this project targets at level AA, and nothing here needs a fixed orientation; users with a mounted device, for example on a wheelchair, can be blocked by a lock. `CLAUDE.md` section 5 and Part C of the production checklist say the same
-- [ ] **Open: offline** (now shared with Web Push: [web_push.md](web_push.md) needs the same single service worker file, so decide the two together). Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
-- [ ] **Open: iOS launch screen.** Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
-- [ ] **Open: desktop install sheet.** Chrome shows only screenshots with `form_factor: "wide"` on desktop, and step 4 plans narrow ones only. Decide whether one wide screenshot is worth adding (optional)
+- [x] **Decided 2026-11-17: no offline page now**; decide it together with Web Push and Phase 3 (the service worker is shared). Was open: offline (now shared with Web Push: [web_push.md](web_push.md) needs the same single service worker file, so decide the two together). Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
+- [x] **Decided 2026-11-17: skip iOS launch screens for now.** Was open: iOS launch screen. Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
+- [x] **Decided 2026-11-17: no wide desktop screenshot.** Was open: desktop install sheet. Chrome shows only screenshots with `form_factor: "wide"` on desktop, and step 4 plans narrow ones only. Decide whether one wide screenshot is worth adding (optional)
 
 ## 2. Icons
 
@@ -94,10 +94,10 @@ HTTPS is needed. Use a Vercel preview deployment (the best test, the real produc
 
 ## 9. Docs and PLAN.md
 
-- [ ] Tick the matching items in Part C of [production_checklist.md](production_checklist.md) as each is verified (the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 moved there, so PLAN.md has nothing to tick)
-- [ ] Add a line to the README: how to install the site on a phone (two sentences)
-- [ ] Update `CLAUDE.md` (the status line and the repository layout: `manifest.ts`, `apple-icon.png`, `public/icons`, `scripts/make-icons.mts`)
-- [ ] Open the PR with phone screenshots (install prompt and the home screen icon) and merge only when every check is green
+- [x] Tick the matching items in Part C of [production_checklist.md](production_checklist.md) as each is verified (the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 moved there, so PLAN.md has nothing to tick)
+- [x] Add a line to the README: how to install the site on a phone (two sentences)
+- [x] Update `CLAUDE.md` (the status line and the repository layout: `manifest.ts`, `apple-icon.png`, `public/icons`, `scripts/make-icons.mts`)
+- [ ] Open the PR with phone screenshots (PR #136 is open; the phone screenshots come from steps 7 and 8) (install prompt and the home screen icon) and merge only when every check is green
 
 ## 10. Later (not Phase 1)
 
