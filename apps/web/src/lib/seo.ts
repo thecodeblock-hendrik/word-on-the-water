@@ -20,6 +20,9 @@ export const siteMetadata: Metadata = {
   applicationName: SITE_NAME,
   openGraph: { type: "website", ...OPEN_GRAPH_BASE },
   twitter: { card: "summary_large_image" },
+  // The label under the home screen icon on iOS: the full name would be cut off, so use the
+  // manifest's short name. "default" keeps the status bar above the header, not over it.
+  appleWebApp: { capable: true, title: "WotW", statusBarStyle: "default" },
 };
 
 /**

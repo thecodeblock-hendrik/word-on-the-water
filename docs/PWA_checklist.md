@@ -59,10 +59,10 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 5. iOS and the viewport
 
-- [ ] In `layout.tsx` add `metadata.appleWebApp`: `capable: true`, `title: "Word on the Water"`, `statusBarStyle: "default"` (try `black-translucent` only if the header handles the status bar area). Checked in Next 16.4.6: `capable: true` emits `mobile-web-app-capable`, and Safari 26 opens any site added to the home screen as a web app anyway, so `capable` is optional
-- [ ] Confirm the existing `viewport` already has `viewportFit: "cover"` and `themeColor` per colour scheme (it does); keep the safe-area padding on the header, the Bible sheet and the chapter bar
-- [ ] Check that links to other sites open in the browser and not inside the installed window (the ESV link, social links); same-site links stay inside
-- [ ] Commit: `feat(web): iOS home screen metadata`
+- [x] In `layout.tsx` add `metadata.appleWebApp`: `capable: true`, `title: "Word on the Water"`, `statusBarStyle: "default"` (try `black-translucent` only if the header handles the status bar area). Checked in Next 16.4.6: `capable: true` emits `mobile-web-app-capable`, and Safari 26 opens any site added to the home screen as a web app anyway, so `capable` is optional
+- [x] Confirm the existing `viewport` already has `viewportFit: "cover"` and `themeColor` per colour scheme (it does); keep the safe-area padding on the header, the Bible sheet and the chapter bar
+- [x] Check that links to other sites open in the browser and not inside the installed window (the ESV link, social links); same-site links stay inside
+- [x] Commit: `feat(web): iOS home screen metadata` (2026-11-17: `appleWebApp` is in `siteMetadata` (`src/lib/seo.ts`) with `capable: true`, `statusBarStyle: "default"` and the title **"WotW"**, not the full name as first written, because iOS cuts a label under the icon at about 11 characters and this matches the manifest short name; change it in one place if you prefer the long name. Rendered head checked on a production build: `viewport-fit=cover`, a `theme-color` per scheme, `mobile-web-app-capable`, the title and the status bar style. No link in the code uses `target="_blank"`, so outside links are left to the installed app, which shows them in the browser's own view; confirm on a phone in step 8. The header needs no top inset with the `default` status bar; the footer, chapter bar and sheets already pad for the bottom)
 
 ## 6. Security headers and CSP
 
