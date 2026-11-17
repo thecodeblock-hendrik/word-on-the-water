@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
+import { warmChat } from "@/lib/actions/chat";
 import { OPEN_CHAT } from "@/lib/chat/open";
 import { cameBackByHistory, chatReturnUrl, clearChatReturn } from "@/lib/chat/return";
 
@@ -18,11 +19,16 @@ export function ChatHost({ bibleLinks = false }: { bibleLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const opener = useRef<HTMLElement | null>(null);
+  const warmed = useRef(false);
 
   useEffect(() => {
     function onOpen(event: Event) {
       opener.current = (event as CustomEvent<HTMLElement | null>).detail;
       clearChatReturn();
+      if (!warmed.current) {
+        warmed.current = true;
+        void warmChat();
+      }
       setLoaded(true);
       setOpen(true);
     }

@@ -28,7 +28,7 @@ describe("content media route", () => {
     );
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("image/png");
-    expect(res.headers.get("cache-control")).toMatch(/public/);
+    expect(res.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
     expect((await res.arrayBuffer()).byteLength).toBeGreaterThan(1000);
   });
 

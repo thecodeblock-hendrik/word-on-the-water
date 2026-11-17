@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: (process.env.DEV_ORIGINS ?? "").split(",").filter(Boolean),
   images: {
     formats: ["image/avif", "image/webp"],
+    // Image URLs carry a content hash, so an optimized copy never goes stale: keep it a year.
+    minimumCacheTTL: 31_536_000,
     // Every image is served by src/app/content, with a content hash in its path. No query strings.
     localPatterns: [{ pathname: "/content/**", search: "" }],
   },

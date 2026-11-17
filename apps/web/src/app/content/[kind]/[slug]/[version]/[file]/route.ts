@@ -23,7 +23,7 @@ export async function GET(_request: Request, { params }: { params: Params }) {
     const image = await readFile(/* turbopackIgnore: true */ join(CONTENT_DIR, kind, slug, file));
     if (hashOf(image) !== version) return new Response("Not found", { status: 404 });
     return new Response(new Uint8Array(image), {
-      headers: { "Content-Type": file.endsWith(".jpg") ? "image/jpeg" : "image/png", "Cache-Control": "public, max-age=3600" },
+      headers: { "Content-Type": file.endsWith(".jpg") ? "image/jpeg" : "image/png", "Cache-Control": "public, max-age=31536000, immutable" },
     });
   } catch {
     return new Response("Not found", { status: 404 });

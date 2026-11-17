@@ -7,7 +7,7 @@ import { ChatHost } from "@/components/chat/chat-host";
 import { ChatReturn } from "@/components/chat/chat-return";
 import { chatReturnUrl, clearChatReturn, markChatLeft } from "@/lib/chat/return";
 
-vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn() }));
+vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn(), warmChat: vi.fn() }));
 
 beforeEach(() => sessionStorage.clear());
 afterEach(() => {
