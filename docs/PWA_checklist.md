@@ -1,6 +1,6 @@
 # PWA checklist
 
-**Status (2026-11-17): built, waiting for the install checks.** Sections 1 to 6 and the docs of section 9 are done on PR #136 (icons, manifest, shortcuts, screenshots, iOS settings, e2e test). What is left is the desktop check (7) and the real phone checks (8) on the PR preview, then the merge. Launch is Saturday 28 November 2026. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
+**Status (2026-11-17): built, waiting for the install checks.** Sections 1 to 6 and the docs of section 9 are done on PR #136 (icons, manifest, shortcuts, screenshots, iOS settings, e2e test). Android and the iPhone icon and name were checked on the preview on 2026-11-17; the desktop install (7) and the rest of the iPhone checks (8) were not reported and are still open, so repeat them on the live domain at launch (production checklist, Part C). Launch is Saturday 28 November 2026. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
 
 Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
@@ -76,7 +76,7 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 - [ ] `pnpm build && pnpm start` and open the site in Chrome
 - [ ] DevTools, Application, Manifest: no errors or warnings, the icons and the maskable preview show, "Installability" says the page can be installed
-- [ ] Click the install icon in the address bar, install, and check it opens in its own window with the right name and icon
+- [ ] (Desktop Chrome was opened on the preview on 2026-11-17 and only the Turnstile error was reported; the Manifest panel result and the desktop install were not reported, so these four stay unticked) Click the install icon in the address bar, install, and check it opens in its own window with the right name and icon
 - [ ] Uninstall it again
 
 ## 8. Check it on a real phone
@@ -85,12 +85,12 @@ HTTPS is needed. Use a Vercel preview deployment (the best test, the real produc
 
 - [x] Deploy a preview (PR #136, 2026-11-17)
 - [ ] Previews are behind Deployment Protection. Next adds `crossorigin="use-credentials"` to the manifest link on Vercel previews (checked in Next 16.4.6, `metadata-elements.js`), so the manifest loads while you are logged in. The icons, and the apple icon iOS fetches, are probably requested without your login and may show as missing. Not confirmed: if they do, test with the protection bypass or on the real domain once it is live (production checklist, Part G) before blaming the icons
-- [ ] **Android Chrome:** (2026-11-17: on a phone, the icon and name looked good; the platform and the other points below are still to confirm) the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
-- [ ] **iPhone Safari:** Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
+- [x] **Android Chrome:** (2026-11-17: passed on an Android emulator, reported by Hendrik) the Install app prompt or menu item appears; install; icon and name on the home screen; opens full screen with the right splash colour; long-press shows the shortcuts
+- [ ] **iPhone Safari:** (2026-11-17: the icon and the "WotW" label looked good on an iPhone; the rest was not reported, so not ticked) Share, Add to Home Screen; icon, name and no black corners on the icon; opens full screen; the status bar and the notch do not cover the header
 - [ ] The theme colour of the browser bar follows light and dark
 - [ ] Links, the menu, the sign-up form and the `/thank-you` page work in the installed window; Got Questions opens and closes, and the Bible picker sheet, the chapter bar and the Your chat button work too (both features are on in Production, and in previews, where their Vercel variables are also set) (there is no browser Back button on iPhone, so every page must have a way back inside the page)
 - [ ] Rotate the phone and check nothing breaks
-- [ ] Note any problem in the PR
+- [x] Note any problem in the PR (2026-11-17: Chrome showed a Cloudflare Turnstile error 110200, "domain not allowed", on the per-deployment preview address `wotw-<hash>-thecodeblock.vercel.app`. It is the sign-up widget, not the PWA: this branch changes no sign-up code, and the preview already uses the preview widget key. Open: whether the preview widget lists that host, a Cloudflare dashboard check; production needs only `wordonthewater.net` and `www`, checked in Part G)
 
 ## 9. Docs and PLAN.md
 
