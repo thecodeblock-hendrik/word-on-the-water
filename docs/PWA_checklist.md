@@ -14,10 +14,10 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 1. Decisions to confirm first
 
-- [ ] Source of the icon: use the existing inline SVG logo (the ring, wave and cross in the header) **(Hendrik: confirm, or supply a master SVG or a 1024 px PNG)**
-- [ ] App names: `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
-- [ ] Icon background colour: Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
-- [ ] Start page: `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
+- [x] Source of the icon (decided 2026-11-17: the existing logo, from `logo.tsx`): use the existing inline SVG logo (the ring, wave and cross in the header) **(Hendrik: confirm, or supply a master SVG or a 1024 px PNG)**
+- [x] App names (decided 2026-11-17): `name` "Word on the Water", `short_name` "WotW" (the short name is what shows under the home screen icon; confirm it is not too cryptic)
+- [x] Icon background colour (decided 2026-11-17: Night swell navy `#0f2233`, one icon for both schemes): Dawn patrol `#fbf3e8` or the deep navy `#0f2233`, and whether one icon is enough for both schemes (manifest icons cannot change with the theme)
+- [x] Start page (decided 2026-11-17): `/` for everyone, with a shortcut to Start here (and a Bible shortcut: the Bible reader is on in Production since 2026-11-16)
 - [x] Orientation: **no lock** (decided 2026-11-16). Leave `orientation` out of the manifest, so the default (`any`) applies. A portrait lock fails WCAG 1.3.4 (technique failure F97), which this project targets at level AA, and nothing here needs a fixed orientation; users with a mounted device, for example on a wheelchair, can be blocked by a lock. `CLAUDE.md` section 5 and Part C of the production checklist say the same
 - [ ] **Open: offline** (now shared with Web Push: [web_push.md](web_push.md) needs the same single service worker file, so decide the two together). Without a service worker the installed app opens to the browser's offline error page when there is no signal, which beach readers will meet. Chrome and MDN do not require a service worker to install. Phase 3 plans offline reading (step 10); decide whether a minimal offline fallback page (a small service worker that precaches one page, served with `Cache-Control: no-cache` and its own CSP) should come now instead
 - [ ] **Open: iOS launch screen.** Safari does not build a splash screen from the manifest, so without `apple-touch-startup-image` links the app shows a plain launch screen (possibly a white flash in the dark theme). Next supports `appleWebApp.startupImage` with one image per device size. Decide: skip it, or generate a few common sizes in the icon script
@@ -25,15 +25,15 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 2. Icons
 
-- [ ] Export the logo as a standalone SVG with no CSS variables (fixed colours), in `apps/web/src/app/icon.svg`
-- [ ] Generate `icon-192.png` and `icon-512.png` (`purpose: "any"`) from it into `apps/web/public/icons/`
-- [ ] Generate `icon-96.png` for the Start here shortcut (step 4)
-- [ ] Generate `icon-maskable-512.png` with the logo inside the central 80% safe zone and a full-bleed background colour
-- [ ] Generate `apple-icon.png` at 180 px (`apps/web/src/app/apple-icon.png`), full-bleed with no transparency (iOS fills transparent areas with black)
-- [ ] Keep `favicon.ico` as it is
-- [ ] Put the generation in a small script (`apps/web/scripts/make-icons.mts`, run with pnpm) so the icons can be rebuilt when the logo changes; commit the PNGs it produces
-- [ ] Check each icon by eye on a light and a dark background, and in the maskable preview at https://maskable.app
-- [ ] Commit: `feat(web): app icons`
+- [x] Export the logo as a standalone SVG with no CSS variables (fixed colours), in `apps/web/src/app/icon.svg`
+- [x] Generate `icon-192.png` and `icon-512.png` (`purpose: "any"`) from it into `apps/web/public/icons/`
+- [x] Generate `icon-96.png` for the Start here shortcut (step 4)
+- [x] Generate `icon-maskable-512.png` with the logo inside the central 80% safe zone and a full-bleed background colour
+- [x] Generate `apple-icon.png` at 180 px (`apps/web/src/app/apple-icon.png`), full-bleed with no transparency (iOS fills transparent areas with black)
+- [x] Keep `favicon.ico` as it is
+- [x] Put the generation in a small script (`apps/web/scripts/make-icons.mts`, run with pnpm) so the icons can be rebuilt when the logo changes; commit the PNGs it produces
+- [x] Check each icon by eye on a light and a dark background, and in the maskable preview at https://maskable.app
+- [x] Commit: `feat(web): app icons` (2026-11-17: master `src/app/icon.svg` on the Night swell navy with the logo's own paths; `pnpm make:icons` renders every PNG with sharp; `tests/unit/icons.test.ts` checks sizes, no transparency, the maskable safe zone and fixed colours. The maskable icon scales the mark to 66% so even the wave tail stays inside the safe circle. Checked by eye; the maskable.app preview is still worth one look)
 
 ## 3. Manifest (test first)
 

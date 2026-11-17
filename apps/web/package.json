@@ -14,6 +14,7 @@
     "e2e": "playwright test",
     "e2e:fast": "playwright test --project=pixel-7 --project=desktop-chromium",
     "check:placeholders": "NODE_NO_WARNINGS=1 node scripts/check-placeholders.mts",
+    "make:icons": "NODE_NO_WARNINGS=1 node scripts/make-icons.mts",
     "check:devotionals": "NODE_NO_WARNINGS=1 node scripts/check-devotionals.mts",
     "build:chat-topics": "NODE_NO_WARNINGS=1 node scripts/build-chat-topics.mts",
     "build:bible": "NODE_NO_WARNINGS=1 node scripts/build-bible.mts",
@@ -52,6 +53,7 @@
     "eslint-config-prettier": "^10.1.8",
     "jsdom": "^31.0.0",
     "prettier": "^3.9.10",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^5.1.0"
