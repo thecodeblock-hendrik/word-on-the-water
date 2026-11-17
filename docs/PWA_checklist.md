@@ -37,17 +37,17 @@ Step by step plan to make Word on the Water an installable web app (a PWA). It e
 
 ## 3. Manifest (test first)
 
-- [ ] Write the unit test `tests/unit/manifest.test.ts` first and see it fail: required fields exist, `display` is `standalone`, there is no `orientation` member, `start_url` and `scope` are `/`, icons include 192 and 512 `any` and a 512 `maskable`, `theme_color` and `background_color` equal the token values in `src/lib/theme.ts` and `tokens.css`
-- [ ] Create `apps/web/src/app/manifest.ts` returning `MetadataRoute.Manifest`:
-  - [ ] `name`, `short_name`, `description` (one plain sentence), `lang: "en"`
-  - [ ] `id: "/"`, `start_url: "/"`, `scope: "/"`
-  - [ ] `display: "standalone"` and no `orientation` member (step 1)
-  - [ ] `background_color` and `theme_color` from the tokens (import the values, never retype hex codes)
-  - [ ] `categories: ["lifestyle", "education"]` (check the allowed list; keep only well-known values)
-  - [ ] `icons` for the four PNGs above, with the correct `sizes`, `type` and `purpose`
-- [ ] Open `http://localhost:3000/manifest.webmanifest` and read the JSON
-- [ ] The unit test passes
-- [ ] Commit: `feat(web): web app manifest`
+- [x] Write the unit test `tests/unit/manifest.test.ts` first and see it fail: required fields exist, `display` is `standalone`, there is no `orientation` member, `start_url` and `scope` are `/`, icons include 192 and 512 `any` and a 512 `maskable`, `theme_color` and `background_color` equal the token values in `src/lib/theme.ts` and `tokens.css`
+- [x] Create `apps/web/src/app/manifest.ts` returning `MetadataRoute.Manifest`:
+  - [x] `name`, `short_name`, `description` (one plain sentence), `lang: "en"`
+  - [x] `id: "/"`, `start_url: "/"`, `scope: "/"`
+  - [x] `display: "standalone"` and no `orientation` member (step 1)
+  - [x] `background_color` and `theme_color` from the tokens (import the values, never retype hex codes)
+  - [x] `categories: ["lifestyle", "education"]` (check the allowed list; keep only well-known values)
+  - [x] `icons` for the four PNGs above, with the correct `sizes`, `type` and `purpose`
+- [x] Open `http://localhost:3000/manifest.webmanifest` and read the JSON
+- [x] The unit test passes
+- [x] Commit: `feat(web): web app manifest` (2026-11-17: `src/app/manifest.ts`, `tests/unit/manifest.test.ts` with 7 tests incl. that every listed icon exists with the size it claims; served as `application/manifest+json` and linked from the head; theme and background colour are both Night swell navy, one pair for both schemes)
 
 ## 4. Shortcuts and screenshots
 
