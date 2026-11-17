@@ -1,6 +1,6 @@
 # PWA checklist
 
-**Status (2026-11-17): built, waiting for the install checks.** Sections 1 to 6 and the docs of section 9 are done on PR #136 (icons, manifest, shortcuts, screenshots, iOS settings, e2e test). Android and the iPhone icon and name were checked on the preview on 2026-11-17; the desktop install (7) and the rest of the iPhone checks (8) were not reported and are still open, so repeat them on the live domain at launch (production checklist, Part C). Launch is Saturday 28 November 2026. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
+**Status (2026-11-17): built and merged (PR #136).** Sections 1 to 6 and the docs of section 9 are done (icons, manifest, shortcuts, screenshots, iOS settings, e2e test). Android and the iPhone icon and name were checked on the preview on 2026-11-17; the desktop install (7) and the rest of the iPhone checks (8) were not reported and are still open, so repeat them on the live domain at launch (production checklist, Part C). Launch is Saturday 28 November 2026. Ticks here are mirrored in Part C of [production_checklist.md](production_checklist.md), which is the list the launch follows.
 
 Step by step plan to make Word on the Water an installable web app (a PWA). It expands Part C of [production_checklist.md](production_checklist.md) (the PWA items that used to be in [PLAN.md](PLAN.md) sections 1.6 and 1.8; the conversion is a launch-time step now), and follows [CLAUDE.md](../CLAUDE.md) sections 5 and 9. Before writing code, read the bundled Next.js docs: `apps/web/node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`, `.../03-file-conventions/01-metadata/manifest.md` and `.../app-icons.md`.
 
@@ -97,7 +97,7 @@ HTTPS is needed. Use a Vercel preview deployment (the best test, the real produc
 - [x] Tick the matching items in Part C of [production_checklist.md](production_checklist.md) as each is verified (the PWA items in [PLAN.md](PLAN.md) 1.6 and the Installability item in 1.8 moved there, so PLAN.md has nothing to tick)
 - [x] Add a line to the README: how to install the site on a phone (two sentences)
 - [x] Update `CLAUDE.md` (the status line and the repository layout: `manifest.ts`, `apple-icon.png`, `public/icons`, `scripts/make-icons.mts`)
-- [ ] Open the PR with phone screenshots (PR #136 is open; the phone screenshots come from steps 7 and 8) (install prompt and the home screen icon) and merge only when every check is green
+- [x] Open the PR and merge only when every check is green (PR #136, merged 2026-11-17 with all checks green; phone screenshots of the install prompt and the home screen icon were not supplied)
 
 ## 10. Later (not Phase 1)
 
