@@ -1,6 +1,6 @@
 # Web Push plan
 
-**Status (2026-11-16): design decided, nothing built.** Hendrik answered the design questions on 2026-11-16 (section 12). Web Push is **planned after the PWA** ([PWA_checklist.md](PWA_checklist.md)), not a Phase 2 gate decision any more: push needs a service worker and, on iPhone, an installed home screen app, and it **shares one service worker with the PWA's offline decision**. [CLAUDE.md](../CLAUDE.md) and [PLAN.md](PLAN.md) 2.5 say so. Anything that changes the security posture needs an ADR first (CLAUDE.md section 14): [ADR 0011](adr/0011-web-push.md) is drafted (proposed) and becomes accepted when spike W1 confirms the library.
+**Status (2026-11-17): design decided, nothing built; the PWA it waits for is built and merged (PR #136, no service worker yet).** Hendrik answered the design questions on 2026-11-16 (section 12). Web Push is **planned after the PWA** ([PWA_checklist.md](PWA_checklist.md)), not a Phase 2 gate decision any more: push needs a service worker and, on iPhone, an installed home screen app, and it **shares one service worker with the PWA's offline decision**. [CLAUDE.md](../CLAUDE.md) and [PLAN.md](PLAN.md) 2.5 say so. Anything that changes the security posture needs an ADR first (CLAUDE.md section 14): [ADR 0011](adr/0011-web-push.md) is drafted (proposed) and becomes accepted when spike W1 confirms the library.
 
 **Goal:** tell people who opt in that this week's devotional is out, with one short notification, from our own code, at no cost. It adds a channel next to the weekly Kit email; it does not replace it.
 

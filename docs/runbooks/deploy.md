@@ -45,11 +45,15 @@ Vercel does not proxy the data services. The Neon and Upstash integrations put e
 | Root directory | `apps/web` | `apps/api` |
 | Framework | Next.js | FastAPI (entrypoint `app/main.py`, Python from `.python-version`, deps from `uv.lock`) |
 | Region | `fra1` | `fra1` |
+| Fluid compute | on (checked 2026-11-17 from the project API) | on |
+| Node | `engines.node` 24.x in `package.json`, which overrides the dashboard's 26.x ("Project Setting overridden by package.json"); matches CI and local | not used (Python) |
 | Production URL | `wotw-web.vercel.app`; custom domain `wordonthewater.net` is a launch step (see [production_checklist.md](../production_checklist.md)); DNS stays at Squarespace and the old site is still live | `wotw-api.vercel.app` (stays on its protected URL) |
 | Deployment Protection | Previews (Standard) | All deployments; the web passes the automation bypass |
 | Data | none | Neon `wotw-db` (`NEON_*`), Upstash `wotw-redis` (`UPSTASH_*`) |
 
 Team `thecodeblock`, Hobby plan. Vercel's Git integration deploys every push: a branch gets previews, `main` gets production.
+
+**Speed on Hobby (measured 2026-11-17).** Both functions scale to zero when idle, so the first request after about 8 minutes takes about 2 s (API 2.1 s cold against 0.7 s warm; the web function the same), and one more round trip from South Africa to `fra1` adds a few hundred ms. Fluid compute is already on; Cold Start Prevention shows "Disabled" on Hobby and is revisited after the move to Pro (production_checklist.md, Part B). Two code-side measures are in place: opening the chat sends one `warmChat` call that wakes the web function and the API behind it, and content images are served `immutable` for a year with `images.minimumCacheTTL` to match (their addresses carry a content hash), because an optimizer cache miss cost 1.2 to 1.9 s against 0.25 s on a hit. To measure again: `vercel curl /health/live --deployment <api url>` for the API and `vercel curl /api/health --deployment <web url>` for both (the project IDs are in `apps/*/.vercel/project.json`; `vercel api /v9/projects/<id>` shows `resourceConfig.fluid`).
 
 **Ignored builds** (`ignoreCommand` in each `vercel.json`): a build is skipped when nothing under the app changed since `VERCEL_GIT_PREVIOUS_SHA`, the last successful deployment of the branch. A redeploy of the same commit (for example after changing env vars) always builds. If that commit is not in Vercel's clone (a squash-merge replaces the branch commits), `git diff` exits 128, which Vercel reports as a failed deployment; the command therefore ends with `|| exit 1` so anything but "no changes" builds. The API always builds previews, so every web preview has an API preview to call.
 
