@@ -240,7 +240,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Shown from `publishAt` (UTC) with no redeploy; the landing card follows the calendar; `DEVOTIONAL_TODAY` previews another day
 - [x] `pnpm check:devotionals` validates the files; five Advent devotionals published (28 November, 5, 12, 19 and 26 December 2026), credited to "H"
 - [x] Tests: unit for the loader, view and page; e2e on five browser projects with the date pinned
-- [ ] Article JSON-LD, sitemap entries and the devotional archive page (step 1.6 and Phase 2.3)
+- [x] Article JSON-LD and sitemap entries (2026-11-18: each devotional page carries an `Article` JSON-LD script, `articleJsonLd` in `src/lib/seo.ts`, tested in `json-ld.test.tsx` and `devotional-page.test.tsx`; the sitemap lists devotionals). The devotional archive page is after launch, Phase 2.3
 - [x] Sign-up form in the closing band: the `SubscribeBand` (`#subscribe`) now holds the form on the landing page and at the end of every devotional (1.3)
 
 ### 1.2c Bible reader (built ahead of the plan, behind `BIBLE_ENABLED`)
@@ -330,7 +330,7 @@ Not part of the launch. Until it is built the page shows `hello@wordonthewater.n
 - [x] Real addresses on the page in place of the mockup placeholders: `hello@wordonthewater.net` for contact ("Talk to someone" when the chat is off, the privacy policy, `security.txt`; 2026-11-15). `prayer@` is not shown until the prayer form (1.4) is built, because the Prayer option was removed from the page
 - [x] `generateMetadata`, canonical URLs, Open Graph image, JSON-LD `Organization` (2026-11-14). `src/lib/seo.ts` holds the site-wide metadata: `metadataBase` is `SITE_URL`, so canonical and image addresses are absolute; pages inherit the site name, website type, locale `en_GB` and a large Twitter card; the home page is its own canonical; a devotional keeps its canonical, article type and verse card. `src/app/opengraph-image.tsx` builds the default 1200 x 630 social image at build time (Night swell, the lighthouse crop `content/site/social/og-background.jpg`, the title) for the home page and any page without its own image; Twitter reuses it. The home page carries JSON-LD (`Organization` and `WebSite`). Left out on purpose until they exist: a `logo` (the icons arrive with the PWA, see PWA_checklist.md) and `sameAs` social profiles (the handles are placeholders)
 - [x] `sitemap.ts` and `robots.ts` (2026-11-14): `robots` allows everything except `/api/` and names the sitemap; `sitemap` lists the home page and the devotionals a reader can open today, newest first, and awaits `connection()` so a devotional appears on its publish day with no redeploy (a code sitemap is otherwise cached at build time). `/thank-you` is left out. Both use `SITE_URL` (`src/lib/site.ts`, default `https://wordonthewater.net`, the same setting as the API; a Vercel preview uses its own address and the e2e server sets it to itself, because a link to another site is blocked by the CSP). The Bible pages are not listed yet (decision open)
-- [ ] Footer: link to a full statement of faith once a page or URL exists (optional; the four points are on the page)
+- [ ] **After launch:** footer link to a full statement of faith once a page or URL exists (optional; the four points are on the page)
 - [x] Moved to [production_checklist.md](production_checklist.md): the PWA conversion (manifest, icons, shortcuts, iOS settings, tests; the steps are in [PWA_checklist.md](PWA_checklist.md)) and enforcing the CSP in production
 
 ### 1.7 Retention and operations
@@ -392,8 +392,8 @@ Checked against the code and the tests on 2026-11-16: what is proven is ticked w
 - [x] No sideways scroll at 320, 375, 414, 768, 820, 1024, 1280 and 1440 wide, light and dark, on the landing page, a devotional and the privacy page (measured 2026-11-16; the e2e overflow spec covers 320 to 414)
 - [x] Landscape on a phone, and the notch and home-indicator safe areas on a real iPhone **(Hendrik)**
 - [x] Keyboard-only pass (measured 2026-11-16, phone and desktop, light and dark): the skip link is the first stop, every focus stop has a visible outline, and the menu, the theme toggle (works with Enter) and the sign-up fields are reachable
-- [ ] Devotional pages: Article JSON-LD (only the home page has `Organization` and `WebSite` data) and the devotional archive page (also under 1.2b and 2.3)
-- [ ] Optional later: add a point on the Holy Spirit or Jesus' return to the statement of faith
+- [x] Devotional pages: Article JSON-LD (done 2026-11-18, see 1.2b); the devotional archive page moved after launch to 2.3 (the series list works as the index for now)
+- [ ] **After launch (optional):** add a point on the Holy Spirit or Jesus' return to the statement of faith
 
 **Exit gate Phase 1**
 - [ ] Steps 1.3, 1.6, 1.7, 1.8 and 1.11 above are ticked (1.4 and 1.5 are deferred past launch) and the 1.8 budgets are met
@@ -423,7 +423,7 @@ Checked against the code and the tests on 2026-11-16: what is proven is ticked w
 - [ ] Decide whether to move devotionals from repo markdown (Phase 1) to `devotionals`, `series`, `scriptures`, `tags` tables with an authoring UI, or keep files and add only search
 - [ ] Authoring UI: draft, preview, schedule, publish (sanitised, never raw HTML from users)
 - [ ] Public archive page (the detail page and series list exist from step 1.2b; pages render per request under the nonce CSP, ADR 0007, so revisit ISR), 62ch measure, Lora body
-- [ ] RSS feed, Article JSON-LD, sitemap updates
+- [ ] RSS feed and sitemap updates (Article JSON-LD was done in Phase 1, 2026-11-18)
 - [ ] Basic search with Postgres full-text
 
 ### 2.4 Weekly email

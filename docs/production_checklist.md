@@ -12,7 +12,7 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ## Part A. Gate: is the rest done?
 
-- [ ] PLAN.md steps 1.3, 1.6, 1.7, 1.8 and 1.11 are all ticked (sign-up, legal and SEO, retention, quality gates, final landing page review). The prayer form (1.4) and contact form (1.5) are deferred past launch (decided 2026-11-14).
+- [x] PLAN.md steps 1.3, 1.6, 1.7, 1.8 and 1.11 are done (sign-up, legal and SEO, retention, quality gates, final landing page review), checked 2026-11-18. Three optional items are deliberately moved after launch and stay unticked there: the footer link to a full statement of faith (1.6), moving the crons to Vercel Schedules (1.7) and a Holy Spirit or Jesus' return point in the statement of faith (1.11); the devotional archive page is Phase 2.3. Article JSON-LD was built for launch. The prayer form (1.4) and contact form (1.5) are deferred past launch (decided 2026-11-14).
 - [ ] Budgets met on a deployed preview: Lighthouse mobile (Performance 95, Accessibility 100, Best Practices 100, SEO 100), LCP under 2.0 s, CLS under 0.05, INP under 200 ms, landing JS under 165 KB gzipped ([ADR 0010](adr/0010-landing-js-budget.md)).
 - [ ] No unresolved high or critical finding in CodeQL, the dependency audits or gitleaks.
 - [ ] **Privacy policy:** the responsible name (the registered name, Word On The Water) and the postal address (PO Box 6055, Port Elizabeth, Eastern Cape 6001, the same one Kit prints) are filled in (2026-11-14). Still to do: read the whole page once, update `PRIVACY_UPDATED` if you change anything, and fill the two social handles so that `pnpm check:placeholders` passes.
