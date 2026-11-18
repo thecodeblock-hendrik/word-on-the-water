@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import Home from "@/app/page";
 import { JsonLd } from "@/components/json-ld";
-import { siteJsonLd } from "@/lib/seo";
+import { articleJsonLd, siteJsonLd } from "@/lib/seo";
 
 afterEach(cleanup);
 
@@ -67,5 +67,41 @@ describe("the home page", () => {
       "Organization",
       "WebSite",
     ]);
+  });
+});
+
+describe("articleJsonLd", () => {
+  const meta = {
+    title: "More Than Watchmen",
+    summary: "Every dawn patrol starts in the dark.",
+    publishAt: "2026-11-28",
+    author: "H",
+    imageAlt: "A surfer at dawn",
+  };
+  const article = articleJsonLd({
+    slug: "advent-01-more-than-watchmen",
+    meta,
+    imageUrl: "https://wordonthewater.net/content/devotionals/x/abc/verse-card.png",
+  });
+
+  it("describes the devotional as an Article with its title, summary, date and image", () => {
+    expect(article).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: "More Than Watchmen",
+      description: "Every dawn patrol starts in the dark.",
+      datePublished: "2026-11-28",
+      image: "https://wordonthewater.net/content/devotionals/x/abc/verse-card.png",
+      url: "https://wordonthewater.net/devotionals/advent-01-more-than-watchmen",
+    });
+  });
+
+  it("credits the author as written and names the organisation as publisher", () => {
+    expect(article.author).toEqual({ "@type": "Person", name: "H" });
+    expect(article.publisher).toEqual({ "@id": "https://wordonthewater.net/#organization" });
+  });
+
+  it("points at its own page as the main entity", () => {
+    expect(article.mainEntityOfPage).toBe(article.url);
   });
 });

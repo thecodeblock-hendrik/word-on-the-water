@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/json-ld";
 import { ArticleBody } from "@/components/devotional/article-body";
 import { ArticleHead } from "@/components/devotional/article-head";
 import { CopyLink } from "@/components/devotional/copy-link";
@@ -12,7 +13,8 @@ import { VerseShare } from "@/components/devotional/verse-share";
 import { today } from "@/lib/devotionals/format";
 import { isViewable, loadContent } from "@/lib/devotionals/load";
 import { seriesView } from "@/lib/devotionals/series-view";
-import { OPEN_GRAPH_BASE } from "@/lib/seo";
+import { articleJsonLd, OPEN_GRAPH_BASE } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -60,6 +62,15 @@ export default async function DevotionalPage({ params }: Props) {
   const { items, previous, next } = seriesView(devotional, series, devotionals, today());
   return (
     <>
+      <JsonLd
+        data={articleJsonLd({
+          slug: devotional.slug,
+          meta: devotional.meta,
+          imageUrl: absoluteUrl(
+            mediaUrl("devotionals", devotional.slug, "verse-card-night-swell.png"),
+          ),
+        })}
+      />
       <div className={`mx-auto max-w-[1080px] ${gutters}`}>
         <ArticleHead devotional={devotional} series={series} />
         <div className="grid items-start gap-8 pb-16 pt-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-14">
