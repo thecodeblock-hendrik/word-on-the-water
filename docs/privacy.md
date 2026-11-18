@@ -47,13 +47,13 @@ Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Pray
 |---|---|---|
 | Vercel | Site, API, logs, analytics | `fra1` (Frankfurt) for functions; global edge network |
 | Neon | The database | `aws-eu-central-1` (Frankfurt) |
-| Upstash | Hashed rate-limit keys | Region to confirm |
+| Upstash | Hashed rate-limit keys | Frankfurt, Germany (confirmed 2026-11-18) |
 | Kit | Newsletter subscribers and the emails sent to them | Provider's locations |
 | Postmark | Notification and transactional email in transit | Provider's locations |
 | Cloudflare | Turnstile bot check; R2 storage of the nightly database dumps, encrypted before upload so Cloudflare cannot read them | Turnstile global; R2 bucket in Western Europe (WEUR) |
 | Sentry | Scrubbed error reports | Provider's locations |
 | Squarespace | DNS, and forwarding of `hello@` and `prayer@` to the owner's own mailbox | Provider's locations |
-| The owner's own mailbox provider | Forwarded notifications, including consented prayer text | To confirm |
+| Google (Gmail), the owner's own mailbox | Mail forwarded from `hello@` (and later `prayer@`), including consented prayer text | Provider's locations (confirmed 2026-11-18) |
 
 Providers outside the EU and South Africa are covered by their standard contractual terms; the policy page names them. A data processing agreement is needed with each provider that holds subscriber or prayer data: Kit, Postmark, Neon, Vercel, Sentry, Cloudflare (R2 holds the encrypted dumps).
 
@@ -72,9 +72,9 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 ## Decisions needed from Hendrik
 
 1. **Who is the data controller and what is the legal entity name and address** for the policy and the email footer (also required in newsletters). Answered 2026-11-14: the privacy page names Word On The Water, the registered name, and gives PO Box 6055, Port Elizabeth, Eastern Cape 6001 (the PO Box Kit prints in every email footer). If the registered name ever changes, change it there.
-2. **Which regulator and jurisdiction** to name first: where the owner and most readers live.
+2. ~~Which regulator to name first.~~ Decided 2026-11-18: keep the policy as it is (South Africa's Information Regulator, and the visitor's own EU authority for EU readers).
 3. ~~How long nightly dumps are kept.~~ Decided: 30 days, enforced by an R2 lifecycle rule. A dump holds deleted-on-request data until it expires, so erased data is gone from backups within 30 days.
-4. **Upstash region** and **which mailbox provider receives the forwards.**
+4. ~~Upstash region and the mailbox provider.~~ Answered 2026-11-18: Upstash in Frankfurt, forwards received by Gmail.
 5. **A data processing agreement** accepted with each provider listed above.
 
 Keep this file in step with the code: when a feature adds a field, a service or a retention rule, update it in the same change.
