@@ -53,7 +53,7 @@ Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Pray
 | Cloudflare | Turnstile bot check; R2 storage of the nightly database dumps, encrypted before upload so Cloudflare cannot read them | Turnstile global; R2 bucket in Western Europe (WEUR) |
 | Sentry | Scrubbed error reports | Provider's locations |
 | Squarespace | DNS, and forwarding of `hello@` and `prayer@` to the owner's own mailbox | Provider's locations |
-| Google (Gmail), the owner's own mailbox | Mail forwarded from `hello@` (and later `prayer@`), including consented prayer text | Provider's locations (confirmed 2026-11-18) |
+| Google (Gmail), the owner's own mailbox | Mail forwarded from `hello@` (and later `prayer@`), including consented prayer text. A personal Gmail has no signable DPA; accepted for launch because forwarding carries only mail people send us. Revisit (Google Workspace) before the prayer form is built | Provider's locations (confirmed 2026-11-18) |
 
 Providers outside the EU and South Africa are covered by their standard contractual terms; the policy page names them. A data processing agreement is needed with each provider that holds subscriber or prayer data: Kit, Postmark, Neon, Vercel, Sentry, Cloudflare (R2 holds the encrypted dumps).
 

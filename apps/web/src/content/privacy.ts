@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "../lib/site.ts";
 
 /** The day the policy was last changed. Change it whenever the text below changes. */
-export const PRIVACY_UPDATED = "2026-11-15";
+export const PRIVACY_UPDATED = "2026-11-18";
 
 export type PolicyItem = { term: string; text: string };
 export type PolicySection = {
@@ -88,7 +88,7 @@ export function privacyPolicy({
             : []),
           {
             term: "Emails you send us",
-            text: `If you email ${CONTACT_EMAIL}, it is ordinary email: it passes through our email host (Squarespace) to our own mailbox. We keep it only as long as we need to answer you. Please do not send anything you would not want to put in an email.`,
+            text: `If you email ${CONTACT_EMAIL}, it is ordinary email: it passes through our email host (Squarespace) to our own Gmail mailbox (Google). We keep it only as long as we need to answer you. Please do not send anything you would not want to put in an email.`,
           },
         ],
       },
@@ -158,6 +158,7 @@ export function privacyPolicy({
           },
           { term: "Sentry", text: "Receives error reports with personal details removed." },
           { term: "Squarespace", text: "Our domain name, and the forwarding of email sent to us." },
+          { term: "Google", text: "Runs the Gmail mailbox that the email you send us is forwarded to." },
         ],
         closing: [
           "Some of these services are based outside the EU and South Africa, mainly in the United States, and each is bound by its own data-protection terms. We do not sell your details and we do not share them with anyone else.",

@@ -56,6 +56,7 @@ describe("the privacy policy content", () => {
       "Cloudflare",
       "Sentry",
       "Squarespace",
+      "Google",
     ]);
   });
 
