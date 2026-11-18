@@ -151,12 +151,18 @@ export function privacyPolicy({
           { term: "Kit", text: "Sends the weekly email and holds the subscriber list." },
           { term: "Vercel", text: "Hosts the site, and records visits and speed." },
           { term: "Neon", text: "Holds our database, in Frankfurt, Germany." },
-          { term: "Upstash", text: "Holds the short-lived abuse-prevention keys." },
+          {
+            term: "Upstash",
+            text: "Holds the short-lived abuse-prevention keys, in Frankfurt, Germany.",
+          },
           {
             term: "Cloudflare",
             text: "Runs the sign-up check, and stores our encrypted nightly backups, which it cannot read.",
           },
-          { term: "Sentry", text: "Receives error reports with personal details removed." },
+          {
+            term: "Sentry",
+            text: "Receives error reports with personal details removed, and stores them in the EU.",
+          },
           { term: "Squarespace", text: "Our domain name, and the forwarding of email sent to us." },
           { term: "Google", text: "Runs the Gmail mailbox that the email you send us is forwarded to." },
         ],

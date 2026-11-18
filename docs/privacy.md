@@ -55,7 +55,20 @@ Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Pray
 | Squarespace | DNS, and forwarding of `hello@` and `prayer@` to the owner's own mailbox | Provider's locations |
 | Google (Gmail), the owner's own mailbox | Mail forwarded from `hello@` (and later `prayer@`), including consented prayer text. A personal Gmail has no signable DPA; accepted for launch because forwarding carries only mail people send us. Revisit (Google Workspace) before the prayer form is built | Provider's locations (confirmed 2026-11-18) |
 
-Providers outside the EU and South Africa are covered by their standard contractual terms; the policy page names them. A data processing agreement is needed with each provider that holds subscriber or prayer data: Kit, Postmark, Neon, Vercel, Sentry, Cloudflare (R2 holds the encrypted dumps).
+Providers outside the EU and South Africa are covered by their standard contractual terms; the policy page names them. A data processing agreement (DPA) is needed with each provider that holds subscriber or prayer data: Kit, Postmark (once the forms exist), Neon, Vercel, Sentry, Cloudflare (R2 holds the encrypted dumps), Upstash.
+
+### Data processing agreements (checked 2026-11-18)
+
+| Provider | Status | Version | Left to do |
+|---|---|---|---|
+| Kit | Incorporated through its Terms (kit.com/dpa; includes EU SCCs and the UK IDTA) | Updated 9 Oct 2026 | Print kit.com/dpa to PDF (no download offered) |
+| Neon | Incorporated through the Databricks DPA and the Neon schedule; an e-signed copy is optional (signing replaces any existing DPA) | Schedule 14 Oct 2026; DPA sample 21 Jul 2023 | PDF saved. Consider the e-signature before prayer requests are stored (special category data) |
+| Vercel | Incorporated through its Terms, but the DPA text is written for Enterprise plans; no DPA in the dashboard on Hobby | DPA effective 31 Mar 2026 | Print vercel.com/legal/dpa to PDF; the move to Pro before launch (production_checklist.md, Part B) must include a re-check of the DPA and the commercial-use terms |
+| Sentry | Accepted in the dashboard (org thecodeblock); data stored in the EU; aggregated-data use is off | v5.1.0, signed 18 Nov 2026 | None |
+| Cloudflare | Incorporated through the Self-Serve Subscription Agreement | v6.4, effective 3 Apr 2026 | None (PDF saved) |
+| Upstash | Incorporated through its Terms, no signature needed | Updated April 2025 | None (PDF saved). Both Redis databases (production and preview) are in Frankfurt |
+
+Vercel's "Improve models with my data" setting was on until 2026-11-18 and was switched off that day (Settings, Data Preferences). Vercel says this stops sharing going forward only. The site was not public, so the data involved was test data and source code, not visitor data. Neither Vercel nor Google (Gmail, a personal account with no signable DPA, accepted for launch) is a gap in the public policy, but both are the first things to revisit: Vercel on the move to Pro, Google before the prayer form.
 
 ## Rights and how they are met
 
@@ -75,7 +88,7 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 2. ~~Which regulator to name first.~~ Decided 2026-11-18: keep the policy as it is (South Africa's Information Regulator, and the visitor's own EU authority for EU readers).
 3. ~~How long nightly dumps are kept.~~ Decided: 30 days, enforced by an R2 lifecycle rule. A dump holds deleted-on-request data until it expires, so erased data is gone from backups within 30 days.
 4. ~~Upstash region and the mailbox provider.~~ Answered 2026-11-18: Upstash in Frankfurt, forwards received by Gmail.
-5. **A data processing agreement** accepted with each provider listed above.
+5. ~~A data processing agreement with each provider.~~ Checked 2026-11-18, see the table above. Open: print the Kit and Vercel DPAs to PDF, review the Vercel plan (Hobby is non-commercial), and decide on Neon's optional e-signature.
 
 Keep this file in step with the code: when a feature adds a field, a service or a retention rule, update it in the same change.
 
