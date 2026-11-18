@@ -210,3 +210,40 @@ test("every font arriving late stays within the layout shift budget", async ({
   const shift = await shiftWithLateFonts(page, await fontFiles(page, null));
   expect(shift).toBeLessThan(0.05);
 });
+
+test("in the app installed on an iPhone, Save image opens the share sheet and stays on the page", async ({
+  page,
+}) => {
+  // A download in an iPhone home screen app replaces the page with a file view that has no way
+  // back, so the installed app must share the card instead. Pretend to be that app and record
+  // what reaches the share sheet.
+  await page.addInitScript(() => {
+    const w = window as unknown as { shared: { name: string; type: string; size: number }[] };
+    w.shared = [];
+    Object.defineProperty(navigator, "standalone", { value: true });
+    Object.defineProperty(navigator, "share", {
+      value: async ({ files }: ShareData) => {
+        w.shared.push(...files!.map(({ name, type, size }) => ({ name, type, size })));
+      },
+    });
+  });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto(path);
+  const save = page.locator("[aria-labelledby=h-verse]").getByRole("link", { name: "Save image" });
+  await save.filter({ visible: true }).click();
+
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { shared: unknown[] }).shared))
+    .toEqual([
+      {
+        name: expect.stringMatching(/^verse-card-.+\.png$/),
+        type: "image/png",
+        size: expect.any(Number),
+      },
+    ]);
+  const [{ size }] = await page.evaluate(
+    () => (window as unknown as { shared: { size: number }[] }).shared,
+  );
+  expect(size).toBeGreaterThan(10_000);
+  await expect(page).toHaveURL(path);
+});

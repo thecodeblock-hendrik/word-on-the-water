@@ -1,6 +1,6 @@
 import { ContentImage } from "@/components/content-image";
 import { mediaUrl } from "@/components/devotional/media";
-import { buttonClasses } from "@/components/ui/button";
+import { SaveImageLink } from "@/components/devotional/save-image-link";
 import type { Devotional } from "@/lib/devotionals/parse";
 
 const cards = [
@@ -44,13 +44,10 @@ export function VerseShare({ devotional }: { devotional: Devotional }) {
           <div className="mt-3">
             {cards.map(({ file, scheme }) => (
               <div key={file} className={scheme}>
-                <a
+                <SaveImageLink
                   href={mediaUrl("devotionals", devotional.slug, file)}
-                  download
-                  className={buttonClasses("outline")}
-                >
-                  Save image
-                </a>
+                  fileName={file}
+                />
               </div>
             ))}
           </div>
