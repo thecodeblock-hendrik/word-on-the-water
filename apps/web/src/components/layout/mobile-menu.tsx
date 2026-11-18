@@ -22,6 +22,7 @@ function useHydrated() {
 /**
  * Menu for screens below lg. Non-modal, so the button stays usable and toggles it.
  * Esc, the button or choosing a link or switching the theme closes it, and focus returns to the button.
+ * It scrolls when the screen is too short for it (a phone on its side).
  * The theme toggle sits at the foot of the panel, because the header bar has no room for it here.
  */
 export function MobileMenu({
@@ -57,7 +58,7 @@ export function MobileMenu({
       <Dialog.Content
         data-testid="mobile-menu"
         aria-describedby={undefined}
-        className="absolute inset-x-0 top-full animate-menu-in border-b border-line bg-bg px-4 pb-4 pt-2 shadow-menu lg:hidden"
+        className="absolute inset-x-0 top-full max-h-[calc(100dvh-4.5rem-env(safe-area-inset-top))] animate-menu-in overflow-y-auto overscroll-contain border-b border-line bg-bg px-4 pb-4 pt-2 shadow-menu lg:hidden"
       >
         <Dialog.Title className="sr-only">Menu</Dialog.Title>
         <nav aria-label="Main menu" className="grid">
