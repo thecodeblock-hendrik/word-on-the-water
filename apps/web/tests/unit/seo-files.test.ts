@@ -8,6 +8,7 @@ vi.mock("next/server", async (importOriginal) => ({
 
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
+import { PRIVACY_UPDATED } from "@/content/privacy";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 
 afterEach(() => vi.unstubAllEnvs());
@@ -70,7 +71,7 @@ describe("sitemap.xml", () => {
   it("lists the privacy page, dated by the day the policy was last updated", async () => {
     vi.stubEnv("DEVOTIONAL_TODAY", "2026-12-21");
     const entry = (await sitemap()).find((e) => e.url === privacy);
-    expect(entry?.lastModified).toBe("2026-11-15");
+    expect(entry?.lastModified).toBe(PRIVACY_UPDATED);
   });
 
   it("never lists the thank-you page or API routes, and every address is absolute", async () => {
