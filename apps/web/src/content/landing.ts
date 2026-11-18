@@ -141,11 +141,8 @@ export const footer = {
       ],
     },
   ],
-  /** A social link shows in the footer only once it has an href. */
-  social: [
-    { label: "Instagram", handle: "[@handle]", href: undefined as string | undefined },
-    { label: "YouTube", handle: "[@channel]", href: undefined as string | undefined },
-  ],
+  /** A social link shows in the footer only once it has an href. None exist yet: add an entry when an account does. */
+  social: [] as { label: string; handle: string; href?: string }[],
   email: { label: "Email", href: "/#subscribe" } satisfies Link,
 };
 

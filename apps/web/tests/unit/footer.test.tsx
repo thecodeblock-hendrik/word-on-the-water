@@ -102,7 +102,7 @@ describe("Footer", () => {
 });
 
 describe("footer content", () => {
-  it("keeps social handles as placeholders so the launch check flags them", () => {
-    expect(footer.social.some((s) => s.handle.startsWith("["))).toBe(true);
+  it("has no social handle placeholder: an account is added only once it exists", () => {
+    expect(footer.social.filter((s) => s.handle.startsWith("["))).toEqual([]);
   });
 });
