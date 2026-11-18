@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL } from "@/lib/site";
+import { CONTACT_EMAIL } from "../lib/site.ts";
 import type { Scripture } from "@/lib/scripture";
 
 type Link = { label: string; href: string };
