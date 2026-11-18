@@ -56,7 +56,14 @@ describe("the privacy policy content", () => {
       "Cloudflare",
       "Sentry",
       "Squarespace",
+      "Google",
     ]);
+  });
+
+  it("says where Sentry and Upstash keep data: the EU and Frankfurt", () => {
+    const text = (term: string) => section("who-else").items!.find((i) => i.term === term)!.text;
+    expect(text("Sentry")).toMatch(/EU/);
+    expect(text("Upstash")).toMatch(/Frankfurt/);
   });
 
   it("states the retention the job enforces: 7 days unconfirmed, 30 days of backups", () => {
