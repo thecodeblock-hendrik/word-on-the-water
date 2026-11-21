@@ -20,6 +20,7 @@ describe("generated API types", () => {
     expectTypeOf<keyof paths>().toEqualTypeOf<
       | "/cron/drain-outbox"
       | "/cron/retention"
+      | "/cron/sync-kit"
       | "/health/live"
       | "/health/ready"
       | "/v1/chat/messages"

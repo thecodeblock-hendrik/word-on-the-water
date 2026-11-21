@@ -7,6 +7,7 @@ is created as inactive. Adding it to the double opt-in form makes Kit send the c
 Broadcasts are only ever created as drafts; a person schedules them in Kit (2.4 spike, same ADR).
 """
 
+from collections.abc import Coroutine
 from typing import Any
 
 import httpx
@@ -80,12 +81,36 @@ class KitClient:
         )
         return int(data["broadcast"]["id"])
 
-    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
-        response = await self._client.post(
-            KIT_URL + path,
-            headers={"X-Kit-Api-Key": self._api_key, "Accept": "application/json"},
-            json=payload,
+    async def list_subscribers(
+        self, after: str | None = None
+    ) -> tuple[list[tuple[int, str, str]], str | None]:
+        """One page of every subscriber in any state, as (id, email, state), and the next cursor.
+
+        States are active, inactive, bounced, complained and cancelled. The cursor is None on the
+        last page. Reading works on Kit's free plan, which has no webhooks (ADR 0008).
+        """
+        params = {"status": "all", "per_page": "1000", "slim": "true"}
+        if after:
+            params["after"] = after
+        data = await self._send(
+            self._client.get(KIT_URL + "/subscribers", params=params, headers=self._headers)
         )
+        people = [(p["id"], p["email_address"], p["state"]) for p in data["subscribers"]]
+        page = data["pagination"]
+        return people, page["end_cursor"] if page["has_next_page"] else None
+
+    @property
+    def _headers(self) -> dict[str, str]:
+        return {"X-Kit-Api-Key": self._api_key, "Accept": "application/json"}
+
+    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        return await self._send(
+            self._client.post(KIT_URL + path, headers=self._headers, json=payload)
+        )
+
+    @staticmethod
+    async def _send(request: Coroutine[Any, Any, httpx.Response]) -> dict[str, Any]:
+        response = await request
         if response.status_code == 429:
             raise KitRateLimitedError("Kit is rate limiting this key (status 429)")
         if response.status_code not in (200, 201):

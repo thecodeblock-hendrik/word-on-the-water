@@ -11,6 +11,7 @@
   },
   "crons": [
     { "path": "/cron/drain-outbox", "schedule": "*/5 * * * *" },
+    { "path": "/cron/sync-kit", "schedule": "0 3 * * *" },
     { "path": "/cron/retention", "schedule": "30 3 * * *" }
   ]
 }

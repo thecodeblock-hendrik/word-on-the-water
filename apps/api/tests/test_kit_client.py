@@ -161,3 +161,74 @@ async def test_a_failed_broadcast_raises_without_the_key_or_the_content(status: 
 async def test_a_rate_limited_broadcast_is_retryable() -> None:
     with pytest.raises(KitRateLimitedError):
         await create_draft(FakeKit(broadcast=429))
+
+
+def kit_page(*people: tuple[int, str, str], next_cursor: str | None = None) -> httpx.Response:
+    """A page of GET /v4/subscribers as the Kit docs describe it (cursor pagination)."""
+    return httpx.Response(
+        200,
+        json={
+            "subscribers": [
+                {"id": id_, "email_address": email, "state": state, "first_name": None}
+                for id_, email, state in people
+            ],
+            "pagination": {
+                "has_next_page": next_cursor is not None,
+                "end_cursor": next_cursor or "last",
+                "per_page": 1000,
+            },
+        },
+    )
+
+
+def list_client(handler: httpx.MockTransport) -> KitClient:
+    return KitClient(API_KEY, 99, client=httpx.AsyncClient(transport=handler))
+
+
+async def test_list_subscribers_asks_for_every_state_and_returns_the_page() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return kit_page(
+            (1, EMAIL, "active"), (2, "gone@example.com", "cancelled"), next_cursor="c2"
+        )
+
+    people, cursor = await list_client(httpx.MockTransport(handler)).list_subscribers()
+
+    request = seen[0]
+    assert (request.method, request.url.path) == ("GET", "/v4/subscribers")
+    assert request.url.params["status"] == "all"
+    assert request.url.params["per_page"] == "1000"
+    assert "after" not in request.url.params
+    assert request.headers["x-kit-api-key"] == API_KEY
+    assert people == [(1, EMAIL, "active"), (2, "gone@example.com", "cancelled")]
+    assert cursor == "c2"
+
+
+async def test_list_subscribers_sends_the_cursor_and_ends_without_one() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return kit_page((3, EMAIL, "bounced"))
+
+    people, cursor = await list_client(httpx.MockTransport(handler)).list_subscribers(after="c2")
+
+    assert seen[0].url.params["after"] == "c2"
+    assert people == [(3, EMAIL, "bounced")]
+    assert cursor is None
+
+
+async def test_list_subscribers_rate_limited_and_failure_are_kit_errors() -> None:
+    def limited(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(429)
+
+    def refused(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(401, json={"errors": ["Authentication Failed"]})
+
+    with pytest.raises(KitRateLimitedError):
+        await list_client(httpx.MockTransport(limited)).list_subscribers()
+    with pytest.raises(KitError) as error:
+        await list_client(httpx.MockTransport(refused)).list_subscribers()
+    assert API_KEY not in str(error.value)

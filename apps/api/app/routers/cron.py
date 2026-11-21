@@ -13,9 +13,11 @@ from app.core.security import require_cron_secret
 from app.db.session import get_session
 from app.integrations.email.base import EmailProvider
 from app.integrations.email.factory import get_email_provider
-from app.integrations.kit.factory import get_kit_job
+from app.integrations.kit.client import KitClient
+from app.integrations.kit.factory import get_kit_client, get_kit_job
 from app.jobs.drain_outbox import drain_outbox
 from app.jobs.retention import run_retention
+from app.jobs.sync_kit import sync_kit
 from app.services.kit_jobs import KitSubscribeJob
 
 router = APIRouter(prefix="/cron", tags=["cron"], dependencies=[Depends(require_cron_secret)])
@@ -28,6 +30,10 @@ def email_provider(settings: Annotated[Settings, Depends(get_settings)]) -> Emai
 
 def kit_job(settings: Annotated[Settings, Depends(get_settings)]) -> KitSubscribeJob | None:
     return get_kit_job(settings)
+
+
+def kit_source(settings: Annotated[Settings, Depends(get_settings)]) -> KitClient | None:
+    return get_kit_client(settings)
 
 
 @router.get("/drain-outbox")
@@ -52,4 +58,17 @@ async def retention(session: Annotated[AsyncSession, Depends(get_session)]) -> d
     """Delete data past its retention period (docs/privacy.md). Logs counts, never rows."""
     counts = asdict(await run_retention(session))
     log.info("retention_run", **counts)
+    return counts
+
+
+@router.get("/sync-kit")
+async def sync_kit_status(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    kit: Annotated[KitClient | None, Depends(kit_source)],
+) -> dict[str, int]:
+    """Copy each subscriber's state from Kit's list into our mirror. Counts only are logged."""
+    if kit is None:
+        return {"checked": 0, "updated": 0}
+    counts = asdict(await sync_kit(session, kit))
+    log.info("kit_synced", **counts)
     return counts

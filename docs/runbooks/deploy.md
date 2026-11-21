@@ -115,10 +115,11 @@ ENVIRONMENT=production uv run alembic upgrade head
 
 ## Cron
 
-Two crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON_SECRET`:
+Three crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON_SECRET`:
 
 | Path | When | What |
 |---|---|---|
+| `/cron/sync-kit` | daily 03:00 UTC | Reads every subscriber's state from Kit and updates our mirror (stands in for the Kit webhook, which needs a paid plan); runs before retention so confirmed people are active and survive it; logs counts only (`kit_synced`) |
 | `/cron/retention` | daily 03:30 UTC | Deletes data past its retention period (docs/privacy.md); logs counts only |
 | `/cron/drain-outbox` | every 5 minutes | Sends queued emails and retries Kit calls; a message that fails for good logs `outbox_messages_failed` and sends Sentry one message |
 
