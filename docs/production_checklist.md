@@ -25,7 +25,7 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ## Part B. Accounts and owner hardening (no domain needed)
 
-- [ ] Vercel: upgrade to **Pro** (Hobby is non-commercial and has quota limits).
+- [x] Vercel: upgrade to **Pro** (Hobby is non-commercial and has quota limits). (checked 2026-11-21: team `thecodeblock` is on the `pro` plan)
 - [ ] After the move to Pro, look at **Cold Start Prevention** in each project's Functions settings (it shows "Disabled" on Hobby, 2026-11-17; Vercel's docs say Pro keeps one production instance warm but its pricing page lists the feature under Enterprise, so confirm in the dashboard). Fluid compute is already on for both projects. Then leave both idle for 10 minutes, open the chat and click a topic: it took about 2 s on Hobby (API 2.1 s cold against 0.7 s warm). If it is still slow, ping both functions every 5 minutes.
 - [ ] Vercel: restrict who can promote to production; two-factor on every team member; turn on the **audit log** (Pro).
 - [ ] Two-factor on Squarespace (domain and DNS) and the registrar lock on.
@@ -33,7 +33,7 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 - [ ] Recovery codes for every account stored offline.
 - [ ] Rotate any secret that was ever shown in a chat, a screenshot or a log ([runbooks/rotate-secrets.md](runbooks/rotate-secrets.md)).
 - [ ] With Pro: a log drain to a log store (Better Stack or Axiom) and a staging environment (a custom Vercel environment), deferred from step 0.10.
-- [ ] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
+- [x] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
 - [ ] Vercel Firewall rate-limit rules on the sign-up route and on `/v1/chat/messages` (the prayer and contact routes when those forms are built); Attack Challenge Mode noted in the incident runbook.
 
 ---
@@ -96,25 +96,25 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 **Attaching `wordonthewater.net` to Vercel replaces the Squarespace site with the new site.** Do this only when you are happy for the new site to be public. Email is not affected as long as the MX records are left alone (`hello@` and `prayer@` keep forwarding). Never paste a secret into chat or the repo.
 
-- [ ] A production deployment of `wotw-web` built from the latest `main` is **Ready** (Vercel, `wotw-web`, Deployments, filter Production; if the newest is Cancelled or old, three dots on the latest Ready one, then **Redeploy**). Have Squarespace and Vercel open in two tabs.
+- [x] A production deployment of `wotw-web` built from the latest `main` is **Ready** (Vercel, `wotw-web`, Deployments, filter Production; if the newest is Cancelled or old, three dots on the latest Ready one, then **Redeploy**). Have Squarespace and Vercel open in two tabs.
 
 **G1. Save the old DNS so you can undo**
-- [ ] Squarespace, Domains, `wordonthewater.net`, DNS Settings: screenshot **every** record (A, CNAME, MX, TXT) and keep it safe.
-- [ ] Note the MX records and every TXT record starting `v=spf1`: you will not touch them.
+- [x] Squarespace, Domains, `wordonthewater.net`, DNS Settings: screenshot **every** record (A, CNAME, MX, TXT) and keep it safe.
+- [x] Note the MX records and every TXT record starting `v=spf1`: you will not touch them.
 
 **G2. Add the domain in Vercel**
-- [ ] `wotw-web`, Settings, Domains, Add: `wordonthewater.net` attached to **Production**, and `www.wordonthewater.net` set to **redirect to** `wordonthewater.net` (apex is primary).
-- [ ] Vercel shows "Invalid configuration" and lists the records it needs (an **A record** for the apex and a **CNAME** for `www`). Copy the exact values from that page; do not type them from memory.
-- [ ] `wotw-api` stays on its protected `vercel.app` address.
+- [x] `wotw-web`, Settings, Domains, Add: `wordonthewater.net` attached to **Production**, and `www.wordonthewater.net` set to **redirect to** `wordonthewater.net` (apex is primary).
+- [x] Vercel shows "Invalid configuration" and lists the records it needs (an **A record** for the apex and a **CNAME** for `www`). Copy the exact values from that page; do not type them from memory.
+- [x] `wotw-api` stays on its protected `vercel.app` address.
 
 **G3. Change the records in Squarespace**
-- [ ] Replace the existing apex (`@`) A records and the `www` record that point at Squarespace with the values Vercel showed. If Squarespace marks some as "Squarespace defaults" for the website, remove those for the apex and `www` only.
-- [ ] Do **not** change the MX records, the SPF TXT record or any DKIM or DMARC record (the Kit `ckespa`, `cka._domainkey` and `cka2._domainkey` CNAMEs stay too). Save.
+- [x] Replace the existing apex (`@`) A records and the `www` record that point at Squarespace with the values Vercel showed. If Squarespace marks some as "Squarespace defaults" for the website, remove those for the apex and `www` only.
+- [x] Do **not** change the MX records, the SPF TXT record or any DKIM or DMARC record (the Kit `ckespa`, `cka._domainkey` and `cka2._domainkey` CNAMEs stay too). Save.
 
 **G4. Check it**
-- [ ] After a few minutes (up to a few hours for DNS) both Vercel domain rows show **Valid Configuration** and a certificate.
-- [ ] `https://wordonthewater.net` shows the new site; `https://www.wordonthewater.net` redirects to it; HTTPS and the HSTS header check out on both.
-- [ ] A test email to `hello@wordonthewater.net` and one to `prayer@wordonthewater.net` still arrive in your mailbox.
+- [x] After a few minutes (up to a few hours for DNS) both Vercel domain rows show **Valid Configuration** and a certificate. (done 2026-11-21: Hendrik saw Valid Configuration on the apex; the `www` certificate was still being issued at that point and `www` answered over HTTPS when checked afterwards; authoritative DNS answers `216.150.1.1` and the Vercel CNAME)
+- [x] `https://wordonthewater.net` shows the new site; `https://www.wordonthewater.net` redirects to it; HTTPS and the HSTS header check out on both. (checked 2026-11-21 via `curl --resolve`: apex 200 from Vercel with HSTS `max-age=63072000; includeSubDomains; preload`, `www` 308 to the apex, http redirects to https, Let's Encrypt certificate valid to 2027-02-19)
+- [x] A test email to `hello@wordonthewater.net` and one to `prayer@wordonthewater.net` still arrive in your mailbox. (done 2026-11-21: both arrived within 13 seconds, but in Gmail's spam folder; SPF, DKIM and DMARC all passed and Gmail's reason was "similar to messages identified as spam", from a one-word test sent from the same Gmail account; fix is Report not spam and a Gmail filter)
 - [ ] To go back: restore the A and CNAME records from the G1 screenshot.
 
 ---
@@ -123,28 +123,30 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 Kit tells our site when a subscriber confirms, unsubscribes, bounces or complains, so our database mirror stays right. The route is built (`/api/webhooks/kit` on `wotw-web`, forwarding to `wotw-api`). Kit can only reach a **public** address, so the webhook is registered for production, on the real domain, after Part G.
 
+**Decision 2026-11-21: H3 to H5 are skipped for launch.** Kit's webhook endpoints (`/v4/webhook_endpoints`) refuse this account's API key with 401 "Authentication Failed" while every other call works (`/account`, `/forms`, `/tags` and the legacy `/webhooks` give 200), and Hendrik confirmed in Kit that webhooks need a paid plan, which we are not buying. The legacy `/webhooks` resource is not a way round it: it carries no signing secret, and our receiver refuses unsigned calls. Without the webhook, Kit still sends, confirms and unsubscribes by itself; only our database mirror stops learning who confirmed, unsubscribed or bounced (see ADR 0008, Finding 2026-11-21). The route and the registration tool stay in the code for when a paid plan exists. A daily sync from Kit's API is listed in PLAN.md 1.3. H1 and H2 still apply.
+
 **H1. Redirect and redeploy**
 - [ ] Kit production form: set the redirect after sign-up and after confirmation to `https://wordonthewater.net/thank-you`.
-- [ ] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this).
+- [x] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this). (not needed 2026-11-21: both Production deployments were built from `main` after the routes existed, and the two checks below prove the forwarder and the API route are live)
 
 **H2. Check the route on production before registering** (the chain is public site, then our forwarder, then the protected API)
-- [ ] `curl -i https://wordonthewater.net/api/webhooks/kit` gives **405** (only POST is accepted).
-- [ ] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**. That is good: the forwarder reached the production API and the API says no webhook secret is set yet.
+- [x] `curl -i https://wordonthewater.net/api/webhooks/kit` gives **405** (only POST is accepted). (checked 2026-11-21: 405)
+- [x] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**. That is good: the forwarder reached the production API and the API says no webhook secret is set yet. (checked 2026-11-21: 503)
 - [ ] **502** instead means the forwarder cannot reach the API: check `API_BASE_URL` and `API_BYPASS_SECRET` in `wotw-web` Production and redeploy. **401** means the secret is already set (fine).
 
-**H3. Register the webhook in Kit**
+**H3. Register the webhook in Kit (skipped, see the decision above)**
 - [ ] The root `.env` holds the Kit API key of the account that owns the production list (`KIT_API_KEY`; Kit webhooks are account-wide).
 - [ ] From the repo root: `make kit-webhook URL=https://wordonthewater.net/api/webhooks/kit`. Expect `Registered Kit webhook <id>. The signing secret is saved in .env as KIT_WEBHOOK_SECRET.` (the secret is not printed).
 - [ ] If it says the address is already registered, delete that endpoint in Kit's developer settings (webhooks) and run it again (Kit shows a secret only when it is created).
 - [ ] Kit, developer settings, webhooks: the endpoint is listed with `subscriber.activated`, `.unsubscribed`, `.bounced` and `.complained`.
 
-**H4. Put the secret in Vercel (`wotw-api`, Production only)**
+**H4. Put the secret in Vercel (`wotw-api`, Production only) (skipped, see the decision above)**
 - [ ] Copy it without showing it: `grep '^KIT_WEBHOOK_SECRET=' .env | cut -d= -f2- | pbcopy`.
 - [ ] `wotw-api`, Settings, Environment Variables, Add: `KIT_WEBHOOK_SECRET`, paste, **Production only**, **Sensitive** on, save. Then clear the clipboard: `pbcopy </dev/null`. Never add it to Preview (a preview must not hold the production secret; Kit cannot reach previews anyway).
 - [ ] Redeploy `wotw-api` in Production (a new variable reaches only a new deployment), wait for Ready.
 - [ ] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` now gives **401** (the API refuses an unsigned call). 401 instead of 503 proves the secret is in place.
 
-**H5. Confirm with a real delivery** (the signature key format was inferred from Kit's docs and has never seen a real delivery)
+**H5. Confirm with a real delivery (skipped, see the decision above)** (the signature key format was inferred from Kit's docs and has never seen a real delivery)
 - [ ] Cause an event in Kit: confirm or unsubscribe a **test** subscriber, or sign up and confirm once the redirect is set.
 - [ ] Kit, developer settings, webhooks: the endpoint's recent deliveries show **200**. **401** means the signature check failed (likely the secret format; the API logs for `/v1/webhooks/kit` show why). **502 or 503** means the API was unreachable or had no secret: re-check H4.
 - [ ] Tell Claude Code a delivery went through, so it reads the API logs (expect a 200) and ticks the PLAN.md 1.3 items.
