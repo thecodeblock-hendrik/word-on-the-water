@@ -17,7 +17,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | Part | Subject | Done | Open | Who and what |
 |---|---|---|---|---|
 | A | Gate: is the rest done? | 8 | 0 | Done |
-| B | Accounts and owner hardening | 2 | 8 | Hendrik: dashboards and accounts (Pro and the 5-minute cron are done) |
+| B | Accounts and owner hardening | 3 | 7 | Hendrik: dashboards and accounts (Pro, the 5-minute cron and the Firewall rules are done) |
 | C | Convert the site to a PWA | 7 | 0 | Done |
 | D | Security and operations checks | 4 | 5 | Needs a staging environment (possible now on Pro) and Hendrik's rehearsals; Claude drafts `migrate.yml` |
 | E | Email authentication | 5 | 0 | Done |
@@ -25,7 +25,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
 | H | Kit form redirect | 7 | 0 | Done except the optional webhook (skipped, needs a paid Kit plan) |
 | I | Production smoke test | 1 | 12 | First sign-up done; the rest of the smoke test on the live domain |
-| J | Exit gate and after launch | 0 | 11 | Launch gate and after launch |
+| J | Exit gate and after launch | 0 | 12 | Launch gate and after launch |
 | K | Weekly email broadcasts | 1 | 16 | Hendrik: first broadcast steps in Kit |
 | L | Got Questions chat | 4 | 3 | Hendrik: preview walk-through, firewall rule |
 
@@ -57,7 +57,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 - [ ] Rotate any secret that was ever shown in a chat, a screenshot or a log ([runbooks/rotate-secrets.md](runbooks/rotate-secrets.md)).
 - [ ] With Pro: a log drain to a log store (Better Stack or Axiom) and a staging environment (a custom Vercel environment), deferred from step 0.10.
 - [x] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
-- [ ] Vercel Firewall rate-limit rules on the sign-up route and on `/v1/chat/messages` (the prayer and contact routes when those forms are built); Attack Challenge Mode noted in the incident runbook.
+- [x] Vercel Firewall rate-limit rules on the sign-up route and on `/v1/chat/messages` (the prayer and contact routes when those forms are built); Attack Challenge Mode noted in the incident runbook. (done by Hendrik 2026-11-21: two rate-limit rules on `wotw-web`, matched on Server Action Name because sign-up and chat are Server Actions and not paths, so `/v1/chat/messages` is not reachable from the public site; the values are in [runbooks/deploy.md](runbooks/deploy.md), "Firewall rules"; both start on Log; Hendrik did not report which action names the dashboard listed, so confirm they read `subscribe`, `sendChat` and `warmChat`; Attack Challenge Mode is in [runbooks/incident.md](runbooks/incident.md))
 
 ---
 
@@ -187,6 +187,7 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 - [ ] All Part A budgets met and no high security findings.
 - [ ] Part K is complete: the first weekly email reached a real inbox (not spam), from `hello@`, with the banner, the unsubscribe link and a working "Read it on the website" link.
 - [ ] Alerts are set up and each one has been seen to fire once ([runbooks/alerts.md](runbooks/alerts.md)).
+- [ ] **After about a day of real traffic:** both Firewall rules (sign-up and chat, [runbooks/deploy.md](runbooks/deploy.md)) are on Log; look at the Firewall traffic view for anything legitimate that was caught, then switch each rule to Too Many Requests (429), publish, and note the date here.
 - [ ] **First week after launch:** `kit_synced` shows in the API logs every day (counts only), and subscribers who confirmed are `active` in our table. If the first sign-ups reach 7 days still `pending` while Kit shows them active, the sync is not working: stop and look (the retention job deletes pending rows after 7 days).
 - [ ] **Monthly:** in the Kit dashboard, delete the subscribers that are still unconfirmed after 7 days (Subscribers, filter Unconfirmed). The retention job cannot do this: Kit's API has no delete (see [privacy.md](privacy.md)).
 - [ ] **Accepted advisories lapse soon after launch:** `GHSA-3g3m-2fjr-6pw4` (glob, 2026-12-01, three days after launch), `GHSA-fc5q-39xc-vjpf` (picomatch, high severity, dev-only, no fix yet, 2026-12-15, in `osv-scanner.toml` and `pnpm-workspace.yaml`) and `GHSA-g3hv-75wg-m249` (minimatch, 2026-12-31, only in `osv-scanner.toml`, which is why `pnpm audit` still lists it as moderate). Re-check each before it lapses, then remove its entry everywhere or extend it with a new reason.

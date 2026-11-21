@@ -142,6 +142,21 @@ The drain runs every 5 minutes (changed on the move to Pro, 2026-11-21); on Hobb
 
 Sources: [migrate from Cron Jobs](https://vercel.com/docs/schedules/migrate-from-cron-jobs), [Cron Jobs usage and pricing](https://vercel.com/docs/schedules/cron-jobs/usage-and-pricing) and [the January 2026 limits change](https://vercel.com/changelog/cron-jobs-now-support-100-per-project-on-every-plan).
 
+## Firewall rules (`wotw-web`)
+
+Two rate-limit rules on the web project, set up by Hendrik on 2026-11-21 (Vercel, `wotw-web`, Firewall, Configure, published with Review Changes and Publish; they take effect at once, with no redeploy). They guard the public site only: the API's own address is behind the login wall and only the web app calls it. Sign-up, chat and the theme toggle are Next.js Server Actions, so the browser posts to the page URL and the rules match on **Server Action Name** (the function names in `apps/web/src/lib/actions`), not on a path. The numbers are deliberately looser than the API's own limits (5 sign-ups an hour per address and 3 per email, 30 chat messages per 10 minutes), so a real visitor reaches the API's friendly generic 429 before Vercel's.
+
+| Rule | If | Limit | Action |
+|---|---|---|---|
+| Rate limit sign-up | Server Action Name equals `subscribe` | Fixed window, 10 minutes, 10 requests, key IP | Log first, then Too Many Requests (429) |
+| Rate limit chat | Server Action Name is any of `sendChat`, `warmChat` (`warmChat` fires each time the chat is opened) | Fixed window, 1 minute, 40 requests, key IP | Log first, then Too Many Requests (429) |
+
+- Both rules start on **Log**, which blocks nothing. After about a day of real traffic, check the Firewall traffic view for anything legitimate that was caught, then edit each rule to 429 and publish again. The date of the switch goes in production_checklist.md, Part J.
+- If a rule ever needs to be rebuilt and the dashboard does not offer Server Action Name, use one rule on Method equals POST and the Request Header `next-action` exists, 30 requests a minute per IP (sign-up and chat then share one limit).
+- Rate limiting is included on Pro and billed by usage; Pro allows 40 rules per project, and rate-limit rules count toward that number.
+- In an attack, Attack Challenge Mode is the emergency switch (see [incident.md](incident.md)); it is not part of these two rules.
+- The prayer and contact forms, when they are built, need their own rule (their Server Action names).
+
 ## Checks after a deploy
 
 ```
