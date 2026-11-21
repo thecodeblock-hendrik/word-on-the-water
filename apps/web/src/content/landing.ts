@@ -165,7 +165,7 @@ export const signup = {
   },
   success: {
     heading: "Check your inbox",
-    body: "We sent you a link to confirm your email. If it does not arrive in a few minutes, look in your spam folder.",
+    body: `We sent you a link to confirm your email. If it does not arrive in a few minutes, look in your spam folder. Still nothing, or you unsubscribed before? Email ${CONTACT_EMAIL}.`,
   },
   noScript:
     "Signing up needs JavaScript for the spam check. Email hello@wordonthewater.net and we will add you.",
