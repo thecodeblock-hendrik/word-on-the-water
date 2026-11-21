@@ -74,7 +74,7 @@ Everything runs on **Vercel**, with data services from the Vercel Marketplace so
 **Serverless rules that follow from Vercel:**
 - No long-running processes or in-memory state; anything stateful lives in Postgres or Redis.
 - SQLAlchemy uses Neon's **pooled** endpoint with `NullPool` (let PgBouncer pool) and short timeouts; Alembic migrations use the **direct** (unpooled) URL.
-- Keep API function cold starts small: lean dependencies, lazy-import heavy libraries, set `maxDuration` sensibly (10–30 s). Fluid compute is on for both projects (checked 2026-11-17, region `fra1`); on Hobby a function still scales to zero when idle, so the first request after a pause takes about 2 s. Cold Start Prevention is a Pro question (see production_checklist.md, Part B).
+- Keep API function cold starts small: lean dependencies, lazy-import heavy libraries, set `maxDuration` sensibly (10–30 s). Fluid compute is on for both projects (checked 2026-11-17, region `fra1`); on Hobby a function scaled to zero when idle, so the first request after a pause took about 2 s. On Pro (2026-11-21) cold-start prevention is built into Fluid Compute and enabled on both projects (no separate toggle): the first request after 15 minutes idle took 0.95 s for the web page against 0.28 s warm, and the API stays warm through the 5-minute outbox cron (production_checklist.md, Part B).
 - Node: `apps/web/package.json` has `engines.node` 24.x, which overrides the Vercel dashboard's 26.x (the dashboard shows "Project Setting overridden by package.json"). That is intended: production, CI and local all run Node 24.
 - Region: pin both projects and the database to the same region nearest the audience (e.g. `fra1`/`lhr1` for Europe/Africa, `iad1` for US). Confirm with Hendrik.
 - Cron endpoints check the `Authorization: Bearer $CRON_SECRET` header Vercel sends.
@@ -274,7 +274,7 @@ Comply with **GDPR and POPIA** (and similar) by default: data minimisation, clea
 - Lockfiles committed; `pnpm install --frozen-lockfile`, `uv sync --locked`.
 - Dependabot (weekly, grouped), `pnpm audit` and `pip-audit` in CI, **CodeQL** for TS and Python, **Bandit** + **Ruff** security rules, **OSV-Scanner** across both lockfiles.
 - Pin GitHub Actions to commit SHAs; least-privilege `permissions:` in workflows. Use a scoped Vercel token stored as a GitHub Environment secret only where CI must call Vercel; prefer Vercel OIDC federation for any cloud access from functions.
-- Vercel: enable Deployment Protection on preview deployments, restrict who can promote to production, turn on 2FA for every team member, enable the Vercel audit log on Pro.
+- Vercel: enable Deployment Protection on preview deployments, restrict who can promote to production, turn on 2FA for every team member, use the Vercel Activity Log (the audit log is Enterprise-only; on Pro the free Activity Log is always on).
 - Branch protection on `main`: PR required, checks green, 1 review, no force-push, signed commits recommended.
 - Keep production dependencies separate from dev dependencies (`uv` groups, `devDependencies`) so test tooling never ships in a function bundle.
 
