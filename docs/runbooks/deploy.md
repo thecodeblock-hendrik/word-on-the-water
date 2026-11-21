@@ -109,7 +109,7 @@ DATABASE_URL_DIRECT="postgresql+asyncpg://app_migrator:<password>@<NEON_PGHOST_U
 ENVIRONMENT=production uv run alembic upgrade head
 ```
 
-`ENVIRONMENT` other than `local` turns on certificate and hostname verification. Production migrations move to `migrate.yml` with a manual approval (planned, a launch step). Run locally with `ENVIRONMENT=production`, the settings refuse Cloudflare's test Turnstile secret that sits in your `.env`: pass a non-test dummy for that one command, for example `TURNSTILE_SECRET_KEY=unused-by-migrations`. Run it from `apps/api` (Alembic imports `app` from the current directory).
+`ENVIRONMENT` other than `local` turns on certificate and hostname verification. Production migrations move to `migrate.yml` with a manual approval (planned after launch and before Phase 2, see [post_launch.md](../post_launch.md)). Run locally with `ENVIRONMENT=production`, the settings refuse Cloudflare's test Turnstile secret that sits in your `.env`: pass a non-test dummy for that one command, for example `TURNSTILE_SECRET_KEY=unused-by-migrations`. Run it from `apps/api` (Alembic imports `app` from the current directory).
 
 **Preview databases are not migrated automatically.** Vercel creates a Neon branch per git branch, copied from `preview-base` when it is first created. A new migration therefore has to be applied to `preview-base` and to the branch of every open pull request that needs it, or the preview API fails with `DBAPIError` on the first query that touches the new schema. Check with `select version_num from alembic_version;` on the branch the preview uses.
 
