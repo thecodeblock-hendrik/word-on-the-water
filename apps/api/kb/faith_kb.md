@@ -1374,7 +1374,7 @@ This knowledge base answers the questions people most often ask about the Christ
 
 ### 8.5 Should babies be baptised? How should baptism be done?
 
-**Also asked:** Infant baptism vs believer’s baptism · Immersion or sprinkling?
+**Also asked:** Infant baptism vs believer’s baptism · Immersion or sprinkling? · Is infant baptism biblical? · Should babies be baptised or only adults who believe? · Do babies need to be baptised?
 
 **Short answer:** Evangelicals agree that baptism is important and commanded. They differ on who should be baptised and how.
 

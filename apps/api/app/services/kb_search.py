@@ -14,7 +14,8 @@ be answered reach at least coverage 0.58 and score 12.8; the knowledge base's
 own questions all score 15.5 or more with coverage 1.0. So medium needs score
 10 and coverage 0.55, and high needs score 12 and coverage 0.7. Known limit:
 matching is by words, so "is the bible true" needs "Is the Bible true?" as a
-paraphrase in the knowledge base to find its entry.
+paraphrase in the knowledge base to find its entry. Spelling variants are folded first
+(honour and honor, baptise and baptize) and "baptism" joins "baptised", so those need no paraphrase.
 """
 
 import difflib
@@ -106,11 +107,28 @@ def stem(word: str) -> str:
     return word
 
 
+# The knowledge base is written in British English and visitors type both, so the common variants
+# are folded to one form before stemming: honour and honor, baptise and baptize, judgement and
+# judgment. Both sides of a search go through the same folding, so it only ever adds matches.
+_OUR = re.compile(r"^([a-z]{3,})our(s|ed|ing|able)?$")
+_ISE = re.compile(r"^([a-z]{3,})is(e|es|ed|ing|ation|ations)$")
+
+# Stems that spelling rules cannot join: "baptism" has no verb ending to strip.
+STEM_ALIASES = {"baptism": "baptiz", "baptize": "baptiz"}
+
+
+def fold_spelling(word: str) -> str:
+    word = _OUR.sub(r"\1or\2", word)
+    word = _ISE.sub(r"\1iz\2", word)
+    return word.replace("judgement", "judgment")
+
+
 def tokens(text: str) -> list[str]:
-    """Lowercase, drop apostrophes, split on non-letters, drop stop words, stem."""
+    """Lowercase, drop apostrophes, split on non-letters, drop stop words, fold spelling, stem."""
     text = unicodedata.normalize("NFKC", text).lower()
     text = re.sub(r"['’‘`]", "", text)
-    return [stem(w) for w in re.findall(r"[a-z0-9]+", text) if w not in STOP_WORDS]
+    stems = (stem(fold_spelling(w)) for w in re.findall(r"[a-z0-9]+", text) if w not in STOP_WORDS)
+    return [STEM_ALIASES.get(w, w) for w in stems]
 
 
 @dataclass(frozen=True)

@@ -27,7 +27,7 @@ def own_questions(kb: KnowledgeBase) -> list[tuple[str, str]]:
 
 def test_the_knowledge_bases_own_questions_are_found(kb: KnowledgeBase, index: SearchIndex) -> None:
     cases = own_questions(kb)
-    assert len(cases) == 716
+    assert len(cases) == 719
     first = sum(index.search(q).ranked[:1] == (i,) for q, i in cases)
     top3 = sum(i in index.search(q).ranked[:3] for q, i in cases)
     print(f"own questions: first {first / len(cases):.3f}, top three {top3 / len(cases):.3f}")
@@ -46,6 +46,25 @@ def test_real_world_wordings_are_found(index: SearchIndex) -> None:
 @pytest.mark.parametrize("query", OFF_TOPIC)
 def test_off_topic_questions_get_no_answer(index: SearchIndex, query: str) -> None:
     assert index.search(query).band == "low"
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "Should babies be baptised?",
+        "Should babies be baptised or only adults who believe?",
+        "Is infant baptism biblical?",
+        "Do babies need to be baptised?",
+        "Should babies be baptized?",
+    ],
+)
+def test_infant_baptism_wordings_get_the_baptism_entry_confidently(
+    index: SearchIndex, query: str
+) -> None:
+    # Found on the live chat (2026-11-21): the last two real wordings got no answer or a list.
+    result = index.search(query)
+    assert result.ranked[0] == "8.5"
+    assert result.band == "high"
 
 
 def test_who_is_jesus_is_a_confident_answer(index: SearchIndex) -> None:
