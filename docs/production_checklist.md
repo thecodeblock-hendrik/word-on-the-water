@@ -17,9 +17,9 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | Part | Subject | Done | Open | Who and what |
 |---|---|---|---|---|
 | A | Gate: is the rest done? | 8 | 0 | Done |
-| B | Accounts and owner hardening | 8 | 2 | Left: rotate exposed secrets, the log drain and staging (Hendrik, dashboards) |
+| B | Accounts and owner hardening | 9 | 0 | Done (the log drain and staging are deferred to after launch) |
 | C | Convert the site to a PWA | 7 | 0 | Done |
-| D | Security and operations checks | 4 | 5 | Needs a staging environment (possible now on Pro) and Hendrik's rehearsals; Claude drafts `migrate.yml` |
+| D | Security and operations checks | 4 | 3 | Left: `migrate.yml` (Claude drafts), the rollback rehearsal and the backup restore test (Hendrik); staging, ZAP and CSP report-only deferred |
 | E | Email authentication | 5 | 0 | Done |
 | F | Production configuration | 6 | 2 | Hendrik: database check, preview widget |
 | G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
@@ -29,7 +29,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | K | Weekly email broadcasts | 1 | 16 | Hendrik: first broadcast steps in Kit |
 | L | Got Questions chat | 4 | 3 | Hendrik: preview walk-through, firewall rule |
 
-**Done on 2026-11-21:** the first live sign-up end to end (Turnstile, Kit confirmation in the inbox, `/cron/sync-kit` moved the mirror to active), after fixing the production Kit API key (see the Part F incident note). **Next, in order:** Hendrik works through the Part B dashboard items (2FA, audit log, Firewall rate-limit rules, log drain and staging) and the Part F leftovers (database check, preview widget); then the rest of the Part I smoke test on the live domain and the first broadcast (Part K). After every merge, promote the new production builds by hand (Part D). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
+**Done on 2026-11-21:** the first live sign-up end to end (Turnstile, Kit confirmation in the inbox, `/cron/sync-kit` moved the mirror to active), after fixing the production Kit API key (see the Part F incident note). **Next, in order:** the Part F leftovers (database check, preview widget) and the Part D rehearsals (`migrate.yml`, rollback, backup restore); then the rest of the Part I smoke test on the live domain and the first broadcast (Part K). After every merge, promote the new production builds by hand (Part D). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
 
 ---
 
@@ -54,8 +54,8 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 - [x] Two-factor on Squarespace (domain and DNS) and the registrar lock on. (done by Hendrik 2026-11-21)
 - [x] Two-factor on GitHub, Vercel, Neon, Upstash, Kit and Squarespace (Postmark when it is set up), threat E4. (done by Hendrik 2026-11-21, not verifiable from here: GitHub's API returned null for the two-factor status because the token lacks the scope. GitHub two-factor belongs to the `thecodeblock-hendrik` user account, which owns the repository as a User, not an organisation)
 - [x] Recovery codes for every account stored offline. (done by Hendrik 2026-11-21)
-- [ ] Rotate any secret that was ever shown in a chat, a screenshot or a log ([runbooks/rotate-secrets.md](runbooks/rotate-secrets.md)).
-- [ ] With Pro: a log drain to a log store (Better Stack or Axiom) and a staging environment (a custom Vercel environment), deferred from step 0.10.
+- [x] Rotate any secret that was ever shown in a chat, a screenshot or a log ([runbooks/rotate-secrets.md](runbooks/rotate-secrets.md)). (done by Hendrik 2026-11-21; which secrets were rotated was not reported, so the rotation log in the runbook is the record. If the Kit API key was one of them, the next sign-up or a hand run of `/cron/sync-kit` is the proof it works: remember a changed variable needs a redeploy and a promote, Part D)
+- Deferred after launch (decided 2026-11-21, now in PLAN.md 1.7): a log drain to a log store (Better Stack or Axiom) and a staging environment. Per-PR previews are the pre-production check for launch, and Vercel's own runtime logs have been enough to find every problem so far. A drain would send visitor IP addresses to a new processor, so it needs the privacy documents updated first.
 - [x] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
 - [x] Vercel Firewall rate-limit rules on the sign-up route and on `/v1/chat/messages` (the prayer and contact routes when those forms are built); Attack Challenge Mode noted in the incident runbook. (done by Hendrik 2026-11-21: two rate-limit rules on `wotw-web`, matched on Server Action Name because sign-up and chat are Server Actions and not paths, so `/v1/chat/messages` is not reachable from the public site; the values are in [runbooks/deploy.md](runbooks/deploy.md), "Firewall rules"; both start on Log; Hendrik did not report which action names the dashboard listed, so confirm they read `subscribe`, `sendChat` and `warmChat`; Attack Challenge Mode is in [runbooks/incident.md](runbooks/incident.md))
 
@@ -77,13 +77,13 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 
 ## Part D. Security and operations checks (staging or preview)
 
-- [ ] Run the CSP in report-only on staging (`CSP_REPORT_ONLY=1`), review the reports, then enforce it in production (`CSP_REPORT_ONLY` off).
+- Skipped (decided 2026-11-21): the CSP report-only run on staging. The enforced CSP is already confirmed on production (next item) and `CSP_REPORT_ONLY` is unset there; a report-only run can be done later on a `staging` branch preview (PLAN.md 1.7).
 - [x] The production response has the CSP header and it is enforced (threat plan T3) (checked 2026-11-21 on `wotw-web.vercel.app`: `content-security-policy` header with a nonce, `CSP_REPORT_ONLY` not set in Production).
 - [x] `/docs` and `/openapi.json` return 404 in production (threat plan I5) (checked 2026-11-21 with `vercel curl` against `wotw-api.vercel.app`: both give the app's own 404, `/health/live` gives 200; `ENVIRONMENT=production` is set).
 - [ ] `migrate.yml` with a manual approval; production auto-promotion off; promote after the migrations and the smoke tests pass. Auto-promotion is already off in both Vercel projects (checked 2026-11-21: `autoAssignCustomDomains` is false), so **after every merge to `main`, the new production deployment of `wotw-api` and `wotw-web` must be promoted by hand** (Vercel, Deployments, the newest Ready one, three dots, Promote to Production, or `vercel promote <url>`). Until then the live site and the crons run the last promoted build (on 2026-11-21 that was the API from 17 November and the web site from 18 November, so the 5-minute drain, the Kit sync, the landscape menu fix and the Article JSON-LD were not live). Promote the API first when a merge changes both, and after any migration has been applied.
 - [ ] Rollback rehearsed with Vercel Instant Rollback.
 - [ ] Backup restore tested from the nightly dump and from Neon point-in-time recovery (`docs/runbooks/restore-db.md`).
-- [ ] ZAP baseline scan against staging: no high findings. The weekly `zap.yml` job already scans a local production build (PR #117); this repeats it against staging once Pro gives us one.
+- Deferred (decided 2026-11-21): a ZAP scan against staging. The weekly `zap.yml` job already scans a production build in CI (PR #117); a one-off scan of a preview with the protection bypass header is optional (PLAN.md 1.7).
 - [x] Re-check the Done threat items on the deployed site (threat model S1, S2, S4, T4, E1): calls without the service token or `CRON_SECRET` give 401, a forged `X-Client-IP` is ignored, CI security workflows are green, `app_runtime` cannot run DDL. (checked 2026-11-21 on `wotw-api.vercel.app` with `vercel curl`: `/v1/ping`, `POST /v1/subscribers`, `/cron/drain-outbox` and `/cron/retention` give 401 with no or a wrong token, and a forged `X-Client-IP` without a token gives 401; Security, CodeQL and CI are green on `main` at f16cc4f; as `app_runtime` on the production database, create table gives "permission denied for schema public", alter and drop table "must be owner", truncate "permission denied", and select works)
 - [x] The retention job (PLAN.md 1.7) runs on the production cron (checked 2026-11-21: `/cron/retention` is scheduled `30 3 * * *` in `apps/api/vercel.json`, and Hendrik saw a successful run in the Vercel dashboard, Settings, Cron Jobs; Hobby keeps runtime logs for about an hour, so earlier runs cannot be read back).
 
