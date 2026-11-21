@@ -106,11 +106,28 @@ def stem(word: str) -> str:
     return word
 
 
+# The knowledge base is written in British English and visitors type both, so the common variants
+# are folded to one form before stemming: honour and honor, baptise and baptize, judgement and
+# judgment. Both sides of a search go through the same folding, so it only ever adds matches.
+_OUR = re.compile(r"^([a-z]{3,})our(s|ed|ing|able)?$")
+_ISE = re.compile(r"^([a-z]{3,})is(e|es|ed|ing|ation|ations)$")
+
+# Stems that spelling rules cannot join: "baptism" has no verb ending to strip.
+STEM_ALIASES = {"baptism": "baptiz", "baptize": "baptiz"}
+
+
+def fold_spelling(word: str) -> str:
+    word = _OUR.sub(r"\1or\2", word)
+    word = _ISE.sub(r"\1iz\2", word)
+    return word.replace("judgement", "judgment")
+
+
 def tokens(text: str) -> list[str]:
-    """Lowercase, drop apostrophes, split on non-letters, drop stop words, stem."""
+    """Lowercase, drop apostrophes, split on non-letters, drop stop words, fold spelling, stem."""
     text = unicodedata.normalize("NFKC", text).lower()
     text = re.sub(r"['’‘`]", "", text)
-    return [stem(w) for w in re.findall(r"[a-z0-9]+", text) if w not in STOP_WORDS]
+    stems = (stem(fold_spelling(w)) for w in re.findall(r"[a-z0-9]+", text) if w not in STOP_WORDS)
+    return [STEM_ALIASES.get(w, w) for w in stems]
 
 
 @dataclass(frozen=True)
