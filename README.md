@@ -10,9 +10,9 @@ Christian ministry web app publishing devotionals and Bible teaching for surfers
 
 ## Status
 
-Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress and the site is **not public yet**: `wordonthewater.net` still points at the old Squarespace site. The planned launch date is **Saturday 28 November 2026**.
+Phase 0 (foundations) is complete. Phase 1 (the public landing page) is in progress and the site has been **live on `wordonthewater.net` since 2026-11-21** (Vercel Pro). The launch date is **Saturday 28 November 2026**, when the first devotional goes out; what is still open is listed in [docs/production_checklist.md](docs/production_checklist.md).
 
-Built: the landing page with its real copy, light and dark themes, the devotional pages (five Advent devotionals, the first on the launch date), a Bible reader (BSB and WEB, switched on in Production), an installable PWA (icons, manifest, shortcuts, screenshots; no offline mode yet), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and the Kit webhook route). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; mail from `hello@` needs Kit's DKIM first (launch checklist, Parts E and K). The Got Questions chat (step 1.10) is built and tested behind `CHAT_ENABLED` (answers from a local knowledge base, nothing stored on the server); it is switched on in Production. Next: the manual passes in 1.8, the final landing page review (1.11) and the launch steps in `docs/production_checklist.md` (which now include the PWA install checks on the live domain and the first Kit draft test); the prayer request form (1.4) and contact form (1.5) come after launch, and the page has no prayer option until then. Everything that needs the live domain is a launch-time step.
+Built: the landing page with its real copy, light and dark themes, the devotional pages (five Advent devotionals, the first on the launch date), a Bible reader (BSB and WEB, switched on in Production), an installable PWA (icons, manifest, shortcuts, screenshots; no offline mode yet), and the email sign-up with Kit double opt-in (Turnstile, rate limits, retry from an outbox, `/thank-you`, and a daily sync of the Kit list into our database; Kit's webhooks need a paid plan, so none is registered). The sign-up works end to end on a Vercel preview. The weekly email is built ahead as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email with the series banner and creates a Kit draft that you review and schedule in Kit; Kit's DKIM is set and a test passed SPF, DKIM and DMARC (launch checklist, Parts E and K). The Got Questions chat (step 1.10) is built and tested behind `CHAT_ENABLED` (answers from a local knowledge base, nothing stored on the server); it is switched on in Production. Next: the manual passes in 1.8, the final landing page review (1.11) and the launch steps in `docs/production_checklist.md` (which now include the PWA install checks on the live domain and the first Kit draft test); the prayer request form (1.4) and contact form (1.5) come after launch, and the page has no prayer option until then. Everything that needs the live domain is a launch-time step.
 
 ## Stack
 
@@ -25,7 +25,7 @@ Built: the landing page with its real copy, light and dark themes, the devotiona
 
 Vercel builds and deploys straight from the GitHub repo (no containers). Docker is used only locally for Postgres, Redis and Mailpit.
 
-The browser only talks to Next.js, which calls FastAPI server-side with a service token. Kit's webhooks reach the API through a forwarder route on the web project (`/api/webhooks/kit`).
+The browser only talks to Next.js, which calls FastAPI server-side with a service token. Kit's list is mirrored into our database by a daily job (`/cron/sync-kit`); a webhook receiver exists (a forwarder route on the web project, `/api/webhooks/kit`) for a paid Kit plan but is not registered.
 
 ## Install on a phone
 
@@ -58,7 +58,7 @@ make typecheck   # mypy, tsc
 make test        # pytest, vitest
 make e2e         # playwright, all browsers
 make types       # regenerate API types
-make kit-webhook URL=https://<site>/api/webhooks/kit   # register the Kit webhook (launch time)
+make kit-webhook URL=https://<site>/api/webhooks/kit   # register the Kit webhook (needs a paid Kit plan; not used at launch)
 make down        # stop services
 ```
 

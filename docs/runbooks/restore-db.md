@@ -68,7 +68,7 @@ Use this route when the point-in-time window has passed, or when Neon itself is 
 1. **Schema matches the code:** `alembic current` against the restored database equals the deployed head. If you restored to before a migration, the deployed app may need rolling back or the migration re-running.
 2. **Health:** `vercel curl /api/health --deployment <web deployment URL>` returns ok (see the deploy runbook).
 3. **Data that should be gone may be back.** People who unsubscribed or asked for deletion since the restore point reappear. Re-apply every erasure request and unsubscribe from that period (Kit holds the unsubscribe state), and run the retention job so expired prayer requests, contact messages and unconfirmed subscribers go again.
-4. **Mirror drift:** subscribers in Neon can disagree with Kit after a restore; Kit wins. Re-sync status from Kit.
+4. **Mirror drift:** subscribers in Neon can disagree with Kit after a restore; Kit wins. Re-sync status from Kit by calling `/cron/sync-kit` once by hand (it also runs daily at 03:00 UTC).
 5. **Outbox:** rows sent before the restore point may be pending again and would send twice. Check `email_outbox` for old pending rows and mark them failed.
 6. Write down what happened in `docs/incidents/` and, if personal data was lost or exposed, follow the incident runbook.
 
