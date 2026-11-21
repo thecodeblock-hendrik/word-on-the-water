@@ -62,7 +62,7 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 - [ ] Backup restore tested from the nightly dump and from Neon point-in-time recovery (`docs/runbooks/restore-db.md`).
 - [ ] ZAP baseline scan against staging: no high findings. The weekly `zap.yml` job already scans a local production build (PR #117); this repeats it against staging once Pro gives us one.
 - [x] Re-check the Done threat items on the deployed site (threat model S1, S2, S4, T4, E1): calls without the service token or `CRON_SECRET` give 401, a forged `X-Client-IP` is ignored, CI security workflows are green, `app_runtime` cannot run DDL. (checked 2026-11-21 on `wotw-api.vercel.app` with `vercel curl`: `/v1/ping`, `POST /v1/subscribers`, `/cron/drain-outbox` and `/cron/retention` give 401 with no or a wrong token, and a forged `X-Client-IP` without a token gives 401; Security, CodeQL and CI are green on `main` at f16cc4f; as `app_runtime` on the production database, create table gives "permission denied for schema public", alter and drop table "must be owner", truncate "permission denied", and select works)
-- [ ] The retention job (PLAN.md 1.7) runs on the production cron.
+- [x] The retention job (PLAN.md 1.7) runs on the production cron (checked 2026-11-21: `/cron/retention` is scheduled `30 3 * * *` in `apps/api/vercel.json`, and Hendrik saw a successful run in the Vercel dashboard, Settings, Cron Jobs; Hobby keeps runtime logs for about an hour, so earlier runs cannot be read back).
 
 ---
 
