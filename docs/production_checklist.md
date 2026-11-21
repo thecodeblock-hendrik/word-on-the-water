@@ -123,6 +123,8 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 Kit tells our site when a subscriber confirms, unsubscribes, bounces or complains, so our database mirror stays right. The route is built (`/api/webhooks/kit` on `wotw-web`, forwarding to `wotw-api`). Kit can only reach a **public** address, so the webhook is registered for production, on the real domain, after Part G.
 
+**Decision 2026-11-21: H3 to H5 are skipped for launch.** Kit's webhook endpoints (`/v4/webhook_endpoints`) refuse this account's API key with 401 "Authentication Failed" while every other call works (`/account`, `/forms`, `/tags` and the legacy `/webhooks` give 200), and Hendrik confirmed in Kit that webhooks need a paid plan, which we are not buying. The legacy `/webhooks` resource is not a way round it: it carries no signing secret, and our receiver refuses unsigned calls. Without the webhook, Kit still sends, confirms and unsubscribes by itself; only our database mirror stops learning who confirmed, unsubscribed or bounced (see ADR 0008, Finding 2026-11-21). The route and the registration tool stay in the code for when a paid plan exists. A daily sync from Kit's API is listed in PLAN.md 1.3. H1 and H2 still apply.
+
 **H1. Redirect and redeploy**
 - [ ] Kit production form: set the redirect after sign-up and after confirmation to `https://wordonthewater.net/thank-you`.
 - [ ] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this).
@@ -132,19 +134,19 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 - [ ] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**. That is good: the forwarder reached the production API and the API says no webhook secret is set yet.
 - [ ] **502** instead means the forwarder cannot reach the API: check `API_BASE_URL` and `API_BYPASS_SECRET` in `wotw-web` Production and redeploy. **401** means the secret is already set (fine).
 
-**H3. Register the webhook in Kit**
+**H3. Register the webhook in Kit (skipped, see the decision above)**
 - [ ] The root `.env` holds the Kit API key of the account that owns the production list (`KIT_API_KEY`; Kit webhooks are account-wide).
 - [ ] From the repo root: `make kit-webhook URL=https://wordonthewater.net/api/webhooks/kit`. Expect `Registered Kit webhook <id>. The signing secret is saved in .env as KIT_WEBHOOK_SECRET.` (the secret is not printed).
 - [ ] If it says the address is already registered, delete that endpoint in Kit's developer settings (webhooks) and run it again (Kit shows a secret only when it is created).
 - [ ] Kit, developer settings, webhooks: the endpoint is listed with `subscriber.activated`, `.unsubscribed`, `.bounced` and `.complained`.
 
-**H4. Put the secret in Vercel (`wotw-api`, Production only)**
+**H4. Put the secret in Vercel (`wotw-api`, Production only) (skipped, see the decision above)**
 - [ ] Copy it without showing it: `grep '^KIT_WEBHOOK_SECRET=' .env | cut -d= -f2- | pbcopy`.
 - [ ] `wotw-api`, Settings, Environment Variables, Add: `KIT_WEBHOOK_SECRET`, paste, **Production only**, **Sensitive** on, save. Then clear the clipboard: `pbcopy </dev/null`. Never add it to Preview (a preview must not hold the production secret; Kit cannot reach previews anyway).
 - [ ] Redeploy `wotw-api` in Production (a new variable reaches only a new deployment), wait for Ready.
 - [ ] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` now gives **401** (the API refuses an unsigned call). 401 instead of 503 proves the secret is in place.
 
-**H5. Confirm with a real delivery** (the signature key format was inferred from Kit's docs and has never seen a real delivery)
+**H5. Confirm with a real delivery (skipped, see the decision above)** (the signature key format was inferred from Kit's docs and has never seen a real delivery)
 - [ ] Cause an event in Kit: confirm or unsubscribe a **test** subscriber, or sign up and confirm once the redirect is set.
 - [ ] Kit, developer settings, webhooks: the endpoint's recent deliveries show **200**. **401** means the signature check failed (likely the secret format; the API logs for `/v1/webhooks/kit` show why). **502 or 503** means the API was unreachable or had no secret: re-check H4.
 - [ ] Tell Claude Code a delivery went through, so it reads the API logs (expect a 200) and ticks the PLAN.md 1.3 items.
