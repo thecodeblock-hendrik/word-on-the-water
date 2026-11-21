@@ -129,17 +129,20 @@ class Chat:
         result = self.index.search(text, adjust)
         if result.band == "high":
             return self._answer(self.entries[result.ranked[0]])
+        if term := self._typed_term(words):
+            return term
         if result.band == "medium":
             return self._clarify([self.entries[i] for i in result.ranked])
         if last is not None and pointing:
             return self._related(last)
-        return self._typed_term(words) or self.no_answer()
+        return self.no_answer()
 
     def _typed_term(self, words: str) -> ChatReply | None:
         """The definition, when the question is only a glossary word or alias.
 
-        Only reached where the search found nothing, so a question with its own entry ("what is
-        grace") keeps its full answer.
+        Only reached when the search is not confident, so a question with its own entry ("what is
+        grace") keeps its full answer. It comes before a "did you mean" list: after an answer the
+        context boost can lift a bare glossary word into that band, and a definition beats guesses.
         """
         match = TERM_QUESTION.match(" ".join(words.split()))
         glossary = self.typed_terms.get(match.group("term")) if match else None
