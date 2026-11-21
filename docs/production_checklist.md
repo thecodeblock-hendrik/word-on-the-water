@@ -17,7 +17,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | Part | Subject | Done | Open | Who and what |
 |---|---|---|---|---|
 | A | Gate: is the rest done? | 8 | 0 | Done |
-| B | Accounts and owner hardening | 3 | 7 | Hendrik: dashboards and accounts (Pro, the 5-minute cron and the Firewall rules are done) |
+| B | Accounts and owner hardening | 8 | 2 | Left: rotate exposed secrets, the log drain and staging (Hendrik, dashboards) |
 | C | Convert the site to a PWA | 7 | 0 | Done |
 | D | Security and operations checks | 4 | 5 | Needs a staging environment (possible now on Pro) and Hendrik's rehearsals; Claude drafts `migrate.yml` |
 | E | Email authentication | 5 | 0 | Done |
@@ -49,11 +49,11 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 ## Part B. Accounts and owner hardening (no domain needed)
 
 - [x] Vercel: upgrade to **Pro** (Hobby is non-commercial and has quota limits). (checked 2026-11-21: team `thecodeblock` is on the `pro` plan)
-- [ ] After the move to Pro, look at **Cold Start Prevention** in each project's Functions settings (it shows "Disabled" on Hobby, 2026-11-17; Vercel's docs say Pro keeps one production instance warm but its pricing page lists the feature under Enterprise, so confirm in the dashboard). Fluid compute is already on for both projects. Then leave both idle for 10 minutes, open the chat and click a topic: it took about 2 s on Hobby (API 2.1 s cold against 0.7 s warm). If it is still slow, ping both functions every 5 minutes.
-- [ ] Vercel: restrict who can promote to production; two-factor on every team member; turn on the **audit log** (Pro).
-- [ ] Two-factor on Squarespace (domain and DNS) and the registrar lock on.
-- [ ] Two-factor on GitHub, Vercel, Neon, Upstash, Kit and Squarespace (Postmark when it is set up), threat E4.
-- [ ] Recovery codes for every account stored offline.
+- [x] After the move to Pro, look at **Cold Start Prevention** in each project's Functions settings (it shows "Disabled" on Hobby, 2026-11-17; Vercel's docs say Pro keeps one production instance warm but its pricing page lists the feature under Enterprise, so confirm in the dashboard). Fluid compute is already on for both projects. Then leave both idle for 10 minutes, open the chat and click a topic: it took about 2 s on Hobby (API 2.1 s cold against 0.7 s warm). If it is still slow, ping both functions every 5 minutes. (done 2026-11-21: there is no separate toggle on Pro, Hendrik confirmed in the dashboard that cold-start prevention is built into Fluid Compute and enabled on both projects, and the API shows `fluid: true` for both. Measured after 15 minutes idle, time to first byte of the first request against a warm one: web page 0.95 s against 0.28 s, API health check 0.62 s against 0.23 s through `vercel curl`. The API stays warm because the 5-minute outbox cron calls it; the web page has a cold first request about 0.65 s slower, with no multi-second cold start (Hobby measured about 2.1 s cold against 0.7 s warm for the API on 2026-11-17). The full chat journey, opening the chat and clicking a topic, was not measured: try it on a phone after 10 minutes idle)
+- [x] Vercel: restrict who can promote to production; two-factor on every team member; turn on the **audit log** (Enterprise only; on Pro the free Activity Log is always on). (checked 2026-11-21: the team has one member, the owner, so only Hendrik can promote; two-factor on that account done by Hendrik, see the next items. The Vercel **audit log is Enterprise-only**: Pro has the free Activity Log, which needs no switch, so this item cannot be done as first written and the Activity Log stands in for it ([Vercel audit log docs](https://vercel.com/docs/audit-log)). Add a second member only with a role that cannot promote)
+- [x] Two-factor on Squarespace (domain and DNS) and the registrar lock on. (done by Hendrik 2026-11-21)
+- [x] Two-factor on GitHub, Vercel, Neon, Upstash, Kit and Squarespace (Postmark when it is set up), threat E4. (done by Hendrik 2026-11-21, not verifiable from here: GitHub's API returned null for the two-factor status because the token lacks the scope. GitHub two-factor belongs to the `thecodeblock-hendrik` user account, which owns the repository as a User, not an organisation)
+- [x] Recovery codes for every account stored offline. (done by Hendrik 2026-11-21)
 - [ ] Rotate any secret that was ever shown in a chat, a screenshot or a log ([runbooks/rotate-secrets.md](runbooks/rotate-secrets.md)).
 - [ ] With Pro: a log drain to a log store (Better Stack or Axiom) and a staging environment (a custom Vercel environment), deferred from step 0.10.
 - [x] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
