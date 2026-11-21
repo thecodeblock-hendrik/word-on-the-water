@@ -10,6 +10,29 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ---
 
+## Where we stand (2026-11-21, one week before launch)
+
+The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook is skipped and replaced by a daily sync (Part H), and the Part D checks that need no staging are done. Counts are of ticked and unticked boxes in each part:
+
+| Part | Subject | Done | Open | Who and what |
+|---|---|---|---|---|
+| A | Gate: is the rest done? | 8 | 0 | Done |
+| B | Accounts and owner hardening | 2 | 8 | Hendrik: dashboards and accounts (Pro and the 5-minute cron are done) |
+| C | Convert the site to a PWA | 7 | 0 | Done |
+| D | Security and operations checks | 4 | 5 | Needs a staging environment (possible now on Pro) and Hendrik's rehearsals; Claude drafts `migrate.yml` |
+| E | Email authentication | 5 | 0 | Done |
+| F | Production configuration | 5 | 3 | Hendrik: token match, database check, preview widget |
+| G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
+| H | Kit form redirect | 3 | 4 | Hendrik: Kit redirect; then check the daily sync (the webhook is skipped) |
+| I | Production smoke test | 0 | 13 | After Part H: smoke test on the live domain |
+| J | Exit gate and after launch | 0 | 11 | Launch gate and after launch |
+| K | Weekly email broadcasts | 1 | 16 | Hendrik: first broadcast steps in Kit |
+| L | Got Questions chat | 4 | 3 | Hendrik: preview walk-through, firewall rule |
+
+**Next, in order:** Hendrik sets the Kit redirect (H1), then Claude checks the sync route on production (H3); Hendrik works through the Part B dashboard items (2FA, audit log, Firewall rate-limit rules, log drain and staging); the Part F leftovers; then the Part I smoke test on the live domain and the first broadcast (Part K). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
+
+---
+
 ## Part A. Gate: is the rest done?
 
 - [x] PLAN.md steps 1.3, 1.6, 1.7, 1.8 and 1.11 are done (sign-up, legal and SEO, retention, quality gates, final landing page review), checked 2026-11-18. Three optional items are deliberately moved after launch and stay unticked there: the footer link to a full statement of faith (1.6), moving the crons to Vercel Schedules (1.7) and a Holy Spirit or Jesus' return point in the statement of faith (1.11); the devotional archive page is Phase 2.3. Article JSON-LD was built for launch. The prayer form (1.4) and contact form (1.5) are deferred past launch (decided 2026-11-14).
@@ -119,44 +142,31 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 ---
 
-## Part H. Kit form redirect and webhook
+## Part H. Kit form redirect (the webhook is not used at launch)
 
-Kit tells our site when a subscriber confirms, unsubscribes, bounces or complains, so our database mirror stays right. The route is built (`/api/webhooks/kit` on `wotw-web`, forwarding to `wotw-api`). Kit can only reach a **public** address, so the webhook is registered for production, on the real domain, after Part G.
-
-**Decision 2026-11-21: H3 to H5 are skipped for launch.** Kit's webhook endpoints (`/v4/webhook_endpoints`) refuse this account's API key with 401 "Authentication Failed" while every other call works (`/account`, `/forms`, `/tags` and the legacy `/webhooks` give 200), and Hendrik confirmed in Kit that webhooks need a paid plan, which we are not buying. The legacy `/webhooks` resource is not a way round it: it carries no signing secret, and our receiver refuses unsigned calls. Without the webhook, Kit still sends, confirms and unsubscribes by itself; only our database mirror stops learning who confirmed, unsubscribed or bounced (see ADR 0008, Finding 2026-11-21). The route and the registration tool stay in the code for when a paid plan exists. A daily sync from Kit's API is listed in PLAN.md 1.3. H1 and H2 still apply.
+**Decision 2026-11-21: no Kit webhook at launch.** Kit's webhook endpoints (`/v4/webhook_endpoints`) refuse this account's API key with 401 "Authentication Failed" while every other call works (`/account`, `/forms`, `/tags` and the legacy `/webhooks` give 200), and Hendrik confirmed in Kit that webhooks need a paid plan, which we are not buying. The legacy `/webhooks` resource is not a way round it: it carries no signing secret and our receiver refuses unsigned calls. Kit still sends mail, runs double opt-in and honours unsubscribes by itself. What would have kept our database mirror in step is now a **daily sync**: `GET /cron/sync-kit` at 03:00 UTC reads every subscriber from Kit's API, before the retention job (03:30) deletes pending rows, so people who confirmed are `active` and survive it (ADR 0008, PLAN.md 1.3). The receiver route and `make kit-webhook` stay in the code for a paid plan.
 
 **H1. Redirect and redeploy**
 - [ ] Kit production form: set the redirect after sign-up and after confirmation to `https://wordonthewater.net/thank-you`.
 - [x] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this). (not needed 2026-11-21: both Production deployments were built from `main` after the routes existed, and the two checks below prove the forwarder and the API route are live)
 
-**H2. Check the route on production before registering** (the chain is public site, then our forwarder, then the protected API)
+**H2. Check the forwarder route on production** (the route is dormant at launch, but it must answer safely: public site, then our forwarder, then the protected API)
 - [x] `curl -i https://wordonthewater.net/api/webhooks/kit` gives **405** (only POST is accepted). (checked 2026-11-21: 405)
-- [x] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**. That is good: the forwarder reached the production API and the API says no webhook secret is set yet. (checked 2026-11-21: 503)
-- [ ] **502** instead means the forwarder cannot reach the API: check `API_BASE_URL` and `API_BYPASS_SECRET` in `wotw-web` Production and redeploy. **401** means the secret is already set (fine).
+- [x] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**: the forwarder reached the production API, and the API says no webhook secret is set, which is right while no webhook is registered. (checked 2026-11-21: 503) A **502** would mean the forwarder cannot reach the API (check `API_BASE_URL` and `API_BYPASS_SECRET` in `wotw-web` Production); a **401** would mean a secret is set.
 
-**H3. Register the webhook in Kit (skipped, see the decision above)**
-- [ ] The root `.env` holds the Kit API key of the account that owns the production list (`KIT_API_KEY`; Kit webhooks are account-wide).
-- [ ] From the repo root: `make kit-webhook URL=https://wordonthewater.net/api/webhooks/kit`. Expect `Registered Kit webhook <id>. The signing secret is saved in .env as KIT_WEBHOOK_SECRET.` (the secret is not printed).
-- [ ] If it says the address is already registered, delete that endpoint in Kit's developer settings (webhooks) and run it again (Kit shows a secret only when it is created).
-- [ ] Kit, developer settings, webhooks: the endpoint is listed with `subscriber.activated`, `.unsubscribed`, `.bounced` and `.complained`.
+**H3. Check the daily Kit sync on production** (after PR #150 is deployed)
+- [ ] Vercel, `wotw-api`, Settings, Cron Jobs lists `/cron/sync-kit` at `0 3 * * *`.
+- [ ] Run it once by hand: `curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api.vercel.app/cron/sync-kit` returns `{"checked": N, "updated": M}`. Before the first real sign-up `checked` is the number of subscribers in Kit and `updated` is 0 (the production list was empty on 2026-11-21, so `{"checked": 0, "updated": 0}` is correct).
+- [ ] After the first real sign-up and confirmation (Part I): the next run (or a hand run) gives `updated` of at least 1, and the person is `active` in our table. The logs show `kit_synced` with counts only, no addresses.
 
-**H4. Put the secret in Vercel (`wotw-api`, Production only) (skipped, see the decision above)**
-- [ ] Copy it without showing it: `grep '^KIT_WEBHOOK_SECRET=' .env | cut -d= -f2- | pbcopy`.
-- [ ] `wotw-api`, Settings, Environment Variables, Add: `KIT_WEBHOOK_SECRET`, paste, **Production only**, **Sensitive** on, save. Then clear the clipboard: `pbcopy </dev/null`. Never add it to Preview (a preview must not hold the production secret; Kit cannot reach previews anyway).
-- [ ] Redeploy `wotw-api` in Production (a new variable reaches only a new deployment), wait for Ready.
-- [ ] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` now gives **401** (the API refuses an unsigned call). 401 instead of 503 proves the secret is in place.
-
-**H5. Confirm with a real delivery (skipped, see the decision above)** (the signature key format was inferred from Kit's docs and has never seen a real delivery)
-- [ ] Cause an event in Kit: confirm or unsubscribe a **test** subscriber, or sign up and confirm once the redirect is set.
-- [ ] Kit, developer settings, webhooks: the endpoint's recent deliveries show **200**. **401** means the signature check failed (likely the secret format; the API logs for `/v1/webhooks/kit` show why). **502 or 503** means the API was unreachable or had no secret: re-check H4.
-- [ ] Tell Claude Code a delivery went through, so it reads the API logs (expect a 200) and ticks the PLAN.md 1.3 items.
+**Not done at launch: registering the webhook (needs a paid Kit plan).** If Kit is ever upgraded: run `make kit-webhook URL=https://wordonthewater.net/api/webhooks/kit` (it saves the signing secret in the root `.env` as `KIT_WEBHOOK_SECRET` and never prints it), add the secret to `wotw-api` Production only (Sensitive), redeploy `wotw-api`, check an unsigned POST to the forwarder now gives **401**, and confirm a real delivery shows **200** in Kit's developer settings. The signature format was inferred from Kit's docs and has never seen a real delivery. The daily sync can then stay as a safety net.
 
 ---
 
 ## Part I. Production smoke test (on the real domain)
 
-- [ ] Subscribe with a real address, confirm through the Kit email, land on `/thank-you`; Kit shows `active` and our mirror shows the same.
-- [ ] Unsubscribe through the Kit link; our mirror shows `unsubscribed`.
+- [ ] Subscribe with a real address, confirm through the Kit email, land on `/thank-you`; Kit shows `active`; our mirror shows `pending` until the next daily sync (03:00 UTC, or run `/cron/sync-kit` by hand, Part H3), then `active`.
+- [ ] Unsubscribe through the Kit link; Kit shows the person unsubscribed at once and our mirror follows after the next daily sync (Part H3).
 - [ ] The `hello@wordonthewater.net` mail links on the page ("Talk to someone" while the chat is off, the privacy policy) open a mail to the right address, and a message sent to it arrives. The prayer and contact forms and the `prayer@` address are not on the page at launch; their smoke tests (a prayer request reaches the prayer inbox, text only if the consent box was ticked; a contact message reaches `hello@`) belong to PLAN.md 1.4 and 1.5.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
 - [ ] No personal data or prayer text appears in the logs or Sentry.
@@ -165,7 +175,7 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 - [ ] `https://wordonthewater.net/.well-known/security.txt` loads as plain text with the contact, the canonical address and an `Expires` about a year ahead.
 - [ ] `https://wordonthewater.net/robots.txt` and `/sitemap.xml` load; the sitemap lists only the devotionals that are published today and gains the next one on its publish day without a redeploy.
 - [ ] Lighthouse mobile on `https://wordonthewater.net` (home page and a devotional): SEO 100 (the one budget a preview cannot prove, because of its `noindex` header), and Performance 95, Accessibility 100 and Best Practices 100 still hold on the live site.
-- [ ] Vercel, the API project, Cron Jobs lists `/cron/retention` (03:30 UTC) and `/cron/drain-outbox` (05:00 UTC). Trigger each once by hand with `curl -H "Authorization: Bearer $CRON_SECRET" https://wotw-api.vercel.app/cron/retention` (with the protection bypass header) and read the counts; the day after, the Cron Jobs page shows a successful run.
+- [ ] Vercel, the API project, Cron Jobs lists `/cron/sync-kit` (03:00 UTC), `/cron/retention` (03:30 UTC) and `/cron/drain-outbox` (every 5 minutes). Trigger each once by hand with `curl -H "Authorization: Bearer $CRON_SECRET" https://wotw-api.vercel.app/cron/retention` (with the protection bypass header) and read the counts; the day after, the Cron Jobs page shows a successful run.
 - [ ] Send a tag-limited test broadcast from `hello@` and read it (Part K).
 - [ ] No console errors and no CSP violations on the production domain; both colour schemes reviewed end to end on a real phone and a desktop browser.
 
@@ -177,6 +187,7 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 - [ ] All Part A budgets met and no high security findings.
 - [ ] Part K is complete: the first weekly email reached a real inbox (not spam), from `hello@`, with the banner, the unsubscribe link and a working "Read it on the website" link.
 - [ ] Alerts are set up and each one has been seen to fire once ([runbooks/alerts.md](runbooks/alerts.md)).
+- [ ] **First week after launch:** `kit_synced` shows in the API logs every day (counts only), and subscribers who confirmed are `active` in our table. If the first sign-ups reach 7 days still `pending` while Kit shows them active, the sync is not working: stop and look (the retention job deletes pending rows after 7 days).
 - [ ] **Monthly:** in the Kit dashboard, delete the subscribers that are still unconfirmed after 7 days (Subscribers, filter Unconfirmed). The retention job cannot do this: Kit's API has no delete (see [privacy.md](privacy.md)).
 - [ ] **Accepted advisories lapse soon after launch:** `GHSA-3g3m-2fjr-6pw4` (glob, 2026-12-01, three days after launch), `GHSA-fc5q-39xc-vjpf` (picomatch, high severity, dev-only, no fix yet, 2026-12-15, in `osv-scanner.toml` and `pnpm-workspace.yaml`) and `GHSA-g3hv-75wg-m249` (minimatch, 2026-12-31, only in `osv-scanner.toml`, which is why `pnpm audit` still lists it as moderate). Re-check each before it lapses, then remove its entry everywhere or extend it with a new reason.
 - [ ] Two weeks after launch: review the DMARC reports, then move DMARC to `p=quarantine`.
@@ -206,10 +217,10 @@ How it works is in [devotional_format.md](devotional_format.md), "The weekly ema
 - [ ] A few days before, run `pnpm broadcast:devotional advent-01-more-than-watchmen --all`, open the draft in Kit and check the subject (`emailSubject`), the preview text (`summary`) and the sender.
 - [ ] Send yourself a test from Kit and read it on your phone.
 - [ ] Schedule it in Kit for 2026-11-28 after 02:00 Harare time (the page goes live at 00:00 UTC), so the website link works when readers tap it.
-- [ ] Check the unsubscribe link in the test: Kit shows `unsubscribed` and our mirror follows through the webhook (Part H).
+- [ ] Check the unsubscribe link in the test: Kit shows `unsubscribed` and our mirror follows after the next daily sync (Part H3).
 
 **After the first send**
-- [ ] In Kit's report, check recipients, opens, unsubscribes, bounces and complaints, and that bounces and complaints reached our mirror.
+- [ ] In Kit's report, check recipients, opens, unsubscribes, bounces and complaints, and that bounces and complaints reached our mirror after the next daily sync.
 - [ ] Read the first DMARC reports and confirm Kit's mail passes, then continue with the `p=quarantine` step in Part J.
 - [ ] From the second week on, follow the four steps in [devotional_format.md](devotional_format.md).
 
