@@ -55,8 +55,8 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 ## Part D. Security and operations checks (staging or preview)
 
 - [ ] Run the CSP in report-only on staging (`CSP_REPORT_ONLY=1`), review the reports, then enforce it in production (`CSP_REPORT_ONLY` off).
-- [ ] The production response has the CSP header and it is enforced (threat plan T3).
-- [ ] `/docs` and `/openapi.json` return 404 in production (threat plan I5).
+- [x] The production response has the CSP header and it is enforced (threat plan T3) (checked 2026-11-21 on `wotw-web.vercel.app`: `content-security-policy` header with a nonce, `CSP_REPORT_ONLY` not set in Production).
+- [x] `/docs` and `/openapi.json` return 404 in production (threat plan I5) (checked 2026-11-21 with `vercel curl` against `wotw-api.vercel.app`: both give the app's own 404, `/health/live` gives 200; `ENVIRONMENT=production` is set).
 - [ ] `migrate.yml` with a manual approval; production auto-promotion off; promote after the migrations and the smoke tests pass.
 - [ ] Rollback rehearsed with Vercel Instant Rollback.
 - [ ] Backup restore tested from the nightly dump and from Neon point-in-time recovery (`docs/runbooks/restore-db.md`).
