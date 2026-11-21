@@ -149,7 +149,7 @@ for e in entries:
 
 # ---- glossary terms used in each entry ---------------------------------------
 SKIP_ALIASES = {"christ", "pastor"}  # appears in nearly every answer
-COMMON = {"sin", "faith", "salvation", "evangelical"}  # too frequent to suggest everywhere
+COMMON = {"sin", "faith", "salvation", "evangelical", "lord"}  # too frequent to suggest everywhere
 for e in entries:
     body = " ".join([e["question"], e["short_answer"], e["explanation"]]).lower()
     found = []

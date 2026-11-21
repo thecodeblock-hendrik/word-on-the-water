@@ -43,7 +43,7 @@ def test_counts_match_the_meta_counts() -> None:
     kb = load_kb(DATA)
     assert len(kb.entries) == kb.meta.counts.entries == 228
     assert sum(e.contested for e in kb.entries) == kb.meta.counts.contested == 16
-    assert len(kb.glossary) == kb.meta.counts.glossary_terms == 39
+    assert len(kb.glossary) == kb.meta.counts.glossary_terms == 41
     assert len(kb.themes) == kb.meta.counts.themes == 15
 
 
@@ -151,3 +151,11 @@ def test_get_kb_returns_none_and_logs_only_the_error_class(
     assert logs == [
         {"event": "kb_load_failed", "log_level": "error", "error": "KnowledgeBaseError"}
     ]
+
+
+def test_lord_is_a_term_but_is_not_pushed_on_every_answer() -> None:
+    # "Lord" is in 28 answers; a chip on each would be noise, so it is looked up only when typed.
+    kb = get_kb()
+    assert kb is not None
+    assert "Lord" in {g.term for g in kb.glossary}
+    assert [e.id for e in kb.entries if "Lord" in e.glossary_terms] == []
