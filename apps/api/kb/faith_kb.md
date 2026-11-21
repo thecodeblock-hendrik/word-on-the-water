@@ -2519,6 +2519,7 @@ Short definitions of words used in the answers above, so the chatbot can handle 
 | Hallelujah | Hebrew for “Praise Yah” (praise the LORD). | Psalm 150; Revelation 19:1–6 | – |
 | Incarnation | The eternal Son of God taking on full human nature as Jesus, without ceasing to be God. | John 1:14; Philippians 2:6–8; Hebrews 2:14–17 | 2.3, 2.5 |
 | Justification | God declaring a sinner righteous because of Christ, received by faith. | Romans 5:1; Galatians 2:16 | 3.9 |
+| Lord | A title of authority and divine honour. “Jesus is Lord” means he is God and rules over everything, so Christians trust and obey him. In many English Bibles “LORD” in capitals stands for God’s personal name, Yahweh. | Romans 10:9; Philippians 2:9–11; 1 Corinthians 12:3; John 20:28 | 2.19, 2.2 |
 | Mediator | One who stands between two parties to bring them together. Jesus is the one mediator between God and people. | 1 Timothy 2:5; Hebrews 9:15 | 7.5 |
 | Messiah (Christ) | Hebrew “Mashiach” and Greek “Christos,” both meaning “Anointed One”: the promised Saviour-King. “Christ” is a title, not Jesus’ surname. | Isaiah 61:1; Matthew 16:16; John 1:41 | 2.11 |
 | New Covenant | God’s promise to forgive sin and write his law on hearts, fulfilled through Jesus’ death. | Jeremiah 31:31–34; Luke 22:20; Hebrews 8:6–13 | 14.15 |
@@ -2530,6 +2531,7 @@ Short definitions of words used in the answers above, so the chatbot can handle 
 | Sacrament (ordinance) | A practice Christ commanded the church to observe as a sign of the gospel. Protestants recognise two: baptism and the Lord’s Supper. Some prefer the word “ordinance.” | Matthew 28:19; 1 Corinthians 11:23–26 | 8.4, 8.6 |
 | Salvation | Being rescued by God from sin and its penalty and brought into eternal life with him. | Ephesians 2:8–9; Titus 3:4–7 | 3.2 |
 | Sanctification | The lifelong process of becoming more like Christ through the Holy Spirit. | 2 Corinthians 3:18; 1 Thessalonians 4:3 | 3.10 |
+| Saviour (Savior) | The one who rescues. The Bible calls Jesus the Saviour because he saves people from sin and its penalty by his death and resurrection. | Matthew 1:21; Luke 2:11; John 4:42; Acts 4:12 | 2.1, 3.2 |
 | Sin | Any failure to love and obey God in thought, word, deed or attitude. | Romans 3:23; 1 John 3:4 | 3.3 |
 | Sovereignty | God’s rule and control over all things. | Psalm 115:3; Ephesians 1:11 | 1.10 |
 | Trinity | One God existing eternally as Father, Son and Holy Spirit. | Matthew 28:19; 2 Corinthians 13:14 | 1.3 |

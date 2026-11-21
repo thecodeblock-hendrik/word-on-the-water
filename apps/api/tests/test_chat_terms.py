@@ -80,3 +80,17 @@ def test_a_question_with_its_own_entry_still_gets_the_full_answer(chat: Chat) ->
 )
 def test_words_that_are_not_glossary_terms_still_get_no_answer(chat: Chat, message: str) -> None:
     assert say(chat, message).kind == "no_answer"
+
+
+def test_define_lord_gives_the_definition_with_the_lord_entry_to_read_next(chat: Chat) -> None:
+    reply = say(chat, "define lord")
+    assert reply.kind == "term"
+    assert reply.term is not None
+    assert reply.term.term == "Lord"
+    assert [o.id for o in reply.term.entries] == ["2.19", "2.2"]
+
+
+def test_saviour_is_a_glossary_term_with_savior_as_its_alias(chat: Chat) -> None:
+    names = glossary_names(chat)
+    assert "Saviour" in names
+    assert "Savior" in names
