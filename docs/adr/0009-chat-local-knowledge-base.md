@@ -1,6 +1,6 @@
 # 0009. Got Questions chat from a local knowledge base
 
-Status: accepted as scope on 2026-11-14 (nothing built yet; the plan is [chat.md](../archive/chat.md), PLAN.md step 1.10, mockups in [design/chat_mockups.html](../design/chat_mockups.html)).
+Status: accepted as scope on 2026-11-14; **built and live in Production since 2026-11-16** (PLAN.md step 1.10; the original plan is [chat.md](../archive/chat.md), mockups in [design/chat_mockups.html](../design/chat_mockups.html); changes since launch preparation are under "Updates" at the end).
 
 ## Context
 The "New to faith? Start here" section needs a way for a newcomer to ask questions about the Christian faith and ask follow-ups. The first design used an LLM (OpenRouter, `nvidia/nemotron-3.5-super-vl:free`) with a web search tool limited to GotQuestions.org, Bible.org and BibleProject, under a strict system prompt.
@@ -25,3 +25,11 @@ No AI model and no web search in v1. Answers come from our own reviewed knowledg
 - Most LLM-specific threats (prompt injection, data leaving our systems, hallucination, cost) are gone. New risks are content correctness, matching quality and knowledge base tampering (mitigated by review, a committed JSON checked by `make kb-check`, and the evaluation set).
 - The chat can only answer what the knowledge base contains and matches wording, not meaning. Quality is measured by an evaluation set built from the knowledge base's own 532 questions and paraphrases (a prototype found the right entry first 96.2% of the time and in the top three 99.6%, an optimistic figure because those words are in the index) plus off-topic, crisis, personal-detail and follow-up cases.
 - A later LLM layer that only rephrases retrieved entries stays possible. It needs its own ADR, a paid zero-retention provider with a data processing agreement, and explicit consent first.
+
+## Updates
+
+### 2026-11-21: what the walk-through on the production chat changed
+- **Spelling.** The knowledge base is British; visitors type both. `kb_search.tokens` folds `-our`/`-or`, `-ise`/`-ize` and `judgement`/`judgment` before stemming, and joins "baptism" with "baptised" (the stemmer never matched them). Both sides of a search use the same folding, so it only adds matches. Measured before and after: no change in the retrieval figures (own questions 0.994 first, real world 60/62 first, 62/62 top three).
+- **Typed glossary words.** The glossary (41 terms) was only reachable by tapping a term chip, so 136 of 276 typed glossary questions got no answer. A question that is only a glossary word or alias ("define lord", "what does covenant mean", a bare "messiah") now gets the definition when the search is not confident, including right after an answer, where the context boost used to lift it into a "did you mean" list. A confident answer still wins ("what is grace" keeps entry 3.5), and a bare "amen" stays small talk. After the change 0 of 294 typed glossary questions get no answer.
+- **Decision: the no-answer rule is not loosened.** Off-topic questions can score as high as 20.8 ("how do I find a good plumber", coverage 0.53); only the coverage check keeps them out, so a "high score, low coverage" rule would offer faith answers to plumber questions. Missed wordings are fixed by adding them to the right entry's "Also asked" line, not by changing thresholds.
+- **Data.** Entry 8.5 gained three baptism wordings, entry 2.1 "Who is my Saviour?", and "Lord" and "Saviour (Savior)" became glossary terms ("lord" is on the build's too-frequent list so it is no chip on 28 answers). The "related questions" lists are computed from each entry's text, so a paraphrase can reshuffle them: one paraphrase on 2.1 moved two lists, two moved five, so check the diff of `faith_kb.json` when adding wordings.
