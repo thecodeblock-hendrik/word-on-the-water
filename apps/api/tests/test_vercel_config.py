@@ -22,5 +22,6 @@ def test_retention_is_scheduled_once_a_day() -> None:
     assert re.fullmatch(r"\d{1,2} \d{1,2} \* \* \*", CRONS["/cron/retention"])
 
 
-def test_the_outbox_drain_is_still_scheduled() -> None:
-    assert "/cron/drain-outbox" in CRONS
+def test_the_outbox_drain_runs_every_five_minutes() -> None:
+    # Needs Pro: Hobby fails the deploy with anything more frequent than daily.
+    assert CRONS["/cron/drain-outbox"] == "*/5 * * * *"
