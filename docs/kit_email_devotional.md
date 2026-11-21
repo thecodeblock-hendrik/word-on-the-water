@@ -140,7 +140,7 @@ Kit groups subscribers with **tags**. The command makes you choose an audience o
 
 You do **not** look the id up each week: a tag's id never changes, so use the same test tag, 25869858, every time.
 
-**The test tag (set up 2026-11-17):** `spike-test`, id **25869858**. Your own address (the one active subscriber in the account) carries it, so a draft aimed at it goes to you and nobody else. This is the permanent way to send test devotionals to your own inbox:
+**The test tag (set up 2026-11-17):** `spike-test`, id **25869858**. As of 2026-11-21 a fresh Gmail alias of your address (`+kittest`) carries it, not your main address: that one unsubscribed and Kit cannot re-subscribe it through the API (ADR 0008), so it stays `cancelled`. The alias is the one active subscriber in the account, so a draft aimed at the tag goes to you and nobody else. This is the permanent way to send test devotionals to your own inbox:
 
 ```
 pnpm broadcast:devotional advent-02-the-long-wait --tag 25869858
