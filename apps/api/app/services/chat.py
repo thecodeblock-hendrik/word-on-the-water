@@ -49,6 +49,11 @@ MORE = re.compile(
     r"|(?:can|could) you (?:explain|elaborate)(?: (?:that|it|this|more|further|simply|again))*"
     r"|what do you mean|i dont understand)(?: please)?$"
 )
+# "what does covenant mean", "define grace", "the Messiah": a question that is only a glossary word.
+TERM_QUESTION = re.compile(
+    r"^(?:(?:what is the meaning of|meaning of|what(?:s| is| are| does)|who(?:s| is| are)"
+    r"|define|explain|tell me about)\s+)?(?:(?:the|a|an)\s+)?(?P<term>.+?)(?:\s+means?)?$"
+)
 SMALL_TALK = {
     "greeting": (
         re.compile(r"^(?:hi|hello|hey|howzit|good (?:morning|afternoon|evening))(?: there)?$"),
@@ -71,6 +76,11 @@ DID_YOU_MEAN = "I am not sure what you mean. Did you mean one of these?"
 RELATED_TEXT = "Here are some related questions."
 
 
+def plain(text: str) -> str:
+    """Lowercase and drop apostrophes and punctuation: how a message meets the patterns."""
+    return re.sub(r"[^\w\s]", "", text.lower().replace("'", "")).strip()
+
+
 class Chat:
     """Answers chat turns. Build once per process; `reply` is a pure function."""
 
@@ -79,6 +89,7 @@ class Chat:
         self.index = SearchIndex(kb)
         self.entries = kb.entries_by_id
         self.terms = {name.lower(): g for g in kb.glossary for name in (g.term, *g.aliases)}
+        self.typed_terms = {plain(name): g for g in kb.glossary for name in (g.term, *g.aliases)}
 
     def reply(self, turn: ChatTurn, context: ChatContext) -> ChatReply:
         if not self._context_is_valid(context):
@@ -103,7 +114,7 @@ class Chat:
             )
         if guard.outcome != "ok":
             return self._rejected(guard.outcome)
-        words = re.sub(r"[^\w\s]", "", guard.text.lower().replace("'", "")).strip()
+        words = plain(guard.text)
         for pattern, text in SMALL_TALK.values():
             if pattern.match(words):
                 return ChatReply(kind="smalltalk", text=text, kb_version=self.kb.version)
@@ -122,7 +133,17 @@ class Chat:
             return self._clarify([self.entries[i] for i in result.ranked])
         if last is not None and pointing:
             return self._related(last)
-        return self.no_answer()
+        return self._typed_term(words) or self.no_answer()
+
+    def _typed_term(self, words: str) -> ChatReply | None:
+        """The definition, when the question is only a glossary word or alias.
+
+        Only reached where the search found nothing, so a question with its own entry ("what is
+        grace") keeps its full answer.
+        """
+        match = TERM_QUESTION.match(" ".join(words.split()))
+        glossary = self.typed_terms.get(match.group("term")) if match else None
+        return self._term(glossary.term) if glossary else None
 
     def no_answer(self) -> ChatReply:
         return ChatReply(
