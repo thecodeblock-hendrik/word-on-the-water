@@ -21,15 +21,15 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | C | Convert the site to a PWA | 7 | 0 | Done |
 | D | Security and operations checks | 4 | 5 | Needs a staging environment (possible now on Pro) and Hendrik's rehearsals; Claude drafts `migrate.yml` |
 | E | Email authentication | 5 | 0 | Done |
-| F | Production configuration | 5 | 3 | Hendrik: token match, database check, preview widget |
+| F | Production configuration | 6 | 2 | Hendrik: database check, preview widget |
 | G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
-| H | Kit form redirect | 4 | 3 | Hendrik: Kit redirect; then check the daily sync (the webhook is skipped) |
-| I | Production smoke test | 0 | 13 | After Part H: smoke test on the live domain |
+| H | Kit form redirect | 7 | 0 | Done except the optional webhook (skipped, needs a paid Kit plan) |
+| I | Production smoke test | 1 | 12 | First sign-up done; the rest of the smoke test on the live domain |
 | J | Exit gate and after launch | 0 | 11 | Launch gate and after launch |
 | K | Weekly email broadcasts | 1 | 16 | Hendrik: first broadcast steps in Kit |
 | L | Got Questions chat | 4 | 3 | Hendrik: preview walk-through, firewall rule |
 
-**Next, in order:** Hendrik sets the Kit redirect (H1), then Claude checks the sync route on production (H3); Hendrik works through the Part B dashboard items (2FA, audit log, Firewall rate-limit rules, log drain and staging); the Part F leftovers; then the Part I smoke test on the live domain and the first broadcast (Part K). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
+**Done on 2026-11-21:** the first live sign-up end to end (Turnstile, Kit confirmation in the inbox, `/cron/sync-kit` moved the mirror to active), after fixing the production Kit API key (see the Part F incident note). **Next, in order:** Hendrik works through the Part B dashboard items (2FA, audit log, Firewall rate-limit rules, log drain and staging) and the Part F leftovers (database check, preview widget); then the rest of the Part I smoke test on the live domain and the first broadcast (Part K). After every merge, promote the new production builds by hand (Part D). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
 
 ---
 
@@ -104,13 +104,13 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 ## Part F. Production configuration (still no domain switch)
 
-- [x] `wotw-api` Production variables set: `KIT_API_KEY`, `KIT_FORM_ID` and `TURNSTILE_SECRET_KEY` (Sensitive where Vercel allows). `EMAIL_FROM` (`Word on the Water <hello@wordonthewater.net>`; nothing reads it yet, checked 2026-11-21), `PRAYER_INBOX`, `CONTACT_INBOX`, `POSTMARK_SERVER_TOKEN`, `EMAIL_PROVIDER=postmark` and the prayer encryption key come with steps 1.4 and 1.5 (PLAN.md). Preview keeps its test values. (checked 2026-11-21: `KIT_API_KEY` and `TURNSTILE_SECRET_KEY` are Secret and `KIT_FORM_ID` is set in `wotw-api` Production; `EMAIL_FROM` is not read by anything yet)
+- [x] `wotw-api` Production variables set (**incident 2026-11-21:** the first live sign-up failed because Kit answered 401 to the `KIT_API_KEY` stored in Production, while the same account accepted the key in the local `.env`; the form id `10158126` was right. Vercel hides Sensitive values, so the stored value could not be inspected. Replacing it with the working key, redeploying and promoting fixed it, and the queued sign-up was delivered by the outbox retry. Lesson: after changing a variable, redeploy and promote, and expect the old deployment to serve a few cron runs first.): `KIT_API_KEY`, `KIT_FORM_ID` and `TURNSTILE_SECRET_KEY` (Sensitive where Vercel allows). `EMAIL_FROM` (`Word on the Water <hello@wordonthewater.net>`; nothing reads it yet, checked 2026-11-21), `PRAYER_INBOX`, `CONTACT_INBOX`, `POSTMARK_SERVER_TOKEN`, `EMAIL_PROVIDER=postmark` and the prayer encryption key come with steps 1.4 and 1.5 (PLAN.md). Preview keeps its test values. (checked 2026-11-21: `KIT_API_KEY` and `TURNSTILE_SECRET_KEY` are Secret and `KIT_FORM_ID` is set in `wotw-api` Production; `EMAIL_FROM` is not read by anything yet)
 - [x] Public site URL `https://wordonthewater.net` for metadata, the sitemap and links in email (checked 2026-11-21: `SITE_URL` is not set in Production on purpose, the code defaults to `https://wordonthewater.net` (`apps/web/src/lib/site.ts`), and `wotw-web.vercel.app` already serves that address in its canonical link and every sitemap `<loc>`).
 - [x] Production Kit: the real form with double opt-in on, and the production `KIT_API_KEY` and `KIT_FORM_ID` in Production only. Preview and Development use the Kit test form and key (or a separate Kit account), never the production key now that real subscribers exist. (confirmed by Hendrik 2026-11-21)
 - [x] Production uses only the production Turnstile widget keys (the API refuses Cloudflare's test secrets in production by design). `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is set for Production, and `wotw-web` is redeployed after it was added (the value is built into the site). (confirmed by Hendrik 2026-11-21)
 - [ ] The Cloudflare Turnstile **preview** widget (key ending `…33Cdq…`) should list the preview hosts: on 2026-11-17 Chrome showed error 110200 ("domain not allowed") on a per-deployment preview address (`wotw-<hash>-thecodeblock.vercel.app`), so check which hostnames it lists and whether `vercel.app` matches subdomains. Not needed for launch.
 - [x] The Cloudflare Turnstile production widget lists only `wordonthewater.net` and `www.wordonthewater.net`. It will refuse any `*.vercel.app` address (error 110200), so the production smoke test must run on the real domain. (confirmed by Hendrik 2026-11-21)
-- [ ] Tokens match in `wotw-web` and `wotw-api` Production (`SERVICE_TOKEN`), and `API_BYPASS_SECRET` is set in `wotw-web` Production.
+- [x] Tokens match in `wotw-web` and `wotw-api` Production (`SERVICE_TOKEN`), and `API_BYPASS_SECRET` is set in `wotw-web` Production. (proven 2026-11-21 by the first live sign-up: the browser request went through the web app to `POST /v1/subscribers` on the API, which only answers with a matching `SERVICE_TOKEN` and, behind the login wall, `API_BYPASS_SECRET`; the values themselves were not compared)
 - [ ] Production database is on the current migration with no test data, and the production and preview roles have different passwords.
 
 ---
@@ -155,9 +155,9 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 - [x] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**: the forwarder reached the production API, and the API says no webhook secret is set, which is right while no webhook is registered. (checked 2026-11-21: 503) A **502** would mean the forwarder cannot reach the API (check `API_BASE_URL` and `API_BYPASS_SECRET` in `wotw-web` Production); a **401** would mean a secret is set.
 
 **H3. Check the daily Kit sync on production** (after PR #150 is deployed)
-- [ ] Vercel, `wotw-api`, Settings, Cron Jobs lists `/cron/sync-kit` at `0 3 * * *`.
-- [ ] Run it once by hand: `curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api.vercel.app/cron/sync-kit` returns `{"checked": N, "updated": M}`. Before the first real sign-up `checked` is the number of subscribers in Kit and `updated` is 0 (the production list was empty on 2026-11-21, so `{"checked": 0, "updated": 0}` is correct).
-- [ ] After the first real sign-up and confirmation (Part I): the next run (or a hand run) gives `updated` of at least 1, and the person is `active` in our table. The logs show `kit_synced` with counts only, no addresses.
+- [x] Vercel, `wotw-api`, Settings, Cron Jobs lists `/cron/sync-kit` at `0 3 * * *`. (checked 2026-11-21: the promoted production deployment carries all three crons, `*/5 * * * *` drain, `0 3 * * *` sync and `30 3 * * *` retention)
+- [x] Run it once by hand (done by Hendrik 2026-11-21 13:01 UTC from the Cron Jobs page, after the first live sign-up; the result was `{"checked": 1, "updated": 1}` instead of zeros): `curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api.vercel.app/cron/sync-kit` returns `{"checked": N, "updated": M}`. Before the first real sign-up `checked` is the number of subscribers in Kit and `updated` is 0 (the production list was empty on 2026-11-21, so `{"checked": 0, "updated": 0}` is correct).
+- [x] After the first real sign-up and confirmation (Part I) (done 2026-11-21: Kit showed the subscriber `active` after confirming, and the sync run logged `kit_synced` with `checked` 1 and `updated` 1, counts only): the next run (or a hand run) gives `updated` of at least 1, and the person is `active` in our table. The logs show `kit_synced` with counts only, no addresses.
 
 **Not done at launch: registering the webhook (needs a paid Kit plan).** If Kit is ever upgraded: run `make kit-webhook URL=https://wordonthewater.net/api/webhooks/kit` (it saves the signing secret in the root `.env` as `KIT_WEBHOOK_SECRET` and never prints it), add the secret to `wotw-api` Production only (Sensitive), redeploy `wotw-api`, check an unsigned POST to the forwarder now gives **401**, and confirm a real delivery shows **200** in Kit's developer settings. The signature format was inferred from Kit's docs and has never seen a real delivery. The daily sync can then stay as a safety net.
 
@@ -165,7 +165,7 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 ## Part I. Production smoke test (on the real domain)
 
-- [ ] Subscribe with a real address, confirm through the Kit email, land on `/thank-you`; Kit shows `active`; our mirror shows `pending` until the next daily sync (03:00 UTC, or run `/cron/sync-kit` by hand, Part H3), then `active`.
+- [x] Subscribe with a real address, confirm through the Kit email, land on `/thank-you`; Kit shows `active`; our mirror shows `pending` until the next daily sync (03:00 UTC, or run `/cron/sync-kit` by hand, Part H3), then `active`. (done 2026-11-21 with Hendrik's own address: the confirmation arrived in the normal inbox, Kit showed `active` after confirming, and the sync moved our mirror; whether `/thank-you` appeared after confirming was not reported, so check it once more with the next test address)
 - [ ] Unsubscribe through the Kit link; Kit shows the person unsubscribed at once and our mirror follows after the next daily sync (Part H3).
 - [ ] The `hello@wordonthewater.net` mail links on the page ("Talk to someone" while the chat is off, the privacy policy) open a mail to the right address, and a message sent to it arrives. The prayer and contact forms and the `prayer@` address are not on the page at launch; their smoke tests (a prayer request reaches the prayer inbox, text only if the consent box was ticked; a contact message reaches `hello@`) belong to PLAN.md 1.4 and 1.5.
 - [ ] The rate limit answers 429 on repeated sign-ups, and a form without the spam check is refused.
