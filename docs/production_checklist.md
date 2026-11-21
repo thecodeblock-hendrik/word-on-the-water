@@ -19,7 +19,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | A | Gate: is the rest done? | 8 | 0 | Done |
 | B | Accounts and owner hardening | 9 | 0 | Done (the log drain and staging are deferred to after launch) |
 | C | Convert the site to a PWA | 7 | 0 | Done |
-| D | Security and operations checks | 4 | 3 | Left: `migrate.yml` (Claude drafts), the rollback rehearsal and the backup restore test (Hendrik); staging, ZAP and CSP report-only deferred |
+| D | Security and operations checks | 4 | 2 | Left: the rollback rehearsal and the backup restore test (Hendrik); `migrate.yml`, staging, ZAP and CSP report-only are deferred to [post_launch.md](post_launch.md) |
 | E | Email authentication | 5 | 0 | Done |
 | F | Production configuration | 6 | 2 | Hendrik: database check, preview widget |
 | G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
@@ -29,7 +29,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | K | Weekly email broadcasts | 1 | 16 | Hendrik: first broadcast steps in Kit |
 | L | Got Questions chat | 4 | 3 | Hendrik: preview walk-through, firewall rule |
 
-**Done on 2026-11-21:** the first live sign-up end to end (Turnstile, Kit confirmation in the inbox, `/cron/sync-kit` moved the mirror to active), after fixing the production Kit API key (see the Part F incident note). **Next, in order:** the Part F leftovers (database check, preview widget) and the Part D rehearsals (`migrate.yml`, rollback, backup restore); then the rest of the Part I smoke test on the live domain and the first broadcast (Part K). After every merge, promote the new production builds by hand (Part D). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
+**Done on 2026-11-21:** the first live sign-up end to end (Turnstile, Kit confirmation in the inbox, `/cron/sync-kit` moved the mirror to active), after fixing the production Kit API key (see the Part F incident note). **Next, in order:** the Part F leftovers (database check, preview widget) and the Part D rehearsals (rollback, backup restore); then the rest of the Part I smoke test on the live domain and the first broadcast (Part K). After every merge, promote the new production builds by hand (Part D). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
 
 ---
 
@@ -80,7 +80,7 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 - Skipped (decided 2026-11-21): the CSP report-only run on staging. The enforced CSP is already confirmed on production (next item) and `CSP_REPORT_ONLY` is unset there; a report-only run can be done later on a `staging` branch preview (PLAN.md 1.7).
 - [x] The production response has the CSP header and it is enforced (threat plan T3) (checked 2026-11-21 on `wotw-web.vercel.app`: `content-security-policy` header with a nonce, `CSP_REPORT_ONLY` not set in Production).
 - [x] `/docs` and `/openapi.json` return 404 in production (threat plan I5) (checked 2026-11-21 with `vercel curl` against `wotw-api.vercel.app`: both give the app's own 404, `/health/live` gives 200; `ENVIRONMENT=production` is set).
-- [ ] `migrate.yml` with a manual approval; production auto-promotion off; promote after the migrations and the smoke tests pass. Auto-promotion is already off in both Vercel projects (checked 2026-11-21: `autoAssignCustomDomains` is false), so **after every merge to `main`, the new production deployment of `wotw-api` and `wotw-web` must be promoted by hand** (Vercel, Deployments, the newest Ready one, three dots, Promote to Production, or `vercel promote <url>`). Until then the live site and the crons run the last promoted build (on 2026-11-21 that was the API from 17 November and the web site from 18 November, so the 5-minute drain, the Kit sync, the landscape menu fix and the Article JSON-LD were not live). Promote the API first when a merge changes both, and after any migration has been applied.
+- Deferred after launch (decided 2026-11-21, now in [post_launch.md](post_launch.md), before Phase 2): `migrate.yml`, a GitHub Action that runs the production migrations after a manual approval. Until then migrations run by hand ([runbooks/deploy.md](runbooks/deploy.md)): apply a migration first, promote second. Auto-promotion is already off in both Vercel projects (checked 2026-11-21: `autoAssignCustomDomains` is false), so **after every merge to `main`, the new production deployment of `wotw-api` and `wotw-web` must be promoted by hand** (Vercel, Deployments, the newest Ready one, three dots, Promote to Production, or `vercel promote <url>`). Until then the live site and the crons run the last promoted build (on 2026-11-21 that was the API from 17 November and the web site from 18 November, so the 5-minute drain, the Kit sync, the landscape menu fix and the Article JSON-LD were not live). Promote the API first when a merge changes both, and after any migration has been applied.
 - [ ] Rollback rehearsed with Vercel Instant Rollback.
 - [ ] Backup restore tested from the nightly dump and from Neon point-in-time recovery (`docs/runbooks/restore-db.md`).
 - Deferred (decided 2026-11-21): a ZAP scan against staging. The weekly `zap.yml` job already scans a production build in CI (PR #117); a one-off scan of a preview with the protection bypass header is optional (PLAN.md 1.7).
@@ -182,6 +182,8 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 ---
 
 ## Part J. Exit gate and after launch
+
+The launch exit gate. Work that continues after launch (and everything else we decided to do later) is tracked in [post_launch.md](post_launch.md); some of its first-week items repeat here on purpose.
 
 - [ ] A visitor on a mid-range phone can read the page, subscribe and confirm, and reach `hello@` through the mail link (the forms and the `prayer@` address are deferred, PLAN.md 1.4 and 1.5).
 - [ ] All Part A budgets met and no high security findings.
