@@ -35,7 +35,7 @@ Written 2026-11-21. "Who" says whose hands the step needs: **Hendrik** (dashboar
 - [ ] **Move the crons to Vercel Schedules** (Claude): Vercel calls Cron Jobs a legacy feature (no removal date). A configuration change in `apps/api/vercel.json` (the three routes stay; remove the `crons` entries in the same change or each route runs twice), see [runbooks/deploy.md](runbooks/deploy.md), "Cron".
 - [ ] **Web coverage reported in CI** (Claude): Vitest coverage as a CI step, a Phase 0 carry-over (PLAN.md 0.8).
 - [ ] **Strict `Content-Type` check** on POST routes (Claude, PLAN.md 0.3).
-- [ ] **Make `Lighthouse (mobile)` a required check** in branch protection, and the manual passes (keyboard only, VoiceOver, TalkBack) and a real mid-range Android check (Hendrik, PLAN.md 1.8), if not done before launch.
+- [ ] **Make `Lighthouse (mobile)` a required check** in branch protection (Hendrik: GitHub, Settings, Branches, the `main` rule, add `Lighthouse (mobile)`). Checked 2026-11-21: the 10 required checks do not include it. The manual passes and the real Android check are done (PLAN.md 1.8).
 
 ## 4. Kit and email
 
