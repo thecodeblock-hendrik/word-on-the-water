@@ -155,7 +155,7 @@ Vercel Cron gets through Deployment Protection by itself: it calls the deploymen
 
 ## Rollback
 
-Vercel Instant Rollback to the previous production deployment (`vercel rollback`). Safe because migrations are backward compatible.
+Vercel Instant Rollback to the previous production deployment (`vercel rollback`). Going forward is manual too: production auto-promotion is off in both projects, so a merge to `main` builds a production deployment that is not served until it is promoted (dashboard, Deployments, Promote to Production, or `vercel promote <url>`). Check `vercel inspect wotw-api.vercel.app` to see which build is live. Crons run only on the promoted deployment. Safe because migrations are backward compatible.
 
 ## Kit webhook (not registered at launch)
 

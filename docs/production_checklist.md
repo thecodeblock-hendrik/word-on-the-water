@@ -23,7 +23,7 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | E | Email authentication | 5 | 0 | Done |
 | F | Production configuration | 5 | 3 | Hendrik: token match, database check, preview widget |
 | G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
-| H | Kit form redirect | 3 | 4 | Hendrik: Kit redirect; then check the daily sync (the webhook is skipped) |
+| H | Kit form redirect | 4 | 3 | Hendrik: Kit redirect; then check the daily sync (the webhook is skipped) |
 | I | Production smoke test | 0 | 13 | After Part H: smoke test on the live domain |
 | J | Exit gate and after launch | 0 | 11 | Launch gate and after launch |
 | K | Weekly email broadcasts | 1 | 16 | Hendrik: first broadcast steps in Kit |
@@ -80,7 +80,7 @@ Do this on a branch and test it on a preview before launch. The detailed steps, 
 - [ ] Run the CSP in report-only on staging (`CSP_REPORT_ONLY=1`), review the reports, then enforce it in production (`CSP_REPORT_ONLY` off).
 - [x] The production response has the CSP header and it is enforced (threat plan T3) (checked 2026-11-21 on `wotw-web.vercel.app`: `content-security-policy` header with a nonce, `CSP_REPORT_ONLY` not set in Production).
 - [x] `/docs` and `/openapi.json` return 404 in production (threat plan I5) (checked 2026-11-21 with `vercel curl` against `wotw-api.vercel.app`: both give the app's own 404, `/health/live` gives 200; `ENVIRONMENT=production` is set).
-- [ ] `migrate.yml` with a manual approval; production auto-promotion off; promote after the migrations and the smoke tests pass.
+- [ ] `migrate.yml` with a manual approval; production auto-promotion off; promote after the migrations and the smoke tests pass. Auto-promotion is already off in both Vercel projects (checked 2026-11-21: `autoAssignCustomDomains` is false), so **after every merge to `main`, the new production deployment of `wotw-api` and `wotw-web` must be promoted by hand** (Vercel, Deployments, the newest Ready one, three dots, Promote to Production, or `vercel promote <url>`). Until then the live site and the crons run the last promoted build (on 2026-11-21 that was the API from 17 November and the web site from 18 November, so the 5-minute drain, the Kit sync, the landscape menu fix and the Article JSON-LD were not live). Promote the API first when a merge changes both, and after any migration has been applied.
 - [ ] Rollback rehearsed with Vercel Instant Rollback.
 - [ ] Backup restore tested from the nightly dump and from Neon point-in-time recovery (`docs/runbooks/restore-db.md`).
 - [ ] ZAP baseline scan against staging: no high findings. The weekly `zap.yml` job already scans a local production build (PR #117); this repeats it against staging once Pro gives us one.
@@ -147,7 +147,7 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 **Decision 2026-11-21: no Kit webhook at launch.** Kit's webhook endpoints (`/v4/webhook_endpoints`) refuse this account's API key with 401 "Authentication Failed" while every other call works (`/account`, `/forms`, `/tags` and the legacy `/webhooks` give 200), and Hendrik confirmed in Kit that webhooks need a paid plan, which we are not buying. The legacy `/webhooks` resource is not a way round it: it carries no signing secret and our receiver refuses unsigned calls. Kit still sends mail, runs double opt-in and honours unsubscribes by itself. What would have kept our database mirror in step is now a **daily sync**: `GET /cron/sync-kit` at 03:00 UTC reads every subscriber from Kit's API, before the retention job (03:30) deletes pending rows, so people who confirmed are `active` and survive it (ADR 0008, PLAN.md 1.3). The receiver route and `make kit-webhook` stay in the code for a paid plan.
 
 **H1. Redirect and redeploy**
-- [ ] Kit production form: set the redirect after sign-up and after confirmation to `https://wordonthewater.net/thank-you`.
+- [x] Kit production form: set the redirect after sign-up and after confirmation to `https://wordonthewater.net/thank-you`. (done by Hendrik 2026-11-21; the form also has auto-confirm off, which double opt-in needs, and reCAPTCHA off, which is fine because our own form checks Turnstile, the honeypot and rate limits before Kit is called)
 - [x] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this). (not needed 2026-11-21: both Production deployments were built from `main` after the routes existed, and the two checks below prove the forwarder and the API route are live)
 
 **H2. Check the forwarder route on production** (the route is dormant at launch, but it must answer safely: public site, then our forwarder, then the protected API)
