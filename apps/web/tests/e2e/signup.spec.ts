@@ -195,6 +195,15 @@ test.describe("/thank-you", () => {
     expect(violations).toEqual([]);
   });
 
+  test("links the privacy policy, since Kit sends subscribers here after they confirm", async ({
+    page,
+  }) => {
+    await page.goto("/thank-you");
+    await expect(
+      page.getByRole("contentinfo").getByRole("link", { name: "Privacy policy" }),
+    ).toHaveAttribute("href", "/privacy");
+  });
+
   test("has no Subscribe button, and the menu stays at the right edge", async ({ page }) => {
     await page.goto("/thank-you");
     const header = page.getByRole("banner");

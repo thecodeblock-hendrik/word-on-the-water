@@ -52,3 +52,28 @@ export function siteJsonLd() {
     ],
   };
 }
+
+/** A devotional as a schema.org Article. The image is the absolute address of its verse card. */
+export function articleJsonLd({
+  slug,
+  meta,
+  imageUrl,
+}: {
+  slug: string;
+  meta: { title: string; summary: string; publishAt: string; author: string };
+  imageUrl: string;
+}) {
+  const url = absoluteUrl(`/devotionals/${slug}`);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: meta.title,
+    description: meta.summary,
+    datePublished: meta.publishAt,
+    image: imageUrl,
+    url,
+    mainEntityOfPage: url,
+    author: { "@type": "Person", name: meta.author },
+    publisher: { "@id": absoluteUrl("/#organization") },
+  };
+}

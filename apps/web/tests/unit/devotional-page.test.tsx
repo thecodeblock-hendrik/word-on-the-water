@@ -26,6 +26,15 @@ afterEach(() => {
 });
 
 describe("devotional page", () => {
+  it("carries Article structured data for search engines", async () => {
+    const { container } = await renderPage();
+    const script = container.querySelector('script[type="application/ld+json"]');
+    const data = JSON.parse(script!.textContent!);
+    expect(data["@type"]).toBe("Article");
+    expect(data.headline).toBe("More Than Watchmen");
+    expect(data.image).toMatch(/^https:\/\/wordonthewater\.net\/content\/devotionals\//);
+  });
+
   it("has the crumbs, one h1, the summary and the byline", async () => {
     await renderPage();
     const crumbs = screen.getByRole("navigation", { name: /breadcrumb/i });
