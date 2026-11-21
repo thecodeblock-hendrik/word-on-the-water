@@ -14,7 +14,8 @@ be answered reach at least coverage 0.58 and score 12.8; the knowledge base's
 own questions all score 15.5 or more with coverage 1.0. So medium needs score
 10 and coverage 0.55, and high needs score 12 and coverage 0.7. Known limit:
 matching is by words, so "is the bible true" needs "Is the Bible true?" as a
-paraphrase in the knowledge base to find its entry.
+paraphrase in the knowledge base to find its entry. Spelling variants are folded first
+(honour and honor, baptise and baptize) and "baptism" joins "baptised", so those need no paraphrase.
 """
 
 import difflib
