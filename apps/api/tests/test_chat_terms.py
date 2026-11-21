@@ -94,3 +94,31 @@ def test_saviour_is_a_glossary_term_with_savior_as_its_alias(chat: Chat) -> None
     names = glossary_names(chat)
     assert "Saviour" in names
     assert "Savior" in names
+
+
+def after(chat: Chat, first: str, then: str) -> ChatReply:
+    """Ask `first`, keep the context the browser would keep, then ask `then`."""
+    context = ChatContext()
+    reply = chat.reply(ChatTurn(message=first), context)
+    if reply.kind == "answer" and reply.entry:
+        context = ChatContext(last_entry_id=reply.entry.id, seen_entry_ids=[reply.entry.id])
+    return chat.reply(ChatTurn(message=then), context)
+
+
+@pytest.mark.parametrize(
+    ("first", "word", "term"),
+    [
+        ("what does redemption mean", "pharisees", "Pharisees"),
+        ("how do i pray", "mediator", "Mediator"),
+        ("who is jesus", "hallelujah", "Hallelujah"),
+        ("what is the gospel", "gentile", "Gentile"),
+    ],
+)
+def test_a_glossary_word_typed_after_an_answer_still_gets_its_definition(
+    chat: Chat, first: str, word: str, term: str
+) -> None:
+    # Found on the live chat (2026-11-21): the context boost made "pharisees" a did-you-mean list.
+    reply = after(chat, first, word)
+    assert reply.kind == "term"
+    assert reply.term is not None
+    assert reply.term.term == term
