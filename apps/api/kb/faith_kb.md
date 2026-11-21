@@ -222,7 +222,7 @@ This knowledge base answers the questions people most often ask about the Christ
 
 ### 2.1 Who is Jesus?
 
-**Also asked:** Who was Jesus Christ? · What do Christians believe about Jesus?
+**Also asked:** Who was Jesus Christ? · What do Christians believe about Jesus? · Who is my Saviour?
 
 **Short answer:** Jesus is the eternal Son of God who became a man, lived a sinless life, died on the cross for our sins, rose from the dead and now reigns as Lord. He is the only Saviour and the centre of the Christian faith.
 

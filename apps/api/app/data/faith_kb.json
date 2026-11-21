@@ -633,7 +633,8 @@
       "question": "Who is Jesus?",
       "also_asked": [
         "Who was Jesus Christ?",
-        "What do Christians believe about Jesus?"
+        "What do Christians believe about Jesus?",
+        "Who is my Saviour?"
       ],
       "short_answer": "Jesus is the eternal Son of God who became a man, lived a sinless life, died on the cross for our sins, rose from the dead and now reigns as Lord. He is the only Saviour and the centre of the Christian faith.",
       "explanation": "Jesus was born in Bethlehem, grew up in Nazareth and taught in Israel in the first century. Christians believe he was far more than a teacher: he is “the Word” who was with God and was God, and who “became flesh” (John 1:1, 14). The title “Christ” means “Anointed One” (Messiah), the promised King of Israel.",
@@ -660,7 +661,7 @@
       "glossary_terms": [
         "Messiah"
       ],
-      "search_text": "Who is Jesus? | Who was Jesus Christ? | What do Christians believe about Jesus? | jesus, identity, christology | Jesus is the eternal Son of God who became a man, lived a sinless life, died on the cross for our sins, rose from the dead and now reigns as Lord. He is the only Saviour and the centre of the Christian faith."
+      "search_text": "Who is Jesus? | Who was Jesus Christ? | What do Christians believe about Jesus? | Who is my Saviour? | jesus, identity, christology | Jesus is the eternal Son of God who became a man, lived a sinless life, died on the cross for our sins, rose from the dead and now reigns as Lord. He is the only Saviour and the centre of the Christian faith."
     },
     {
       "id": "2.2",
@@ -1077,8 +1078,8 @@
         "temptation"
       ],
       "related": [
-        "2.1",
         "14.4",
+        "2.1",
         "3.3",
         "2.8",
         "2.3"
@@ -1146,8 +1147,8 @@
         "2.14",
         "2.13",
         "2.2",
-        "2.1",
-        "2.19"
+        "2.19",
+        "2.6"
       ],
       "glossary_terms": [],
       "search_text": "Why did Jesus teach in parables? | What is a parable? | jesus, parables, teaching | A parable is a short story from everyday life that teaches a spiritual truth. Jesus used them to reveal truth to those willing to listen while hiding it from those who had hardened their hearts."
