@@ -88,4 +88,5 @@ Plan and compliance checks: [bible_feature.md](bible_feature.md).
 
 - [ ] **Print the Kit and Vercel data processing agreements to PDF** and keep them with the others ([privacy.md](privacy.md): kit.com/dpa and vercel.com/legal/dpa) (Hendrik).
 - [ ] **Re-check Vercel's DPA now that the team is on Pro** (Hendrik): its text is written for Enterprise plans.
+- [ ] **Decide whether the public privacy policy should name Google reCAPTCHA** (Hendrik, then Claude edits `src/content/privacy.ts` and the date in `PRIVACY_UPDATED`): it is used only on Kit's own hosted sign-up page that we send returning readers to, not on our site; `docs/privacy.md` already lists it. If you say yes, the policy gets one line next to the Kit and Cloudflare entries.
 - [ ] **Review the privacy policy whenever data changes**: a log drain, the forms, a new email provider. Update `docs/privacy.md` and `src/content/privacy.ts` together and the date in `PRIVACY_UPDATED`.
