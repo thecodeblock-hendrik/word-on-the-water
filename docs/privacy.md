@@ -31,7 +31,7 @@ Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Pray
 
 | Data | Kept for | Then |
 |---|---|---|
-| Unconfirmed subscribers | 7 days | Deleted from Neon by the job. In Kit they stay as unconfirmed (Kit never emails them) until the owner deletes them in the Kit dashboard, a monthly task: Kit's API has no delete, and unsubscribing them through the API would block a later honest sign-up |
+| Unconfirmed subscribers | 7 days | Deleted from Neon by the job. The daily Kit sync (03:00 UTC, before the job at 03:30) first marks everyone who confirmed in Kit as active, so only people who never confirmed are deleted. In Kit they stay as unconfirmed (Kit never emails them) until the owner deletes them in the Kit dashboard, a monthly task: Kit's API has no delete, and unsubscribing them through the API would block a later honest sign-up |
 | Active subscribers | Until they unsubscribe, then the unsubscribe record | Deleted on request |
 | Prayer requests | 90 days (`delete_after`) | Deleted or anonymised |
 | Contact messages | 12 months (`delete_after`) | Deleted |
