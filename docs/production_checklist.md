@@ -96,25 +96,25 @@ These are TXT and CNAME records in **Squarespace DNS** for `wordonthewater.net`.
 
 **Attaching `wordonthewater.net` to Vercel replaces the Squarespace site with the new site.** Do this only when you are happy for the new site to be public. Email is not affected as long as the MX records are left alone (`hello@` and `prayer@` keep forwarding). Never paste a secret into chat or the repo.
 
-- [ ] A production deployment of `wotw-web` built from the latest `main` is **Ready** (Vercel, `wotw-web`, Deployments, filter Production; if the newest is Cancelled or old, three dots on the latest Ready one, then **Redeploy**). Have Squarespace and Vercel open in two tabs.
+- [x] A production deployment of `wotw-web` built from the latest `main` is **Ready** (Vercel, `wotw-web`, Deployments, filter Production; if the newest is Cancelled or old, three dots on the latest Ready one, then **Redeploy**). Have Squarespace and Vercel open in two tabs.
 
 **G1. Save the old DNS so you can undo**
-- [ ] Squarespace, Domains, `wordonthewater.net`, DNS Settings: screenshot **every** record (A, CNAME, MX, TXT) and keep it safe.
-- [ ] Note the MX records and every TXT record starting `v=spf1`: you will not touch them.
+- [x] Squarespace, Domains, `wordonthewater.net`, DNS Settings: screenshot **every** record (A, CNAME, MX, TXT) and keep it safe.
+- [x] Note the MX records and every TXT record starting `v=spf1`: you will not touch them.
 
 **G2. Add the domain in Vercel**
-- [ ] `wotw-web`, Settings, Domains, Add: `wordonthewater.net` attached to **Production**, and `www.wordonthewater.net` set to **redirect to** `wordonthewater.net` (apex is primary).
-- [ ] Vercel shows "Invalid configuration" and lists the records it needs (an **A record** for the apex and a **CNAME** for `www`). Copy the exact values from that page; do not type them from memory.
-- [ ] `wotw-api` stays on its protected `vercel.app` address.
+- [x] `wotw-web`, Settings, Domains, Add: `wordonthewater.net` attached to **Production**, and `www.wordonthewater.net` set to **redirect to** `wordonthewater.net` (apex is primary).
+- [x] Vercel shows "Invalid configuration" and lists the records it needs (an **A record** for the apex and a **CNAME** for `www`). Copy the exact values from that page; do not type them from memory.
+- [x] `wotw-api` stays on its protected `vercel.app` address.
 
 **G3. Change the records in Squarespace**
-- [ ] Replace the existing apex (`@`) A records and the `www` record that point at Squarespace with the values Vercel showed. If Squarespace marks some as "Squarespace defaults" for the website, remove those for the apex and `www` only.
-- [ ] Do **not** change the MX records, the SPF TXT record or any DKIM or DMARC record (the Kit `ckespa`, `cka._domainkey` and `cka2._domainkey` CNAMEs stay too). Save.
+- [x] Replace the existing apex (`@`) A records and the `www` record that point at Squarespace with the values Vercel showed. If Squarespace marks some as "Squarespace defaults" for the website, remove those for the apex and `www` only.
+- [x] Do **not** change the MX records, the SPF TXT record or any DKIM or DMARC record (the Kit `ckespa`, `cka._domainkey` and `cka2._domainkey` CNAMEs stay too). Save.
 
 **G4. Check it**
-- [ ] After a few minutes (up to a few hours for DNS) both Vercel domain rows show **Valid Configuration** and a certificate.
-- [ ] `https://wordonthewater.net` shows the new site; `https://www.wordonthewater.net` redirects to it; HTTPS and the HSTS header check out on both.
-- [ ] A test email to `hello@wordonthewater.net` and one to `prayer@wordonthewater.net` still arrive in your mailbox.
+- [x] After a few minutes (up to a few hours for DNS) both Vercel domain rows show **Valid Configuration** and a certificate. (done 2026-11-21: Hendrik saw Valid Configuration on the apex; the `www` certificate was still being issued at that point and `www` answered over HTTPS when checked afterwards; authoritative DNS answers `216.150.1.1` and the Vercel CNAME)
+- [x] `https://wordonthewater.net` shows the new site; `https://www.wordonthewater.net` redirects to it; HTTPS and the HSTS header check out on both. (checked 2026-11-21 via `curl --resolve`: apex 200 from Vercel with HSTS `max-age=63072000; includeSubDomains; preload`, `www` 308 to the apex, http redirects to https, Let's Encrypt certificate valid to 2027-02-19)
+- [x] A test email to `hello@wordonthewater.net` and one to `prayer@wordonthewater.net` still arrive in your mailbox. (done 2026-11-21: both arrived within 13 seconds, but in Gmail's spam folder; SPF, DKIM and DMARC all passed and Gmail's reason was "similar to messages identified as spam", from a one-word test sent from the same Gmail account; fix is Report not spam and a Gmail filter)
 - [ ] To go back: restore the A and CNAME records from the G1 screenshot.
 
 ---
@@ -127,11 +127,11 @@ Kit tells our site when a subscriber confirms, unsubscribes, bounces or complain
 
 **H1. Redirect and redeploy**
 - [ ] Kit production form: set the redirect after sign-up and after confirmation to `https://wordonthewater.net/thank-you`.
-- [ ] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this).
+- [x] Redeploy `wotw-web` and `wotw-api` in Production (the new routes and `/thank-you` exist on production only after this). (not needed 2026-11-21: both Production deployments were built from `main` after the routes existed, and the two checks below prove the forwarder and the API route are live)
 
 **H2. Check the route on production before registering** (the chain is public site, then our forwarder, then the protected API)
-- [ ] `curl -i https://wordonthewater.net/api/webhooks/kit` gives **405** (only POST is accepted).
-- [ ] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**. That is good: the forwarder reached the production API and the API says no webhook secret is set yet.
+- [x] `curl -i https://wordonthewater.net/api/webhooks/kit` gives **405** (only POST is accepted). (checked 2026-11-21: 405)
+- [x] `curl -i -X POST https://wordonthewater.net/api/webhooks/kit -d '{}'` gives **503**. That is good: the forwarder reached the production API and the API says no webhook secret is set yet. (checked 2026-11-21: 503)
 - [ ] **502** instead means the forwarder cannot reach the API: check `API_BASE_URL` and `API_BYPASS_SECRET` in `wotw-web` Production and redeploy. **401** means the secret is already set (fine).
 
 **H3. Register the webhook in Kit (skipped, see the decision above)**
