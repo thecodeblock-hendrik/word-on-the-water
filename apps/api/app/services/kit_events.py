@@ -17,6 +17,14 @@ STATUS_BY_EVENT = {
     "subscriber.bounced": SubscriberStatus.BOUNCED,
 }
 
+# What Kit's API calls a subscriber's state. `inactive` is a sign-up not yet confirmed: no change.
+STATUS_BY_KIT_STATE = {
+    "active": SubscriberStatus.ACTIVE,
+    "cancelled": SubscriberStatus.UNSUBSCRIBED,
+    "complained": SubscriberStatus.UNSUBSCRIBED,
+    "bounced": SubscriberStatus.BOUNCED,
+}
+
 
 async def apply_kit_event(session: AsyncSession, event: KitEvent, now: datetime) -> bool:
     """Update the mirror row for one event and commit. True if a subscriber was changed.
@@ -38,12 +46,22 @@ async def apply_kit_event(session: AsyncSession, event: KitEvent, now: datetime)
     )
     if row is None:
         return False
-    row.kit_subscriber_id = subscriber.id
+    set_status(row, status, subscriber.id, now)
+    await session.commit()
+    return True
+
+
+def set_status(row: Subscriber, status: SubscriberStatus, kit_id: int, now: datetime) -> bool:
+    """Move a mirror row to the status Kit reports. True if the row changed.
+
+    Shared by the webhook and the daily sync, so both apply the same rule.
+    """
+    changed = (row.status, row.kit_subscriber_id) != (status, kit_id)
+    row.kit_subscriber_id = kit_id
     row.status = status
     if status is SubscriberStatus.ACTIVE:
         row.confirmed_at = row.confirmed_at or now
         row.unsubscribed_at = None
     elif status is SubscriberStatus.UNSUBSCRIBED:
-        row.unsubscribed_at = now
-    await session.commit()
-    return True
+        row.unsubscribed_at = row.unsubscribed_at or now
+    return changed
