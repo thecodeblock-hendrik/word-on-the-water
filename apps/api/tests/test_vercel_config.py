@@ -24,3 +24,11 @@ def test_retention_is_scheduled_once_a_day() -> None:
 
 def test_the_outbox_drain_is_still_scheduled() -> None:
     assert "/cron/drain-outbox" in CRONS
+
+
+def test_kit_is_synced_daily_before_retention_deletes_pending_rows() -> None:
+    sync, retention = CRONS["/cron/sync-kit"], CRONS["/cron/retention"]
+    assert re.fullmatch(r"\d{1,2} \d{1,2} \* \* \*", sync)
+    minute, hour = (int(part) for part in sync.split()[:2])
+    retention_minute, retention_hour = (int(part) for part in retention.split()[:2])
+    assert (hour, minute) < (retention_hour, retention_minute)
