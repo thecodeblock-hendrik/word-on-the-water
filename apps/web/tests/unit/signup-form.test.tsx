@@ -128,6 +128,20 @@ describe("SignupForm answers", () => {
     expect(screen.queryByLabelText(signup.emailLabel)).toBeNull();
   });
 
+  it("tells a reader who gets no email, or unsubscribed before, to write to hello@", async () => {
+    // Kit cannot re-subscribe an unsubscribed address through its API, and the form answers the
+    // same whatever the address's state, so the message itself has to name the way out.
+    answer({ status: "success" });
+    render(<SignupForm {...props} />);
+    fireEvent.change(screen.getByLabelText(signup.emailLabel), {
+      target: { value: "reader@example.com" },
+    });
+    submit();
+    const status = await screen.findByRole("status");
+    expect(status).toHaveTextContent("hello@wordonthewater.net");
+    expect(status).toHaveTextContent(/unsubscribed before/i);
+  });
+
   it("shows a field error on the field and keeps what was typed", async () => {
     answer({
       status: "error",
