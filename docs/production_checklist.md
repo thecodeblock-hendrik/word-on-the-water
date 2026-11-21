@@ -25,7 +25,7 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ## Part B. Accounts and owner hardening (no domain needed)
 
-- [ ] Vercel: upgrade to **Pro** (Hobby is non-commercial and has quota limits).
+- [x] Vercel: upgrade to **Pro** (Hobby is non-commercial and has quota limits). (checked 2026-11-21: team `thecodeblock` is on the `pro` plan)
 - [ ] After the move to Pro, look at **Cold Start Prevention** in each project's Functions settings (it shows "Disabled" on Hobby, 2026-11-17; Vercel's docs say Pro keeps one production instance warm but its pricing page lists the feature under Enterprise, so confirm in the dashboard). Fluid compute is already on for both projects. Then leave both idle for 10 minutes, open the chat and click a topic: it took about 2 s on Hobby (API 2.1 s cold against 0.7 s warm). If it is still slow, ping both functions every 5 minutes.
 - [ ] Vercel: restrict who can promote to production; two-factor on every team member; turn on the **audit log** (Pro).
 - [ ] Two-factor on Squarespace (domain and DNS) and the registrar lock on.
@@ -33,7 +33,7 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 - [ ] Recovery codes for every account stored offline.
 - [ ] Rotate any secret that was ever shown in a chat, a screenshot or a log ([runbooks/rotate-secrets.md](runbooks/rotate-secrets.md)).
 - [ ] With Pro: a log drain to a log store (Better Stack or Axiom) and a staging environment (a custom Vercel environment), deferred from step 0.10.
-- [ ] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
+- [x] Outbox cron changed to `*/5 * * * *` in `apps/api/vercel.json` and in the deploy runbook (Hobby fails the deploy with anything more frequent than daily).
 - [ ] Vercel Firewall rate-limit rules on the sign-up route and on `/v1/chat/messages` (the prayer and contact routes when those forms are built); Attack Challenge Mode noted in the incident runbook.
 
 ---

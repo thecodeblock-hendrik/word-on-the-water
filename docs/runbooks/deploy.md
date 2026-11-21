@@ -120,16 +120,16 @@ Two crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON
 | Path | When | What |
 |---|---|---|
 | `/cron/retention` | daily 03:30 UTC | Deletes data past its retention period (docs/privacy.md); logs counts only |
-| `/cron/drain-outbox` | daily 05:00 UTC | Sends queued emails and retries Kit calls; a message that fails for good logs `outbox_messages_failed` and sends Sentry one message |
+| `/cron/drain-outbox` | every 5 minutes | Sends queued emails and retries Kit calls; a message that fails for good logs `outbox_messages_failed` and sends Sentry one message |
 
-Hobby only allows crons that run once a day, at any time within the scheduled hour (so 03:30 means somewhere between 03:00 and 03:59 UTC); a more frequent one fails the deploy. Since Vercel's January 2026 change there is no per-team limit and each project may have 100 crons on every plan (it used to be two per team on Hobby). Change the drain to `*/5 * * * *` after moving to Pro. **Crons run only on the Production deployment**, never on previews. To try one on a preview, call it by hand with the cron secret and the Deployment Protection bypass (`curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api-git-<branch>-thecodeblock.vercel.app/cron/retention`); the preview database is its own Neon branch, so this is safe. `tests/test_vercel_config.py` checks that each cron calls a route that exists and refuses an unauthenticated call.
+The drain runs every 5 minutes (changed on the move to Pro, 2026-11-21); on Hobby a cron may run only once a day and a more frequent one fails the deploy, and the retention cron stays daily. Each project may have 100 crons on every plan. **Crons run only on the Production deployment**, never on previews. To try one on a preview, call it by hand with the cron secret and the Deployment Protection bypass (`curl -H "Authorization: Bearer $CRON_SECRET" -H "x-vercel-protection-bypass: $BYPASS" https://wotw-api-git-<branch>-thecodeblock.vercel.app/cron/retention`); the preview database is its own Neon branch, so this is safe. `tests/test_vercel_config.py` checks that each cron calls a route that exists and refuses an unauthenticated call.
 
 **Cron Jobs are a legacy feature (noted 2026-11-14).** Vercel's pages say they "will be migrated to Schedules in the future", with no removal date, and the dashboard shows a banner saying so. Nothing has to change yet. When we move (after launch, not before 28 November), it is a configuration change in `apps/api/vercel.json` and the routes stay as they are:
 
 ```json
 "schedules": {
   "retention":    { "schedule": "30 3 * * *", "path": "/cron/retention",    "requestMethod": "GET" },
-  "drain-outbox": { "schedule": "0 5 * * *",  "path": "/cron/drain-outbox", "requestMethod": "GET" }
+  "drain-outbox": { "schedule": "*/5 * * * *", "path": "/cron/drain-outbox", "requestMethod": "GET" }
 }
 ```
 
