@@ -62,6 +62,7 @@ Detailed steps are in [PLAN.md](PLAN.md) 1.4 (prayer) and 1.5 (contact); the lis
 
 - [ ] **Footer link to a full statement of faith** once a page or URL exists (optional, PLAN.md 1.6).
 - [ ] **A point on the Holy Spirit or Jesus' return** in the statement of faith (optional, Hendrik writes the wording, PLAN.md 1.11).
+- [ ] **A dedicated home page share image** (optional, Hendrik chooses, Claude swaps the file). Today the home link's WhatsApp and social card is the Advent lighthouse photo, cropped to 1200x630 with the site title on top (`apps/web/content/site/social/og-background.jpg`, built by `src/app/opengraph-image.tsx`). It is a separate copy of the photo, so changing the series art does not change it, and the live home page itself has no hero photo. After Advent the card will keep the lighthouse. Options: keep it as the permanent brand image (the plan for launch), or choose a dedicated picture (for example the surfing photo) and replace the file, then deploy, promote and re-test in WhatsApp with a changed address (previews are cached; Meta's Sharing Debugger can refresh the bare address). Do not make the home card follow the current series or devotional: a shared link would change under people.
 - [ ] **A devotional archive page** (Phase 2.3): the series list is the index until then.
 - [ ] **Weekly devotionals**: keep the weekly rhythm after the first on launch day (5, 12 and 19 December are written; more are needed after that).
 
