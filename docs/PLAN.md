@@ -177,7 +177,7 @@ Tests are written first for all logic. The order of items in this plan is not th
 - [x] Validate: a test PR runs every workflow green (PR #10, all 11 checks, six Playwright browser projects)
 
 ### 0.9 Vercel and external services
-- [x] Vercel team with 2FA for all members (team `thecodeblock`, Hobby)
+- [x] Vercel team with 2FA for all members (team `thecodeblock`, Hobby while building, Pro since 2026-11-21)
 - [x] Projects `wotw-web` (root `apps/web`) and `wotw-api` (root `apps/api`) linked to GitHub
 - [x] Ignored Build Step per project so docs-only changes do not redeploy (diff against `VERCEL_GIT_PREVIOUS_SHA`; the API always builds previews so each web preview has an API to call)
 - [x] Region chosen and pinned for both projects and the database: `fra1` (Neon `aws-eu-central-1`)
