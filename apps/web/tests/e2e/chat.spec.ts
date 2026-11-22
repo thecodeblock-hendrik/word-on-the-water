@@ -281,7 +281,7 @@ test.describe("with the chat on", () => {
       expect(credit.y + credit.height).toBeLessThanOrEqual(bump.y + 1);
     });
 
-    test("on a phone the chapter buttons use the short names, and are named for what is shown", async ({
+    test("on a phone the chapter buttons use the short names, with Your chat or Shore between them, and are named for what is shown", async ({
       browser,
     }) => {
       const open = async (chatReturn: boolean) => {
@@ -305,9 +305,11 @@ test.describe("with the chat on", () => {
         withChat.getByRole("link", { name: "Next chapter: Matt 17", exact: true }),
       ).toBeVisible();
       const without = await open(false);
+      // Shore takes the same room in the middle, so the short names are used there too.
       await expect(
-        without.getByRole("link", { name: "Previous chapter: Matthew 15", exact: true }),
+        without.getByRole("link", { name: "Previous chapter: Matt 15", exact: true }),
       ).toBeVisible();
+      await expect(without.getByRole("link", { name: "Shore" })).toBeVisible();
       await expect(without.locator("[data-chat-return]")).toHaveCount(0);
     });
 
