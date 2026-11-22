@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { ChatHost } from "@/components/chat/chat-host";
 import { BottomNav } from "@/components/layout/bottom-nav";
+
+vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn(), warmChat: vi.fn() }));
 
 afterEach(cleanup);
 
@@ -46,6 +50,19 @@ describe("BottomNav on the site pages", () => {
       expect(screen.getByRole("link", { name }).className).toMatch(/\bmin-h-12\b/);
     }
     expect(screen.getByRole("navigation").className).toMatch(/env\(safe-area-inset-bottom\)/);
+  });
+});
+
+describe("BottomNav Got Questions", () => {
+  it("opens the chat in place, without following its mail link", async () => {
+    render(
+      <>
+        <BottomNav devotionalHref="/devotionals/advent-01" />
+        <ChatHost />
+      </>,
+    );
+    await userEvent.setup().click(screen.getByRole("link", { name: "Got Questions" }));
+    expect(await screen.findByRole("dialog", { name: "Got Questions" })).toBeInTheDocument();
   });
 });
 
