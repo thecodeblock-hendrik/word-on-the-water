@@ -3,7 +3,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { featured, latestPublished, loadDevotionals, published } from "@/lib/devotionals/load";
+import {
+  currentDevotionalHref,
+  featured,
+  latestPublished,
+  loadDevotionals,
+  published,
+} from "@/lib/devotionals/load";
 
 const file = (title: string, publishAt: string, n: number) => `---
 title: ${title}
@@ -101,5 +107,23 @@ describe("featured", () => {
     expect(featured(all, "2026-12-05")?.slug).toBe("advent-01");
     expect(featured(all, "2026-12-13")?.slug).toBe("advent-02");
     expect(featured([], "2026-12-13")).toBeUndefined();
+  });
+});
+
+describe("currentDevotionalHref", () => {
+  it("links to the latest published devotional", () => {
+    add("advent-01", file("One", "2026-12-05", 1));
+    add("advent-02", file("Two", "2026-12-12", 2));
+    const all = loadDevotionals(dir);
+    expect(currentDevotionalHref(all, "2026-12-14")).toBe("/devotionals/advent-02");
+    expect(currentDevotionalHref(all, "2026-12-06")).toBe("/devotionals/advent-01");
+  });
+
+  it("links to the first devotional before any is published", () => {
+    add("advent-01", file("One", "2026-12-05", 1));
+    add("advent-02", file("Two", "2026-12-12", 2));
+    expect(currentDevotionalHref(loadDevotionals(dir), "2026-11-20")).toBe(
+      "/devotionals/advent-01",
+    );
   });
 });

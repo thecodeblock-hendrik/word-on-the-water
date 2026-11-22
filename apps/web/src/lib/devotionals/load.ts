@@ -69,6 +69,11 @@ export function featured(all: Devotional[], today: string): Devotional | undefin
   return latestPublished(all, today) ?? all.at(-1);
 }
 
+/** The address of the featured devotional, for links that mean "the current devotional". */
+export function currentDevotionalHref(all: Devotional[], today: string): string {
+  return `/devotionals/${featured(all, today)!.slug}`;
+}
+
 /** A devotional page is shown once published, and the first one is shown before any is. */
 export function isViewable(all: Devotional[], slug: string, today: string): boolean {
   return published(all, today).some((d) => d.slug === slug) || featured(all, today)?.slug === slug;
