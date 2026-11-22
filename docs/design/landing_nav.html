@@ -334,4 +334,84 @@ for(const [t,c,body] of sets){
 }
 document.getElementById('g').innerHTML=h;
 </script>
+<h2>H. Auto-hiding bar while reading (proposal)</h2>
+<p class="lead">On the devotional and the Bible reader the bar slides off the bottom when you scroll down, and slides back on the slightest scroll up. First the devotional and the Bible reader, the other pages after, the chat later. Phones only; desktop is unchanged.</p>
+<table class="cmp"><tr><th>When</th><th>Bar</th><th>Why</th></tr>
+<tr><td>At the very top of the page</td><td>Shown</td><td>Nothing to read past yet, and the bar is how a new visitor finds the other places</td></tr>
+<tr><td>Scrolling down more than about 40px</td><td>Slides down and out (200ms)</td><td>Gives the text the whole screen. 40px so a small wobble does not hide it</td></tr>
+<tr><td>Any scroll up</td><td>Slides back in (200ms)</td><td>Softens the discoverability risk: a visitor who scrolls straight down finds the bar the moment they scroll back</td></tr>
+<tr><td>At the end of the page or chapter</td><td>Shown</td><td>The end is where the next step belongs (Next chapter, the other places)</td></tr>
+<tr><td>Focus moves into the bar</td><td>Shown</td><td>Keyboard and screen reader users must never land on something they cannot see. While hidden the bar is inert</td></tr>
+<tr><td>Reduced motion</td><td>No slide, it just appears and disappears</td><td>prefers-reduced-motion</td></tr>
+<tr><td>The page</td><td>Keeps its bottom padding</td><td>Nothing jumps when the bar hides, so no layout shift. The Undo toast follows the bar</td></tr></table>
+<style>
+.hint-arrow{position:absolute;right:10px;top:50%;z-index:3;width:30px;height:60px;border-radius:15px;background:rgba(0,0,0,.28);color:#fff;display:grid;place-items:center;font:700 16px system-ui}
+.long p{font:17px/1.7 Georgia,serif;margin:0 0 14px}
+.long{padding:14px 16px;flex:1;overflow:hidden;position:relative}
+.long h5{font:700 22px/1.2 "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 8px;color:var(--accent-ink)}
+.bar-slot{position:relative;flex:none;height:92px}
+.bar-slot.gone{height:0}
+.mid-slide{transform:translateY(46px)}
+.shrunk{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4}
+.shrunk .nb-btn{position:static;width:48px;height:48px;box-shadow:0 3px 10px rgba(0,0,0,.3);border:3px solid var(--surface)}
+.shrunk .nb-btn svg{width:24px;height:24px}
+.shrunk-note{position:absolute;left:0;right:0;bottom:66px;text-align:center;font:600 12px system-ui;color:var(--muted)}
+.sbar{position:absolute;right:3px;width:4px;border-radius:2px;background:rgba(128,128,128,.55);z-index:3}
+</style>
+<div id="h"></div>
+<script>
+const para = 'The night watch knows the dark will end, but only because the sun has risen before. Hope is not a feeling that the wave will be small. It is the memory of every morning the water went flat and gold.';
+const topText = '<div class="eyebrow">Advent &middot; 2 of 5</div><h3 style="font:700 34px/1.1 \'Barlow Condensed\',\'Arial Narrow\',system-ui;margin:4px 0 10px;text-transform:uppercase">The long wait</h3><p>' + para + '</p><p>' + para + '</p>';
+const midText = '<p>' + para + '</p><h5>The word</h5><p>' + para + '</p><p>' + para + '</p><p>' + para + '</p>';
+const endText = '<p>' + para + '</p><h5>Pray</h5><p>Father, help me wait well. Amen.</p><p style="color:var(--muted);font-size:14px">Scripture quotations are from the ESV. See the footer for the full notice.</p>';
+const bibleText = '<div class="pbtn"><span>John 3</span><span>&#9662;</span></div><p class="vtext" style="margin-top:12px"><sup>16</sup>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life. <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him. <sup>18</sup>He who believes in him is not judged. He who doesn&rsquo;t believe has been judged already.</p>';
+const bibleMid = '<p class="vtext"><sup>19</sup>This is the judgement, that the light has come into the world, and men loved the darkness rather than the light, for their works were evil. <sup>20</sup>For everyone who does evil hates the light, and doesn&rsquo;t come to the light, lest his works would be exposed. <sup>21</sup>But he who does the truth comes to the light, that his works may be revealed.</p>';
+const downHint = '<span class="hint-arrow">&darr;</span>';
+const upHint = '<span class="hint-arrow">&uarr;</span>';
+const sb = (top, h) => '<span class="sbar" style="top:' + top + 'px;height:' + h + 'px"></span>';
+const siteBar = (cls) => '<div class="bar-slot"><div class="' + (cls || '') + '"><div class="nbar">' + bg + '<span class="cb prev tab on">' + dev + 'Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Got Questions</span><span class="nb-btn" style="top:7px">' + bib + '</span><span class="nb-lbl" style="top:66px">Bible</span></div></div></div>';
+const readerBar = (cls) => '<div class="bar-slot"><div class="' + (cls || '') + '"><div class="nbar">' + bg + '<span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px">' + surf + '</span><span class="nb-lbl" style="top:66px">Shore</span></div></div></div>';
+const noBar = '<div class="bar-slot gone"></div>';
+const shrink = '<div class="shrunk"><span class="nb-btn">' + bib + '</span></div>';
+const dev_ = (text, bar, extra) => stat + topbar + '<div class="long">' + text + (extra || '') + '</div>' + bar;
+const bible_ = (text, bar, extra) => stat + topbar + '<div class="long">' + text + (extra || '') + '</div>' + bar;
+const rows = [
+ ['Devotional, light', '', [
+  ['1. At the top', 'The bar is shown.', dev_(topText, siteBar(), sb(8, 90))],
+  ['2. Scrolling down', 'The bar has slid off. The text has the whole screen.', dev_(midText, noBar, downHint + sb(120, 90))],
+  ['3. Scroll up, a little', 'It starts sliding back at once (mid-slide, 200ms).', dev_(midText, siteBar('mid-slide'), upHint + sb(120, 90))],
+  ['4. Scrolled up', 'The bar is back where it was.', dev_(midText, siteBar(), sb(120, 90))],
+  ['5. End of the page', 'Shown at the end, whichever way the visitor arrived.', dev_(endText, siteBar(), sb(250, 90))]
+ ]],
+ ['Devotional, dark', 'night', [
+  ['Scrolling down', 'Hidden.', dev_(midText, noBar, downHint + sb(120, 90))],
+  ['Scroll up, mid-slide', 'Returning.', dev_(midText, siteBar('mid-slide'), upHint + sb(120, 90))],
+  ['Scrolled up', 'Shown.', dev_(midText, siteBar(), sb(120, 90))]
+ ]],
+ ['Bible reader, light', '', [
+  ['Scrolling down', 'The chapter bar slides off too, so the verses get the whole screen.', bible_(bibleText + bibleMid, noBar, downHint + sb(120, 90))],
+  ['Scroll up, mid-slide', 'Previous, Shore and Next slide back.', bible_(bibleText + bibleMid, readerBar('mid-slide'), upHint + sb(120, 90))],
+  ['Scrolled up', 'Shown.', bible_(bibleText + bibleMid, readerBar(), sb(120, 90))]
+ ]],
+ ['Bible reader, dark', 'night', [
+  ['Scrolling down', 'Hidden.', bible_(bibleText + bibleMid, noBar, downHint + sb(120, 90))],
+  ['Scrolled up', 'Shown.', bible_(bibleText + bibleMid, readerBar(), sb(120, 90))]
+ ]],
+ ['Alternative: shrink to the round button (instead of hiding it all)', '', [
+  ['Devotional, light', 'A smaller round Bible button stays, so the bar is never fully gone. It floats over the text at the bottom centre, so it hides a line or two while you read.', dev_(midText, noBar, downHint + sb(120, 90) + shrink)],
+  ['Bible reader, light', 'In the reader the chapter buttons would be gone, so this variant fits the devotional better.', bible_(bibleText + bibleMid, noBar, downHint + sb(120, 90) + shrink)]
+ ]],
+ ['Alternative, dark', 'night', [
+  ['Devotional, dark', 'Same, in Night swell.', dev_(midText, noBar, downHint + sb(120, 90) + shrink)]
+ ]]
+];
+let hh = '';
+for (const [title, cls, frames] of rows) {
+  hh += '<h3 style="margin:28px 0 0">' + title + '</h3><div class="row">';
+  for (const [t, c, body] of frames) hh += '<figure><div class="phone ' + cls + '">' + body + '</div><figcaption><b>' + t + '.</b> ' + c + '</figcaption></figure>';
+  hh += '</div>';
+}
+hh += '<h3 style="margin:28px 0 0">The risk, and what softens it</h3><ul class="notes"><li>A first-time visitor who scrolls straight down may never see the bar, and so not know the other places exist until they scroll up.</li><li>It returns on the slightest scroll up, and always at the top and the end of the page, so the first scroll back up reveals it.</li><li>The Subscribe button and the menu in the header stay as they are, so the main ways on are always on screen.</li><li>If real phone testing shows people do not find it, the alternative above (a small round button that stays) is a fallback.</li></ul>';
+document.getElementById('h').innerHTML = hh;
+</script>
 </body></html>
