@@ -24,10 +24,13 @@ export function BottomNav({
   devotionalHref,
   variant = "site",
   current,
+  onNavigate,
 }: {
   devotionalHref: string;
   /** The page the visitor is on, shown by colour and `aria-current`. */
   current?: "devotional";
+  /** Called when a link is followed, for example to close the chat the bar sits in. */
+  onNavigate?: () => void;
   variant?: "site" | "chat";
 }) {
   return (
@@ -38,6 +41,7 @@ export function BottomNav({
     >
       <Link
         href={devotionalHref}
+        onClick={onNavigate}
         aria-current={current === "devotional" ? "page" : undefined}
         className={`${side} ${current === "devotional" ? here : outlined}`}
       >
@@ -56,6 +60,7 @@ export function BottomNav({
         </svg>
         <Link
           href="/bible"
+          onClick={onNavigate}
           prefetch={false}
           className="absolute inset-0 font-ui text-xs font-bold leading-none text-ink"
         >
@@ -66,7 +71,7 @@ export function BottomNav({
         </Link>
       </div>
       {variant === "chat" ? (
-        <Link href="/" className={`${side} ${filled}`}>
+        <Link href="/" onClick={onNavigate} className={`${side} ${filled}`}>
           <ShoreIcon className="size-5" />
           {bottomNav.shore}
         </Link>

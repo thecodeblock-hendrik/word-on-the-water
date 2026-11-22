@@ -38,4 +38,9 @@ describe("useKeyboardOpen", () => {
     resizeTo(700);
     expect(result.current).toBe(false);
   });
+
+  it("is false where the browser has no visual viewport", () => {
+    Object.defineProperty(window, "visualViewport", { value: undefined, configurable: true });
+    expect(renderHook(() => useKeyboardOpen()).result.current).toBe(false);
+  });
 });

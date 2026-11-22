@@ -6,8 +6,10 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { ChatInput } from "@/components/chat/chat-input";
 import { Chip } from "@/components/chat/chip";
 import { TopicBrowser } from "@/components/chat/topic-browser";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { MessageList } from "@/components/chat/message-list";
 import { useChat } from "@/components/chat/use-chat";
+import { useKeyboardOpen } from "@/components/chat/use-keyboard-open";
 import { chat } from "@/content/chat";
 import type { ChatTurn } from "@/lib/chat/submit";
 
@@ -22,12 +24,15 @@ export function ChatPanel({
   open,
   onOpenChange,
   bibleLinks = false,
+  devotionalHref,
   returnFocusTo,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Link key verses to the Bible reader (only when it is switched on). */
   bibleLinks?: boolean;
+  /** The current devotional's address; with it, a phone shows the bottom bar under the chat. */
+  devotionalHref?: string;
   /** Where focus goes on close. Safari does not focus a button on click, so the opener is told. */
   returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
@@ -38,6 +43,7 @@ export function ChatPanel({
   const input = useRef<HTMLTextAreaElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
+  const keyboardOpen = useKeyboardOpen();
 
   useEffect(() => {
     const box = scroller.current;
@@ -154,6 +160,13 @@ export function ChatPanel({
             followUp={thread.length > 0}
             inputRef={input}
           />
+          {devotionalHref && !keyboardOpen && (
+            <BottomNav
+              variant="chat"
+              devotionalHref={devotionalHref}
+              onNavigate={() => onOpenChange(false)}
+            />
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

@@ -15,7 +15,13 @@ const ChatPanel = lazy(() =>
  * The one Got Questions panel on the page, opened by any ChatLauncher (the menu bar, the mobile
  * menu, the Start here button). Once opened it stays mounted, so the conversation is not rebuilt.
  */
-export function ChatHost({ bibleLinks = false }: { bibleLinks?: boolean }) {
+export function ChatHost({
+  bibleLinks = false,
+  devotionalHref,
+}: {
+  bibleLinks?: boolean;
+  devotionalHref?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const opener = useRef<HTMLElement | null>(null);
@@ -51,6 +57,7 @@ export function ChatHost({ bibleLinks = false }: { bibleLinks?: boolean }) {
         open={open}
         onOpenChange={setOpen}
         bibleLinks={bibleLinks}
+        devotionalHref={devotionalHref}
         returnFocusTo={opener}
       />
     </Suspense>

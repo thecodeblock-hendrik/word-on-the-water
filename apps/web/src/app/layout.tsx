@@ -52,6 +52,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
   // The phone bottom bar needs both the Bible reader and the chat to be on.
   const bottomNav = isBibleEnabled() && isChatEnabled();
+  const devotionalHref = currentDevotionalHref(loadContent().devotionals, today());
   return (
     <html
       lang="en"
@@ -67,12 +68,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
-        {bottomNav && (
-          <BottomNavHost
-            devotionalHref={currentDevotionalHref(loadContent().devotionals, today())}
+        {bottomNav && <BottomNavHost devotionalHref={devotionalHref} />}
+        {isChatEnabled() && (
+          <ChatHost
+            bibleLinks={isBibleEnabled()}
+            devotionalHref={bottomNav ? devotionalHref : undefined}
           />
         )}
-        {isChatEnabled() && <ChatHost bibleLinks={isBibleEnabled()} />}
         <Analytics />
         <SpeedInsights />
       </body>

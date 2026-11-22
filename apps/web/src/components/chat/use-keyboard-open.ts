@@ -11,7 +11,7 @@ function subscribe(onChange: () => void) {
 
 function snapshot() {
   const viewport = window.visualViewport;
-  return viewport !== null && window.innerHeight - viewport.height > KEYBOARD_MIN_PX;
+  return viewport ? window.innerHeight - viewport.height > KEYBOARD_MIN_PX : false;
 }
 
 /** True while the on-screen keyboard covers part of the page. */
