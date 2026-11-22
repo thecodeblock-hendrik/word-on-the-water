@@ -15,12 +15,12 @@ function watchCsp(page: Page) {
 }
 
 const startButton = (page: Page) =>
-  page.locator("#start").getByRole("link", { name: "Got Questions?" });
+  page.locator("#start").getByRole("link", { name: "Ask the Word" });
 
 async function openChat(page: Page) {
   await page.goto("/#start");
   await startButton(page).click();
-  const dialog = page.getByRole("dialog", { name: "Got Questions" });
+  const dialog = page.getByRole("dialog", { name: "Ask the Word" });
   await expect(dialog).toBeVisible();
   return dialog;
 }
@@ -42,7 +42,7 @@ test.describe("with the chat off (the flag unset)", () => {
       "href",
       "mailto:hello@wordonthewater.net",
     );
-    await expect(page.getByRole("link", { name: /Got Questions/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Ask the Word/ })).toHaveCount(0);
     expect(bodies.filter((b) => b.includes(MARKER))).toEqual([]);
   });
 });
@@ -73,7 +73,7 @@ test.describe("with the chat on", () => {
     await page.waitForLoadState("networkidle");
     expect(chatScripts).toEqual([]);
     await startButton(page).click();
-    await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Ask the Word" })).toBeVisible();
     expect(chatScripts.length).toBeGreaterThan(0);
   });
 
@@ -156,14 +156,14 @@ test.describe("with the chat on", () => {
     if (wide) {
       await page
         .getByRole("navigation", { name: "Main" })
-        .getByRole("link", { name: "Got Questions" })
+        .getByRole("link", { name: "Ask the Word" })
         .click();
     } else {
       await page.getByRole("button", { name: "Menu" }).click();
-      await page.getByTestId("mobile-menu").getByRole("link", { name: "Got Questions" }).click();
+      await page.getByTestId("mobile-menu").getByRole("link", { name: "Ask the Word" }).click();
       await expect(page.getByTestId("mobile-menu")).toHaveCount(0);
     }
-    await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Ask the Word" })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
   });
@@ -188,7 +188,7 @@ test.describe("with the chat on", () => {
       await expect(back).toBeVisible();
 
       await back.click();
-      const dialog = page.getByRole("dialog", { name: "Got Questions" });
+      const dialog = page.getByRole("dialog", { name: "Ask the Word" });
       await expect(dialog).toBeVisible();
       await expect(page).toHaveURL(/\/john\/4/);
       await expect(dialog.getByText("Short answer 2.1.")).toBeVisible();
@@ -199,7 +199,7 @@ test.describe("with the chat on", () => {
     test("the browser Back button reopens the chat too", async ({ page }) => {
       await readVerse(page);
       await page.goBack();
-      await expect(page.getByRole("dialog", { name: "Got Questions" })).toBeVisible();
+      await expect(page.getByRole("dialog", { name: "Ask the Word" })).toBeVisible();
       await page.goForward();
       await expect(page.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });

@@ -39,7 +39,7 @@ function Harness() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)}>Got Questions</button>
+      <button onClick={() => setOpen(true)}>Ask the Word</button>
       <ChatPanel open={open} onOpenChange={setOpen} bibleLinks devotionalHref="/devotionals/a" />
     </>
   );
@@ -57,8 +57,8 @@ const box = () => screen.getByRole("textbox", { name: /question|follow-up/i });
 async function openAndAsk() {
   const user = userEvent.setup();
   render(<Harness />);
-  await user.click(screen.getByRole("button", { name: "Got Questions" }));
-  await screen.findByRole("dialog", { name: "Got Questions" });
+  await user.click(screen.getByRole("button", { name: "Ask the Word" }));
+  await screen.findByRole("dialog", { name: "Ask the Word" });
   sendChat.mockResolvedValue({ ok: true, reply: answer });
   await user.type(box(), "who is jesus{Enter}");
   await screen.findByText("Short answer 2.1.");
@@ -66,8 +66,8 @@ async function openAndAsk() {
 }
 
 async function reopen(user: User) {
-  await user.click(screen.getByRole("button", { name: "Got Questions" }));
-  await screen.findByRole("dialog", { name: "Got Questions" });
+  await user.click(screen.getByRole("button", { name: "Ask the Word" }));
+  await screen.findByRole("dialog", { name: "Ask the Word" });
 }
 
 beforeEach(() => {
@@ -119,7 +119,7 @@ describe("leaving the chat on a phone", () => {
   it("keeps nothing for Undo when the chat was empty", async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    await user.click(screen.getByRole("button", { name: "Got Questions" }));
+    await user.click(screen.getByRole("button", { name: "Ask the Word" }));
     await screen.findByRole("dialog");
     await user.click(screen.getByRole("button", { name: "Close" }));
     expect(takeCleared()).toBeNull();

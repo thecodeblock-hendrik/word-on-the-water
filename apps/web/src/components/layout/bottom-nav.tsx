@@ -14,7 +14,7 @@ const filled = "border-accent-ink bg-accent-ink text-bg hover:brightness-110";
 
 /**
  * The phone bottom bar: Devotional on the left, Bible in the middle in a raised round button, and
- * Got Questions on the right (Shore, the way back to the landing page, on the chat screen). Below
+ * Ask the Word on the right (Shore, the way back to the landing page, on the chat screen). Below
  * `lg` only; the desktop header carries the same places.
  */
 export function BottomNav({
@@ -67,7 +67,7 @@ export function BottomNav({
       ) : (
         <ChatLauncher className={`${side} ${filled}`}>
           <ChatIcon className="size-5" />
-          {bottomNav.gotQuestions}
+          {bottomNav.askTheWord}
         </ChatLauncher>
       )}
     </nav>

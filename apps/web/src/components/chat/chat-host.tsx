@@ -13,7 +13,7 @@ const ChatPanel = lazy(() =>
 );
 
 /**
- * The one Got Questions panel on the page, opened by any ChatLauncher (the menu bar, the mobile
+ * The one Ask the Word panel on the page, opened by any ChatLauncher (the menu bar, the mobile
  * menu, the Start here button). Once opened it stays mounted, so the conversation is not rebuilt.
  */
 export function ChatHost({

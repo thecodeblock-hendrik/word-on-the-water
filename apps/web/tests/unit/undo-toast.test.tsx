@@ -111,13 +111,13 @@ describe("Undo", () => {
       </>,
     );
     act(() => openChat(null));
-    await screen.findByRole("dialog", { name: "Got Questions" });
+    await screen.findByRole("dialog", { name: "Ask the Word" });
     act(() => {
       fireEvent.click(screen.getByRole("button", { name: "Close" }));
     });
     clearChat();
     fireEvent.click(undo());
-    const dialog = await screen.findByRole("dialog", { name: "Got Questions" });
+    const dialog = await screen.findByRole("dialog", { name: "Ask the Word" });
     expect(await screen.findByText("Short answer 2.1.")).toBeInTheDocument();
     expect(screen.getByText("who is jesus")).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: /question|follow-up/i })).toHaveValue("a draft");
@@ -134,7 +134,7 @@ describe("Undo", () => {
     );
     clearChat();
     act(() => openChat(null));
-    await screen.findByRole("dialog", { name: "Got Questions" });
+    await screen.findByRole("dialog", { name: "Ask the Word" });
     expect(status()).toBeEmptyDOMElement();
     expect(screen.queryByText("Short answer 2.1.")).toBeNull();
   });

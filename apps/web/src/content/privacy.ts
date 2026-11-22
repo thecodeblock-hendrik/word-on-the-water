@@ -26,7 +26,7 @@ const POSTAL = "PO Box 6055, Port Elizabeth, Eastern Cape 6001";
 /**
  * The public privacy policy, written from docs/privacy.md (keep the two in step). It says only what
  * is true today: the weekly email sign-up, and email you send us. The Bible cookies are listed only
- * while the Bible reader is switched on, and the Got Questions chat is described only while it is.
+ * while the Bible reader is switched on, and the Ask the Word chat is described only while it is.
  */
 export function privacyPolicy({
   bibleEnabled,
@@ -81,7 +81,7 @@ export function privacyPolicy({
           ...(chatEnabled
             ? [
                 {
-                  term: "Got Questions chat",
+                  term: "Ask the Word chat",
                   text: "The questions you type are matched against our own written answers on our server. They are not stored, not sent to anyone else and not written to our logs; we keep only a count of how many questions were answered. We refuse messages that look like personal details, so please do not share any. Your conversation is kept only in your browser tab, and it is gone when you close the tab or press Clear chat.",
                 },
               ]

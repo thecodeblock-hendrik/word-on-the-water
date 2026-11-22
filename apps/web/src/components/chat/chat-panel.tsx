@@ -21,7 +21,7 @@ const headerButton =
   "inline-flex min-h-11 items-center justify-center rounded-sm px-3 font-ui text-[15px] font-semibold text-ink";
 
 /**
- * Got Questions: a right-hand drawer from lg, a full-height sheet below. Chips send entry ids, so
+ * Ask the Word: a right-hand drawer from lg, a full-height sheet below. Chips send entry ids, so
  * they always work; typed text goes through the API's guards. Loaded on first use.
  */
 export function ChatPanel({

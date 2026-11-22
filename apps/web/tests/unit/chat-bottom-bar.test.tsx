@@ -15,11 +15,11 @@ afterEach(cleanup);
 async function openWithBar() {
   render(<ChatHost devotionalHref="/devotionals/advent-01" />);
   act(() => openChat(null));
-  return screen.findByRole("dialog", { name: "Got Questions" });
+  return screen.findByRole("dialog", { name: "Ask the Word" });
 }
 
 describe("the bottom bar on the chat screen", () => {
-  it("has Devotional, Bible and Shore inside the chat, and no Got Questions", async () => {
+  it("has Devotional, Bible and Shore inside the chat, and no Ask the Word", async () => {
     const dialog = await openWithBar();
     const bar = within(dialog).getByRole("navigation", { name: "Quick links" });
     expect(within(bar).getByRole("link", { name: "Devotional" })).toHaveAttribute(
@@ -28,7 +28,7 @@ describe("the bottom bar on the chat screen", () => {
     );
     expect(within(bar).getByRole("link", { name: "Bible" })).toHaveAttribute("href", "/bible");
     expect(within(bar).getByRole("link", { name: "Shore" })).toHaveAttribute("href", "/");
-    expect(within(bar).queryByRole("link", { name: "Got Questions" })).toBeNull();
+    expect(within(bar).queryByRole("link", { name: "Ask the Word" })).toBeNull();
   });
 
   it.each(["Devotional", "Bible", "Shore"])("leaves the chat when %s is tapped", async (name) => {
@@ -55,7 +55,7 @@ describe("the bottom bar on the chat screen", () => {
   it("is not there when the host was given no devotional link", async () => {
     render(<ChatHost />);
     act(() => openChat(null));
-    const dialog = await screen.findByRole("dialog", { name: "Got Questions" });
+    const dialog = await screen.findByRole("dialog", { name: "Ask the Word" });
     expect(within(dialog).queryByRole("navigation", { name: "Quick links" })).toBeNull();
   });
 });

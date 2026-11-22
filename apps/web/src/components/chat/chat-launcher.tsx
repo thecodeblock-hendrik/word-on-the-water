@@ -6,7 +6,7 @@ import { chat } from "@/content/chat";
 import { openChat } from "@/lib/chat/open";
 
 /**
- * A Got Questions link: a mail link without JavaScript; with it, a click asks the page's ChatHost
+ * An Ask the Word link: a mail link without JavaScript; with it, a click asks the page's ChatHost
  * to open the chat. Safari does not focus a clicked link, so the opener is named explicitly.
  */
 export function ChatLauncher({

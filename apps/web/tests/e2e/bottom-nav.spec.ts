@@ -3,7 +3,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 // The bar needs the Bible reader and the chat both on, which is the second server (port 3102).
 const CHAT = "http://localhost:3102";
-const labels = ["Devotional", "Bible", "Got Questions"];
+const labels = ["Devotional", "Bible", "Ask the Word"];
 
 test.beforeEach(({ viewport }) => {
   test.skip((viewport?.width ?? 0) >= 1024, "The bottom bar is for phones");
@@ -68,7 +68,7 @@ test("the bar is reached in reading order and shows a focus ring", async ({
     .evaluate((el) => getComputedStyle(el).outlineStyle);
   expect(ring).not.toBe("none");
   await page.keyboard.press("Tab");
-  await expect(bar.getByRole("link", { name: "Got Questions" })).toBeFocused();
+  await expect(bar.getByRole("link", { name: "Ask the Word" })).toBeFocused();
 });
 
 test("the chat screen with its bar has no serious axe problem, in light and dark", async ({
@@ -77,8 +77,8 @@ test("the chat screen with its bar has no serious axe problem, in light and dark
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto(`${CHAT}/`);
-    await page.getByRole("navigation", { name: "Quick links" }).getByText("Got Questions").click();
-    const dialog = page.getByRole("dialog", { name: "Got Questions" });
+    await page.getByRole("navigation", { name: "Quick links" }).getByText("Ask the Word").click();
+    const dialog = page.getByRole("dialog", { name: "Ask the Word" });
     await expect(dialog).toBeVisible();
     for (const label of ["Devotional", "Bible", "Shore"]) {
       await expect(dialog.getByText(label, { exact: true })).toBeVisible();
@@ -93,8 +93,8 @@ test("the undo toast is announced politely, is clear of the bar and has no serio
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto(`${CHAT}/`);
-    await page.getByRole("navigation", { name: "Quick links" }).getByText("Got Questions").click();
-    const dialog = page.getByRole("dialog", { name: "Got Questions" });
+    await page.getByRole("navigation", { name: "Quick links" }).getByText("Ask the Word").click();
+    const dialog = page.getByRole("dialog", { name: "Ask the Word" });
     await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
     await dialog.getByRole("button", { name: "Close" }).click();
     const status = page.getByRole("status");
@@ -116,11 +116,11 @@ test("the undo toast is announced politely, is clear of the bar and has no serio
 // The latest published devotional on the pinned test day (5 December 2026).
 const DEVOTIONAL = "/devotionals/advent-02-the-long-wait";
 const bar = (page: Page) => page.getByRole("navigation", { name: "Quick links" });
-const chatDialog = (page: Page) => page.getByRole("dialog", { name: "Got Questions" });
+const chatDialog = (page: Page) => page.getByRole("dialog", { name: "Ask the Word" });
 
 async function openChatFromBar(page: Page, path = "/") {
   await page.goto(`${CHAT}${path}`);
-  await bar(page).getByText("Got Questions").click();
+  await bar(page).getByText("Ask the Word").click();
   await expect(chatDialog(page)).toBeVisible();
   return chatDialog(page);
 }
@@ -133,7 +133,7 @@ async function askJesus(page: Page) {
 }
 
 test.describe("where each button goes", () => {
-  test("Devotional, Bible and Got Questions on the landing page", async ({ page }) => {
+  test("Devotional, Bible and Ask the Word on the landing page", async ({ page }) => {
     await page.goto(`${CHAT}/`);
     await bar(page).getByRole("link", { name: "Devotional" }).click();
     await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
@@ -149,7 +149,7 @@ test.describe("where each button goes", () => {
     await page.getByRole("link", { name: "Shore" }).click();
     await expect(page).toHaveURL(`${CHAT}/`);
 
-    await bar(page).getByText("Got Questions").click();
+    await bar(page).getByText("Ask the Word").click();
     await expect(chatDialog(page)).toBeVisible();
     await expect(page).toHaveURL(`${CHAT}/`);
   });
@@ -213,7 +213,7 @@ test.describe("the chat, the Bible and back", () => {
     await expect(page.getByRole("link", { name: "Shore" })).toBeVisible();
 
     await page.getByRole("link", { name: "Shore" }).click();
-    await bar(page).getByText("Got Questions").click();
+    await bar(page).getByText("Ask the Word").click();
     await expect(chatDialog(page).getByRole("button", { name: "Who is Jesus?" })).toBeVisible();
     await expect(chatDialog(page).getByText("Short answer 2.1.")).toHaveCount(0);
   });
@@ -237,7 +237,7 @@ test.describe("the chat, the Bible and back", () => {
     await askJesus(page);
     await dialog.getByRole("button", { name: "Close" }).click();
     await expect(page.getByRole("status")).toContainText("Chat cleared");
-    await bar(page).getByText("Got Questions").click();
+    await bar(page).getByText("Ask the Word").click();
     await expect(chatDialog(page).getByText("Short answer 2.1.")).toHaveCount(0);
     await expect(page.getByRole("status", { includeHidden: true })).toBeEmpty();
   });

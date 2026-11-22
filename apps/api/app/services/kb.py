@@ -1,4 +1,4 @@
-"""Loads the Got Questions knowledge base once per process.
+"""Loads the Ask the Word knowledge base once per process.
 
 A bad file never stops the app: `get_kb()` returns None and logs the error
 class only, so the chat can report itself unavailable while health stays up.

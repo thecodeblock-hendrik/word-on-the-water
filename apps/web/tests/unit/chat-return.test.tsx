@@ -46,7 +46,7 @@ describe("ChatReturn, the Your chat tab in the Bible", () => {
       </>,
     );
     await userEvent.setup().click(await screen.findByRole("button", { name: /^your chat$/i }));
-    await screen.findByRole("dialog", { name: "Got Questions" });
+    await screen.findByRole("dialog", { name: "Ask the Word" });
     expect(chatReturnUrl()).toBeNull();
     expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
@@ -70,7 +70,7 @@ describe("ChatReturn, the Your chat tab in the Bible", () => {
 });
 
 describe("the chat reopening when the visitor comes back", () => {
-  const dialog = () => screen.findByRole("dialog", { name: "Got Questions" });
+  const dialog = () => screen.findByRole("dialog", { name: "Ask the Word" });
 
   it("stays closed on an ordinary page load", () => {
     render(<ChatHost />);

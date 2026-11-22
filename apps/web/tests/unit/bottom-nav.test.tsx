@@ -21,14 +21,14 @@ describe("BottomNav on the site pages", () => {
     expect(nav.className).toMatch(/\blg:hidden\b/);
   });
 
-  it("has Devotional, Bible and Got Questions", () => {
+  it("has Devotional, Bible and Ask the Word", () => {
     site();
     expect(screen.getByRole("link", { name: "Devotional" })).toHaveAttribute(
       "href",
       "/devotionals/advent-01",
     );
     expect(screen.getByRole("link", { name: "Bible" })).toHaveAttribute("href", "/bible");
-    expect(screen.getByRole("link", { name: "Got Questions" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Ask the Word" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Shore" })).toBeNull();
   });
 
@@ -46,14 +46,14 @@ describe("BottomNav on the site pages", () => {
 
   it("keeps the side buttons at least 44px tall and clear of the home bar", () => {
     site();
-    for (const name of ["Devotional", "Got Questions"]) {
+    for (const name of ["Devotional", "Ask the Word"]) {
       expect(screen.getByRole("link", { name }).className).toMatch(/\bmin-h-12\b/);
     }
     expect(screen.getByRole("navigation").className).toMatch(/env\(safe-area-inset-bottom\)/);
   });
 });
 
-describe("BottomNav Got Questions", () => {
+describe("BottomNav Ask the Word", () => {
   it("opens the chat in place, without following its mail link", async () => {
     render(
       <>
@@ -61,8 +61,8 @@ describe("BottomNav Got Questions", () => {
         <ChatHost />
       </>,
     );
-    await userEvent.setup().click(screen.getByRole("link", { name: "Got Questions" }));
-    expect(await screen.findByRole("dialog", { name: "Got Questions" })).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole("link", { name: "Ask the Word" }));
+    expect(await screen.findByRole("dialog", { name: "Ask the Word" })).toBeInTheDocument();
   });
 });
 
@@ -82,10 +82,10 @@ describe("BottomNav current page", () => {
 });
 
 describe("BottomNav on the chat screen", () => {
-  it("swaps Got Questions for Shore, which goes to the landing page", () => {
+  it("swaps Ask the Word for Shore, which goes to the landing page", () => {
     render(<BottomNav devotionalHref="/devotionals/advent-01" variant="chat" />);
     expect(screen.getByRole("link", { name: "Shore" })).toHaveAttribute("href", "/");
-    expect(screen.queryByRole("link", { name: "Got Questions" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Ask the Word" })).toBeNull();
     expect(screen.getByRole("link", { name: "Devotional" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Bible" })).toBeInTheDocument();
   });

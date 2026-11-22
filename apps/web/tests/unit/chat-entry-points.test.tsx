@@ -23,27 +23,27 @@ const page = (
     <ChatHost />
   </>
 );
-const chatDialog = () => screen.findByRole("dialog", { name: "Got Questions" });
+const chatDialog = () => screen.findByRole("dialog", { name: "Ask the Word" });
 
-describe("Got Questions in the menu bar", () => {
+describe("Ask the Word in the menu bar", () => {
   it("is a link in the main navigation, after the section links", () => {
     render(<Header />);
     const links = within(screen.getByRole("navigation", { name: "Main" })).getAllByRole("link");
-    expect(links.at(-1)).toHaveTextContent("Got Questions");
+    expect(links.at(-1)).toHaveTextContent("Ask the Word");
     expect(links.at(-1)).toHaveAttribute("href", "mailto:hello@wordonthewater.net");
   });
 
   it("is not there while the chat is off", () => {
     vi.stubEnv("CHAT_ENABLED", "");
     render(<Header />);
-    expect(screen.queryByRole("link", { name: /Got Questions/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Ask the Word/ })).toBeNull();
   });
 
   it("opens the chat, and Escape gives focus back to the link", async () => {
     const user = userEvent.setup();
     render(page);
     const link = within(screen.getByRole("navigation", { name: "Main" })).getByRole("link", {
-      name: "Got Questions",
+      name: "Ask the Word",
     });
     await user.click(link);
     await chatDialog();
@@ -53,7 +53,7 @@ describe("Got Questions in the menu bar", () => {
   });
 });
 
-describe("Got Questions in the mobile menu", () => {
+describe("Ask the Word in the mobile menu", () => {
   it("is listed in the menu, and choosing it closes the menu and opens the chat", async () => {
     const user = userEvent.setup();
     render(page);
@@ -61,7 +61,7 @@ describe("Got Questions in the mobile menu", () => {
     await user.click(menuButton);
     const menu = screen.getByTestId("mobile-menu");
 
-    await user.click(within(menu).getByRole("link", { name: "Got Questions" }));
+    await user.click(within(menu).getByRole("link", { name: "Ask the Word" }));
 
     await chatDialog();
     expect(screen.queryByTestId("mobile-menu")).toBeNull();
@@ -81,20 +81,20 @@ describe("Got Questions in the mobile menu", () => {
 });
 
 describe("the button under Start here", () => {
-  it("asks 'Got Questions?', is solid and opens the same chat", async () => {
+  it("asks 'Ask the Word', is solid and opens the same chat", async () => {
     const user = userEvent.setup();
     render(page);
     const button = within(screen.getByRole("region", { name: "Start here" })).getByRole("link", {
-      name: "Got Questions?",
+      name: "Ask the Word",
     });
     expect(button.className).toMatch(/bg-accent-ink/);
     await user.click(button);
     await chatDialog();
   });
 
-  it("keeps the plain name in the bar and the menu", () => {
+  it("keeps the plain name in the bar and the menu, never as a question", () => {
     render(<Header />);
-    expect(screen.getByRole("link", { name: "Got Questions" })).toBeDefined();
-    expect(screen.queryByRole("link", { name: "Got Questions?" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Ask the Word" })).toBeDefined();
+    expect(screen.queryByRole("link", { name: "Ask the Word?" })).toBeNull();
   });
 });

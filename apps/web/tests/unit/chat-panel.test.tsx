@@ -43,7 +43,7 @@ function Harness({ bibleLinks = false }: { bibleLinks?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)}>Got Questions</button>
+      <button onClick={() => setOpen(true)}>Ask the Word</button>
       <ChatPanel open={open} onOpenChange={setOpen} bibleLinks={bibleLinks} />
     </>
   );
@@ -52,9 +52,9 @@ function Harness({ bibleLinks = false }: { bibleLinks?: boolean }) {
 async function openPanel(bibleLinks = false) {
   const user = userEvent.setup();
   render(<Harness bibleLinks={bibleLinks} />);
-  const trigger = screen.getByRole("button", { name: "Got Questions" });
+  const trigger = screen.getByRole("button", { name: "Ask the Word" });
   await user.click(trigger);
-  return { user, trigger, dialog: await screen.findByRole("dialog", { name: "Got Questions" }) };
+  return { user, trigger, dialog: await screen.findByRole("dialog", { name: "Ask the Word" }) };
 }
 
 const box = () => screen.getByRole("textbox", { name: /question|follow-up/i });
@@ -99,7 +99,7 @@ describe("opening and closing", () => {
     await user.click(screen.getByRole("button", { name: "Close" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 
-    await user.click(screen.getByRole("button", { name: "Got Questions" }));
+    await user.click(screen.getByRole("button", { name: "Ask the Word" }));
     await screen.findByRole("dialog");
     await user.click(screen.getByTestId("chat-overlay"));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
