@@ -33,6 +33,7 @@ export function BottomNav({
   return (
     <nav
       aria-label={bottomNav.landmark}
+      data-bottom-nav
       className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-surface pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
     >
       <Link
