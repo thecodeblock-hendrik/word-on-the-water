@@ -53,6 +53,7 @@ export function ChatPanel({
   const input = useRef<HTMLTextAreaElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
+  const content = useRef<HTMLDivElement>(null);
   const keyboardOpen = useKeyboardOpen();
 
   useEffect(() => {
@@ -110,17 +111,20 @@ export function ChatPanel({
       <Dialog.Portal>
         <Dialog.Overlay data-testid="chat-overlay" className="fixed inset-0 z-50 bg-deep/60" />
         <Dialog.Content
+          ref={content}
           aria-describedby={undefined}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
             opener.current = document.activeElement as HTMLElement | null;
-            input.current?.focus();
+            // On a phone, focusing the box opens the keyboard over the screen before the visitor has
+            // chosen to type; focus goes to the chat itself and they tap the box when ready.
+            (isPhoneScreen() ? content.current : input.current)?.focus();
           }}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             (returnFocusTo?.current ?? opener.current)?.focus();
           }}
-          className="fixed inset-0 z-50 flex h-dvh flex-col bg-bg pt-[env(safe-area-inset-top)] shadow-menu lg:left-auto lg:w-[28rem] lg:border-l lg:border-line"
+          className="fixed inset-0 z-50 flex h-dvh flex-col bg-bg outline-none pt-[env(safe-area-inset-top)] shadow-menu lg:left-auto lg:w-[28rem] lg:border-l lg:border-line"
         >
           <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
             <Dialog.Title className="font-display text-xl font-semibold uppercase tracking-[.05em]">

@@ -82,7 +82,13 @@ test.describe("with the chat on", () => {
   }) => {
     const csp = watchCsp(page);
     const dialog = await openChat(page);
-    await expect(page.getByRole("textbox", { name: "Your question" })).toBeFocused();
+    // A phone does not focus the box (that would open the keyboard); a desktop does.
+    if ((page.viewportSize()?.width ?? 0) >= 1024) {
+      await expect(page.getByRole("textbox", { name: "Your question" })).toBeFocused();
+    } else {
+      await expect(page.getByRole("textbox", { name: "Your question" })).not.toBeFocused();
+      await expect(dialog).toBeFocused();
+    }
 
     await dialog.getByRole("button", { name: "Who is Jesus?" }).click();
     await expect(dialog.getByText("Short answer 2.1.")).toBeVisible();

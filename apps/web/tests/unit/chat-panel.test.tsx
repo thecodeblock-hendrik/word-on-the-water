@@ -67,10 +67,28 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+const screenIs = (kind: "phone" | "desktop") => {
+  window.matchMedia = ((query: string) => ({
+    matches: kind === "desktop",
+    media: query,
+  })) as never;
+};
+
 describe("opening and closing", () => {
-  it("moves focus to the question box and gives it back to the button on Escape", async () => {
+  it("on a desktop moves focus to the question box and gives it back to the button on Escape", async () => {
+    screenIs("desktop");
     const { user, trigger } = await openPanel();
     expect(box()).toHaveFocus();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(trigger).toHaveFocus();
+  });
+
+  it("on a phone leaves the question box alone, so the keyboard does not open, and focus stays in the chat", async () => {
+    screenIs("phone");
+    const { user, trigger, dialog } = await openPanel();
+    expect(box()).not.toHaveFocus();
+    expect(dialog).toHaveFocus();
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(trigger).toHaveFocus();
