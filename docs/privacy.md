@@ -1,6 +1,6 @@
 # Privacy v1
 
-Data inventory, retention and lawful basis for Word on the Water. Version 1, written 2026-10-31 and brought up to date 2026-11-18. **The site is not public until the launch on 28 November 2026, so no real visitor data is collected yet.** The sign-up (with Kit double opt-in), the Bible reader cookies and the Ask the Word chat are built and have only been used with test data on previews. The prayer and contact forms (steps 1.4 and 1.5) are deferred past the launch, so the rows for them below describe the plan, not what runs today. Test subscribers are deleted from Kit's dashboard by hand.
+Data inventory, retention and lawful basis for Word on the Water. Version 1, written 2026-10-31 and brought up to date 2026-11-21. **The site has been live since 2026-11-21; the launch, with the first devotional and the first weekly email, is on 28 November 2026.** Real visitor data can now be collected. Until launch day the only sign-ups are the owner's own test addresses, which are cleaned up in Kit's dashboard by hand. The sign-up (with Kit double opt-in), the Bible reader cookies and the Ask the Word chat are live. The prayer and contact forms (steps 1.4 and 1.5) are deferred past the launch, so the rows for them below describe the plan, not what runs today.
 
 This is the engineering record the public privacy policy page is written from. The page is `/privacy` and its text is `apps/web/src/content/privacy.ts`: keep the two in step. The page lists only what is true at launch, so it leaves out the prayer and contact forms (and Postmark) until they are built. It is not legal advice; Hendrik reviews the policy text before launch.
 
@@ -49,6 +49,7 @@ Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Pray
 | Neon | The database | `aws-eu-central-1` (Frankfurt) |
 | Upstash | Hashed rate-limit keys | Frankfurt, Germany (confirmed 2026-11-18) |
 | Kit | Newsletter subscribers and the emails sent to them | Provider's locations |
+| Google (reCAPTCHA) | Only on Kit's own hosted sign-up page, which we send returning readers to when they cannot rejoin through our form (Invisible reCAPTCHA, switched on 2026-11-21): the visitor's data goes to Google there. Never on our own site, which uses Cloudflare Turnstile | Provider's locations |
 | Postmark | Notification and transactional email in transit | Provider's locations |
 | Cloudflare | Turnstile bot check; R2 storage of the nightly database dumps, encrypted before upload so Cloudflare cannot read them | Turnstile global; R2 bucket in Western Europe (WEUR) |
 | Sentry | Scrubbed error reports | Provider's locations |

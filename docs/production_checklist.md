@@ -2,9 +2,9 @@
 
 **Launch date: Saturday 28 November 2026.** Everything that is only needed when the site goes public lives here, not in [PLAN.md](PLAN.md). It was moved out of PLAN.md step 1.9, the launch parts of 1.3, 1.6 and 1.8, and the launch items of the old threat plan and webhook guide (both now in [archive/](archive/)), so the rest of the plan can be finished first. Everything outstanding that is **not** about launch lives in [PLAN.md](PLAN.md).
 
-**`wordonthewater.net` stays inactive until Part G.** Parts A to F do not point the website at Vercel: the old Squarespace site keeps serving. Part E adds email DNS records only; the mailboxes (MX) are never touched.
+**Part G is done (2026-11-21): `wordonthewater.net` now serves the new site on Vercel Pro.** Parts A to F did not point the website at Vercel (the old Squarespace site kept serving until then), and Part E added email DNS records only; the mailboxes (MX) are never touched.
 
-Do not start this list until steps 1.3 to 1.8 in PLAN.md are ticked. Tick each box here and note the date. Never paste a secret into chat or the repo.
+The PLAN.md steps this list waited for (1.3 to 1.11) are ticked. Tick each box here and note the date. Never paste a secret into chat or the repo.
 
 Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [runbooks/deploy.md](runbooks/deploy.md), [runbooks/alerts.md](runbooks/alerts.md). The domain and webhook steps that used to be a separate guide are now Parts G and H below.
 
@@ -24,12 +24,12 @@ The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook 
 | F | Production configuration | 6 | 2 | Hendrik: database check, preview widget |
 | G | Go live: attach the domain | 11 | 1 | Done: the domain is live (only the "to go back" note stays unticked) |
 | H | Kit form redirect | 7 | 0 | Done except the optional webhook (skipped, needs a paid Kit plan) |
-| I | Production smoke test | 13 | 8 | Everything Claude can check is ticked (2026-11-21); left for Hendrik: Sentry, the database consent version, the WhatsApp and Rich Results checks, the phone and desktop colour schemes, the day-after cron check; and the Part K broadcast |
-| J | Exit gate and after launch | 0 | 12 | Launch gate and after launch |
+| I | Production smoke test | 13 | 8 | Everything Claude can check is ticked (2026-11-21); left for Hendrik: Sentry, the database consent version, the WhatsApp preview of a devotional link, the Schema.org validator, both colour schemes on a phone and a desktop, the day-after cron check; the optional 429 test; and the Organization `logo` (Claude, small) |
+| J | Exit gate and after launch | 0 | 12 | The exit gate (uptime monitor and Sentry alert seen to fire, budgets, Part K) and the checks that continue after launch |
 | K | Weekly email broadcasts | 8 | 9 | Left: clean the spike leftovers in Kit, the "Read it on the website" link, and the real broadcast for devotional 1 (draft, test, schedule), then the first-send checks |
 | L | Ask the Word chat | 7 | 1 | Walk-through and Firewall rule done; left: the optional 429 trip |
 
-**Done on 2026-11-21:** the first live sign-up end to end (Turnstile, Kit confirmation in the inbox, `/cron/sync-kit` moved the mirror to active), after fixing the production Kit API key (see the Part F incident note). **Next, in order:** the Part F leftovers (database check, preview widget) and the Part D rehearsals (rollback, backup restore); then the rest of the Part I smoke test on the live domain and the first broadcast (Part K). After every merge, promote the new production builds by hand (Part D). Tell Claude Code what was done so it ticks the matching items here and in [PLAN.md](PLAN.md).
+**Done on 2026-11-21:** the first live sign-up and an unsubscribe, end to end (Turnstile, the Kit confirmation in the inbox, the sync moving the mirror), after fixing the production Kit API key (see the Part F incident note); the Firewall rate-limit rules, the Part B accounts and cold-start items, the live smoke test (Lighthouse, console and CSP, structured data, logs without personal data), a test broadcast delivered with SPF, DKIM and DMARC passing, and the chat walk-through on production, which found and fixed retrieval gaps (PLAN.md K9). **Next, in order:** the uptime monitor and Sentry alert (the Part J gate); the Part D rehearsals (rollback and backup restore) and the Part F database check; the Part I checks only Hendrik can do; then Part K: clean the Kit spike leftovers, draft the real broadcast for devotional 1 with `--all`, test it, and schedule it for 28 November after 02:00 Harare time. After every merge, promote the new production builds by hand (Part D).
 
 ---
 
