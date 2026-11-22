@@ -14,6 +14,15 @@ Scope: [chat.md](../archive/chat.md). Decision: [ADR 0009](../adr/0009-chat-loca
 2. `make kb` rebuilds `apps/api/app/data/faith_kb.json` and `apps/web/src/content/chat-topics.json`. `make kb-check` (and CI) fails if either is stale.
 3. Run `make test`: the evaluation tests in `apps/api/tests/test_chat_search.py` must still pass (own questions, the real-world and the off-topic sets). Add the new wording to `tests/chat_eval/real_world.py` when a visitor's phrasing was missed.
 4. Open a pull request. Reviewing the wording is the check on doctrine (no pastoral gate, decided 2026-11-15).
+5. The knowledge base ships inside the API, so the change is live only when the new `wotw-api` production build is **promoted by hand** (auto-promotion is off): Vercel, `wotw-api`, Deployments, the build for your merge, Promote, or `vercel promote <url>` from `apps/api`. Then ask the new wording on the live chat.
+6. Check the diff of `faith_kb.json`: the "related questions" lists are computed from each entry's text, so a paraphrase can reshuffle other entries' lists (one paraphrase on 2.1 moved two, two moved five). Prefer one wording per fix, and re-pin the conversation tests only if the new lists are better.
+
+## Typed glossary words and spelling
+
+- The glossary (section 15 of `faith_kb.md`, a table of term, meaning, key verses and full entries) is looked up when someone types only a term or alias ("define lord", "what does covenant mean", "messiah"), but only when the search is not confident, so a question with its own entry keeps its full answer. A bare "amen" is small talk on purpose.
+- To add a term, add a table row (put aliases in brackets after the term, for example `Saviour (Savior)`), run `make kb`, and add a case to `tests/test_chat_terms.py` (every glossary name in six phrasings must get an answer). A very common word ("lord" is in 28 answers) goes on `COMMON` in `kb/build_kb.py`, or it becomes a chip on every answer that contains it.
+- British and American spellings are folded together before matching (honour and honor, baptise and baptize, judgement and judgment), so no paraphrase is needed for those. `tests/test_kb_spelling.py` lists the pairs.
+- Do not loosen the no-answer thresholds to catch a missed question: off-topic questions can score as high as 20.8 and only the coverage check keeps them out. Add the wording to the entry instead (ADR 0009, Updates).
 
 ## Crisis numbers
 

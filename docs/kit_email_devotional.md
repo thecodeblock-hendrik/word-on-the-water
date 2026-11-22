@@ -142,6 +142,8 @@ You do **not** look the id up each week: a tag's id never changes, so use the sa
 
 **The test tag (set up 2026-11-17):** `spike-test`, id **25869858**. As of 2026-11-21 a fresh Gmail alias of your address (`+kittest`) carries it, not your main address: that one unsubscribed and Kit cannot re-subscribe it through the API (ADR 0008), so it stays `cancelled`. The alias is the one active subscriber in the account, so a draft aimed at the tag goes to you and nobody else. This is the permanent way to send test devotionals to your own inbox:
 
+**First delivery test (2026-11-21):** draft 27202872 (`advent-02-the-long-wait`, `--tag 25869858`) was checked in Kit (recipient count 1) and sent to the tag. It landed in the inbox, not spam, with SPF, DKIM and DMARC all passing in Gmail's Show original, and Kit's stats showed 1 recipient, 1 opened, 1 click, 0 unsubscribes. The tag is carried by a fresh Gmail alias of the owner's address, because the owner's main address unsubscribed and Kit cannot re-subscribe it through its API (ADR 0008).
+
 ```
 pnpm broadcast:devotional advent-02-the-long-wait --tag 25869858
 ```
@@ -163,24 +165,24 @@ curl -s -H "X-Kit-Api-Key: $KIT_API_KEY_PREVIEW" https://api.kit.com/v4/tags
 
 Each tag has an `id` and a `name`. Note that Kit's list of a tag's subscribers can come back empty even when the subscriber's own tag list shows the tag (found in the spike, ADR 0008), so to see who carries a tag trust the subscriber's own page in Kit. On 2026-11-17 the account had **one subscriber in total**, so `--all` reaches only that address today; after launch it reaches everyone who confirmed.
 
-## 8. Before the site is live
+## 8. Testing a banner that is not deployed yet
 
-The banner address is on `wordonthewater.net`, which is not live until launch (Part G of the production checklist). Today that domain still shows the old Squarespace page, so the command's banner check answers "not an image" and refuses to make a draft. To **try a draft early**, point the image at a banner that is already merged to `main` on GitHub:
+The site has been live since 2026-11-21, so the banner address `https://wordonthewater.net/email/advent-banner.jpg` answers (200, JPEG, 52 KB) and the command's banner check passes with no override: the test draft of 2026-11-21 was made with the default address. The override below is only for trying a **new** banner that is merged to `main` but not yet deployed or promoted (production auto-promotion is off, so a merged banner is live only after the web build is promoted):
 
 ```
 EMAIL_IMAGE_BASE=https://raw.githubusercontent.com/thecodeblock-hendrik/word-on-the-water/main/apps/web/public/email \
   pnpm broadcast:devotional advent-02-the-long-wait --tag 25869858
 ```
 
-Use this **only for tests, never for an email you will send**: GitHub is not an image host and that address is not ours to keep. (It also only works once `public/email/advent-banner.jpg` is merged to `main`.) Real emails use the default address, after the site is live.
+Use this **only for tests, never for an email you will send**: GitHub is not an image host and that address is not ours to keep. (It also only works once `public/email/advent-banner.jpg` is merged to `main`.) Real emails always use the default address.
 
 ## 9. If the command stops
 
 | Message | Meaning | Fix |
 |---|---|---|
-| `The email banner at ... answered 404` | The banner is not merged or deployed yet | Merge, wait for the deploy, run again |
-| `The email banner could not be reached` | The address does not answer at all | Check the site is live; before launch see section 8 |
-| `... is not an image` | The address answers with a page, not a picture. Until launch this is what `wordonthewater.net` gives (the old Squarespace page, seen 2026-11-17) | After launch, check the file name in `series.yml` and in `public/email`. Before launch see section 8 |
+| `The email banner at ... answered 404` | The banner is not merged, deployed or promoted yet | Merge, wait for the build, promote it in Vercel, run again |
+| `The email banner could not be reached` | The address does not answer at all | Check the site is up and you are online |
+| `... is not an image` | The address answers with a page, not a picture (before 2026-11-21 this was the old Squarespace page) | Check the file name in `series.yml` and in `public/email`, and that the web build that contains the file has been promoted |
 | `Choose the audience: --tag <id> or --all` | No audience given | Add `--tag <id>` or `--all` |
 | `--tag must be a whole number` | The id is not a number | Use the number from the tag list |
 | `Give --tag <id> or --all, not both` | Both were given | Give one |

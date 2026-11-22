@@ -35,7 +35,7 @@ Written 2026-11-21. "Who" says whose hands the step needs: **Hendrik** (dashboar
 - [ ] **Move the crons to Vercel Schedules** (Claude): Vercel calls Cron Jobs a legacy feature (no removal date). A configuration change in `apps/api/vercel.json` (the three routes stay; remove the `crons` entries in the same change or each route runs twice), see [runbooks/deploy.md](runbooks/deploy.md), "Cron".
 - [ ] **Web coverage reported in CI** (Claude): Vitest coverage as a CI step, a Phase 0 carry-over (PLAN.md 0.8).
 - [ ] **Strict `Content-Type` check** on POST routes (Claude, PLAN.md 0.3).
-- [ ] **Make `Lighthouse (mobile)` a required check** in branch protection, and the manual passes (keyboard only, VoiceOver, TalkBack) and a real mid-range Android check (Hendrik, PLAN.md 1.8), if not done before launch.
+- [ ] **Make `Lighthouse (mobile)` a required check** in branch protection (Hendrik: GitHub, Settings, Branches, the `main` rule, add `Lighthouse (mobile)`). Checked 2026-11-21: the 10 required checks do not include it. The manual passes and the real Android check are done (PLAN.md 1.8).
 
 ## 4. Kit and email
 
@@ -88,4 +88,5 @@ Plan and compliance checks: [bible_feature.md](bible_feature.md).
 
 - [ ] **Print the Kit and Vercel data processing agreements to PDF** and keep them with the others ([privacy.md](privacy.md): kit.com/dpa and vercel.com/legal/dpa) (Hendrik).
 - [ ] **Re-check Vercel's DPA now that the team is on Pro** (Hendrik): its text is written for Enterprise plans.
+- [ ] **Decide whether the public privacy policy should name Google reCAPTCHA** (Hendrik, then Claude edits `src/content/privacy.ts` and the date in `PRIVACY_UPDATED`): it is used only on Kit's own hosted sign-up page that we send returning readers to, not on our site; `docs/privacy.md` already lists it. If you say yes, the policy gets one line next to the Kit and Cloudflare entries.
 - [ ] **Review the privacy policy whenever data changes**: a log drain, the forms, a new email provider. Update `docs/privacy.md` and `src/content/privacy.ts` together and the date in `PRIVACY_UPDATED`.
