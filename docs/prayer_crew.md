@@ -2,7 +2,7 @@
 
 Status: investigating (2026-11-22, branch `prayer_crew`). Nothing is built and no date is set. Decisions so far are in "Decisions" below; only this file and [ADR 0012](adr/0012-prayer-crews.md) are written. The other documents are updated when the feature is approved.
 
-Mockups of the whole flow: [design/prayer_crew_design.html](design/prayer_crew_design.html).
+Mockups of the whole flow (decisions of 2026-11-22 are applied in them): [design/prayer_crew_design.html](design/prayer_crew_design.html).
 
 The old public prayer request form (PLAN.md 1.4) **stays** as a separate, later feature: it is for visitors without a crew. Prayer requests from the form go to `prayer@wordonthewater.net` and general messages go to `hello@wordonthewater.net`. The crew feature does not replace it.
 
@@ -68,7 +68,10 @@ Suggested order (magic link only first; Google is a later slice): D (decisions a
 - **The rule that keeps it safe:** a share only counts while the author and the recipient still have at least one crew in common. It is checked every time the request is read (no cleanup job). If the recipient leaves or is removed from the last crew they share with the author, the request disappears for them; if they still share another crew, it stays.
 - Members see requests shared with them, newest first, with the author's first name.
 - The author can edit, un-share, mark as answered or delete at any time. Deleting removes it for everyone at once.
-- No comments and no reactions in version 1 (see below).
+- **"I prayed" (decided for version 1):** a reader taps once; the author sees a count, never names. One tap per person per request, and it can be undone.
+- **"New" badge (decided for version 1):** Prayer in the menu and the lists show what is unread, because there are no notifications. A request counts as read when the person opens it.
+- **Report a problem (decided):** a link on a crew and on a request that emails `support@wordonthewater.net` with the crew name and request id, never the prayer text. The owner of the site can remove an account but cannot read prayers.
+- No comments and no other reactions in version 1 (see below).
 
 ## Data model (sketch)
 
@@ -82,7 +85,8 @@ crews                 id, name varchar(80), owner_id, created_at
 crew_members          crew_id, user_id, role enum(owner, member), joined_at   -- primary key (crew_id, user_id)
 crew_invites          id, crew_id, invited_by, token_hash, email citext null, status enum(pending, accepted, declined, revoked, expired), expires_at
 prayer_requests       id, author_id, title null, body_ciphertext, key_id, status enum(open, answered), created_at, updated_at
-prayer_shares         request_id, user_id (recipient)                         -- primary key (request_id, user_id)
+prayer_shares         request_id, user_id (recipient), read_at null          -- primary key (request_id, user_id); read_at drives the new badge
+prayer_taps           request_id, user_id, created_at                        -- "I prayed", primary key (request_id, user_id)
 ```
 
 - The existing `prayer_requests` table (built for the public form: first name, optional email, `share_with_team`, `delete_after`) stays for the form. The crew's requests go in a new table so the two never mix (shown above as `prayer_requests`, to be named `crew_prayers` when built). The encryption code in ADR 0006 (AES-256-GCM, `key_id` per row) is shared by both.
@@ -105,7 +109,7 @@ This is the highest-sensitivity data on the site (faith, health, family). The ru
 ## Not in version 1 (kept out on purpose)
 
 - Notifications of any kind beyond the invite email and the sign-in email. Without them a crew can go quiet; the later fix is the planned Web Push ([web_push.md](web_push.md)), or one optional weekly email. Version 1 relies on the member opening the app.
-- Comments, replies, reactions. A single "I prayed" tap is the likely first addition because it is small and encouraging.
+- Comments, replies and other reactions. (The single "I prayed" tap is in version 1.)
 - Public prayer requests shown to other visitors. (The separate form that emails `prayer@` is kept for later, see the top of this file.)
 - Admin or moderation view of requests. The owner of the site cannot read them.
 - Passwords, social login, passkeys.
@@ -137,6 +141,10 @@ When this is agreed, one PR on this branch updates:
 | 6 | Magic link only for the first release. Google sign-in comes later. |
 | 7 | First name only. |
 | 8 | No date. Investigating only. Start Postmark on the free tier and upgrade if needed. |
+| 9 | Picker opens with nobody ticked. |
+| 10 | "I prayed" tap in version 1 (count only). |
+| 11 | "New" badge in version 1. |
+| 12 | Report a problem goes to `support@wordonthewater.net` (a new address, to be created as a Squarespace forward like `hello@`). |
 
 ## Who sees a request (decided: Option B)
 

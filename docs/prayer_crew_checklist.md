@@ -22,6 +22,7 @@ Design: [prayer_crew.md](prayer_crew.md), mockups: [design/prayer_crew_design.ht
 - [ ] 0.6 **(Hendrik)** Sign Postmark's DPA and save it with the others ([privacy.md](privacy.md)).
 - [ ] 0.7 Generate `PRAYER_ENCRYPTION_KEY` (32 random bytes) per environment; set as a Sensitive variable on the API only; keep an offline copy in the password manager (losing it loses every request). Different keys for Preview and Production.
 - [ ] 0.8 Add the flag `CREW_ENABLED` to `env.ts` (web) and the API settings, off by default.
+- [ ] 0.8a **(Hendrik)** Create `support@wordonthewater.net` (a Squarespace email forward to your mailbox, like `hello@`; leave the MX records alone) and test that it arrives. Used by "Report a problem".
 - [ ] 0.9 Decide the first-release limits as constants in one module: 5 crews per user, 12 members per crew, 10 pending invites per crew, invite life 7 days, link life 15 minutes, session 30 days.
 
 ## Slice A. Accounts (magic link)
@@ -97,13 +98,16 @@ Branch `feat/crew-invites`.
 Branch `feat/crew-prayers`.
 
 ### C1. Tables
-- [ ] C1.1 Test, then migration: `crew_prayers` (id, author_id, title null, body_ciphertext, key_id, status open|answered, created_at, updated_at), `prayer_shares` (request_id, user_id, primary key request_id + user_id). Not the form's `prayer_requests` table. Preview-base first.
+- [ ] C1.1 Test, then migration: `crew_prayers` (id, author_id, title null, body_ciphertext, key_id, status open|answered, created_at, updated_at), `prayer_shares` (request_id, user_id, read_at null, primary key request_id + user_id) and `prayer_taps` (request_id, user_id, created_at, primary key request_id + user_id). Not the form's `prayer_requests` table. Preview-base first.
 
 ### C2. Service (the access rule lives in one place)
 - [ ] C2.1 Test first, then one `can_read(user, request)` rule: the author, or a share row **and** at least one crew in common with the author, checked on every read. No other code path reads a request.
 - [ ] C2.2 Create (text 1 to 2,000 characters, optional title up to 80), edit, delete, mark answered or open, by the author only.
 - [ ] C2.3 Set recipients: the author sends a list of user ids; each must share a crew with the author right now (reject others, same error as unknown). The list replaces the old one. An empty list is a private prayer.
 - [ ] C2.4 List "my requests" and "shared with me" (newest first, author's first name, no other member data). Decrypt only for permitted readers.
+- [ ] C2.4a "I prayed": a recipient adds or removes their own tap (only if they can read the request); the author sees the count only, never who. Test that a count never leaks names and that a non-reader cannot tap.
+- [ ] C2.4b Unread: mark a share read when its recipient opens it (`read_at`); count unread for the Prayer badge (menu, home, lists). Test that reading one request does not mark others and that the author never sees recipients' read state.
+- [ ] C2.4c Report a problem: an endpoint that emails `support@` through the outbox with the crew name and request id (never prayer text), rate limited, signed-in only.
 - [ ] C2.5 Account deletion and leaving a crew: confirm no code is needed to clean shares (the read-time rule handles it); test that a removed member loses sight immediately, and keeps sight when another crew in common remains.
 - [ ] C2.6 Tests: someone else's request on every endpoint (read, edit, delete, share, mark answered) returns the same not-found answer; tamper with a row and the read fails; no prayer text in logs or Sentry (log-capture test, as I1).
 
@@ -113,7 +117,9 @@ Branch `feat/crew-prayers`.
 
 ### C4. Web
 - [ ] C4.1 My requests and Shared with me lists on `/prayer`; a request page.
-- [ ] C4.2 The write and edit screen: text with a live counter, a people picker grouped by crew with an "Everyone in <crew>" shortcut, a person who is in two crews listed once, the default selection (nobody, or everyone in the first crew) to be decided on a mockup first. Light and dark at 375px with the keyboard open.
+- [ ] C4.2 The write and edit screen: text with a live counter, a people picker grouped by crew with an "Everyone in <crew>" shortcut, a person who is in two crews listed once, nobody ticked when it opens (decided), the button reads Save privately until someone is ticked. Light and dark at 375px with the keyboard open.
+- [ ] C4.2a The badge: "N new" on Prayer in the menu (mobile and drop-down), on Prayer home and the lists, with an unread dot per request. Counts come from one API call; no polling in the background (fetched when a page opens).
+- [ ] C4.2b "I prayed" button and count on a request; a Report a problem link on requests and crews.
 - [ ] C4.3 Mark answered, edit, delete (confirm). A plain note that the request is private and who can see it.
 - [ ] C4.4 Prayer text only in server components or authenticated fetches; no caching of these pages (`no-store`); nothing in the page title or metadata.
 - [ ] C4.5 E2E across two crews: A in crews 1 and 2 shares with B (crew 1) and C (crew 2); D (crew 1 only) sees nothing; B leaves crew 1 and loses sight; delete removes it for everyone. axe clean.
