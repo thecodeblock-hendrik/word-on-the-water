@@ -116,6 +116,23 @@ A visitor types free text; the API answers from a local knowledge base. No model
 | C8 | Message text leaks into logs, Sentry or analytics | Only counts, the outcome kind and the matched entry id are logged; a test asserts a message never appears in logs or Sentry events | Done. Proof: `tests/integration/test_chat.py` (a marker never reaches logs, errors or the Sentry scrubber; the test is shown to fail when a message is logged) |
 | C9 | Chat history is seen by the next person on a shared device | Thread kept in `sessionStorage` only (gone when the tab closes), a Clear chat button, nothing on the server | Done. Proof: `tests/unit/chat-panel.test.tsx` and `tests/e2e/chat.spec.ts` (reload keeps the thread, a new tab does not, Clear chat empties the storage) |
 
+### New in the prayer crew (proposed 2026-11-22, ADR 0012, nothing built)
+
+| ID | Threat | Mitigation | Status |
+|---|---|---|---|
+| PC1 | Someone reads another person's prayer request (broken access control) | One service function answers every read: author, or a share row plus a crew in common, checked on each read; default deny; a "someone else's request" test on every endpoint | Planned |
+| PC2 | Prayer text leaks through logs, Sentry, analytics or email | Same rules as I1; no prayer text in any email (sign-in and invite emails carry none); encrypted at rest (ADR 0006); a log-capture test | Planned |
+| PC3 | The encryption key is lost or leaked | Sensitive variable on the API project only, key id per row, rotation and a key backup in the rotate-secrets runbook; backups hold ciphertext only | Planned |
+| PC4 | Account enumeration through sign-in or invites | Same response whether or not an address has an account; invites never reveal membership | Planned |
+| PC5 | Magic-link abuse: guessing, replay, email flooding of a victim | 256-bit random token, stored hashed, single use, 15 minutes; rate limits per hashed IP and per address; Turnstile on the send step | Planned |
+| PC6 | Session theft or fixation | Opaque id in a `__Host-` `HttpOnly; Secure; SameSite=Lax` cookie; a new id on sign-in; revoke on sign-out; 30 days idle | Planned |
+| PC7 | Invite spam, or a leaked or forwarded invite link | Owner-only invites, verified users only, 10 pending per crew, per-user and per-address rate limits, one email per invite, single use, 7 days, owner can revoke | Planned |
+| PC8 | A stranger's address is kept as an invitee | Kept only until the invite closes or expires, deleted by the retention job, named in the privacy policy | Planned |
+| PC9 | Cross-site request forgery on crew and prayer actions | Server Actions origin check, `SameSite=Lax`, state changes only by POST | Planned |
+| PC10 | A removed member keeps seeing requests | Shares count only while author and recipient share a crew, checked on every read | Planned |
+| PC11 | Account deletion leaves data behind | One deletion path removes requests, shares, memberships and invites, with a test | Planned |
+| PC12 | Sign-in emails land in spam or are rejected (DMARC `p=reject`, strict alignment) | Postmark DKIM and return path set up first, tested to Gmail; a typed code as a fallback | Planned |
+
 ### Denial of service
 
 | ID | Threat | Mitigation | Status |

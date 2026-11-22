@@ -26,7 +26,7 @@ Pick what fits; most can be done in minutes.
 Answer, and write the answers in the incident note:
 
 1. What happened and when did it start and stop? Use the request ID from any failing response to find the log lines.
-2. What data could have been read or changed: subscribers, prayer requests (special category), contact messages, or only secrets?
+2. What data could have been read or changed: subscribers, prayer requests (special category), crew prayer requests and crew membership (once built, ADR 0012), accounts and sessions, contact messages, or only secrets? If sessions may be stolen, delete every row in `sessions` to sign everyone out.
 3. How many people, and which of them can be identified?
 4. Is it still possible? If yes, go back to contain.
 
