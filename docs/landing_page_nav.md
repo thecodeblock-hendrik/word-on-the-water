@@ -27,8 +27,8 @@ Mockups: [design/landing_nav.html](design/landing_nav.html) (New A raised tab, l
 
 One branch and PR (for example `feat/bottom-nav`), tests first, one commit per step.
 
-- [ ] 1. Confirm the mockups (every scenario in `landing_nav.html`) and the open question below.
-- [ ] 2. Content: add the labels (Devotional, Bible, Got Questions) to the typed content files.
+- [x] 1. Confirm the mockups (every scenario in `landing_nav.html`) and the open question below.
+- [x] 2. Content: add the labels (Devotional, Bible, Got Questions) to the typed content files.
 - [ ] 3. Current devotional link: a helper that returns the latest published devotional URL (unit test, with `DEVOTIONAL_TODAY`).
 - [ ] 4. `BottomNav` component: the raised-tab bar (SVG curve, 56px round button, two bordered side buttons, 44px targets, safe-area inset, fixed height). Unit tests.
 - [ ] 5. Current page state: Devotional is accent coloured on the devotional page (`aria-current="page"`).
