@@ -43,10 +43,12 @@ Written 2026-11-21. "Who" says whose hands the step needs: **Hendrik** (dashboar
 - [ ] **Kit webhook, only with a paid Kit plan** (Hendrik decides): the free plan has none (401 on `/v4/webhook_endpoints`, confirmed 2026-11-21, [ADR 0008](adr/0008-kit-subscriptions.md)). If Kit is upgraded: `make kit-webhook URL=https://wordonthewater.net/api/webhooks/kit`, add `KIT_WEBHOOK_SECRET` to `wotw-api` Production only (Sensitive), redeploy, promote, check an unsigned POST gives 401, and confirm a real delivery shows 200. The daily sync can stay as a safety net.
 - [ ] **"Built with Kit" badge** (Hendrik): the free plan adds it below every email and it cannot be restyled; a paid plan removes it (production_checklist.md, Part K).
 - [ ] **Consider another email provider** (Hendrik, ADR first): Brevo may offer webhooks and transactional mail on a free plan, which could replace both Kit's webhook gap and Postmark. Not verified: check its free-plan limits and webhook terms. Switching means rewriting the client, the broadcast command, the signature check and the DNS (DKIM, return path), so only as a planned project.
-- [ ] **Postmark setup** (Claude, Hendrik), with the prayer and contact forms (section 5): add `wordonthewater.net` in Postmark, DKIM and Return-Path records, merge Postmark into the one SPF record ([PLAN.md](PLAN.md) 1.4).
+- [ ] **Postmark setup** (Claude, Hendrik), with the prayer and contact forms (section 5) and the prayer crew sign-in and invite emails (free tier first, upgrade when the monthly count nears the allowance): add `wordonthewater.net` in Postmark, DKIM and Return-Path records, merge Postmark into the one SPF record ([PLAN.md](PLAN.md) 1.4).
 - [ ] **The weekly email, from the second week**: follow the four steps in [devotional_format.md](devotional_format.md) and [kit_email_devotional.md](kit_email_devotional.md); later the Phase 2 admin takes over (section 8).
 
 ## 5. Prayer request and contact forms (decided 2026-11-14: not part of the launch)
+
+The prayer crew (accounts, crews, private sharing) is a separate, larger feature: [prayer_crew.md](prayer_crew.md), [prayer_crew_checklist.md](prayer_crew_checklist.md), [ADR 0012](adr/0012-prayer-crews.md). It needs Postmark (section 4) first. The public form below stays for visitors without a crew.
 
 Detailed steps are in [PLAN.md](PLAN.md) 1.4 (prayer) and 1.5 (contact); the list below is the order to do them in.
 
@@ -80,7 +82,7 @@ Plan and compliance checks: [bible_feature.md](bible_feature.md).
 - [ ] **Web Push for the weekly devotional** (planned after the PWA, decided 2026-11-16): design and steps W1 to W-last in [web_push.md](web_push.md) and [ADR 0011](adr/0011-web-push.md) (proposed; accepted when the W1 spike confirms the library). One notification a week, anonymous subscriptions, manual send for the first month. It shares one service worker with the offline decision.
 - [ ] **Offline reading** (Phase 3, or with Web Push): a service worker serving recent devotionals and the last Bible chapters; a minimal offline fallback page.
 - [ ] **Smaller PWA items** ([PWA_checklist.md](PWA_checklist.md), section 10): iOS launch screens, a wide desktop screenshot, an "Install" button on Android. Repeat the desktop install and iPhone checks on the live domain.
-- [ ] **Phase 2, devotionals and admin**: admin login (passkey or magic link plus a second factor), roles, the prayer request admin view with an audit log, devotional authoring in a built-in admin, weekly email as Kit broadcasts from published devotionals, an RSS feed, search (PLAN.md Phase 2).
+- [ ] **Phase 2, devotionals and admin**: admin login (passkey or magic link plus a second factor), roles, the prayer request admin view with an audit log (for the public form only; crew requests have no admin view, ADR 0012; public accounts come earlier with the prayer crew), devotional authoring in a built-in admin, weekly email as Kit broadcasts from published devotionals, an RSS feed, search (PLAN.md Phase 2).
 - [ ] **Decision gate at Phase 2: a native Flutter app** ([FLUTTER.md](FLUTTER.md), option B: keep the Next.js site and add a Flutter app for iOS and Android on the same API) (Hendrik).
 - [ ] **Phase 3 and 4** (teaching series and audio, community) when wanted (PLAN.md).
 

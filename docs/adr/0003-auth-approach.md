@@ -1,6 +1,6 @@
 # 0003. Authentication approach
 
-Status: accepted (Phase 1 has no login; Phase 2 details to be confirmed)
+Status: accepted (Phase 1 has no login; Phase 2 details to be confirmed). **Amended 2026-11-22:** public accounts now come with the prayer crew, proposed in [ADR 0012](0012-prayer-crews.md): magic link first, Google later, the same session design. The Phase 2 admin login reuses them and adds the second factor.
 
 ## Context
 Phase 1 is a public page with forms and no accounts. An admin area arrives in Phase 2 and must protect sensitive prayer requests.

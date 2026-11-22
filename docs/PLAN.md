@@ -305,6 +305,7 @@ Left to do (this is the only list; the old `continue.md` is archived):
 - [x] Local only: two backup tests fail because `pg_dump` is not installed (CI runs them); the local web and API servers need a restart to pick up the webhook route. Checked 2026-11-14: `libpq` is installed but `/opt/homebrew/opt/libpq/bin` is not on the PATH; with it on the PATH both backup tests pass. Done 2026-11-14: the PATH line is in `~/.zshrc` and both backup tests pass from a fresh shell. No local servers were running, so there is nothing to restart
 
 ### 1.4 Prayer request form (deferred past launch, decided 2026-11-14)
+Kept as its own feature next to the prayer crew (1.12): it is for visitors without a crew, prayer requests go to `prayer@wordonthewater.net` and general messages to `hello@wordonthewater.net` (decided 2026-11-22). It needs no account.
 Not part of the launch. Until it is built the page has no prayer option at all (the Prayer link was removed from the menu bar, mobile menu and footer, and `prayer@` is no longer named on the page or in the privacy policy, 2026-11-15). Keep the steps below as the plan for later.
 - [ ] `crypto.py`: AES-256-GCM envelope encryption, `key_id` per row, rotation supported
 - [ ] Encryption key in secret manager; key rotation documented in runbook
@@ -422,9 +423,13 @@ Checked against the code and the tests on 2026-11-16: what is proven is ticked w
 
 ---
 
+### 1.12 Prayer crew (proposed 2026-11-22, after launch, no date)
+Private prayer for registered users: crews, invites, per-person sharing. Design in [prayer_crew.md](prayer_crew.md), decision in [ADR 0012](adr/0012-prayer-crews.md), the step-by-step build in [prayer_crew_checklist.md](prayer_crew_checklist.md). It brings public accounts forward from Phase 2 and needs Postmark first. Separate from 1.4 (the public form to `prayer@`). Not started.
+
 ## Phase 2 - Devotionals and admin
 
 ### 2.1 Auth and RBAC
+Public accounts and sessions arrive earlier with the prayer crew (1.12); this step then adds roles, the second factor and the admin rules on top of them.
 - [ ] Migrations: `users`, `roles`, `user_roles`, `sessions` (roles `admin`, `editor`, `prayer_team`)
 - [ ] Passkey (WebAuthn) and/or magic-link login with mandatory second factor for admins
 - [ ] Opaque session IDs in Postgres/Redis; `__Host-` cookies `HttpOnly; Secure; SameSite=Lax; Path=/`; 30 minute admin idle timeout
@@ -435,7 +440,7 @@ Checked against the code and the tests on 2026-11-16: what is proven is ticked w
 
 ### 2.2 Admin UI
 - [ ] `(admin)` routes behind auth and feature flag
-- [ ] Prayer request inbox: decrypt on view, status changes, audit trail
+- [ ] Prayer request inbox (the public form only, step 1.4): decrypt on view, status changes, audit trail. Crew requests (1.12) have no admin view by design
 - [ ] Subscriber counts and status read from our mirror; list management and export stay in the Kit dashboard
 - [ ] Contact messages view
 
@@ -512,8 +517,8 @@ From the retired chat documents; none is in scope until decided.
 - [ ] 1. Budget and audience region
 - [x] 2. Domain name: `wordonthewater.net`, mailboxes `hello@wordonthewater.net` and `prayer@wordonthewater.net`
 - [x] 3. Email provider: Kit for subscriptions and newsletters; Postmark (assumed, still to confirm) for transactional mail, since Kit has no transactional send API
-- [ ] 4. Who reads prayer requests; may full text be emailed
-- [ ] 5. Auth needs beyond admin
+- [ ] 4. Who reads prayer requests; may full text be emailed (form: Hendrik; crew requests: only author and chosen recipients, ADR 0012)
+- [x] 5. Auth needs beyond admin: public accounts for the prayer crew, magic link first (proposed 2026-11-22, ADR 0012)
 - [ ] 6. Audience jurisdictions for privacy law
 - [ ] 7. Built-in admin vs headless CMS
 - [x] 8. Colour scheme: Dawn patrol (light) and Night swell (dark), applied to the tokens

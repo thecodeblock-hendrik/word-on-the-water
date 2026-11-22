@@ -1,5 +1,7 @@
 # 0006. Application-layer encryption of prayer requests
 
+Note 2026-11-22: the same scheme protects crew prayer requests ([ADR 0012](0012-prayer-crews.md)), which are stored in their own table and have no admin view.
+
 Status: accepted
 
 ## Context
