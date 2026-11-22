@@ -168,6 +168,29 @@ test.describe("where each button goes", () => {
   }
 });
 
+test("Devotional opens the devotional at its top, wherever the landing page was scrolled to", async ({
+  page,
+}) => {
+  // The smooth scrolling set on <html> once sent a tap from the top of the landing page down to the
+  // devotional's Subscribe band, because the router's scroll and the smooth scroll fought.
+  for (const fraction of [0, 0.5, 1]) {
+    await page.goto(`${CHAT}/`);
+    await page.waitForLoadState("networkidle");
+    await page.evaluate(
+      (f) =>
+        window.scrollTo({
+          top: f * (document.documentElement.scrollHeight - innerHeight),
+          behavior: "instant",
+        }),
+      fraction,
+    );
+    await bar(page).getByRole("link", { name: "Devotional" }).click();
+    await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => Math.round(scrollY)), `from ${fraction}`).toBeLessThan(5);
+  }
+});
+
 test.describe("the chat, the Bible and back", () => {
   test("a verse keeps the chat, Your chat brings it back, closing it makes the Bible show Shore, and a new chat starts empty", async ({
     page,
