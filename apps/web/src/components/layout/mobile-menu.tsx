@@ -31,7 +31,7 @@ export function MobileMenu({
   themeToggle,
 }: {
   links: readonly NavItem[];
-  /** Add Got Questions after the links. */
+  /** Add Ask the Word after the links. */
   chat?: boolean;
   themeToggle: ReactNode;
 }) {

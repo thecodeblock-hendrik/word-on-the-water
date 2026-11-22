@@ -57,7 +57,7 @@ export function Start({ chatEnabled = false }: { chatEnabled?: boolean }) {
                   fill="currentColor"
                 />
               </svg>
-              Got Questions?
+              Ask the Word
             </ChatLauncher>
           ) : (
             <a href={start.talk.href} className={buttonClasses("ghost")}>

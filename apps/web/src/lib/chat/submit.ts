@@ -24,7 +24,7 @@ export type ChatResult = { ok: true; reply: ChatReply } | { ok: false; message: 
 const unavailable = {
   ok: false,
   message:
-    "Got Questions is not available right now. Please try again later, or email hello@wordonthewater.net.",
+    "Ask the Word is not available right now. Please try again later, or email hello@wordonthewater.net.",
 } as const;
 const wrong = { ok: false, message: "Something went wrong. Please try again." } as const;
 const tooMany = {

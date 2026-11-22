@@ -1,4 +1,4 @@
-"""Request and reply models for the Got Questions chat.
+"""Request and reply models for the Ask the Word chat.
 
 The server keeps nothing between requests: the browser sends the small context
 below with every turn.

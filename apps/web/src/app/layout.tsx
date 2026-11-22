@@ -5,11 +5,15 @@ import { Barlow, Barlow_Condensed, Lora } from "next/font/google";
 import { cookies } from "next/headers";
 
 import { ChatHost } from "@/components/chat/chat-host";
+import { UndoToast } from "@/components/chat/undo-toast";
 import { CspNonce } from "@/components/csp-nonce";
 import { LogoSprite } from "@/components/logo";
+import { BottomNavHost } from "@/components/layout/bottom-nav-host";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { currentDevotionalHref, loadContent } from "@/lib/devotionals/load";
+import { today } from "@/lib/devotionals/format";
 import { isBibleEnabled } from "@/lib/bible/flag";
 import { isChatEnabled } from "@/lib/chat/flag";
 import { siteMetadata } from "@/lib/seo";
@@ -47,13 +51,19 @@ export async function generateViewport(): Promise<Viewport> {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Reading cookies makes every page render per request, as the nonce CSP requires (ADR 0007).
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
+  // The phone bottom bar needs both the Bible reader and the chat to be on.
+  const bottomNav = isBibleEnabled() && isChatEnabled();
+  const devotionalHref = currentDevotionalHref(loadContent().devotionals, today());
   return (
     <html
       lang="en"
       data-theme={theme}
+      // Next 16 no longer pauses the smooth scrolling set in globals.css during a page change; this
+      // asks it to, so the router's scroll to the top of the new page is not undone.
+      data-scroll-behavior="smooth"
       className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}
     >
-      <body className="flex min-h-dvh flex-col has-[[data-chapter-nav]]:pb-[calc(3.6rem+var(--chat-extra,0rem)+max(.5rem,env(safe-area-inset-bottom)))] has-[[data-chat-return]]:[--chat-extra:1.8rem] lg:has-[[data-chapter-nav]]:pb-0 [&:has([data-chapter-nav])>footer]:hidden">
+      <body className="flex min-h-dvh flex-col has-[[data-chapter-nav]]:pb-[calc(3.6rem+var(--chat-extra,0rem)+max(.5rem,env(safe-area-inset-bottom)))] has-[[data-bar-middle]]:[--chat-extra:1.8rem] lg:has-[[data-chapter-nav]]:pb-0 [&:has([data-chapter-nav])>footer]:hidden has-[[data-bottom-nav]]:pb-[calc(3.6rem+max(.5rem,env(safe-area-inset-bottom)))] lg:has-[[data-bottom-nav]]:pb-0">
         <CspNonce />
         <LogoSprite />
         <SkipLink />
@@ -62,7 +72,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
-        {isChatEnabled() && <ChatHost bibleLinks={isBibleEnabled()} />}
+        {bottomNav && <BottomNavHost devotionalHref={devotionalHref} />}
+        {bottomNav && <UndoToast />}
+        {isChatEnabled() && (
+          <ChatHost
+            bibleLinks={isBibleEnabled()}
+            devotionalHref={bottomNav ? devotionalHref : undefined}
+          />
+        )}
         <Analytics />
         <SpeedInsights />
       </body>

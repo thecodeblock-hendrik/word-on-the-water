@@ -20,9 +20,10 @@ test("a chapter step crosses into the neighbouring book and back, including the 
   page,
 }) => {
   await page.goto("/bible/bsb/malachi/4");
-  await page.getByRole("link", { name: "Next chapter: Matthew 1" }).click();
+  // On a phone the names are the short forms ("Matt 1", "Mal 4"), because the middle button needs room.
+  await page.getByRole("link", { name: /^Next chapter: (Matthew|Matt) 1$/ }).click();
   await expect(page).toHaveURL("/bible/bsb/matthew/1");
-  await page.getByRole("link", { name: "Previous chapter: Malachi 4" }).click();
+  await page.getByRole("link", { name: /^Previous chapter: (Malachi|Mal) 4$/ }).click();
   await expect(page).toHaveURL("/bible/bsb/malachi/4");
 });
 
@@ -33,7 +34,7 @@ test("the first and last chapters of the Bible have a disabled button, not a dea
   let nav = page.getByRole("navigation", { name: "Previous and next chapter" });
   await expect(nav.getByRole("button", { name: /Start of the Bible/ })).toBeDisabled();
   await expect(nav.getByRole("link", { name: /^Previous chapter/ })).toHaveCount(0);
-  await expect(nav.getByRole("link", { name: "Next chapter: Genesis 2" })).toBeVisible();
+  await expect(nav.getByRole("link", { name: /^Next chapter: (Genesis|Gen) 2$/ })).toBeVisible();
 
   await page.goto("/bible/bsb/revelation/22");
   nav = page.getByRole("navigation", { name: "Previous and next chapter" });
@@ -97,7 +98,7 @@ test.describe("on a phone or tablet (below 1024px)", () => {
     const height = page.viewportSize()!.height;
     expect(box.y + box.height).toBeGreaterThanOrEqual(height - 1);
     expect(box.y + box.height).toBeLessThanOrEqual(height + 1);
-    const links = await bar.getByRole("link").all();
+    const links = await bar.getByRole("link", { name: /chapter/ }).all();
     expect(links).toHaveLength(2);
     for (const link of links) expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     const [a, b] = [await links[0].boundingBox(), await links[1].boundingBox()];
@@ -245,14 +246,14 @@ for (const width of [320, 360, 375, 390, 412]) {
       await page.goto(path);
       const links = page
         .getByRole("navigation", { name: "Previous and next chapter" })
-        .getByRole("link");
+        .getByRole("link", { name: /chapter/ });
       for (const link of await links.all()) {
         const label = `${path}: ${await link.innerText()}`;
         expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
         expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
         await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
-        // The full name is what shows (the short form is only for the chat button), and it all fits.
-        expect(await link.locator(".truncate").innerText(), label).toMatch(/[a-z]{4,}/);
+        // On a phone the short form shows (the middle button needs room), and it all fits.
+        expect(await link.locator(".truncate").innerText(), label).toMatch(/[A-Za-z]{3,}/);
         expect(
           await link.locator(".truncate").evaluate((el) => el.scrollWidth <= el.clientWidth),
           `${label}: the name is cut off`,

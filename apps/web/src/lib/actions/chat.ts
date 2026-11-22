@@ -10,7 +10,7 @@ import { clientIpFrom } from "@/lib/signup";
 /** The chat's Server Action: hands one turn to the API. Nothing is stored or logged here. */
 export async function sendChat(input: ChatInput): Promise<ChatResult> {
   if (!isChatEnabled()) {
-    return { ok: false, message: "Got Questions is not available right now." };
+    return { ok: false, message: "Ask the Word is not available right now." };
   }
   return submitChat(input, clientIpFrom(await headers()), apiFetch);
 }

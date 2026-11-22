@@ -1,6 +1,6 @@
-/** Wording and fixed choices for the Got Questions panel. */
+/** Wording and fixed choices for the Ask the Word panel. */
 export const chat = {
-  title: "Got Questions",
+  title: "Ask the Word",
   intro: "Ask about the Christian faith.",
   introNote: "Answers come from our own knowledge base. It is not a replacement for a pastor.",
   privacy: "Please don't share personal details.",

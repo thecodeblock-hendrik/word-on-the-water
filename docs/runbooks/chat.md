@@ -1,4 +1,4 @@
-# Runbook: Got Questions chat
+# Runbook: Ask the Word chat
 
 Scope: [chat.md](../archive/chat.md). Decision: [ADR 0009](../adr/0009-chat-local-knowledge-base.md). The chat answers from a local knowledge base (KB). No model, no search, nothing stored on the server.
 

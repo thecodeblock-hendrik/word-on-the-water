@@ -116,15 +116,15 @@ describe("the privacy policy content", () => {
   });
 });
 
-describe("the Got Questions chat in the policy", () => {
+describe("the Ask the Word chat in the policy", () => {
   const withChat = privacyPolicy({ bibleEnabled: false, chatEnabled: true });
   const item = withChat.sections
     .find((s) => s.id === "what-we-collect")!
-    .items!.find((i) => i.term === "Got Questions chat");
+    .items!.find((i) => i.term === "Ask the Word chat");
 
   it("is described only while the chat is switched on", () => {
     expect(item).toBeDefined();
-    expect(everything()).not.toContain("Got Questions");
+    expect(everything()).not.toContain("Ask the Word");
   });
 
   it("says nothing is stored or shared, the tab keeps the thread and personal details are refused", () => {

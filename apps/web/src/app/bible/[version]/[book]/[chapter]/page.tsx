@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import { ArrowKeys } from "@/components/bible/arrow-keys";
+import { ShoreButton } from "@/components/bible/shore-button";
 import { ChatReturn } from "@/components/chat/chat-return";
 import { ChapterNav } from "@/components/bible/chapter-nav";
 import { PassagePopover } from "@/components/bible/passage-popover";
@@ -101,7 +102,7 @@ export default async function BibleChapterPage(props: Props) {
       <div className="min-w-0 lg:pt-8">
         <Reader passage={passage} version={version} book={book} invalidVerses={invalidVerses} />
         <ChapterNav version={version.id} book={book} chapter={passage.chapter}>
-          {isChatEnabled() && <ChatReturn />}
+          {isChatEnabled() ? <ChatReturn /> : <ShoreButton />}
         </ChapterNav>
       </div>
     </div>

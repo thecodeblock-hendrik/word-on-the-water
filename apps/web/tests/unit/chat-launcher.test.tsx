@@ -23,7 +23,7 @@ describe("ChatLauncher", () => {
         <ChatHost />
       </>,
     );
-    expect(screen.getByRole("link", { name: "Got Questions" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Ask the Word" })).toHaveAttribute(
       "href",
       "mailto:hello@wordonthewater.net",
     );
@@ -37,10 +37,10 @@ describe("ChatLauncher", () => {
         <ChatHost />
       </>,
     );
-    const link = screen.getByRole("link", { name: "Got Questions" });
+    const link = screen.getByRole("link", { name: "Ask the Word" });
 
     await user.click(link);
-    expect(await screen.findByRole("dialog", { name: "Got Questions" })).toBeDefined();
+    expect(await screen.findByRole("dialog", { name: "Ask the Word" })).toBeDefined();
 
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
@@ -56,14 +56,14 @@ describe("ChatLauncher", () => {
       </>,
     );
     expect(warmChat).not.toHaveBeenCalled();
-    const link = screen.getByRole("link", { name: "Got Questions" });
+    const link = screen.getByRole("link", { name: "Ask the Word" });
 
     await user.click(link);
-    await screen.findByRole("dialog", { name: "Got Questions" });
+    await screen.findByRole("dialog", { name: "Ask the Word" });
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     await user.click(link);
-    await screen.findByRole("dialog", { name: "Got Questions" });
+    await screen.findByRole("dialog", { name: "Ask the Word" });
 
     expect(warmChat).toHaveBeenCalledOnce();
   });
@@ -86,12 +86,12 @@ describe("Start with the chat", () => {
       "href",
       "mailto:hello@wordonthewater.net",
     );
-    expect(screen.queryByRole("link", { name: "Got Questions" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Ask the Word" })).toBeNull();
   });
 
-  it("shows Got Questions in its place when the chat is on", () => {
+  it("shows Ask the Word in its place when the chat is on", () => {
     render(<Start chatEnabled />);
-    expect(screen.getByRole("link", { name: "Got Questions?" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Ask the Word" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Talk to someone" })).toBeNull();
   });
 });

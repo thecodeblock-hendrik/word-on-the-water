@@ -1,4 +1,4 @@
-"""Got Questions chat endpoint. Nothing is stored and message text is never logged."""
+"""Ask the Word chat endpoint. Nothing is stored and message text is never logged."""
 
 import time
 from datetime import UTC, datetime
@@ -29,7 +29,7 @@ def get_chat(settings: Annotated[Settings, Depends(get_settings)]) -> Chat:
     """The shared Chat, or a 503 when the flag is off or the knowledge base did not load."""
     chat = _chat() if settings.chat_enabled else None
     if chat is None:
-        raise ApiError(503, "chat_unavailable", "Got Questions is not available right now.")
+        raise ApiError(503, "chat_unavailable", "Ask the Word is not available right now.")
     return chat
 
 

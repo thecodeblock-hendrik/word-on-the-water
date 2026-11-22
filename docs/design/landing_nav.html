@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing page bottom menu</title>
+<style>
+:root{--bg:#fbf3e8;--surface:#fffaf3;--ink:#2b2d42;--muted:#5c5e70;--line:#e9dccb;--accent:#d9703a;--accent-ink:#a9501f;--on-accent:#fff;--deep:#2b2d42;--on-deep:#fbf3e8;--warn:#fff1d6;--warn-line:#e8c27a;--danger:#fde9e4;--danger-line:#e8a898}
+.night{--bg:#0f2233;--surface:#152c40;--ink:#f4f1ea;--muted:#a9b7c2;--line:#28425a;--accent:#4fa9a6;--accent-ink:#6fc0bc;--on-accent:#0a1825;--deep:#0a1825;--on-deep:#f4f1ea;--warn:#3a3322;--warn-line:#7a6a3a;--danger:#3a2222;--danger-line:#8a4a44}
+*{box-sizing:border-box}
+body{margin:0;background:#e7e2da;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#2b2d42;padding:24px 16px 80px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:40px 0 4px}
+.lead{color:#5c5e70;margin:0 0 8px;max-width:78ch}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:14px}
+figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width:375px}
+.wide figcaption{max-width:1100px}
+.notes{max-width:78ch;font-size:14px;color:#3b3d4e}
+.notes li{margin:2px 0}
+
+/* frames */
+.phone{width:375px;height:760px;background:var(--bg);color:var(--ink);border-radius:30px;border:8px solid #111;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.desk{width:1100px;max-width:100%;height:680px;background:var(--bg);color:var(--ink);border:1px solid #b9b3a8;border-radius:10px;overflow:hidden;position:relative}
+.status{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font:600 12px system-ui;flex:none}
+
+/* page behind (landing) */
+.site-top{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.logo{font:700 20px "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.02em;flex:1}
+.page{padding:20px 16px}
+.eyebrow{font:700 12px system-ui;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.page h3{font:700 34px/1.1 "Barlow Condensed","Arial Narrow",system-ui;margin:4px 0 14px}
+.steps{display:grid;gap:10px;margin:0 0 18px;padding:0;list-style:none}
+.steps li{display:flex;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:15px}
+.steps b{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex:none;font-size:14px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+
+/* buttons */
+.btn{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:0 16px;font:600 16px system-ui;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent;border-color:var(--accent-ink);color:var(--accent-ink)}
+.btn.focus{outline:3px solid var(--accent);outline-offset:2px}
+
+/* dimmed overlay + panels */
+.dim{position:absolute;inset:0;background:rgba(10,24,37,.55)}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:440px;background:var(--bg);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.sheet{position:absolute;inset:26px 0 0 0;background:var(--bg);display:flex;flex-direction:column}
+.sheet.partial{inset:90px 0 0 0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.3)}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 0;flex:none}
+
+/* chat */
+.chat-h{display:flex;align-items:center;gap:6px;padding:8px 8px 8px 16px;border-bottom:1px solid var(--line);flex:none}
+.chat-h strong{font:700 22px "Barlow Condensed","Arial Narrow",system-ui;flex:1;letter-spacing:.01em}
+.iconbtn{min-height:44px;min-width:44px;display:grid;place-items:center;border:0;background:transparent;color:var(--ink);font:600 15px system-ui;border-radius:10px}
+.iconbtn.txt{padding:0 10px;color:var(--accent-ink)}
+.thread{flex:1;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.intro{font-size:15px;color:var(--muted);margin:0}
+.intro b{color:var(--ink)}
+.starter{display:flex;flex-direction:column;gap:8px}
+.chip{min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:22px;padding:0 16px;font:600 15px system-ui;display:inline-flex;align-items:center;text-align:left}
+.chip.sm{min-height:44px;font-weight:500}
+.chip .arrow{margin-left:auto;color:var(--accent-ink);padding-left:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.label{font:700 12px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 0}
+.me{align-self:flex-end;max-width:82%;background:var(--accent);color:var(--on-accent);padding:10px 14px;border-radius:18px 18px 4px 18px;font-size:16px}
+.bot{align-self:flex-start;max-width:96%;background:var(--surface);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:14px;font-size:16px;line-height:1.55;display:flex;flex-direction:column;gap:10px}
+.bot p{margin:0}
+.bot .more{color:var(--accent-ink);font:600 15px system-ui;min-height:44px;display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;text-align:left}
+.bot .exp{border-top:1px solid var(--line);padding-top:10px;color:var(--ink)}
+.verse{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:0 10px;min-height:36px;display:inline-flex;align-items:center;font:600 14px system-ui;color:var(--accent-ink)}
+.note{background:var(--warn);border:1px solid var(--warn-line);border-radius:10px;padding:10px 12px;font-size:14px;display:flex;gap:8px}
+.note.danger{background:var(--danger);border-color:var(--danger-line)}
+.badge{font:700 11px system-ui;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--warn-line);background:var(--warn);border-radius:99px;padding:2px 8px;align-self:flex-start}
+.typing{align-self:flex-start;display:flex;gap:5px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:4px 18px 18px 18px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.6}
+.typing i:nth-child(2){opacity:.8}.typing i:nth-child(3){opacity:1}
+.tel{min-height:56px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 14px;font:700 15px/1.25 system-ui}
+.tel>span:last-child{white-space:nowrap;font-size:17px}
+.tel small{font-weight:500;display:block;opacity:.9}
+.comp{border-top:1px solid var(--line);padding:8px 12px calc(10px + 6px);background:var(--surface);flex:none}
+.hint{font-size:13px;color:var(--muted);margin:0 0 6px;display:flex;gap:6px;align-items:center}
+.field{display:flex;gap:8px;align-items:flex-end}
+.input{flex:1;min-height:48px;border:1px solid var(--muted);border-radius:12px;background:var(--bg);padding:12px 14px;font-size:16px;color:var(--muted)}
+.input.err{border-color:#c0392b;border-width:2px;color:var(--ink)}
+.input.on{border-color:var(--accent);border-width:2px;color:var(--ink)}
+.send{width:48px;height:48px;border-radius:12px;background:var(--accent);color:var(--on-accent);border:0;font:700 20px system-ui;display:grid;place-items:center;flex:none}
+.send.off{background:var(--line);color:var(--muted)}
+.err-msg{font-size:14px;color:#a52a1d;margin:6px 0 0;display:flex;gap:6px}
+.night .err-msg{color:#ff9d8f}
+.foot{font-size:12px;color:var(--muted);margin:8px 0 0;text-align:center}
+.kb{font-size:12px;color:var(--muted)}
+.topic{min-height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);font-weight:600}
+.topic small{color:var(--muted);font-weight:500}
+.back{color:var(--accent-ink);font:600 15px system-ui}
+
+/* back to the chat from the Bible */
+.bar-back{display:flex;align-items:center;min-height:48px;padding:0 4px 0 4px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.bar-back .go{flex:1;min-height:48px;display:flex;align-items:center;gap:8px;padding:0 12px;font:600 15px system-ui;color:var(--accent-ink)}
+.bar-back .go small{color:var(--muted);font-weight:500;font-size:13px}
+.reader{padding:14px 16px;flex:1;overflow:hidden}
+.pbtn{min-height:44px;border:1.5px solid var(--line);background:var(--surface);border-radius:6px;padding:0 12px;display:flex;justify-content:space-between;align-items:center;font:600 17px system-ui}
+.vers{display:flex;gap:6px;margin:10px 0 12px}
+.vers span{min-height:36px;padding:0 14px;border:1px solid var(--line);border-radius:18px;display:inline-flex;align-items:center;font:600 13px system-ui;color:var(--muted)}
+.vers span.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vtext{font:18px/1.7 Georgia,"Times New Roman",serif;margin:0}
+.vtext sup{font:700 11px system-ui;color:var(--accent-ink);margin-right:3px}
+.vtext mark{background:rgba(217,112,58,.2);color:inherit}
+.night .vtext mark{background:rgba(79,169,166,.25)}
+.fab{position:absolute;right:14px;bottom:18px;min-height:48px;padding:0 18px;border-radius:24px;background:var(--accent-ink);color:var(--on-accent);box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;gap:8px;align-items:center;font:700 15px system-ui}
+.peek{position:absolute;left:0;right:0;bottom:0;height:54%;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.3);padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.peek h4{margin:2px 0 0;font:700 20px "Barlow Condensed","Arial Narrow",system-ui}
+.peek .acts{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.cmp{border-collapse:collapse;font-size:14px;max-width:1100px;background:#fffdf9;color:#2b2d42}
+.cmp th,.cmp td{border:1px solid #d9d0c3;padding:8px 10px;text-align:left;vertical-align:top}
+.cmp th{background:#f0e8db}
+.rec{background:#e7f3e8}
+
+/* option A revisions: solid return controls */
+.bubble{width:20px;height:20px;flex:none;fill:currentColor}
+.solid-bar{display:flex;align-items:center;min-height:52px;background:var(--accent-ink);color:var(--on-accent);flex:none}
+.solid-bar .go{flex:1;min-height:52px;display:flex;align-items:center;gap:10px;padding:0 16px;font:700 16px system-ui}
+.solid-bar .iconbtn{color:var(--on-accent)}
+.strip{display:flex;align-items:center;min-height:60px;padding:0 4px 0 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.pill{min-height:44px;display:inline-flex;align-items:center;gap:10px;padding:0 18px;border-radius:22px;background:var(--accent-ink);color:var(--on-accent);font:700 15px system-ui;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.mini-bar{display:flex;align-items:center;justify-content:center;gap:8px;height:34px;background:var(--accent-ink);color:var(--on-accent);flex:none;font:700 13px system-ui}
+.tabbtn{position:absolute;left:12px;top:132px;min-height:48px;padding:0 14px;border-radius:24px;background:var(--accent-ink);color:var(--on-accent);box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:8px;font:700 14px system-ui}
+
+/* Your chat between the chapter buttons */
+.chap-bar{display:flex;align-items:center;gap:8px;padding:8px 16px 14px;border-top:1px solid var(--line);background:var(--surface);flex:none;position:relative}
+.cb{flex:1;min-width:0;min-height:48px;border-radius:4px;border:1.5px solid var(--line);display:flex;align-items:center;gap:6px;padding:0 10px;font:600 15px system-ui;background:var(--bg);color:var(--ink)}
+.cb span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cb.prev{justify-content:flex-start}
+.cb.next{justify-content:flex-end;border-color:var(--accent-ink);background:var(--accent-ink);color:var(--on-accent)}
+.cb.chat{justify-content:center;gap:8px;border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.cb.chat.fit{flex:0 0 auto;padding:0 6px 0 14px;gap:6px}
+.cb.chat .hide{width:32px;height:36px;margin-left:2px;border-left:1px solid rgba(128,128,128,.5);display:grid;place-items:center;font-size:15px}
+.cb.two{flex-direction:column;align-items:flex-start;justify-content:center;gap:0;font-size:13px;line-height:1.15;padding:0 8px;overflow:hidden}
+.cb.two .t{display:block;max-width:100%}
+.cb.next.two{align-items:flex-end}
+.cb.two b{font-size:11px;font-weight:600;opacity:.85;white-space:nowrap}
+.mid{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:-30px;color:var(--ink);font:700 11px system-ui}
+.mid .round{width:60px;height:60px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:3px solid var(--surface)}
+.desk .chap-bar{border:0;background:transparent;max-width:680px;margin:0 auto;padding:8px 40px}
+
+/* 6d: desktop ways back to the chat */
+.desk:has(.dnav){height:520px}
+.dnav{display:flex;align-items:center;gap:22px;padding:0 28px;height:64px;border-bottom:1px solid var(--line);background:var(--bg);font:600 15px system-ui;flex:none}
+.dnav .logo{flex:none;font-size:22px}
+.dnav .links{display:flex;gap:22px;flex:1;margin-left:18px;color:var(--ink)}
+.dnav .links span{white-space:nowrap}
+.dnav .gq{color:var(--accent-ink)}
+.dcol{max-width:680px;margin:0 auto;padding:28px 40px 0}
+.dpass{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.dpass .pbtn{width:230px}
+.dchap{display:flex;justify-content:space-between;margin-top:18px}
+.resume{display:flex;align-items:center;gap:14px;padding:12px 8px 12px 16px;margin-bottom:18px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ink);border-radius:10px}
+.resume .ico{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.resume .txt{flex:1;min-width:0;line-height:1.3}
+.resume .txt b{display:block;font-size:15px}
+.resume .txt small{color:var(--muted);font-size:13px}
+.hdr-chat{position:relative;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:22px;background:var(--ink);color:var(--bg);font:700 15px system-ui}
+.hdr-chat .dot{position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.callout{position:absolute;top:70px;left:378px;width:290px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:14px 14px 12px;font-size:14px;line-height:1.4}
+.callout:before{content:"";position:absolute;top:-7px;left:150px;width:12px;height:12px;background:var(--surface);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.callout .acts{display:flex;gap:8px;margin-top:10px}
+.edge{position:absolute;right:0;top:170px;width:48px;display:flex;flex-direction:column;align-items:stretch;background:var(--ink);color:var(--bg);border-radius:14px 0 0 14px;box-shadow:-4px 6px 18px rgba(0,0,0,.28);overflow:hidden}
+.edge .e-open{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px 0;font:700 14px system-ui}
+.edge .e-open .v{writing-mode:vertical-rl;letter-spacing:.04em}
+.edge .e-x{min-height:44px;display:grid;place-items:center;border-top:1px solid rgba(128,128,128,.45);font-size:15px}
+
+/* New: Your chat inside the chapter bar */
+.nbar{position:relative;height:92px;flex:none}
+.nbar .bg{position:absolute;left:0;top:0;width:359px;height:92px}
+.nbar .cb{position:absolute;top:36px;height:48px;width:107px;flex:none}
+.nbar .cb.prev{left:16px}.nbar .cb.next{right:16px}
+.nb-btn{position:absolute;left:151.5px;width:56px;height:56px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center}
+.nb-btn.ring{border:3px solid var(--surface);box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.nb-lbl{position:absolute;left:0;width:359px;text-align:center;font:700 12px/16px system-ui;color:var(--ink)}
+.seg{display:flex;margin:8px 16px 14px;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;min-height:56px;flex:none}
+.seg>span{display:flex;align-items:center;min-width:0;padding:0 10px;font:600 15px system-ui}
+.seg .p{flex:1;background:var(--bg);color:var(--ink)}
+.seg .n{flex:1;justify-content:flex-end;background:var(--accent-ink);color:var(--on-accent)}
+.seg .c{flex:0 0 88px;flex-direction:column;justify-content:center;gap:2px;background:var(--ink);color:var(--bg);font:700 12px system-ui;padding:0}
+.seg .c+.n,.seg .p+.c{border-left:1px solid var(--surface)}
+.seg .p{border-right:0}
+.nchip{display:flex;align-items:center;gap:10px;margin:8px 16px 0;min-height:48px;padding:0 4px 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:24px;font:600 15px system-ui;flex:none}
+.nchip .i{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.nchip .t{flex:1}.nchip .x{width:44px;height:44px;display:grid;place-items:center;color:var(--muted)}
+.rh{position:relative;padding:20px 16px 18px;flex:none}
+.rh .eb{font:700 13px/16px "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-ink)}
+.rh .ti{font:700 34px/40px "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;margin:10px 0 14px}
+.rh .vs{display:flex;gap:16px;font:500 15px/22px system-ui;color:var(--muted)}
+.rh .vs u{color:var(--accent-ink)}
+.rh+.reader{padding-top:0}
+.eh{position:absolute;top:20px;bottom:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--ink);color:var(--bg);font:700 13px system-ui}
+.eh.tab{right:0;width:34px;gap:8px;border-radius:12px 0 0 12px;box-shadow:-3px 4px 14px rgba(0,0,0,.28)}
+.eh.tab b{writing-mode:vertical-rl;font-weight:700;letter-spacing:.04em}
+.eh.slim{right:0;width:30px;border-radius:10px 0 0 10px;box-shadow:-3px 4px 14px rgba(0,0,0,.28)}
+.rh.pc .ti{font-size:29px;white-space:nowrap}
+.eh.card{right:12px;width:56px;gap:4px;border-radius:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--ink);font:700 11px/13px system-ui;text-align:center}
+.eh.read{right:0;width:50px;gap:5px;border-radius:12px 0 0 12px;font:700 11px/13px system-ui;text-align:center;box-shadow:-3px 4px 14px rgba(0,0,0,.28)}
+.newtag{display:inline-block;background:#d9703a;color:#fff;border-radius:4px;padding:1px 8px;font:700 12px system-ui;letter-spacing:.06em;margin-right:6px}
+.newsec{border:2px solid #d9703a;border-radius:14px;padding:4px 20px 24px;margin-top:28px;background:rgba(217,112,58,.06)}
+
+.hero{padding:22px 16px 8px}
+.hero q{display:block;font:italic 22px/1.35 Georgia,serif;margin:6px 0 6px;quotes:none}
+.hero small{color:var(--muted);font-size:14px}
+.landing{flex:1;overflow:hidden}
+.dcard{margin:14px 16px 0;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.dcard h4{margin:2px 0 4px;font:700 24px/1.15 "Barlow Condensed","Arial Narrow",system-ui}
+.dcard p{margin:0;font-size:15px;color:var(--muted)}
+.nbar .cb.tab{flex-direction:column;justify-content:center;gap:2px;padding:0 4px;font:600 12px/14px system-ui;text-align:center}
+.nbar .cb.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nb-btn svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cb.tab.on{border-color:var(--accent-ink);color:var(--accent-ink)}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+.flow .st{background:#fffdf9;border:1px solid #d9d0c3;border-radius:10px;padding:8px 12px;font-size:14px;max-width:220px}
+.flow .st b{display:block;font-size:12px;color:#a9501f;letter-spacing:.06em;text-transform:uppercase}
+.flow .ar{font-size:20px;color:#a9501f}
+.pg{padding:20px 16px;flex:1;overflow:hidden}
+.pg h3{font:700 34px/1.1 "Barlow Condensed","Arial Narrow",system-ui;margin:4px 0 12px}
+.pg p{margin:0 0 10px;font-size:16px}
+.big{font:700 88px/1 "Barlow Condensed","Arial Narrow",system-ui;color:var(--accent-ink)}
+.sheet.full{inset:0;z-index:5}
+.chap-bar.two{padding:8px 16px 14px}
+
+.fpill{flex:none;margin:6px 12px 34px;min-height:52px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:0 4px 0 18px;box-shadow:0 4px 14px rgba(0,0,0,.12);color:var(--muted);font-size:16px}
+.fpill span:first-child{flex:1}
+.fpill .send{width:44px;height:44px;border-radius:50%}
+.dock{flex:none;background:var(--surface);border-top:1px solid var(--line);padding:10px 12px 0}
+.dock .fpill{margin:0 0 4px;box-shadow:none;background:var(--bg)}
+.dkrow{display:flex;align-items:flex-start;gap:8px;padding:4px 0 12px}
+.dkb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:60px;font:600 12px/14px system-ui;color:var(--ink)}
+.dkb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dkb.mid span.r{width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center}
+.dkb.mid{min-height:76px;margin-top:-6px}
+.dkb.on{color:var(--accent-ink)}
+.dkrow.slim .dkb{min-height:48px}
+.dkrow.slim{padding:0 0 10px}
+.dkrow.slim .dkb.mid{min-height:48px;margin:0}
+.dkrow.slim .dkb.mid span.r{width:44px;height:44px}
+.kbd{flex:none;height:250px;background:#cfd3da;color:#2b2d42;display:grid;place-items:center;font:600 14px system-ui}
+.night .kbd{background:#2a2f38;color:#c8ccd4}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+.flow .st{background:#fffdf9;border:1px solid #d9d0c3;border-radius:10px;padding:8px 12px;font-size:14px;max-width:220px}
+.flow .st b{display:block;font-size:12px;color:#a9501f;letter-spacing:.06em;text-transform:uppercase}
+.flow .ar{font-size:20px;color:#a9501f}
+.pg{padding:20px 16px;flex:1;overflow:hidden}
+.pg h3{font:700 34px/1.1 "Barlow Condensed","Arial Narrow",system-ui;margin:4px 0 12px}
+.pg p{margin:0 0 10px;font-size:16px}
+.big{font:700 88px/1 "Barlow Condensed","Arial Narrow",system-ui;color:var(--accent-ink)}
+.hero{padding:22px 16px 8px}
+.hero q{display:block;font:italic 22px/1.35 Georgia,serif;margin:6px 0 6px;quotes:none}
+.hero small{color:var(--muted);font-size:14px}
+.landing{flex:1;overflow:hidden}
+.dcard{margin:14px 16px 0;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.dcard h4{margin:2px 0 4px;font:700 24px/1.15 "Barlow Condensed","Arial Narrow",system-ui}
+.dcard p{margin:0;font-size:15px;color:var(--muted)}
+.nbar .cb.tab{flex-direction:column;justify-content:center;gap:2px;padding:0 4px;font:600 12px/14px system-ui;text-align:center}
+.nbar .cb.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nb-btn svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cb.tab.on{border-color:var(--accent-ink);color:var(--accent-ink)}
+.fpill{flex:none;margin:6px 12px 34px;min-height:52px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:0 4px 0 18px;box-shadow:0 4px 14px rgba(0,0,0,.12);color:var(--muted);font-size:16px}
+.fpill span:first-child{flex:1}
+.fpill .send{width:44px;height:44px;border-radius:50%}
+.kbd{flex:none;height:250px;background:#cfd3da;color:#2b2d42;display:grid;place-items:center;font:600 14px system-ui}
+.night .kbd{background:#2a2f38;color:#c8ccd4}
+</style></head><body>
+<h1>Landing page - bottom menu (final design)</h1>
+<p class="lead">The raised tab bar as the phone bottom menu, as in landing_page_nav.md. Phones only (below <code>lg</code>); desktop is unchanged. Light is Dawn patrol, dark is Night swell, 375px.</p>
+<table class="cmp"><tr><th>Screen</th><th>Left</th><th>Middle</th><th>Right</th></tr>
+<tr><td>Landing, devotional, privacy, thank you, not found</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td></tr>
+<tr><td>Chat</td><td>Devotional</td><td>Bible</td><td>Shore</td></tr>
+<tr><td>Bible reader</td><td>Previous chapter</td><td>Shore</td><td>Next chapter</td></tr>
+<tr><td>Bible reader, came from the chat</td><td>Previous chapter</td><td>Your chat</td><td>Next chapter</td></tr></table>
+<h2>Flow</h2>
+<div class="flow"><div class="st"><b>1. Any page</b>Devotional goes to the current devotional, Bible to the reader, Ask the Word opens the chat</div></div><div class="flow"><div class="st"><b>1. Bible button</b>Bible reader, Shore in the middle</div><span class="ar">&rarr;</span><div class="st"><b>2. Shore</b>Back to the landing page</div></div><div class="flow"><div class="st"><b>1. Ask the Word</b>Chat opens, empty</div><span class="ar">&rarr;</span><div class="st"><b>2. Ask, tap a verse</b>Bible opens at the verse, Your chat in the middle, thread kept</div><span class="ar">&rarr;</span><div class="st"><b>3. Your chat</b>Chat reopens, same thread</div><span class="ar">&rarr;</span><div class="st"><b>4. Close, or any bar button</b>Thread cleared. The Bible shows Shore again</div></div>
+<h2>A. Landing page</h2><div class="row"><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="landing"><div class="hero"><div class="eyebrow">For surfers and everyone who feels the swell</div><q>&ldquo;Who then is this, that even the wind and the sea obey him?&rdquo;</q><small>Mark 4:41 (ESV)</small></div><div class="dcard"><div class="eyebrow">This week</div><h4>More Than Watchmen</h4><p>An Advent devotional for the long wait before dawn.</p></div><div class="dcard"><div class="eyebrow">New to faith?</div><h4>Start here</h4><p>The gospel in four steps.</p></div></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="landing"><div class="hero"><div class="eyebrow">For surfers and everyone who feels the swell</div><q>&ldquo;Who then is this, that even the wind and the sea obey him?&rdquo;</q><small>Mark 4:41 (ESV)</small></div><div class="dcard"><div class="eyebrow">This week</div><h4>More Than Watchmen</h4><p>An Advent devotional for the long wait before dawn.</p></div><div class="dcard"><div class="eyebrow">New to faith?</div><h4>Start here</h4><p>The gospel in four steps.</p></div></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span></figcaption></figure></div>
+<h2>B. Devotional page</h2><div class="row"><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="landing"><div class="hero"><div class="eyebrow">Advent &middot; Part 1</div><q style="font-size:30px;font-family:'Barlow Condensed','Arial Narrow',system-ui;font-style:normal;font-weight:700;text-transform:uppercase">More Than Watchmen</q><small>Saturday 28 November 2026</small></div><div class="dcard"><p style="font:17px/1.7 Georgia,serif;color:var(--ink)">The night watch knows the dark will end, but only because the sun has risen before&hellip;</p></div></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab on"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span> Devotional is the current page.</figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="landing"><div class="hero"><div class="eyebrow">Advent &middot; Part 1</div><q style="font-size:30px;font-family:'Barlow Condensed','Arial Narrow',system-ui;font-style:normal;font-weight:700;text-transform:uppercase">More Than Watchmen</q><small>Saturday 28 November 2026</small></div><div class="dcard"><p style="font:17px/1.7 Georgia,serif;color:var(--ink)">The night watch knows the dark will end, but only because the sun has risen before&hellip;</p></div></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab on"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span> Devotional is the current page.</figcaption></figure></div>
+<h2>C. Privacy, thank you, not found</h2><div class="row"><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="pg"><div class="eyebrow">Privacy</div><h3>Privacy policy</h3><p>What we keep, why, and for how long. We never sell or share your details.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span><b>Privacy.</b></figcaption></figure><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="pg"><div class="eyebrow">Confirmed</div><h3>You are in. Thank you.</h3><p>Your first devotional arrives on Saturday morning.</p><div class="cta"><span class="btn primary">Read this week&rsquo;s devotional</span></div></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span><b>Thank you.</b></figcaption></figure><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="pg"><div class="big">404</div><h3>Lost at sea</h3><p>That page is not here. Use the buttons below, or go to the landing page.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span><b>Not found.</b></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="pg"><div class="eyebrow">Privacy</div><h3>Privacy policy</h3><p>What we keep, why, and for how long. We never sell or share your details.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span><b>Privacy.</b></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="pg"><div class="eyebrow">Confirmed</div><h3>You are in. Thank you.</h3><p>Your first devotional arrives on Saturday morning.</p><div class="cta"><span class="btn primary">Read this week&rsquo;s devotional</span></div></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span><b>Thank you.</b></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="pg"><div class="big">404</div><h3>Lost at sea</h3><p>That page is not here. Use the buttons below, or go to the landing page.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span><b>Not found.</b></figcaption></figure></div>
+<h2>D. Ask the Word</h2>
+<p class="lead">The message box is a floating pill, and the bar's curve rises into the clear space beneath it. The bar is Devotional, Bible and Shore.</p><div class="row"><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><p class="intro"><b>Ask anything about the Christian faith.</b> Answers come from our own reviewed notes.</p><div class="starter"><span class="chip">Who is Jesus?<span class="arrow">&rsaquo;</span></span><span class="chip">How do I become a Christian?<span class="arrow">&rsaquo;</span></span><span class="chip">Why does God allow suffering?<span class="arrow">&rsaquo;</span></span></div></div><div class="fpill"><span>Ask a question</span><span class="send off">&#10148;</span></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg>Shore</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span><b>Just opened.</b></figcaption></figure><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><div class="me">Does God love me?</div><div class="bot"><p>Yes. God loved the world so much that he gave his Son, so that everyone who believes in him has eternal life.</p><div class="chips"><span class="verse">John 3:16</span><span class="verse">Romans 5:8</span></div></div></div><div class="fpill"><span>Ask a question</span><span class="send off">&#10148;</span></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg>Shore</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Light</span><b>After an answer.</b> Tap a verse to read it.</figcaption></figure><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><div class="me">Does God love me?</div><div class="bot"><p>Yes. God loved the world so much that he gave his Son, so that everyone who believes in him has eternal life.</p><div class="chips"><span class="verse">John 3:16</span><span class="verse">Romans 5:8</span></div></div></div><div class="fpill" style="margin-bottom:8px"><span>Ask a question</span><span class="send off">&#10148;</span></div><div class="kbd">keyboard</div></div><figcaption><span class="newtag">Light</span><b>Typing.</b> The bar hides while the keyboard is open.</figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><p class="intro"><b>Ask anything about the Christian faith.</b> Answers come from our own reviewed notes.</p><div class="starter"><span class="chip">Who is Jesus?<span class="arrow">&rsaquo;</span></span><span class="chip">How do I become a Christian?<span class="arrow">&rsaquo;</span></span><span class="chip">Why does God allow suffering?<span class="arrow">&rsaquo;</span></span></div></div><div class="fpill"><span>Ask a question</span><span class="send off">&#10148;</span></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg>Shore</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span><b>Just opened.</b></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><div class="me">Does God love me?</div><div class="bot"><p>Yes. God loved the world so much that he gave his Son, so that everyone who believes in him has eternal life.</p><div class="chips"><span class="verse">John 3:16</span><span class="verse">Romans 5:8</span></div></div></div><div class="fpill"><span>Ask a question</span><span class="send off">&#10148;</span></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev tab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg>Shore</span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="nb-lbl" style="top:66px">Bible</span></div></div><figcaption><span class="newtag">Dark</span><b>After an answer.</b></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><div class="me">Does God love me?</div><div class="bot"><p>Yes. God loved the world so much that he gave his Son, so that everyone who believes in him has eternal life.</p><div class="chips"><span class="verse">John 3:16</span><span class="verse">Romans 5:8</span></div></div></div><div class="fpill" style="margin-bottom:8px"><span>Ask a question</span><span class="send off">&#10148;</span></div><div class="kbd">keyboard</div></div><figcaption><span class="newtag">Dark</span><b>Typing.</b></figcaption></figure></div>
+<h2>E. Bible from the Bible button</h2>
+<p class="lead">Previous and Next chapter on the sides, Shore in the middle (back to the landing page). Also the state after the chat is closed.</p><div class="row"><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="reader"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers"><span class="on">WEB</span><span>BSB</span></div><p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg></span><span class="nb-lbl" style="top:66px">Shore</span></div></div><figcaption><span class="newtag">Light</span></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="reader"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers"><span class="on">WEB</span><span>BSB</span></div><p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg></span><span class="nb-lbl" style="top:66px">Shore</span></div></div><figcaption><span class="newtag">Dark</span></figcaption></figure></div>
+<h2>F. Bible from a chat verse</h2>
+<p class="lead">Your chat replaces Shore in the middle. Tapping it reopens the chat with the same thread.</p><div class="row"><figure><div class="phone "><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="reader"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers"><span class="on">WEB</span><span>BSB</span></div><p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true" style="fill:currentColor;stroke:none"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="nb-lbl" style="top:66px">Your chat</span></div></div><figcaption><span class="newtag">Light</span></figcaption></figure><figure><div class="phone night"><div class="status"><span>9:41</span><span>5G 100%</span></div><div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div><div class="reader"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers"><span class="on">WEB</span><span>BSB</span></div><p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p></div><div class="nbar"><svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg><span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px"><svg viewBox="0 0 24 24" aria-hidden="true" style="fill:currentColor;stroke:none"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="nb-lbl" style="top:66px">Your chat</span></div></div><figcaption><span class="newtag">Dark</span></figcaption></figure></div>
+<h2>G. Leaving the chat: three ways to say it will be cleared</h2>
+<p class="lead">Shown only when the thread has an answer or the message box has a draft; an empty chat leaves silently. A verse link never asks, because it keeps the chat. Close, Escape and the scrim use the same prompt as the bar buttons. Phones only.</p>
+<table class="cmp"><tr><th>Option</th><th>How it works</th><th>For</th><th>Against</th></tr>
+<tr><td><b>1. Dialog</b></td><td>Centred dialog after tapping Devotional, Bible or Shore. Stay or Leave and clear.</td><td>Clear, standard, nothing is lost by accident</td><td>Extra tap on every exit; interrupts a visitor who just wants to go</td></tr>
+<tr><td><b>2. Bottom sheet</b></td><td>Same question as a sheet rising over the bar, thumb-reachable.</td><td>Easier one-handed; feels native on phones</td><td>Still an extra tap; covers the bar</td></tr>
+<tr><td><b>3. Undo toast</b></td><td>No question. The chat leaves at once, and a toast on the next page says Chat cleared with Undo for 6 seconds.</td><td>No extra tap; mistakes can be undone</td><td>The thread must be held in memory for 6 seconds; the toast sits above the bar and must be announced (<code>role="status"</code>)</td></tr></table>
+<style>
+.scrim{position:absolute;inset:0;background:rgba(10,24,37,.6);z-index:6}
+.dlg{position:absolute;z-index:7;left:24px;right:24px;top:230px;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 16px 40px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:10px}
+.dlg h4,.sht h4{margin:0;font:700 24px/1.1 "Barlow Condensed","Arial Narrow",system-ui}
+.dlg p,.sht p{margin:0;font-size:15px;color:var(--muted)}
+.dlg .acts,.sht .acts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.sht{position:absolute;z-index:7;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.35);padding:0 16px 28px;display:flex;flex-direction:column;gap:10px}
+.sht .grab{margin:8px auto 6px}
+.toast{position:absolute;z-index:4;left:12px;right:12px;bottom:100px;min-height:52px;background:var(--ink);color:var(--bg);border-radius:12px;display:flex;align-items:center;gap:8px;padding:0 4px 0 16px;font:600 15px system-ui;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.toast span:first-child{flex:1}
+.toast .undo{min-height:44px;min-width:64px;display:grid;place-items:center;padding:0 12px;font-weight:700;color:var(--accent)}
+.night .toast .undo{color:var(--accent-ink)}
+.draft{color:var(--ink)}
+</style>
+<div id="g"></div>
+<script>
+const stat='<div class="status"><span>9:41</span><span>5G 100%</span></div>';
+const topbar='<div class="site-top"><span class="logo">Word on the Water</span><span class="btn primary" style="min-height:40px;padding:0 12px;font-size:14px">Subscribe</span><span class="iconbtn">&#9776;</span></div>';
+const bg='<svg class="bg" viewBox="0 0 359 92" aria-hidden="true"><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359V92H0Z" style="fill:var(--surface)"/><path d="M0 28H131.5C141 28 140 1 149.5 1H209.5C219 1 218 28 227.5 28H359" style="fill:none;stroke:var(--line);stroke-width:1.5"/></svg>';
+const surf='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c3 3 3.500 9 0 15-3.500-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/></svg>';
+const dev='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.500 17 12 17s3-2 5.500-2 2.500 2 4.500 2M2 21c3 0 3-2 5.500-2s3 2 5.500 2 3-2 5.500-2"/></svg>';
+const bib='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></svg>';
+const chatBar=bg+'<span class="cb prev tab">'+dev+'Devotional</span><span class="cb next tab">'+surf+'Shore</span><span class="nb-btn" style="top:7px">'+bib+'</span><span class="nb-lbl" style="top:66px">Bible</span>';
+const bibleBar=bg+'<span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px">'+surf+'</span><span class="nb-lbl" style="top:66px">Shore</span>';
+const thread='<div class="chat-h"><strong>Ask the Word</strong><span class="iconbtn txt">Clear</span><span class="iconbtn">&#10005;</span></div><div class="thread"><div class="me">Does God love me?</div><div class="bot"><p>Yes. God loved the world so much that he gave his Son, so that everyone who believes in him has eternal life.</p><div class="chips"><span class="verse">John 3:16</span><span class="verse">Romans 5:8</span></div></div></div><div class="fpill"><span class="draft">Why did Jesus have to die?</span><span class="send">&#10148;</span></div>';
+const chat=over=>stat+thread+'<div class="nbar">'+chatBar+'</div>'+over;
+const reader=over=>stat+topbar+'<div class="reader"><div class="pbtn"><span>John 3:16&ndash;17</span><span>&#9662;</span></div><div class="vers"><span class="on">WEB</span><span>BSB</span></div><p class="vtext"><sup>16</sup><mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him.</p></div>'+over+'<div class="nbar">'+bibleBar+'</div>';
+const dlg='<div class="scrim"></div><div class="dlg" role="alertdialog"><h4>Leave the chat?</h4><p>Your conversation and the message you were typing will be cleared. Tap a verse in an answer to read it and keep your chat.</p><div class="acts"><span class="btn primary">Stay in the chat</span><span class="btn ghost">Leave and clear</span></div></div>';
+const sht='<div class="scrim"></div><div class="sht" role="alertdialog"><div class="grab"></div><h4>Leave the chat?</h4><p>Your conversation and the message you were typing will be cleared. Tap a verse in an answer to read it and keep your chat.</p><div class="acts"><span class="btn primary">Stay in the chat</span><span class="btn ghost">Leave and clear</span></div></div>';
+const toast='<div class="toast" role="status"><span>Chat cleared</span><span class="undo">Undo</span></div>';
+const sets=[
+ ['1. Dialog','Tapped Bible. The dialog asks first.',chat(dlg)],
+ ['2. Bottom sheet','Tapped Bible. The sheet asks first.',chat(sht)],
+ ['3. Undo toast','Landed in the Bible. The chat is already cleared, Undo brings it back for 6 seconds.',reader(toast)]
+];
+let h='';
+for(const [t,c,body] of sets){
+ h+='<h3 style="margin:28px 0 0">'+t+'</h3><div class="row">';
+ for(const [cls,l] of [['','Light'],['night','Dark']])
+  h+='<figure><div class="phone '+cls+'">'+body+'</div><figcaption><span class="newtag">'+l+'</span>'+c+'</figcaption></figure>';
+ h+='</div>';
+}
+document.getElementById('g').innerHTML=h;
+</script>
+<h2>H. Auto-hiding bar while reading (proposal)</h2>
+<p class="lead">On the devotional and the Bible reader the bar slides off the bottom when you scroll down, and slides back on the slightest scroll up. First the devotional and the Bible reader, the other pages after, the chat later. Phones only; desktop is unchanged.</p>
+<table class="cmp"><tr><th>When</th><th>Bar</th><th>Why</th></tr>
+<tr><td>At the very top of the page</td><td>Shown</td><td>Nothing to read past yet, and the bar is how a new visitor finds the other places</td></tr>
+<tr><td>Scrolling down more than about 40px</td><td>Slides down and out (200ms)</td><td>Gives the text the whole screen. 40px so a small wobble does not hide it</td></tr>
+<tr><td>Any scroll up</td><td>Slides back in (200ms)</td><td>Softens the discoverability risk: a visitor who scrolls straight down finds the bar the moment they scroll back</td></tr>
+<tr><td>At the end of the page or chapter</td><td>Shown</td><td>The end is where the next step belongs (Next chapter, the other places)</td></tr>
+<tr><td>Focus moves into the bar</td><td>Shown</td><td>Keyboard and screen reader users must never land on something they cannot see. While hidden the bar is inert</td></tr>
+<tr><td>Reduced motion</td><td>No slide, it just appears and disappears</td><td>prefers-reduced-motion</td></tr>
+<tr><td>The page</td><td>Keeps its bottom padding</td><td>Nothing jumps when the bar hides, so no layout shift. The Undo toast follows the bar</td></tr></table>
+<style>
+.hint-arrow{position:absolute;right:10px;top:50%;z-index:3;width:30px;height:60px;border-radius:15px;background:rgba(0,0,0,.28);color:#fff;display:grid;place-items:center;font:700 16px system-ui}
+.long p{font:17px/1.7 Georgia,serif;margin:0 0 14px}
+.long{padding:14px 16px;flex:1;overflow:hidden;position:relative}
+.long h5{font:700 22px/1.2 "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 8px;color:var(--accent-ink)}
+.bar-slot{position:relative;flex:none;height:92px}
+.bar-slot.gone{height:0}
+.mid-slide{transform:translateY(46px)}
+.shrunk{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4}
+.shrunk .nb-btn{position:static;width:48px;height:48px;box-shadow:0 3px 10px rgba(0,0,0,.3);border:3px solid var(--surface)}
+.shrunk .nb-btn svg{width:24px;height:24px}
+.shrunk-note{position:absolute;left:0;right:0;bottom:66px;text-align:center;font:600 12px system-ui;color:var(--muted)}
+.sbar{position:absolute;right:3px;width:4px;border-radius:2px;background:rgba(128,128,128,.55);z-index:3}
+</style>
+<div id="h"></div>
+<script>
+const para = 'The night watch knows the dark will end, but only because the sun has risen before. Hope is not a feeling that the wave will be small. It is the memory of every morning the water went flat and gold.';
+const topText = '<div class="eyebrow">Advent &middot; 2 of 5</div><h3 style="font:700 34px/1.1 \'Barlow Condensed\',\'Arial Narrow\',system-ui;margin:4px 0 10px;text-transform:uppercase">The long wait</h3><p>' + para + '</p><p>' + para + '</p>';
+const midText = '<p>' + para + '</p><h5>The word</h5><p>' + para + '</p><p>' + para + '</p><p>' + para + '</p>';
+const endText = '<p>' + para + '</p><h5>Pray</h5><p>Father, help me wait well. Amen.</p><p style="color:var(--muted);font-size:14px">Scripture quotations are from the ESV. See the footer for the full notice.</p>';
+const bibleText = '<div class="pbtn"><span>John 3</span><span>&#9662;</span></div><p class="vtext" style="margin-top:12px"><sup>16</sup>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life. <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him. <sup>18</sup>He who believes in him is not judged. He who doesn&rsquo;t believe has been judged already.</p>';
+const bibleMid = '<p class="vtext"><sup>19</sup>This is the judgement, that the light has come into the world, and men loved the darkness rather than the light, for their works were evil. <sup>20</sup>For everyone who does evil hates the light, and doesn&rsquo;t come to the light, lest his works would be exposed. <sup>21</sup>But he who does the truth comes to the light, that his works may be revealed.</p>';
+const downHint = '<span class="hint-arrow">&darr;</span>';
+const upHint = '<span class="hint-arrow">&uarr;</span>';
+const sb = (top, h) => '<span class="sbar" style="top:' + top + 'px;height:' + h + 'px"></span>';
+const siteBar = (cls) => '<div class="bar-slot"><div class="' + (cls || '') + '"><div class="nbar">' + bg + '<span class="cb prev tab on">' + dev + 'Devotional</span><span class="cb next tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Ask the Word</span><span class="nb-btn" style="top:7px">' + bib + '</span><span class="nb-lbl" style="top:66px">Bible</span></div></div></div>';
+const readerBar = (cls) => '<div class="bar-slot"><div class="' + (cls || '') + '"><div class="nbar">' + bg + '<span class="cb prev"><span class="t">&larr; John 2</span></span><span class="cb next"><span class="t">John 4 &rarr;</span></span><span class="nb-btn" style="top:7px">' + surf + '</span><span class="nb-lbl" style="top:66px">Shore</span></div></div></div>';
+const noBar = '<div class="bar-slot gone"></div>';
+const shrink = '<div class="shrunk"><span class="nb-btn">' + bib + '</span></div>';
+const dev_ = (text, bar, extra) => stat + topbar + '<div class="long">' + text + (extra || '') + '</div>' + bar;
+const bible_ = (text, bar, extra) => stat + topbar + '<div class="long">' + text + (extra || '') + '</div>' + bar;
+const rows = [
+ ['Devotional, light', '', [
+  ['1. At the top', 'The bar is shown.', dev_(topText, siteBar(), sb(8, 90))],
+  ['2. Scrolling down', 'The bar has slid off. The text has the whole screen.', dev_(midText, noBar, downHint + sb(120, 90))],
+  ['3. Scroll up, a little', 'It starts sliding back at once (mid-slide, 200ms).', dev_(midText, siteBar('mid-slide'), upHint + sb(120, 90))],
+  ['4. Scrolled up', 'The bar is back where it was.', dev_(midText, siteBar(), sb(120, 90))],
+  ['5. End of the page', 'Shown at the end, whichever way the visitor arrived.', dev_(endText, siteBar(), sb(250, 90))]
+ ]],
+ ['Devotional, dark', 'night', [
+  ['Scrolling down', 'Hidden.', dev_(midText, noBar, downHint + sb(120, 90))],
+  ['Scroll up, mid-slide', 'Returning.', dev_(midText, siteBar('mid-slide'), upHint + sb(120, 90))],
+  ['Scrolled up', 'Shown.', dev_(midText, siteBar(), sb(120, 90))]
+ ]],
+ ['Bible reader, light', '', [
+  ['Scrolling down', 'The chapter bar slides off too, so the verses get the whole screen.', bible_(bibleText + bibleMid, noBar, downHint + sb(120, 90))],
+  ['Scroll up, mid-slide', 'Previous, Shore and Next slide back.', bible_(bibleText + bibleMid, readerBar('mid-slide'), upHint + sb(120, 90))],
+  ['Scrolled up', 'Shown.', bible_(bibleText + bibleMid, readerBar(), sb(120, 90))]
+ ]],
+ ['Bible reader, dark', 'night', [
+  ['Scrolling down', 'Hidden.', bible_(bibleText + bibleMid, noBar, downHint + sb(120, 90))],
+  ['Scrolled up', 'Shown.', bible_(bibleText + bibleMid, readerBar(), sb(120, 90))]
+ ]],
+ ['Alternative: shrink to the round button (instead of hiding it all)', '', [
+  ['Devotional, light', 'A smaller round Bible button stays, so the bar is never fully gone. It floats over the text at the bottom centre, so it hides a line or two while you read.', dev_(midText, noBar, downHint + sb(120, 90) + shrink)],
+  ['Bible reader, light', 'In the reader the chapter buttons would be gone, so this variant fits the devotional better.', bible_(bibleText + bibleMid, noBar, downHint + sb(120, 90) + shrink)]
+ ]],
+ ['Alternative, dark', 'night', [
+  ['Devotional, dark', 'Same, in Night swell.', dev_(midText, noBar, downHint + sb(120, 90) + shrink)]
+ ]]
+];
+let hh = '';
+for (const [title, cls, frames] of rows) {
+  hh += '<h3 style="margin:28px 0 0">' + title + '</h3><div class="row">';
+  for (const [t, c, body] of frames) hh += '<figure><div class="phone ' + cls + '">' + body + '</div><figcaption><b>' + t + '.</b> ' + c + '</figcaption></figure>';
+  hh += '</div>';
+}
+hh += '<h3 style="margin:28px 0 0">The risk, and what softens it</h3><ul class="notes"><li>A first-time visitor who scrolls straight down may never see the bar, and so not know the other places exist until they scroll up.</li><li>It returns on the slightest scroll up, and always at the top and the end of the page, so the first scroll back up reveals it.</li><li>The Subscribe button and the menu in the header stay as they are, so the main ways on are always on screen.</li><li>If real phone testing shows people do not find it, the alternative above (a small round button that stays) is a fallback.</li></ul>';
+document.getElementById('h').innerHTML = hh;
+</script>
+</body></html>

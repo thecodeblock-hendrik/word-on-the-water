@@ -100,7 +100,7 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 | K10 | The sync stops working and the retention job then deletes pending rows, including people who confirmed in Kit | The sync runs at 03:00 UTC, before retention at 03:30; Kit still holds the real list and its own confirmation record; a failed run changes nothing and the next run repeats it; the first-week check in production_checklist.md Part J looks for `kit_synced` every day | Open: add an alert on a missing or failing sync, and the Kit auth-failure alert (PLAN.md 1.3, runbooks/alerts.md) |
 | K11 | A stranger signs up other people's addresses through Kit's own hosted form page, which skips our Turnstile, honeypot and rate limits, and each address gets a confirmation email from our sender | The page's address is not in the repository and is sent only to individual returning readers; Invisible reCAPTCHA is on for that form (2026-11-21); double opt-in means nothing is sent to anyone who does not confirm; auto-confirm is off; our own site never uses the hosted page | Done; residual risk is the address leaking (the page sends data to Google through reCAPTCHA, see privacy.md) |
 
-### New in the Got Questions chat (step 1.10, built behind `CHAT_ENABLED`)
+### New in the Ask the Word chat (step 1.10, built behind `CHAT_ENABLED`)
 
 A visitor types free text; the API answers from a local knowledge base. No model, no third party, nothing stored (ADR 0009).
 

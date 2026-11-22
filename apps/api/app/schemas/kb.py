@@ -1,4 +1,4 @@
-"""Models for the Got Questions knowledge base (`app/data/faith_kb.json`).
+"""Models for the Ask the Word knowledge base (`app/data/faith_kb.json`).
 
 The whole file is validated when it loads: references resolve, counts match the
 meta block and no answer text contains HTML.

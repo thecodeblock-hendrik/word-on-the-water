@@ -6,38 +6,55 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { ChatInput } from "@/components/chat/chat-input";
 import { Chip } from "@/components/chat/chip";
 import { TopicBrowser } from "@/components/chat/topic-browser";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { MessageList } from "@/components/chat/message-list";
 import { useChat } from "@/components/chat/use-chat";
+import { useKeyboardOpen } from "@/components/chat/use-keyboard-open";
 import { chat } from "@/content/chat";
+import { stashCleared } from "@/lib/chat/cleared";
+import { clearChatReturn } from "@/lib/chat/return";
+import { isPhoneScreen } from "@/lib/chat/screen";
 import type { ChatTurn } from "@/lib/chat/submit";
+import type { Thread } from "@/lib/chat/thread";
 
 const headerButton =
   "inline-flex min-h-11 items-center justify-center rounded-sm px-3 font-ui text-[15px] font-semibold text-ink";
 
 /**
- * Got Questions: a right-hand drawer from lg, a full-height sheet below. Chips send entry ids, so
+ * Ask the Word: a right-hand drawer from lg, a full-height sheet below. Chips send entry ids, so
  * they always work; typed text goes through the API's guards. Loaded on first use.
  */
 export function ChatPanel({
   open,
   onOpenChange,
   bibleLinks = false,
+  devotionalHref,
+  initialThread,
+  initialDraft = "",
   returnFocusTo,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Link key verses to the Bible reader (only when it is switched on). */
   bibleLinks?: boolean;
+  /** The current devotional's address; with it, a phone shows the bottom bar under the chat. */
+  devotionalHref?: string;
+  /** A thread to start from instead of the one in this tab's storage (Undo brings one back). */
+  initialThread?: Thread;
+  /** Text to start the question box with (Undo brings back a draft). */
+  initialDraft?: string;
   /** Where focus goes on close. Safari does not focus a button on click, so the opener is told. */
   returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
-  const { thread, shown, pending, ask, clear } = useChat();
-  const [text, setText] = useState("");
+  const { thread, shown, pending, ask, clear } = useChat(initialThread);
+  const [text, setText] = useState(initialDraft);
   const [error, setError] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const keyboardOpen = useKeyboardOpen();
 
   useEffect(() => {
     const box = scroller.current;
@@ -46,6 +63,22 @@ export function ChatPanel({
     const reply = box.querySelector<HTMLElement>("[data-latest-reply]");
     box.scrollTop = reply ? reply.offsetTop - box.offsetTop - 8 : box.scrollHeight;
   }, [shown]);
+
+  /** On a phone, leaving the chat clears it. What was there is kept in memory for Undo. */
+  function leave() {
+    if (!isPhoneScreen()) return;
+    if (thread.length > 0 || text.trim()) stashCleared({ thread, draft: text });
+    clear();
+    setText("");
+    setError(null);
+    setBrowsing(false);
+    clearChatReturn();
+  }
+
+  function changeOpen(next: boolean) {
+    if (!next) leave();
+    onOpenChange(next);
+  }
 
   async function send(turn: ChatTurn, display: string, restore?: string) {
     setError(null);
@@ -74,21 +107,24 @@ export function ChatPanel({
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={changeOpen}>
       <Dialog.Portal>
         <Dialog.Overlay data-testid="chat-overlay" className="fixed inset-0 z-50 bg-deep/60" />
         <Dialog.Content
+          ref={content}
           aria-describedby={undefined}
           onOpenAutoFocus={(event) => {
             event.preventDefault();
             opener.current = document.activeElement as HTMLElement | null;
-            input.current?.focus();
+            // On a phone, focusing the box opens the keyboard over the screen before the visitor has
+            // chosen to type; focus goes to the chat itself and they tap the box when ready.
+            (isPhoneScreen() ? content.current : input.current)?.focus();
           }}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             (returnFocusTo?.current ?? opener.current)?.focus();
           }}
-          className="fixed inset-0 z-50 flex h-dvh flex-col bg-bg pt-[env(safe-area-inset-top)] shadow-menu lg:left-auto lg:w-[28rem] lg:border-l lg:border-line"
+          className="fixed inset-0 z-50 flex h-dvh flex-col bg-bg outline-none pt-[env(safe-area-inset-top)] shadow-menu lg:left-auto lg:w-[28rem] lg:border-l lg:border-line"
         >
           <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
             <Dialog.Title className="font-display text-xl font-semibold uppercase tracking-[.05em]">
@@ -153,7 +189,15 @@ export function ChatPanel({
             error={error}
             followUp={thread.length > 0}
             inputRef={input}
+            aboveBar={Boolean(devotionalHref) && !keyboardOpen}
           />
+          {devotionalHref && !keyboardOpen && (
+            <BottomNav
+              variant="chat"
+              devotionalHref={devotionalHref}
+              onNavigate={() => changeOpen(false)}
+            />
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

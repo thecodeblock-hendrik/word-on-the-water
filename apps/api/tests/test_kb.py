@@ -1,4 +1,4 @@
-"""Loading and validating the Got Questions knowledge base."""
+"""Loading and validating the Ask the Word knowledge base."""
 
 import copy
 import json
