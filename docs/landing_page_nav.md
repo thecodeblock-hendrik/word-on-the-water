@@ -37,7 +37,7 @@ One branch and PR (for example `feat/bottom-nav`), tests first, one commit per s
 - [x] 7. Got Questions opens the chat through `openChat` (no navigation); existing launchers keep working.
 - [x] 8. Clear on close: closing the chat calls `clearThread` and `clearChatReturn`, and keeps the cleared thread and draft in memory for the undo. Following a verse link must not clear. Unit tests for both.
 - [x] 8a. `UndoToast` component: 8 second timer that pauses on focus, `role="status"`, Undo restores thread and draft and reopens the chat, nothing shown for an empty chat, memory dropped on timeout and when a new chat is opened. Unit tests for each, including Undo from the Bible reader and from the devotional page.
-- [ ] 9. Check scenario G: close the chat, open the Bible, no chat button; reopen the chat, empty starter.
+- [x] 9. Check scenario G: close the chat, open the Bible, no chat button; reopen the chat, empty starter. (Checked in a browser at 375px on 2026-11-22; the Shore button in the Bible is step 10, and step 12 automates this flow.)
 - [ ] 10. Bible reader: add the Shore (surfboard) middle button to the raised chapter bar, reuse the Your chat slot (Shore unless the visitor came from the chat). Tests for both states.
 - [ ] 11. Accessibility: labelled nav landmark, visible labels, focus order and ring, toast announced and not covering the bar, axe on every page that has the bar.
 - [ ] 12. E2E on iPhone SE, iPhone 13 and Pixel 7: each button goes where it should; chat to Bible to chat flow; close the chat then the Bible shows Shore; leave the chat, tap Undo, the thread and draft are back.
