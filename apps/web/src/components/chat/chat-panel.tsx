@@ -159,6 +159,7 @@ export function ChatPanel({
             error={error}
             followUp={thread.length > 0}
             inputRef={input}
+            aboveBar={Boolean(devotionalHref) && !keyboardOpen}
           />
           {devotionalHref && !keyboardOpen && (
             <BottomNav
