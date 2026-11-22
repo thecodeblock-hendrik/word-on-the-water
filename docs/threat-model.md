@@ -99,7 +99,7 @@ Actors considered: anonymous internet attacker, abusive bot or spammer, a visito
 | K9 | The daily Kit sync reads every subscriber address with the Kit API key, and the route is called by someone else | Read-only `GET` to Kit with the same Sensitive key as K1 and K2; `/cron/sync-kit` needs `CRON_SECRET` (401 otherwise, tested); it logs counts only, never an address (tested); it updates rows we already have and creates none; it exists because Kit's webhooks need a paid plan (ADR 0008) | Done |
 | K10 | The sync stops working and the retention job then deletes pending rows, including people who confirmed in Kit | The sync runs at 03:00 UTC, before retention at 03:30; Kit still holds the real list and its own confirmation record; a failed run changes nothing and the next run repeats it; the first-week check in production_checklist.md Part J looks for `kit_synced` every day | Open: add an alert on a missing or failing sync, and the Kit auth-failure alert (PLAN.md 1.3, runbooks/alerts.md) |
 
-### New in the Got Questions chat (step 1.10, built behind `CHAT_ENABLED`)
+### New in the Ask the Word chat (step 1.10, built behind `CHAT_ENABLED`)
 
 A visitor types free text; the API answers from a local knowledge base. No model, no third party, nothing stored (ADR 0009).
 
