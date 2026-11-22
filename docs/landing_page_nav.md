@@ -35,7 +35,7 @@ One branch and PR (for example `feat/bottom-nav`), tests first, one commit per s
 - [x] 6. Mount the bar on the landing page, the devotional page, privacy, thank you and not found; hide it from `lg` up. Add bottom padding so it never covers content or the footer.
 - [x] 7a. Chat screen on phones: floating input pill, bar below it, bar hidden while the keyboard is open (test with the visual viewport), thread scrolls above the pill.
 - [x] 7. Got Questions opens the chat through `openChat` (no navigation); existing launchers keep working.
-- [ ] 8. Clear on close: closing the chat calls `clearThread` and `clearChatReturn`, and keeps the cleared thread and draft in memory for the undo. Following a verse link must not clear. Unit tests for both.
+- [x] 8. Clear on close: closing the chat calls `clearThread` and `clearChatReturn`, and keeps the cleared thread and draft in memory for the undo. Following a verse link must not clear. Unit tests for both.
 - [ ] 8a. `UndoToast` component: 8 second timer that pauses on focus, `role="status"`, Undo restores thread and draft and reopens the chat, nothing shown for an empty chat, memory dropped on timeout and on the next navigation. Unit tests for each, including Undo from the Bible reader and from the devotional page.
 - [ ] 9. Check scenario G: close the chat, open the Bible, no chat button; reopen the chat, empty starter.
 - [ ] 10. Bible reader: add the Shore (surfboard) middle button to the raised chapter bar, reuse the Your chat slot (Shore unless the visitor came from the chat). Tests for both states.

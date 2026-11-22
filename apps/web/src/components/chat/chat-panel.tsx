@@ -11,6 +11,9 @@ import { MessageList } from "@/components/chat/message-list";
 import { useChat } from "@/components/chat/use-chat";
 import { useKeyboardOpen } from "@/components/chat/use-keyboard-open";
 import { chat } from "@/content/chat";
+import { stashCleared } from "@/lib/chat/cleared";
+import { clearChatReturn } from "@/lib/chat/return";
+import { isPhoneScreen } from "@/lib/chat/screen";
 import type { ChatTurn } from "@/lib/chat/submit";
 
 const headerButton =
@@ -53,6 +56,22 @@ export function ChatPanel({
     box.scrollTop = reply ? reply.offsetTop - box.offsetTop - 8 : box.scrollHeight;
   }, [shown]);
 
+  /** On a phone, leaving the chat clears it. What was there is kept in memory for Undo. */
+  function leave() {
+    if (!isPhoneScreen()) return;
+    if (thread.length > 0 || text.trim()) stashCleared({ thread, draft: text });
+    clear();
+    setText("");
+    setError(null);
+    setBrowsing(false);
+    clearChatReturn();
+  }
+
+  function changeOpen(next: boolean) {
+    if (!next) leave();
+    onOpenChange(next);
+  }
+
   async function send(turn: ChatTurn, display: string, restore?: string) {
     setError(null);
     const failure = await ask(turn, display);
@@ -80,7 +99,7 @@ export function ChatPanel({
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={changeOpen}>
       <Dialog.Portal>
         <Dialog.Overlay data-testid="chat-overlay" className="fixed inset-0 z-50 bg-deep/60" />
         <Dialog.Content
@@ -165,7 +184,7 @@ export function ChatPanel({
             <BottomNav
               variant="chat"
               devotionalHref={devotionalHref}
-              onNavigate={() => onOpenChange(false)}
+              onNavigate={() => changeOpen(false)}
             />
           )}
         </Dialog.Content>
