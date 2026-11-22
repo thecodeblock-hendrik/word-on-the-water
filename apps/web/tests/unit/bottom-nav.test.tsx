@@ -49,6 +49,21 @@ describe("BottomNav on the site pages", () => {
   });
 });
 
+describe("BottomNav current page", () => {
+  it("marks Devotional as the current page, in the accent colour", () => {
+    render(<BottomNav devotionalHref="/devotionals/advent-01" current="devotional" />);
+    const link = screen.getByRole("link", { name: "Devotional" });
+    expect(link).toHaveAttribute("aria-current", "page");
+    expect(link.className).toMatch(/\bborder-accent-ink\b/);
+    expect(link.className).toMatch(/\btext-accent-ink\b/);
+  });
+
+  it("marks nothing as current by default", () => {
+    site();
+    expect(screen.getByRole("navigation").querySelector("[aria-current]")).toBeNull();
+  });
+});
+
 describe("BottomNav on the chat screen", () => {
   it("swaps Got Questions for Shore, which goes to the landing page", () => {
     render(<BottomNav devotionalHref="/devotionals/advent-01" variant="chat" />);

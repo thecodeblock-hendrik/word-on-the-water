@@ -12,6 +12,7 @@ const LINE = "M0 29C9.5 29 8.5 1.5 18 1.5H86C95.5 1.5 94.5 29 104 29";
 const side =
   "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-sm border-[1.5px] px-1 text-center font-ui text-xs font-semibold leading-[14px]";
 const outlined = "border-line bg-bg text-ink hover:border-accent";
+const here = "border-accent-ink bg-bg text-accent-ink";
 const filled = "border-accent-ink bg-accent-ink text-bg hover:brightness-110";
 
 /**
@@ -22,8 +23,11 @@ const filled = "border-accent-ink bg-accent-ink text-bg hover:brightness-110";
 export function BottomNav({
   devotionalHref,
   variant = "site",
+  current,
 }: {
   devotionalHref: string;
+  /** The page the visitor is on, shown by colour and `aria-current`. */
+  current?: "devotional";
   variant?: "site" | "chat";
 }) {
   return (
@@ -31,7 +35,11 @@ export function BottomNav({
       aria-label={bottomNav.landmark}
       className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-surface pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
     >
-      <Link href={devotionalHref} className={`${side} ${outlined}`}>
+      <Link
+        href={devotionalHref}
+        aria-current={current === "devotional" ? "page" : undefined}
+        className={`${side} ${current === "devotional" ? here : outlined}`}
+      >
         <DevotionalIcon className="size-5" />
         {bottomNav.devotional}
       </Link>

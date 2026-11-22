@@ -31,7 +31,7 @@ One branch and PR (for example `feat/bottom-nav`), tests first, one commit per s
 - [x] 2. Content: add the labels (Devotional, Bible, Got Questions) to the typed content files.
 - [x] 3. Current devotional link: a helper that returns the latest published devotional URL (unit test, with `DEVOTIONAL_TODAY`).
 - [x] 4. `BottomNav` component: the raised-tab bar (SVG curve, 56px round button, two bordered side buttons, 44px targets, safe-area inset, fixed height). Unit tests.
-- [ ] 5. Current page state: Devotional is accent coloured on the devotional page (`aria-current="page"`).
+- [x] 5. Current page state: Devotional is accent coloured on the devotional page (`aria-current="page"`).
 - [ ] 6. Mount the bar on the landing page, the devotional page, privacy, thank you and not found; hide it from `lg` up. Add bottom padding so it never covers content or the footer.
 - [ ] 7a. Chat screen on phones: floating input pill, bar below it, bar hidden while the keyboard is open (test with the visual viewport), thread scrolls above the pill.
 - [ ] 7. Got Questions opens the chat through `openChat` (no navigation); existing launchers keep working.
