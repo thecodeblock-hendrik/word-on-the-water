@@ -2,6 +2,8 @@
 
 Status: investigating (2026-11-22, branch `prayer_crew`). Nothing is built and no date is set. Decisions so far are in "Decisions" below; only this file and [ADR 0012](adr/0012-prayer-crews.md) are written. The other documents are updated when the feature is approved.
 
+Mockups of the whole flow: [design/prayer_crew_design.html](design/prayer_crew_design.html).
+
 The old public prayer request form (PLAN.md 1.4) **stays** as a separate, later feature: it is for visitors without a crew. Prayer requests from the form go to `prayer@wordonthewater.net` and general messages go to `hello@wordonthewater.net`. The crew feature does not replace it.
 
 ## The idea

@@ -1,6 +1,6 @@
 # Prayer crew: build checklist
 
-Design: [prayer_crew.md](prayer_crew.md). Decision: [ADR 0012](adr/0012-prayer-crews.md). Status: **proposed, not started, no date** (2026-11-22). Do not start before Hendrik approves and the launch work in [production_checklist.md](production_checklist.md) is done.
+Design: [prayer_crew.md](prayer_crew.md), mockups: [design/prayer_crew_design.html](design/prayer_crew_design.html). Decision: [ADR 0012](adr/0012-prayer-crews.md). Status: **proposed, not started, no date** (2026-11-22). Do not start before Hendrik approves and the launch work in [production_checklist.md](production_checklist.md) is done.
 
 ## How to work through this list
 
