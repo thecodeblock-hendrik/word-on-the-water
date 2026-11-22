@@ -3,7 +3,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import { warmChat } from "@/lib/actions/chat";
-import { OPEN_CHAT } from "@/lib/chat/open";
+import { type Cleared, dropCleared } from "@/lib/chat/cleared";
+import { OPEN_CHAT, RESTORE_CHAT } from "@/lib/chat/open";
+import { saveThread } from "@/lib/chat/storage";
 import { cameBackByHistory, chatReturnUrl, clearChatReturn } from "@/lib/chat/return";
 
 // The panel is a separate chunk, fetched on the first request to open it, so page JS stays small.
@@ -24,6 +26,7 @@ export function ChatHost({
 }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [restored, setRestored] = useState({ count: 0, draft: "" });
   const opener = useRef<HTMLElement | null>(null);
   const warmed = useRef(false);
 
@@ -31,6 +34,7 @@ export function ChatHost({
     function onOpen(event: Event) {
       opener.current = (event as CustomEvent<HTMLElement | null>).detail;
       clearChatReturn();
+      dropCleared();
       if (!warmed.current) {
         warmed.current = true;
         void warmChat();
@@ -40,6 +44,18 @@ export function ChatHost({
     }
     window.addEventListener(OPEN_CHAT, onOpen);
 
+    // Undo: the panel is rebuilt around the chat that was cleared.
+    function onRestore(event: Event) {
+      const { thread, draft } = (event as CustomEvent<Cleared>).detail;
+      opener.current = null;
+      clearChatReturn();
+      saveThread(thread);
+      setRestored((r) => ({ count: r.count + 1, draft }));
+      setLoaded(true);
+      setOpen(true);
+    }
+    window.addEventListener(RESTORE_CHAT, onRestore);
+
     // The browser's Back button returning to the page the chat was on.
     const backOnChatPage =
       cameBackByHistory() && chatReturnUrl() === `${location.pathname}${location.search}`;
@@ -47,13 +63,18 @@ export function ChatHost({
       clearChatReturn();
       onOpen(new CustomEvent(OPEN_CHAT, { detail: null }));
     }
-    return () => window.removeEventListener(OPEN_CHAT, onOpen);
+    return () => {
+      window.removeEventListener(OPEN_CHAT, onOpen);
+      window.removeEventListener(RESTORE_CHAT, onRestore);
+    };
   }, []);
 
   if (!loaded) return null;
   return (
     <Suspense fallback={null}>
       <ChatPanel
+        key={restored.count}
+        initialDraft={restored.draft}
         open={open}
         onOpenChange={setOpen}
         bibleLinks={bibleLinks}

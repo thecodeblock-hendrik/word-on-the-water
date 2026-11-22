@@ -19,7 +19,7 @@ Mockups: [design/landing_nav.html](design/landing_nav.html) (New A raised tab, l
 - Devotional goes to the current devotional (`latestPublished`). Bible goes to `/bible` (resumes the remembered passage). Got Questions opens the chat in place.
 - Closing or exiting the chat (close button, Escape, scrim, or any bar button) clears the thread, the draft and the "came from the chat" flag at once, so the Bible shows Shore again and reopening the chat starts empty. There is no confirmation question (decided, option 3 in section G of the mockup).
 - Undo toast: if the chat had an answer or a draft, a toast "Chat cleared" with an Undo button shows for 8 seconds above the bar. Undo restores the thread and the draft and reopens the chat over the current page. An empty chat leaves silently, with no toast.
-  - The cleared thread is held in a module-level variable for those 8 seconds only, never in `sessionStorage`, and dropped when the timer ends, on the next navigation or when a new chat starts.
+  - The cleared thread is held in a module-level variable for those 8 seconds only, never in `sessionStorage`, and dropped when the timer ends or when a new chat is opened the normal way. It is not dropped on navigation, because the toast has to show on the page the bar button leads to.
   - The toast has `role="status"`, pauses its timer while Undo has focus (WCAG 2.2.1), keeps a 44px target, sits above the bar so it never covers the raised middle button, and fades with no slide under `prefers-reduced-motion`.
 - Following a verse link from a chat answer to the Bible keeps the thread and the Your chat button.
 
@@ -36,7 +36,7 @@ One branch and PR (for example `feat/bottom-nav`), tests first, one commit per s
 - [x] 7a. Chat screen on phones: floating input pill, bar below it, bar hidden while the keyboard is open (test with the visual viewport), thread scrolls above the pill.
 - [x] 7. Got Questions opens the chat through `openChat` (no navigation); existing launchers keep working.
 - [x] 8. Clear on close: closing the chat calls `clearThread` and `clearChatReturn`, and keeps the cleared thread and draft in memory for the undo. Following a verse link must not clear. Unit tests for both.
-- [ ] 8a. `UndoToast` component: 8 second timer that pauses on focus, `role="status"`, Undo restores thread and draft and reopens the chat, nothing shown for an empty chat, memory dropped on timeout and on the next navigation. Unit tests for each, including Undo from the Bible reader and from the devotional page.
+- [x] 8a. `UndoToast` component: 8 second timer that pauses on focus, `role="status"`, Undo restores thread and draft and reopens the chat, nothing shown for an empty chat, memory dropped on timeout and when a new chat is opened. Unit tests for each, including Undo from the Bible reader and from the devotional page.
 - [ ] 9. Check scenario G: close the chat, open the Bible, no chat button; reopen the chat, empty starter.
 - [ ] 10. Bible reader: add the Shore (surfboard) middle button to the raised chapter bar, reuse the Your chat slot (Shore unless the visitor came from the chat). Tests for both states.
 - [ ] 11. Accessibility: labelled nav landmark, visible labels, focus order and ring, toast announced and not covering the bar, axe on every page that has the bar.

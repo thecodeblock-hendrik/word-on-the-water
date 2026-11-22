@@ -28,6 +28,7 @@ export function ChatPanel({
   onOpenChange,
   bibleLinks = false,
   devotionalHref,
+  initialDraft = "",
   returnFocusTo,
 }: {
   open: boolean;
@@ -36,11 +37,13 @@ export function ChatPanel({
   bibleLinks?: boolean;
   /** The current devotional's address; with it, a phone shows the bottom bar under the chat. */
   devotionalHref?: string;
+  /** Text to start the question box with (Undo brings back a draft). */
+  initialDraft?: string;
   /** Where focus goes on close. Safari does not focus a button on click, so the opener is told. */
   returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const { thread, shown, pending, ask, clear } = useChat();
-  const [text, setText] = useState("");
+  const [text, setText] = useState(initialDraft);
   const [error, setError] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);

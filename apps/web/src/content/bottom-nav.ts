@@ -5,4 +5,6 @@ export const bottomNav = {
   bible: "Bible",
   gotQuestions: "Got Questions",
   shore: "Shore",
+  cleared: "Chat cleared",
+  undo: "Undo",
 } as const;

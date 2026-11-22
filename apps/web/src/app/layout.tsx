@@ -5,6 +5,7 @@ import { Barlow, Barlow_Condensed, Lora } from "next/font/google";
 import { cookies } from "next/headers";
 
 import { ChatHost } from "@/components/chat/chat-host";
+import { UndoToast } from "@/components/chat/undo-toast";
 import { CspNonce } from "@/components/csp-nonce";
 import { LogoSprite } from "@/components/logo";
 import { BottomNavHost } from "@/components/layout/bottom-nav-host";
@@ -69,6 +70,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         {bottomNav && <BottomNavHost devotionalHref={devotionalHref} />}
+        {bottomNav && <UndoToast />}
         {isChatEnabled() && (
           <ChatHost
             bibleLinks={isBibleEnabled()}
