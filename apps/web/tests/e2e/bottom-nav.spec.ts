@@ -112,3 +112,110 @@ test("the undo toast is announced politely, is clear of the bar and has no serio
     await expect(page.getByRole("status", { includeHidden: true })).toBeEmpty();
   }
 });
+
+// The latest published devotional on the pinned test day (5 December 2026).
+const DEVOTIONAL = "/devotionals/advent-02-the-long-wait";
+const bar = (page: Page) => page.getByRole("navigation", { name: "Quick links" });
+const chatDialog = (page: Page) => page.getByRole("dialog", { name: "Got Questions" });
+
+async function openChatFromBar(page: Page, path = "/") {
+  await page.goto(`${CHAT}${path}`);
+  await bar(page).getByText("Got Questions").click();
+  await expect(chatDialog(page)).toBeVisible();
+  return chatDialog(page);
+}
+
+async function askJesus(page: Page) {
+  const dialog = chatDialog(page);
+  await dialog.getByRole("button", { name: "Who is Jesus?" }).click();
+  await expect(dialog.getByText("Short answer 2.1.")).toBeVisible();
+  return dialog;
+}
+
+test.describe("where each button goes", () => {
+  test("Devotional, Bible and Got Questions on the landing page", async ({ page }) => {
+    await page.goto(`${CHAT}/`);
+    await bar(page).getByRole("link", { name: "Devotional" }).click();
+    await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
+    await expect(bar(page).getByRole("link", { name: "Devotional" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+
+    await bar(page).getByRole("link", { name: "Bible" }).click();
+    await expect(page).toHaveURL(/\/bible\/[a-z]+\/[a-z0-9-]+\/\d+/);
+    await expect(page.getByRole("link", { name: "Shore" })).toBeVisible();
+
+    await page.getByRole("link", { name: "Shore" }).click();
+    await expect(page).toHaveURL(`${CHAT}/`);
+
+    await bar(page).getByText("Got Questions").click();
+    await expect(chatDialog(page)).toBeVisible();
+    await expect(page).toHaveURL(`${CHAT}/`);
+  });
+
+  for (const [name, target] of [
+    ["Devotional", DEVOTIONAL],
+    ["Bible", "/bible/"],
+    ["Shore", "/"],
+  ] as const) {
+    test(`${name} on the chat screen leaves the chat and goes there`, async ({ page }) => {
+      const dialog = await openChatFromBar(page, "/privacy");
+      await dialog.getByRole("link", { name, exact: true }).click();
+      await expect(chatDialog(page)).toHaveCount(0);
+      await expect(page).toHaveURL(new RegExp(`${CHAT}${target}`));
+    });
+  }
+});
+
+test.describe("the chat, the Bible and back", () => {
+  test("a verse keeps the chat, Your chat brings it back, closing it makes the Bible show Shore, and a new chat starts empty", async ({
+    page,
+  }) => {
+    const dialog = await openChatFromBar(page);
+    await askJesus(page);
+    await dialog.getByRole("link", { name: "John 3:16" }).click();
+    await expect(page).toHaveURL(/\/bible\/web\/john\/3\?v=16/);
+
+    const yourChat = page.getByRole("button", { name: "Your chat", exact: true });
+    await expect(yourChat).toBeVisible();
+    await expect(page.getByRole("link", { name: "Shore" })).toHaveCount(0);
+
+    await yourChat.click();
+    await expect(chatDialog(page).getByText("Short answer 2.1.")).toBeVisible();
+    await chatDialog(page).getByRole("button", { name: "Close" }).click();
+    await expect(chatDialog(page)).toHaveCount(0);
+
+    await expect(page.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Shore" })).toBeVisible();
+
+    await page.getByRole("link", { name: "Shore" }).click();
+    await bar(page).getByText("Got Questions").click();
+    await expect(chatDialog(page).getByRole("button", { name: "Who is Jesus?" })).toBeVisible();
+    await expect(chatDialog(page).getByText("Short answer 2.1.")).toHaveCount(0);
+  });
+
+  test("leaving by a bar button clears the chat, and Undo brings it back on the new page", async ({
+    page,
+  }) => {
+    const dialog = await openChatFromBar(page);
+    await askJesus(page);
+    await dialog.getByRole("link", { name: "Bible", exact: true }).click();
+    await expect(page).toHaveURL(/\/bible\//);
+
+    await expect(page.getByRole("status")).toContainText("Chat cleared");
+    await page.getByRole("button", { name: "Undo" }).click();
+    await expect(chatDialog(page).getByText("Short answer 2.1.")).toBeVisible();
+    await expect(chatDialog(page).getByText("Who is Jesus?").first()).toBeVisible();
+  });
+
+  test("without Undo the cleared chat is gone for good", async ({ page }) => {
+    const dialog = await openChatFromBar(page);
+    await askJesus(page);
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByRole("status")).toContainText("Chat cleared");
+    await bar(page).getByText("Got Questions").click();
+    await expect(chatDialog(page).getByText("Short answer 2.1.")).toHaveCount(0);
+    await expect(page.getByRole("status", { includeHidden: true })).toBeEmpty();
+  });
+});
