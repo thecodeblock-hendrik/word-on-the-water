@@ -42,7 +42,7 @@ One branch and PR (for example `feat/bottom-nav`), tests first, one commit per s
 - [x] 11. Accessibility: labelled nav landmark, visible labels, focus order and ring, toast announced and not covering the bar, axe on every page that has the bar.
 - [x] 12. E2E on iPhone SE, iPhone 13 and Pixel 7: each button goes where it should; chat to Bible to chat flow; close the chat then the Bible shows Shore; leave the chat, tap Undo, the thread and draft are back.
 - [x] 13. Performance: landing JS stays under 165 KB gzipped, CLS under 0.05. (Measured 2026-11-22 with the Bible and chat on: 163,396 bytes gzipped, 159.6 KiB; Lighthouse mobile 0.99, LCP 1.65 s, CLS 0.0002, TBT about 50 ms on the landing page and a devotional. The restore code lives in the lazy chat panel: a storage import in the always-loaded chat host once pulled zod in and took the page to 194 KB.)
-- [ ] 14. Light and dark check at 375px, then a real phone check (VoiceOver, TalkBack).
+- [ ] 14. Light and dark check at 375px, then a real phone check (VoiceOver, TalkBack). Done 2026-11-22: the 375px check in light and dark of the landing page, devotional, privacy, thank you, not found, the chat (empty and with an answer), the undo toast and the Bible reader (Shore and Your chat); nothing needed changing. Left for Hendrik: the real phone check (VoiceOver on iPhone, TalkBack on Android, and the keyboard hiding the bar in the chat).
 - [ ] 15. Docs: update CLAUDE.md (layout, Bible reader and chat sections) and PLAN.md.
 
 ## Open questions
