@@ -15,6 +15,7 @@ import { stashCleared } from "@/lib/chat/cleared";
 import { clearChatReturn } from "@/lib/chat/return";
 import { isPhoneScreen } from "@/lib/chat/screen";
 import type { ChatTurn } from "@/lib/chat/submit";
+import type { Thread } from "@/lib/chat/thread";
 
 const headerButton =
   "inline-flex min-h-11 items-center justify-center rounded-sm px-3 font-ui text-[15px] font-semibold text-ink";
@@ -28,6 +29,7 @@ export function ChatPanel({
   onOpenChange,
   bibleLinks = false,
   devotionalHref,
+  initialThread,
   initialDraft = "",
   returnFocusTo,
 }: {
@@ -37,12 +39,14 @@ export function ChatPanel({
   bibleLinks?: boolean;
   /** The current devotional's address; with it, a phone shows the bottom bar under the chat. */
   devotionalHref?: string;
+  /** A thread to start from instead of the one in this tab's storage (Undo brings one back). */
+  initialThread?: Thread;
   /** Text to start the question box with (Undo brings back a draft). */
   initialDraft?: string;
   /** Where focus goes on close. Safari does not focus a button on click, so the opener is told. */
   returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
-  const { thread, shown, pending, ask, clear } = useChat();
+  const { thread, shown, pending, ask, clear } = useChat(initialThread);
   const [text, setText] = useState(initialDraft);
   const [error, setError] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);

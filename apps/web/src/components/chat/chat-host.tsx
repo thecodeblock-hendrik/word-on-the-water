@@ -5,7 +5,6 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { warmChat } from "@/lib/actions/chat";
 import { type Cleared, dropCleared } from "@/lib/chat/cleared";
 import { OPEN_CHAT, RESTORE_CHAT } from "@/lib/chat/open";
-import { saveThread } from "@/lib/chat/storage";
 import { cameBackByHistory, chatReturnUrl, clearChatReturn } from "@/lib/chat/return";
 
 // The panel is a separate chunk, fetched on the first request to open it, so page JS stays small.
@@ -26,7 +25,7 @@ export function ChatHost({
 }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [restored, setRestored] = useState({ count: 0, draft: "" });
+  const [restored, setRestored] = useState<{ count: number } & Partial<Cleared>>({ count: 0 });
   const opener = useRef<HTMLElement | null>(null);
   const warmed = useRef(false);
 
@@ -49,8 +48,7 @@ export function ChatHost({
       const { thread, draft } = (event as CustomEvent<Cleared>).detail;
       opener.current = null;
       clearChatReturn();
-      saveThread(thread);
-      setRestored((r) => ({ count: r.count + 1, draft }));
+      setRestored((r) => ({ count: r.count + 1, thread, draft }));
       setLoaded(true);
       setOpen(true);
     }
@@ -74,6 +72,7 @@ export function ChatHost({
     <Suspense fallback={null}>
       <ChatPanel
         key={restored.count}
+        initialThread={restored.thread}
         initialDraft={restored.draft}
         open={open}
         onOpenChange={setOpen}

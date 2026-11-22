@@ -14,8 +14,8 @@ const errors: Record<string, string> = chat.errors;
  * The conversation state. The thread is kept in this tab only. A message is shown while it is
  * sent but saved only once answered, so a refused message (personal details) is never stored.
  */
-export function useChat() {
-  const [thread, setThread] = useState<Thread>(loadThread);
+export function useChat(initialThread?: Thread) {
+  const [thread, setThread] = useState<Thread>(() => initialThread ?? loadThread());
   const [outgoing, setOutgoing] = useState<string | null>(null);
   const [renderedAt] = useState(() => Date.now());
 
