@@ -51,14 +51,14 @@ describe("ChapterNav", () => {
     expect(link.className).toMatch(/min-w-0/);
   });
 
-  it("shows the full name, and the standard short name only on a phone while Your chat is showing", () => {
+  it("shows the full name, and the standard short name only on a phone while the middle button is showing", () => {
     const link = nav("1-thessalonians", 5).getByRole("link", { name: /^Previous chapter/ });
     const [full, short] = [...link.querySelectorAll(".truncate > span")] as HTMLElement[];
     expect(full.textContent).toBe("1 Thessalonians 4");
-    expect(full.className).toMatch(/group-has-\[\[data-chat-return\]\]\/nav:max-lg:hidden/);
+    expect(full.className).toMatch(/group-has-\[\[data-bar-middle\]\]\/nav:max-lg:hidden/);
     expect(short.textContent).toBe("1 Thess 4");
     expect(short.className).toMatch(/^hidden /);
-    expect(short.className).toMatch(/group-has-\[\[data-chat-return\]\]\/nav:max-lg:inline/);
+    expect(short.className).toMatch(/group-has-\[\[data-bar-middle\]\]\/nav:max-lg:inline/);
   });
 
   it("puts previous before next in reading order", () => {

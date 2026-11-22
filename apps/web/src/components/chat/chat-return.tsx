@@ -2,20 +2,18 @@
 
 import { useSyncExternalStore } from "react";
 
+import { ShoreButton } from "@/components/bible/shore-button";
+import { RaisedBump } from "@/components/layout/raised-bump";
 import { chat } from "@/content/chat";
 import { openChat } from "@/lib/chat/open";
 import { chatReturnUrl, clearChatReturn, subscribeChatReturn } from "@/lib/chat/return";
 
 const nothing = () => null;
 
-// The bar's top line rises in a smooth curve around the button and meets the line again (104 x 30,
-// the baseline is the bar's top border). The fill hides the border under the bump.
-const LINE = "M0 29C9.5 29 8.5 1.5 18 1.5H86C95.5 1.5 94.5 29 104 29";
-
 /**
  * The way back to the chat in the Bible reader (it opens the chat over the page, no navigation),
  * shown only to a visitor who came from the chat (a flag in this tab, so a shared link shows
- * nothing). On a phone it sits in the pinned chapter bar between Previous and Next: a round button
+ * nothing; everyone else gets the Shore button in the same place, from a phone up to lg). On a phone it sits in the pinned chapter bar between Previous and Next: a round button
  * with "Your chat" under it, inside a raised part of the bar whose top line curves around the
  * button. It is only 56px wide in the bar. From lg, where the chapter buttons sit under the text,
  * it is a tab fixed to the right edge at mid-height like a drawer handle (the chat opens from
@@ -23,21 +21,17 @@ const LINE = "M0 29C9.5 29 8.5 1.5 18 1.5H86C95.5 1.5 94.5 29 104 29";
  */
 export function ChatReturn() {
   const url = useSyncExternalStore(subscribeChatReturn, chatReturnUrl, nothing);
-  if (!url) return null;
+  if (!url) return <ShoreButton />;
   return (
     <div
       data-chat-return
+      data-bar-middle
       className="relative w-14 flex-none self-stretch lg:fixed lg:right-0 lg:top-1/2 lg:z-30 lg:w-12 lg:-translate-y-1/2 lg:self-auto lg:overflow-hidden lg:rounded-l-2xl lg:bg-ink lg:shadow-menu"
     >
-      <svg
+      <RaisedBump
         data-chat-bump
-        aria-hidden="true"
-        viewBox="0 0 104 30"
         className="absolute left-1/2 top-[-37.5px] h-[30px] w-[104px] -translate-x-1/2 lg:hidden"
-      >
-        <path d={`${LINE}V30H0Z`} className="fill-surface" />
-        <path d={LINE} className="fill-none stroke-line" strokeWidth="1" />
-      </svg>
+      />
       <button
         type="button"
         onClick={() => openChat(null)}

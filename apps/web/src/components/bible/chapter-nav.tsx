@@ -20,8 +20,8 @@ const shortName = (ref: ChapterRef) => `${findBook(ref.book)!.short} ${ref.chapt
 // so the full word is never cut off. Only the form that is shown (display: none is left out) is in
 // the link's name, so a spoken label ("Matt 15") matches what is on screen. (Not the `hidden`
 // attribute: Tailwind's base styles make it display: none !important, which nothing can override.)
-const SHOW_FULL = "group-has-[[data-chat-return]]/nav:max-lg:hidden";
-const SHOW_SHORT = "hidden group-has-[[data-chat-return]]/nav:max-lg:inline";
+const SHOW_FULL = "group-has-[[data-bar-middle]]/nav:max-lg:hidden";
+const SHOW_SHORT = "hidden group-has-[[data-bar-middle]]/nav:max-lg:inline";
 
 const Place = ({ to }: { to: ChapterRef }) => (
   <span className="min-w-0 truncate">

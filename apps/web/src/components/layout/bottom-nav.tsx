@@ -3,11 +3,8 @@ import Link from "next/link";
 import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { bottomNav } from "@/content/bottom-nav";
 
+import { RaisedBump } from "./raised-bump";
 import { BibleIcon, ChatIcon, DevotionalIcon, ShoreIcon } from "./bottom-nav-icons";
-
-// The top line rises in a smooth curve around the middle button and meets the line again (104 x 30,
-// the baseline is the bar's top border). The fill hides the border under the bump.
-const LINE = "M0 29C9.5 29 8.5 1.5 18 1.5H86C95.5 1.5 94.5 29 104 29";
 
 const side =
   "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-sm border-[1.5px] px-1 text-center font-ui text-xs font-semibold leading-[14px]";
@@ -49,15 +46,7 @@ export function BottomNav({
         {bottomNav.devotional}
       </Link>
       <div className="relative w-14 flex-none self-stretch">
-        <svg
-          data-bump
-          aria-hidden="true"
-          viewBox="0 0 104 30"
-          className="absolute left-1/2 top-[-37.5px] h-[30px] w-[104px] -translate-x-1/2"
-        >
-          <path d={`${LINE}V30H0Z`} className="fill-surface" />
-          <path d={LINE} className="fill-none stroke-line" strokeWidth="1" />
-        </svg>
+        <RaisedBump className="absolute left-1/2 top-[-37.5px] h-[30px] w-[104px] -translate-x-1/2" />
         <Link
           href="/bible"
           onClick={onNavigate}
