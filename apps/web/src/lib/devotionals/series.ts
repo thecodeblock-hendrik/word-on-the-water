@@ -14,6 +14,8 @@ const seriesSchema = z
     title: z.string().min(1),
     tagline: z.string().min(1),
     artAlt: z.string().min(1),
+    /** One or two sentences about the series, shown on the weekly devotional card on the landing page. */
+    description: z.string().min(1).max(160),
     /** The weekly email's header image: a file name in public/email (see docs/kit_email_devotional.md). */
     emailBanner: z
       .string()

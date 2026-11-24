@@ -8,6 +8,7 @@ import { loadContent } from "@/lib/devotionals/load";
 const series = `title: Advent
 tagline: waiting for the light
 artAlt: Alt.
+description: About the series.
 outline:
   - { number: 1, title: One, passage: "Psalm 130:5–6", date: 2026-12-05 }
   - { number: 2, title: Two, passage: "Luke 1:5–25", date: 2026-12-12 }

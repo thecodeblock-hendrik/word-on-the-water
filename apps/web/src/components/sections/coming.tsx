@@ -8,15 +8,17 @@ import type { Devotional } from "@/lib/devotionals/parse";
 import { reportRows } from "@/lib/devotionals/report";
 import type { Series } from "@/lib/devotionals/series";
 import { formatDate } from "@/lib/devotionals/format";
+import { WeeklyCard } from "@/components/sections/weekly-card";
 
 const eyebrow = "font-display text-sm font-semibold uppercase tracking-[.18em] text-accent-ink";
 const h3 = "font-display text-[1.35rem] font-semibold uppercase leading-[1.05] tracking-[.05em]";
 
-/** What is on the way, plus the latest devotional so readers can see what they will get. */
+/** The weekly devotional, the latest one so readers can see what they will get, then what is planned. */
 export function Coming({ devotional, series }: { devotional: Devotional; series: Series }) {
   const { meta } = devotional;
   const report = reportRows(devotional, series);
   const excerpt = devotional.sections[0].markdown.split("\n\n");
+  const [weekly, ...later] = coming.offers;
   return (
     <section id="coming" aria-labelledby="coming-h" className="py-10 md:py-[72px]">
       <div className="mx-auto max-w-[1120px] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
@@ -30,25 +32,7 @@ export function Coming({ devotional, series }: { devotional: Devotional; series:
           </h2>
           <p className="text-muted">{coming.intro}</p>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {coming.offers.map((offer) => (
-            <article
-              key={offer.title}
-              className="grid content-start gap-3 rounded-md border border-line bg-surface p-6"
-            >
-              <span className="flex items-center gap-2 font-ui text-xs font-semibold uppercase tracking-[.08em] text-muted">
-                <span aria-hidden="true" className="size-2 rounded-full bg-accent" />
-                <span>
-                  <PlaceholderText>{offer.status}</PlaceholderText>
-                </span>
-              </span>
-              <h3 className={h3}>{offer.title}</h3>
-              <p className="text-[.98rem] text-muted">
-                <PlaceholderText>{offer.body}</PlaceholderText>
-              </p>
-            </article>
-          ))}
-        </div>
+        <WeeklyCard offer={weekly} devotional={devotional} series={series} />
         <div
           role="region"
           aria-label="Devotional preview"
@@ -89,7 +73,29 @@ export function Coming({ devotional, series }: { devotional: Devotional; series:
             </Link>
           </div>
         </div>
+        <div className="mt-7 grid gap-5 md:grid-cols-2">
+          {later.map((offer) => (
+            <OfferCard key={offer.title} offer={offer} />
+          ))}
+        </div>
       </div>
     </section>
+  );
+}
+
+function OfferCard({ offer }: { offer: (typeof coming.offers)[number] }) {
+  return (
+    <article className="grid content-start gap-3 rounded-md border border-line bg-surface p-6">
+      <span className="flex items-center gap-2 font-ui text-xs font-semibold uppercase tracking-[.08em] text-muted">
+        <span aria-hidden="true" className="size-2 rounded-full bg-accent" />
+        <span>
+          <PlaceholderText>{offer.status}</PlaceholderText>
+        </span>
+      </span>
+      <h3 className={h3}>{offer.title}</h3>
+      <p className="text-[.98rem] text-muted">
+        <PlaceholderText>{offer.body}</PlaceholderText>
+      </p>
+    </article>
   );
 }

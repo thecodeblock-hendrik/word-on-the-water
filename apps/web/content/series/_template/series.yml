@@ -3,6 +3,8 @@
 title: Series name
 tagline: A few words under the name
 artAlt: Describe the illustration in one sentence.
+# One or two sentences, up to 160 characters, shown on the weekly devotional card on the landing page.
+description: What this series is about, in a sentence or two.
 # The planned weeks. Once a week's devotional.md exists, its own title, passage and date are used instead.
 outline:
   - { number: 1, title: First working title, passage: "Mark 4:35–41", date: 2027-01-09 }

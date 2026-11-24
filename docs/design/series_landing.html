@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Series on the landing page: mockups</title>
+<style>
+:root{--bg:#fbf3e8;--surface:#fffaf3;--ink:#2b2d42;--muted:#5c5e70;--line:#e9dccb;--accent:#d9703a;--accent-ink:#a9501f;--on-accent:#fff;--deep:#2b2d42;--on-deep:#fbf3e8;--on-deep-muted:#c4c3cf;--accent-on-deep:#f0955f}
+.night{--bg:#0f2233;--surface:#152c40;--ink:#f4f1ea;--muted:#a9b7c2;--line:#28425a;--accent:#4fa9a6;--accent-ink:#6fc0bc;--on-accent:#0a1825;--deep:#0a1825;--on-deep:#f4f1ea;--on-deep-muted:#9fb0bd;--accent-on-deep:#4fa9a6}
+*{box-sizing:border-box}
+body{margin:0;background:#e7e2da;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#2b2d42;padding:24px 16px 80px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:44px 0 4px}
+.lead{color:#5c5e70;margin:0 0 8px;max-width:78ch}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:14px}
+figure{margin:0}figcaption{font-size:13px;color:#4a4c5c;margin-top:8px;max-width:375px}
+.wide figcaption{max-width:1000px}
+.notes{max-width:78ch;font-size:14px;color:#3b3d4e}.notes li{margin:2px 0}
+
+/* frames: a slice of the landing page, What's coming only */
+.phone{width:375px;background:var(--bg);color:var(--ink);border-radius:30px;border:8px solid #111;overflow:hidden;padding:20px 16px 24px}
+.desk{width:1000px;max-width:100%;background:var(--bg);color:var(--ink);border:1px solid #b9b3a8;border-radius:10px;overflow:hidden;padding:36px 48px 40px}
+.head{display:grid;gap:6px;margin-bottom:22px}
+.eyebrow{font:700 12px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.head h3{font:600 34px/1.05 "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;letter-spacing:.04em;margin:0}
+.desk .head h3{font-size:42px}
+.head p{margin:0;color:var(--muted);font-size:15px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:6px;overflow:hidden}
+.stub{margin-top:16px;border:1px solid var(--line);border-radius:6px;height:54px;background:linear-gradient(var(--surface),var(--surface));display:flex;align-items:center;padding:0 16px;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.status{display:flex;align-items:center;gap:8px;font:600 12px system-ui;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.card h4{font:600 22px/1.05 "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;letter-spacing:.05em;margin:0}
+.card p{margin:0;font:15.5px/1.5 Georgia,serif;color:var(--muted)}
+.body{padding:22px;display:grid;gap:10px;align-content:start}
+.art{background:#2b2d42 center/cover no-repeat}
+.dawn{background-image:url("../../apps/web/content/series/advent/art-dawn-patrol.png")}
+.night .art{background-image:url("../../apps/web/content/series/advent/art-night-swell.png")}
+.serif{font-family:Georgia,serif}
+.link{font:600 14px system-ui;color:var(--accent-ink);text-decoration:underline;text-underline-offset:3px}
+
+/* week markers */
+.weeks{display:flex;gap:6px;flex-wrap:wrap}
+.wk{font:600 12px system-ui;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted);background:transparent}
+.wk.done{border-color:var(--accent);color:var(--accent-ink)}
+.wk.now{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.dots{display:flex;gap:6px;align-items:center}
+.dots b{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.dots b.done{background:var(--accent)}
+.dots b.now{background:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+
+/* option A: ribbon on the card */
+.A-top{display:grid;gap:4px;padding:16px 22px;background:var(--deep);color:var(--on-deep)}
+.A-top .k{font:700 11px system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-deep)}
+.A-top .t{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.A-top .t strong{font:600 30px/1 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.06em;text-transform:uppercase}
+.A-top .t span{font:italic 15px Georgia,serif;color:var(--on-deep-muted)}
+.A-top p{font:14px/1.5 Georgia,serif;color:var(--on-deep-muted)}
+.A-top .dots b{background:rgba(255,255,255,.25)}
+.A-top .dots b.done,.A-top .dots b.now{background:var(--accent-on-deep)}
+.A-top .dots b.now{box-shadow:0 0 0 3px rgba(240,149,95,.3)}
+.night .A-top .dots b.now{box-shadow:0 0 0 3px rgba(79,169,166,.3)}
+.A-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px}
+
+/* option B: art beside the card */
+.B{display:grid;grid-template-columns:1fr}
+.desk .B{grid-template-columns:340px minmax(0,1fr)}
+.B .art{min-height:190px;position:relative;display:flex;align-items:flex-end}
+.B .art::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(10,24,37,.85))}
+.B .art div{position:relative;z-index:1;padding:16px 20px;color:#fbf3e8}
+.B .art small{font:700 11px system-ui;letter-spacing:.16em;text-transform:uppercase;color:#f0955f;display:block}
+.night .B .art small{color:#6fc0bc}
+.B .art strong{font:600 40px/1 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.06em;text-transform:uppercase;display:block}
+.B .art em{font:italic 14px Georgia,serif;opacity:.9}
+.B .sdesc{font:15px/1.5 Georgia,serif;color:var(--ink)}
+.B hr{border:0;border-top:1px solid var(--line);margin:6px 0;width:100%}
+.weekline{font:600 12px system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink)}
+
+/* option C: series banner above the card, then the card says which week */
+.C-band{background:var(--deep);color:var(--on-deep);border-radius:6px;padding:22px;display:grid;gap:12px;margin-bottom:16px}
+.desk .C-band{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:36px;padding:28px 32px;align-items:center}
+.C-band .k{font:700 11px system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-deep)}
+.C-band .big{font:600 56px/.95 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.05em;text-transform:uppercase;margin:4px 0}
+.desk .C-band .big{font-size:72px}
+.C-band .tag{font:italic 17px Georgia,serif;color:var(--accent-on-deep)}
+.C-band p{font:14.5px/1.55 Georgia,serif;color:var(--on-deep-muted);margin:8px 0 0}
+.list{display:grid;gap:0;margin:0;padding:0;list-style:none;font:14px system-ui}
+.list li{display:flex;gap:12px;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.16);color:var(--on-deep-muted)}
+.list li b{font:600 12px system-ui;letter-spacing:.08em;width:46px;flex:none}
+.list li.now{color:var(--on-deep);font-weight:600}
+.list li.now b{color:var(--accent-on-deep)}
+.list li.soon{border-bottom-style:dashed}
+.list em{margin-left:auto;font:italic 12px Georgia,serif;opacity:.8}
+.C-card .body p{max-width:60ch}
+
+/* shared by D, E, F: at least 44px to tap, a visible focus ring, no colour-only meaning */
+a.tap,summary.tap{min-height:44px;display:inline-flex;align-items:center;gap:8px}
+a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:6px;background:var(--accent-ink);color:#fff;font:600 15px system-ui;text-decoration:none}
+.night .btn{background:var(--accent);color:var(--on-accent)}
+
+/* option D: a quiet callout inside the card */
+.D-call{border-left:4px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface));padding:12px 16px;border-radius:0 6px 6px 0;display:grid;gap:4px}
+.D-call .k{font:700 12px system-ui;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.D-call strong{font:600 24px/1.1 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.D-call strong span{font:italic 400 15px Georgia,serif;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:6px}
+.D-call p{font:14.5px/1.5 Georgia,serif;color:var(--ink)}
+
+/* option E: a stepper (an ordered list) */
+.E-head{padding:22px 22px 6px;display:grid;gap:4px}
+.E-head .k{font:700 12px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.E-head strong{font:600 34px/1 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.05em;text-transform:uppercase}
+.E-head strong span{font:italic 400 16px Georgia,serif;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:8px}
+.E-head p{font:15px/1.5 Georgia,serif;color:var(--ink);max-width:60ch}
+.steps{list-style:none;margin:0;padding:12px 22px 4px;display:grid;gap:0;counter-reset:s}
+.steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:8px 0;position:relative;font:14.5px system-ui;color:var(--ink)}
+.steps li::before{content:attr(data-n);width:32px;height:32px;border-radius:50%;border:2px solid var(--accent-ink);display:grid;place-items:center;font:700 13px system-ui;color:var(--accent-ink);background:var(--surface)}
+.steps li.done::before{content:"\2713";background:var(--accent-ink);color:#fff}
+.night .steps li.done::before{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.steps li.now::before{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.steps li.next::before{border-style:dashed;color:var(--muted);border-color:var(--muted)}
+.steps li small{display:block;color:var(--muted);font-size:12.5px}
+.steps li .tag{display:inline-block;margin-left:6px;font:700 11px system-ui;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--ink);border-radius:999px;padding:1px 8px;color:var(--ink)}
+.steps a{color:var(--ink);text-underline-offset:3px;min-height:24px}
+.E-foot{padding:6px 22px 22px;border-top:1px solid var(--line);margin-top:10px;display:grid;gap:8px;padding-top:16px}
+.desk .steps{grid-template-columns:repeat(5,1fr);gap:16px;padding:18px 22px 4px}
+.desk .steps li{grid-template-columns:1fr;gap:8px;padding:0}
+.desk .steps li:not(:last-child)::after{content:"";position:absolute;top:16px;left:40px;right:-12px;border-top:2px solid var(--line)}
+.desk .steps li.done:not(:last-child)::after{border-top-color:var(--accent-ink)}
+
+/* option F: series intro beside this week; a disclosure on the phone */
+.F{display:grid}
+.desk .F{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.F-series{background:var(--deep);color:var(--on-deep);padding:22px;display:grid;gap:8px;align-content:start}
+.F-series .k{font:700 12px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-on-deep)}
+.F-series .big{font:600 44px/.95 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.05em;text-transform:uppercase}
+.F-series .tag{font:italic 16px Georgia,serif;color:var(--on-deep-muted)}
+.F-series p{font:15px/1.55 Georgia,serif;color:var(--on-deep)}
+.F-series .meta{font:600 13px system-ui;color:var(--on-deep-muted)}
+details.F-d{border-bottom:1px solid var(--line);background:var(--deep);color:var(--on-deep)}
+details.F-d>summary{list-style:none;cursor:pointer;padding:0 22px;justify-content:space-between;width:100%}
+details.F-d>summary::-webkit-details-marker{display:none}
+details.F-d>summary .name{font:600 24px/1 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.06em;text-transform:uppercase}
+details.F-d>summary .name small{font:italic 400 14px Georgia,serif;text-transform:none;letter-spacing:0;color:var(--on-deep-muted);margin-left:8px}
+details.F-d>summary .chev{font:700 14px system-ui;color:var(--accent-on-deep)}
+details.F-d[open]>summary .chev::after{content:"Hide"}
+details.F-d:not([open])>summary .chev::after{content:"About"}
+details.F-d .more{padding:0 22px 20px;display:grid;gap:8px}
+details.F-d .more p{font:15px/1.55 Georgia,serif;color:var(--on-deep)}
+details.F-d .more .meta{font:600 13px system-ui;color:var(--on-deep-muted)}
+.F-week{padding:22px;display:grid;gap:10px;align-content:start}
+.F-week .k{font:700 12px system-ui;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.F-week h5{font:600 30px/1.05 "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.04em;text-transform:uppercase;margin:0}
+.F-week .ref{font:600 13px system-ui;color:var(--muted)}
+</style>
+</head>
+<body>
+<h1>Showing the current series in What's coming</h1>
+<p class="lead">Six ways (A to C first, D to F added after) to put the series name (Advent), its tagline and a short description in front of readers, inside or just above the Weekly devotional card. Each is shown on a phone (375px, the main design) and on desktop, in Dawn patrol and Night swell. The series data already has a title, tagline, both art images and the five-week outline; only the short description is new (a <code>description</code> line in <code>series.yml</code>). "Week 4 of 5" comes from the latest published devotional. Each new series would fill it in the same way.</p>
+
+<!-- ============ OPTION A ============ -->
+<h2>A. Series ribbon on the card</h2>
+<p class="lead">Smallest change. A dark ribbon sits on top of the Weekly devotional card: "This season's series", the name, tagline, two lines of description and a five-segment progress bar.</p>
+
+<div class="row">
+  <figure>
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card">
+        <div class="A-top"><span class="k">This season's series</span>
+          <div class="t"><strong>Advent</strong><span>Waiting for the light</span></div>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p>
+          <div class="A-foot"><div class="dots"><b class="done"></b><b class="done"></b><b class="done"></b><b class="now"></b><b></b></div><span class="k" style="color:var(--on-deep)">Week 4 of 5</span></div>
+        </div>
+        <div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4><p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Dawn patrol. The ribbon is the first thing inside the card.</figcaption>
+  </figure>
+  <figure class="night">
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card">
+        <div class="A-top"><span class="k">This season's series</span>
+          <div class="t"><strong>Advent</strong><span>Waiting for the light</span></div>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p>
+          <div class="A-foot"><div class="dots"><b class="done"></b><b class="done"></b><b class="done"></b><b class="now"></b><b></b></div><span class="k" style="color:var(--on-deep)">Week 4 of 5</span></div>
+        </div>
+        <div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4><p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Night swell.</figcaption>
+  </figure>
+</div>
+<div class="row wide"><figure>
+  <div class="desk"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3><p>The next wave is always coming. Sign up for the weekly devotional and never miss a set.</p></div>
+    <div class="card">
+      <div class="A-top" style="grid-template-columns:1fr auto;column-gap:40px;align-items:center">
+        <div style="display:grid;gap:4px"><span class="k">This season's series</span>
+          <div class="t"><strong>Advent</strong><span>Waiting for the light</span></div>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+        <div style="display:grid;gap:8px;justify-items:end"><div class="dots"><b class="done"></b><b class="done"></b><b class="done"></b><b class="now"></b><b></b></div><span class="k" style="color:var(--on-deep)">Week 4 of 5</span></div>
+      </div>
+      <div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4><p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p></div>
+    </div>
+    <div class="stub">Today's report</div></div>
+  <figcaption>Desktop. Calm and compact; the ribbon pulls the eye without moving anything else. Weakest on attention of the three.</figcaption>
+</figure></div>
+
+<!-- ============ OPTION B ============ -->
+<h2>B. Series art card</h2>
+<p class="lead">The Weekly devotional card gets the series art (the surfers in the dark lineup, already made for each theme) with ADVENT set over it. The text beside or below carries the description, "Week 4: Shepherds on the Night Shift" and the progress bar. Most visual, and each series brings its own picture.</p>
+
+<div class="row">
+  <figure>
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card B">
+        <div class="art dawn"><div><small>This season's series</small><strong>Advent</strong><em>Waiting for the light</em></div></div>
+        <div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4>
+          <p class="sdesc">Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p>
+          <div class="dots"><b class="done"></b><b class="done"></b><b class="done"></b><b class="now"></b><b></b></div>
+          <span class="weekline">Week 4 of 5: Shepherds on the Night Shift</span></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Dawn patrol. Art on top, text below; the art is the attention grabber.</figcaption>
+  </figure>
+  <figure class="night">
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card B">
+        <div class="art dawn"><div><small>This season's series</small><strong>Advent</strong><em>Waiting for the light</em></div></div>
+        <div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4>
+          <p class="sdesc">Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p>
+          <div class="dots"><b class="done"></b><b class="done"></b><b class="done"></b><b class="now"></b><b></b></div>
+          <span class="weekline">Week 4 of 5: Shepherds on the Night Shift</span></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Night swell (uses the night art).</figcaption>
+  </figure>
+</div>
+<div class="row wide"><figure>
+  <div class="desk"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3><p>The next wave is always coming. Sign up for the weekly devotional and never miss a set.</p></div>
+    <div class="card B">
+      <div class="art dawn"><div><small>This season's series</small><strong>Advent</strong><em>Waiting for the light</em></div></div>
+      <div class="body" style="padding:28px"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4>
+        <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p>
+        <hr>
+        <p class="sdesc">Advent: five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p>
+        <div class="dots"><b class="done"></b><b class="done"></b><b class="done"></b><b class="now"></b><b></b></div>
+        <span class="weekline">Week 4 of 5: Shepherds on the Night Shift</span></div>
+    </div>
+    <div class="stub">Today's report</div></div>
+  <figcaption>Desktop: art left, text right. Needs the art images to be good enough at 340px wide (they are, but check the crop).</figcaption>
+</figure></div>
+
+<!-- ============ OPTION C ============ -->
+<h2>C. Series banner above the card, with the weeks listed</h2>
+<p class="lead">A full-width dark banner between the section heading and the Weekly devotional card. ADVENT in big display type, the tagline, the description, and all five weeks listed with this week highlighted and the next weeks shown as coming. The loudest option, and it answers "what is this series about and where are we in it?" at a glance.</p>
+
+<div class="row">
+  <figure>
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="C-band"><div><span class="k">This season's series</span><div class="big">Advent</div><div class="tag">Waiting for the light</div>
+        <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+        <ul class="list">
+          <li><b>WK 1</b>More Than Watchmen</li><li><b>WK 2</b>The Long Wait</li><li><b>WK 3</b>A Quiet Man's Yes</li>
+          <li class="now"><b>WK 4</b>Shepherds on the Night Shift<em>this week</em></li><li class="soon"><b>WK 5</b>The Word Became Flesh<em>26 Dec</em></li></ul></div>
+      <div class="card C-card"><div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4><p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p></div></div></div>
+    <figcaption>Phone, Dawn patrol. Past weeks could link to their devotionals.</figcaption>
+  </figure>
+  <figure class="night">
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="C-band"><div><span class="k">This season's series</span><div class="big">Advent</div><div class="tag">Waiting for the light</div>
+        <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+        <ul class="list">
+          <li><b>WK 1</b>More Than Watchmen</li><li><b>WK 2</b>The Long Wait</li><li><b>WK 3</b>A Quiet Man's Yes</li>
+          <li class="now"><b>WK 4</b>Shepherds on the Night Shift<em>this week</em></li><li class="soon"><b>WK 5</b>The Word Became Flesh<em>26 Dec</em></li></ul></div>
+      <div class="card C-card"><div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4><p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p></div></div></div>
+    <figcaption>Phone, Night swell. On Night swell the banner is only a shade darker than the page, so it leans on the teal accent.</figcaption>
+  </figure>
+</div>
+<div class="row wide"><figure>
+  <div class="desk"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3><p>The next wave is always coming. Sign up for the weekly devotional and never miss a set.</p></div>
+    <div class="C-band"><div><span class="k">This season's series</span><div class="big">Advent</div><div class="tag">Waiting for the light</div>
+      <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+      <ul class="list">
+        <li><b>WK 1</b>More Than Watchmen</li><li><b>WK 2</b>The Long Wait</li><li><b>WK 3</b>A Quiet Man's Yes</li>
+        <li class="now"><b>WK 4</b>Shepherds on the Night Shift<em>this week</em></li><li class="soon"><b>WK 5</b>The Word Became Flesh<em>26 Dec</em></li></ul></div>
+    <div class="card C-card"><div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4><p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p></div></div>
+    <div class="stub">Today's report</div></div>
+  <figcaption>Desktop. The banner sits above the Weekly devotional card, not inside it, so it is a small change to the section's structure.</figcaption>
+</figure></div>
+
+<!-- ============ OPTION D ============ -->
+<h2>D. Callout inside the card</h2>
+<p class="lead">The series is context for the devotional, so it sits inside the Weekly devotional card as a callout with a left accent bar: label, name, tagline, description. The bar and the label (not colour alone) mark it as a different kind of text. Text is the ink colour on a faint tint, so contrast stays high in both themes. No new heights beyond about 120px, no images, no new interaction.</p>
+
+<div class="row">
+  <figure>
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card"><div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4>
+        <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p>
+        <div class="D-call"><span class="k">Current series · Week 4 of 5</span><strong>Advent<span>Waiting for the light</span></strong>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div></div></div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Dawn patrol.</figcaption>
+  </figure>
+  <figure class="night">
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card"><div class="body"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4>
+        <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p>
+        <div class="D-call"><span class="k">Current series · Week 4 of 5</span><strong>Advent<span>Waiting for the light</span></strong>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div></div></div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Night swell.</figcaption>
+  </figure>
+</div>
+<div class="row wide"><figure>
+  <div class="desk"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3><p>The next wave is always coming. Sign up for the weekly devotional and never miss a set.</p></div>
+    <div class="card"><div class="body" style="padding:28px"><span class="status"><i></i>Rolling in consistently</span><h4>Weekly devotional</h4>
+      <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p>
+      <div class="D-call" style="max-width:640px"><span class="k">Current series · Week 4 of 5</span><strong>Advent<span>Waiting for the light</span></strong>
+        <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div></div></div>
+    <div class="stub">Today's report</div></div>
+  <figcaption>Desktop. Quiet and easy to scan, but the least attention-grabbing of the six: it informs more than it draws the eye.</figcaption>
+</figure></div>
+
+<!-- ============ OPTION E ============ -->
+<h2>E. Series card with a week-by-week stepper</h2>
+<p class="lead">A stepper is the standard pattern for "where am I in a sequence". It is an ordered list. Each step has a number or a tick and a text label, never colour alone: done weeks show a tick and link to their devotional, this week has a "This week" tag and <code>aria-current="step"</code>, coming weeks have a dashed marker and no link. One primary button, "Read this week's devotional". Vertical on a phone, five columns on desktop.</p>
+
+<div class="row">
+  <figure>
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card">
+        <div class="E-head"><span class="k">This season's series</span><strong>Advent<span>Waiting for the light</span></strong>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+        <ol class="steps" aria-label="Advent: the five weeks">
+          <li class="done" data-n=""><div><a class="tap" href="#">More Than Watchmen</a><small>28 Nov · Read</small></div></li>
+          <li class="done" data-n=""><div><a class="tap" href="#">The Long Wait</a><small>5 Dec · Read</small></div></li>
+          <li class="done" data-n=""><div><a class="tap" href="#">A Quiet Man's Yes</a><small>12 Dec · Read</small></div></li>
+          <li class="now" data-n="4" aria-current="step"><div><a class="tap" href="#"><b>Shepherds on the Night Shift</b></a><span class="tag">This week</span><small>19 Dec · Luke 2:8–20</small></div></li>
+          <li class="next" data-n="5"><div>The Word Became Flesh<small>26 Dec · Coming</small></div></li>
+        </ol>
+        <div class="E-foot"><span class="status"><i></i>Weekly devotional · a five-minute read each Saturday</span><a class="btn" href="#">Read this week's devotional</a></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Dawn patrol. Numbers 1 to 3 show as ticks once read.</figcaption>
+  </figure>
+  <figure class="night">
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card">
+        <div class="E-head"><span class="k">This season's series</span><strong>Advent<span>Waiting for the light</span></strong>
+          <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+        <ol class="steps" aria-label="Advent: the five weeks">
+          <li class="done" data-n=""><div><a class="tap" href="#">More Than Watchmen</a><small>28 Nov · Read</small></div></li>
+          <li class="done" data-n=""><div><a class="tap" href="#">The Long Wait</a><small>5 Dec · Read</small></div></li>
+          <li class="done" data-n=""><div><a class="tap" href="#">A Quiet Man's Yes</a><small>12 Dec · Read</small></div></li>
+          <li class="now" data-n="4" aria-current="step"><div><a class="tap" href="#"><b>Shepherds on the Night Shift</b></a><span class="tag">This week</span><small>19 Dec · Luke 2:8–20</small></div></li>
+          <li class="next" data-n="5"><div>The Word Became Flesh<small>26 Dec · Coming</small></div></li>
+        </ol>
+        <div class="E-foot"><span class="status"><i></i>Weekly devotional · a five-minute read each Saturday</span><a class="btn" href="#">Read this week's devotional</a></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Night swell.</figcaption>
+  </figure>
+</div>
+<div class="row wide"><figure>
+  <div class="desk"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3><p>The next wave is always coming. Sign up for the weekly devotional and never miss a set.</p></div>
+    <div class="card">
+      <div class="E-head"><span class="k">This season's series</span><strong>Advent<span>Waiting for the light</span></strong>
+        <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p></div>
+      <ol class="steps" aria-label="Advent: the five weeks">
+        <li class="done" data-n=""><div><a class="tap" href="#">More Than Watchmen</a><small>28 Nov · Read</small></div></li>
+        <li class="done" data-n=""><div><a class="tap" href="#">The Long Wait</a><small>5 Dec · Read</small></div></li>
+        <li class="done" data-n=""><div><a class="tap" href="#">A Quiet Man's Yes</a><small>12 Dec · Read</small></div></li>
+        <li class="now" data-n="4" aria-current="step"><div><a class="tap" href="#"><b>Shepherds on the Night Shift</b></a><span class="tag">This week</span><small>19 Dec · Luke 2:8–20</small></div></li>
+        <li class="next" data-n="5"><div>The Word Became Flesh<small>26 Dec · Coming</small></div></li>
+      </ol>
+      <div class="E-foot" style="grid-template-columns:1fr auto;align-items:center"><span class="status"><i></i>Weekly devotional · a five-minute read each Saturday</span><a class="btn" href="#">Read this week's devotional</a></div>
+    </div>
+    <div class="stub">Today's report</div></div>
+  <figcaption>Desktop. The most useful for returning readers (catch up on a missed week); the heaviest block. Needs a series with a planned outline, which every series already has.</figcaption>
+</figure></div>
+
+<!-- ============ OPTION F ============ -->
+<h2>F. Series beside this week, a disclosure on phones</h2>
+<p class="lead">Progressive disclosure keeps the phone short. On desktop the series sits beside this week's devotional in two columns. On a phone it collapses to one 48px row, "Advent: Waiting for the light" with an About toggle (a real <code>details</code> element, keyboard and screen-reader friendly), and this week's devotional with its single button stays in view. The first phone shows it closed, the second open.</p>
+
+<div class="row">
+  <figure>
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card">
+        <details class="F-d"><summary class="tap"><span class="name">Advent<small>Waiting for the light</small></span><span class="chev" aria-hidden="true"></span></summary>
+          <div class="more"><p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p><span class="meta">Week 4 of 5</span></div></details>
+        <div class="F-week"><span class="status"><i></i>Weekly devotional · Rolling in consistently</span><span class="k">This week · Week 4 of 5</span><h5>Shepherds on the Night Shift</h5><span class="ref">Luke 2:8–20 · 19 Dec</span>
+          <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p><a class="btn" href="#">Read this week's devotional</a></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Dawn patrol, closed (the default). The series is one row; the page does not grow.</figcaption>
+  </figure>
+  <figure class="night">
+    <div class="phone"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3></div>
+      <div class="card">
+        <details class="F-d" open><summary class="tap"><span class="name">Advent<small>Waiting for the light</small></span><span class="chev" aria-hidden="true"></span></summary>
+          <div class="more"><p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p><span class="meta">Week 4 of 5</span></div></details>
+        <div class="F-week"><span class="status"><i></i>Weekly devotional · Rolling in consistently</span><span class="k">This week · Week 4 of 5</span><h5>Shepherds on the Night Shift</h5><span class="ref">Luke 2:8–20 · 19 Dec</span>
+          <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p><a class="btn" href="#">Read this week's devotional</a></div>
+      </div>
+      <div class="stub">Today's report</div></div>
+    <figcaption>Phone, Night swell, open.</figcaption>
+  </figure>
+</div>
+<div class="row wide"><figure>
+  <div class="desk"><div class="head"><span class="eyebrow">What's coming</span><h3>Read it before the paddle out</h3><p>The next wave is always coming. Sign up for the weekly devotional and never miss a set.</p></div>
+    <div class="card"><div class="F">
+      <div class="F-series"><span class="k">This season's series</span><div class="big">Advent</div><div class="tag">Waiting for the light</div>
+        <p>Five Saturdays of watching and waiting in the dark lineup, until the Word arrives.</p><span class="meta">Week 4 of 5</span></div>
+      <div class="F-week" style="padding:28px"><span class="status"><i></i>Weekly devotional · Rolling in consistently</span><span class="k">This week · Week 4 of 5</span><h5>Shepherds on the Night Shift</h5><span class="ref">Luke 2:8–20 · 19 Dec</span>
+        <p>A five-minute read each Saturday. One passage, one thought, one question to take into the week.</p><a class="btn" href="#" style="justify-self:start">Read this week's devotional</a></div>
+    </div></div>
+    <div class="stub">Today's report</div></div>
+  <figcaption>Desktop: always open, two columns. It leads with the thing the reader came for (this week) and names the series as the reason to keep coming back.</figcaption>
+</figure></div>
+
+<h2>Comparison</h2>
+<ul class="notes">
+  <li><b>A, ribbon:</b> least change and least height (about 150px on a phone). Good if the section is already long. Modest pull.</li>
+  <li><b>B, art card:</b> strongest feeling, reuses the series art that already exists for each theme. Taller (about 400px on a phone) and depends on the art cropping well.</li>
+  <li><b>C, banner with weeks:</b> the most informative and the loudest. Tallest (about 440px on a phone). The week list could link each past week to its devotional.</li>
+  <li><b>D, callout:</b> the smallest and calmest. A left-bar callout inside the card, about 120px. Easy to scan and nothing new to build or maintain, but it informs more than it grabs attention.</li>
+  <li><b>E, stepper:</b> the standard pattern for progress through a sequence. Tick, number and text labels (not colour alone), past weeks link to their devotional, one primary button. The most useful for catching up; the heaviest block.</li>
+  <li><b>F, beside this week, with a disclosure:</b> the series is one 48px row on a phone and opens on tap; side by side on desktop. Leads with this week's devotional and its button. The best balance of attention and length.</li>
+  <li><b>Standards applied to D, E and F:</b> text at WCAG AA contrast in both themes (no faded or low-opacity text), every tap target at least 44px, a visible focus ring, meaning carried by text and shape as well as colour, real <code>ol</code> and <code>details</code> elements, one primary action per block, and no text laid over images.</li>
+  <li>All six need the same data: a <code>description</code> in <code>series.yml</code> (one or two sentences, about 100 characters), and the current week taken from the latest published devotional. They could also be mixed, for example A's ribbon with C's week list shown only on tap.</li>
+</ul>
+</body>
+</html>

@@ -50,7 +50,7 @@ export const coming = {
   eyebrow: "What's coming",
   heading: "Read it before the paddle out",
   intro:
-    "Content is on the way. Sign up and the first devotional lands in your inbox on launch day.",
+    "The next wave is always coming. Sign up for the weekly devotional and never miss a set.",
   offers: [
     {
       status: "Rolling in consistently",
@@ -136,7 +136,7 @@ export const footer = {
     {
       title: "About",
       links: [
-        { label: "Our story", href: "/#about" },
+        { label: "Our story", href: "/" },
         { label: "Statement of faith", href: "/#believe" },
       ],
     },
