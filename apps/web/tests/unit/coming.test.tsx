@@ -57,6 +57,19 @@ describe("Coming", () => {
     });
   });
 
+  it("puts the weekly devotional first, then the latest devotional, then the later offers", () => {
+    render(<Coming devotional={devotional} series={series} />);
+    const [weekly, planning, later] = screen.getAllByRole("article");
+    const preview = screen.getByRole("region", { name: /devotional preview/i });
+    const follows = (a: Node, b: Node) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(weekly).toHaveTextContent("Weekly devotional");
+    expect(follows(weekly, preview)).toBe(true);
+    expect(follows(preview, planning)).toBe(true);
+    expect(planning).toHaveTextContent("In planning");
+    expect(later).toHaveTextContent("Later");
+  });
+
   it("shows the devotional's title, date, author and the start of the text", () => {
     render(<Coming devotional={devotional} series={series} />);
     const preview = screen.getByRole("region", { name: /devotional preview/i });
