@@ -7,7 +7,6 @@ import { TRANSLATION, formatReference } from "@/lib/scripture";
 export function Hero() {
   return (
     <section
-      id="top"
       aria-labelledby="hero-verse"
       className="relative bg-deep text-on-deep [--logo-gap:var(--deep)] [--logo-ring:var(--on-deep)] [--logo-wave:var(--accent-on-deep)]"
     >

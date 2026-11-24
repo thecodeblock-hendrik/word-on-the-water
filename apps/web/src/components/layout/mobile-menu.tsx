@@ -58,6 +58,12 @@ export function MobileMenu({
       <Dialog.Content
         data-testid="mobile-menu"
         aria-describedby={undefined}
+        // Focus still goes back to the Menu button, but without scrolling: that scroll cancelled the
+        // smooth scroll to the top that the About link had just started.
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          trigger.current?.focus({ preventScroll: true });
+        }}
         className="absolute inset-x-0 top-full max-h-[calc(100dvh-4.5rem-env(safe-area-inset-top))] animate-menu-in overflow-y-auto overscroll-contain border-b border-line bg-bg px-4 pb-4 pt-2 shadow-menu lg:hidden"
       >
         <Dialog.Title className="sr-only">Menu</Dialog.Title>

@@ -136,7 +136,7 @@ export const footer = {
     {
       title: "About",
       links: [
-        { label: "Our story", href: "/#top" },
+        { label: "Our story", href: "/" },
         { label: "Statement of faith", href: "/#believe" },
       ],
     },

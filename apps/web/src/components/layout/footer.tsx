@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { NavLink } from "@/components/layout/nav-link";
 import { Logo } from "@/components/logo";
 import { footer, hero } from "@/content/landing";
 import { isBibleEnabled } from "@/lib/bible/flag";
@@ -65,9 +66,9 @@ export function Footer({ year = new Date().getFullYear(), privacyHref = "/privac
               <ul role="list" className="m-0 grid list-none p-0">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} prefetch={link.prefetch} className={linkClass}>
+                    <NavLink href={link.href} prefetch={link.prefetch} className={linkClass}>
                       {link.label}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>

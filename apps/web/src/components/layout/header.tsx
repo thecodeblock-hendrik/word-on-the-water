@@ -60,13 +60,13 @@ export function Header() {
           className="flex flex-wrap gap-x-5 border-t border-line pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] font-ui text-[15px] lg:hidden"
         >
           {links.map((link) => (
-            <Link
+            <NavLink
               key={link.label}
               href={link.href}
               className="inline-flex min-h-11 items-center font-medium text-ink"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
           {chatEnabled && (
             <a

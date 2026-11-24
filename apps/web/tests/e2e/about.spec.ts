@@ -1,18 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function scrolledDown(page: Page) {
-  await page.goto("/");
+async function scrollDown(page: Page) {
   await page.locator("#believe").scrollIntoViewIfNeeded();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
 }
 
-async function expectAtTop(page: Page) {
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
-  await expect(page).toHaveURL(/\/#top$/);
-}
-
-test("the About link takes you to the top of the landing page", async ({ page }) => {
-  await scrolledDown(page);
+async function clickHeaderAbout(page: Page) {
   if (page.viewportSize()!.width < 1024) {
     await page.getByRole("button", { name: "Menu" }).click();
     await page.getByTestId("mobile-menu").getByRole("link", { name: "About" }).click();
@@ -22,17 +15,36 @@ test("the About link takes you to the top of the landing page", async ({ page })
       .getByRole("link", { name: "About" })
       .click();
   }
-  await expectAtTop(page);
-});
+}
 
-test("the footer Our story link takes you to the top of the landing page", async ({ page }) => {
-  await scrolledDown(page);
+async function clickFooterOurStory(page: Page) {
   await page
     .getByRole("navigation", { name: "About" })
     .getByRole("link", { name: "Our story" })
     .click();
-  await expectAtTop(page);
-});
+}
+
+const links = [
+  ["About", clickHeaderAbout],
+  ["footer Our story", clickFooterOurStory],
+] as const;
+
+// Every time, including a second click and a page that was opened with a hash in its address.
+for (const [name, click] of links) {
+  for (const start of ["/", "/#top"]) {
+    test(`${name} takes you to the top of the landing page, from ${start}, twice`, async ({
+      page,
+    }) => {
+      await page.goto(start);
+      for (let time = 0; time < 2; time++) {
+        await scrollDown(page);
+        await click(page);
+        await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+        await expect(page).toHaveURL(/\/$/);
+      }
+    });
+  }
+}
 
 test("who it is for lists three groups", async ({ page }) => {
   await page.goto("/");
