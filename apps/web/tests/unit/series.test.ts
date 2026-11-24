@@ -9,6 +9,7 @@ import { loadSeries } from "@/lib/devotionals/series-load";
 const source = `title: Advent
 tagline: waiting for the light
 artAlt: Surfers sitting in a dark lineup.
+description: Five Saturdays of waiting.
 outline:
   - { number: 1, title: More Than Watchmen, passage: "Psalm 130:5–6; Isaiah 9:2", date: 2026-12-05 }
   - { number: 2, title: The Long Wait, passage: "Luke 1:5–25", date: 2026-12-12 }
@@ -21,6 +22,12 @@ describe("parseSeries", () => {
     expect(s.title).toBe("Advent");
     expect(s.outline.map((o) => o.title)).toEqual(["More Than Watchmen", "The Long Wait"]);
     expect(s.outline[1].date).toBe("2026-12-12");
+  });
+
+  it("reads the description, which every series must have", () => {
+    expect(parseSeries(source, "advent").description).toBe("Five Saturdays of waiting.");
+    const without = source.replace("description: Five Saturdays of waiting.\n", "");
+    expect(() => parseSeries(without, "advent")).toThrow(/description/);
   });
 
   it("reads the optional email banner file name, and has none by default", () => {

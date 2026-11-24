@@ -82,7 +82,7 @@ Unknown header fields are rejected, so a typo such as `autor` is caught.
 
 A series is described once, in `apps/web/content/series/<name>/`, not in every devotional:
 
-- `series.yml`: the title, a tagline, the illustration's alt text, and the outline, one entry per planned week (number, working title, passage, date).
+- `series.yml`: the title, a tagline, the illustration's alt text, a description (one or two sentences, up to 160 characters, shown with the art on the weekly devotional card on the landing page), and the outline, one entry per planned week (number, working title, passage, date).
 - `art-dawn-patrol.png` and `art-night-swell.png`: the series illustration for each colour scheme (the Advent files are tall portraits, 2833 by 4533; the site crops them to a banner).
 - The weekly email banner is **not** kept in the series folder: it is `apps/web/public/email/<series>-banner.jpg`, named by `emailBanner` in `series.yml` (see [kit_email_devotional.md](kit_email_devotional.md)). It is a wide crop (about 16:9) of the Night swell art, 1200 px wide, JPEG, under 100 KB. On macOS: `sips -c <height> <width> --cropOffset <y> <x> art-night-swell.png --out crop.png`, then `sips -s format jpeg -s formatOptions 78 -Z 1200 crop.png --out advent-banner.jpg` (Advent used a 2833 by 1600 crop starting 1800 px from the top, which keeps the lamp in the upper third and shows the tower down to the hills). Without `emailBanner` the email has no banner.
 

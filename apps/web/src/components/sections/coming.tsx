@@ -8,6 +8,7 @@ import type { Devotional } from "@/lib/devotionals/parse";
 import { reportRows } from "@/lib/devotionals/report";
 import type { Series } from "@/lib/devotionals/series";
 import { formatDate } from "@/lib/devotionals/format";
+import { WeeklyCard } from "@/components/sections/weekly-card";
 
 const eyebrow = "font-display text-sm font-semibold uppercase tracking-[.18em] text-accent-ink";
 const h3 = "font-display text-[1.35rem] font-semibold uppercase leading-[1.05] tracking-[.05em]";
@@ -31,7 +32,7 @@ export function Coming({ devotional, series }: { devotional: Devotional; series:
           </h2>
           <p className="text-muted">{coming.intro}</p>
         </div>
-        <OfferCard offer={weekly} />
+        <WeeklyCard offer={weekly} devotional={devotional} series={series} />
         <div
           role="region"
           aria-label="Devotional preview"

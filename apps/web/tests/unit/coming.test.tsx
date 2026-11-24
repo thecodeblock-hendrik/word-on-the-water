@@ -57,6 +57,29 @@ describe("Coming", () => {
     });
   });
 
+  it("shows the series on the weekly devotional card: name, tagline, description, week and art", () => {
+    render(<Coming devotional={devotional} series={series} />);
+    const [weekly] = screen.getAllByRole("article");
+    expect(weekly).toHaveTextContent("This season's series");
+    expect(weekly).toHaveTextContent(series.title);
+    expect(weekly).toHaveTextContent(series.tagline);
+    expect(weekly).toHaveTextContent(series.description);
+    expect(weekly).toHaveTextContent(
+      `Week ${devotional.meta.seriesNumber} of ${series.outline.length}: ${devotional.meta.title}`,
+    );
+    const art = within(weekly).getAllByAltText(series.artAlt);
+    const sources = art.map((img) => decodeURIComponent(img.getAttribute("src") ?? ""));
+    expect(sources.some((s) => s.includes("art-dawn-patrol.png"))).toBe(true);
+    expect(sources.some((s) => s.includes("art-night-swell.png"))).toBe(true);
+  });
+
+  it("leaves the other cards without series art", () => {
+    render(<Coming devotional={devotional} series={series} />);
+    const [, planning, later] = screen.getAllByRole("article");
+    expect(within(planning).queryByRole("img")).toBeNull();
+    expect(within(later).queryByRole("img")).toBeNull();
+  });
+
   it("puts the weekly devotional first, then the latest devotional, then the later offers", () => {
     render(<Coming devotional={devotional} series={series} />);
     const [weekly, planning, later] = screen.getAllByRole("article");
