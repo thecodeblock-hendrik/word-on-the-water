@@ -1,11 +1,19 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-test("the About link lands on the heading, not hidden under the sticky header", async ({
-  page,
-}) => {
+async function scrolledDown(page: Page) {
   await page.goto("/");
-  const width = page.viewportSize()!.width;
-  if (width < 1024) {
+  await page.locator("#believe").scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+}
+
+async function expectAtTop(page: Page) {
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page).toHaveURL(/\/#top$/);
+}
+
+test("the About link takes you to the top of the landing page", async ({ page }) => {
+  await scrolledDown(page);
+  if (page.viewportSize()!.width < 1024) {
     await page.getByRole("button", { name: "Menu" }).click();
     await page.getByTestId("mobile-menu").getByRole("link", { name: "About" }).click();
   } else {
@@ -14,12 +22,16 @@ test("the About link lands on the heading, not hidden under the sticky header", 
       .getByRole("link", { name: "About" })
       .click();
   }
-  const heading = page.getByRole("heading", { level: 2, name: /faith that holds/i });
-  await expect(heading).toBeInViewport();
-  await expect(page).toHaveURL(/#about$/);
-  await expect
-    .poll(async () => (await heading.boundingBox())!.y)
-    .toBeGreaterThanOrEqual((await page.getByRole("banner").boundingBox())!.height);
+  await expectAtTop(page);
+});
+
+test("the footer Our story link takes you to the top of the landing page", async ({ page }) => {
+  await scrolledDown(page);
+  await page
+    .getByRole("navigation", { name: "About" })
+    .getByRole("link", { name: "Our story" })
+    .click();
+  await expectAtTop(page);
 });
 
 test("who it is for lists three groups", async ({ page }) => {

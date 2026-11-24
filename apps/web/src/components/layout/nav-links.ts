@@ -8,7 +8,7 @@ export type NavItem = {
 };
 
 export const NAV_LINKS: readonly NavItem[] = [
-  { label: "About", href: "/#about" },
+  { label: "About", href: "/#top" },
   { label: "Devotionals", href: "/#coming" },
   { label: "Start here", href: "/#start" },
   { label: "What we believe", href: "/#believe" },
