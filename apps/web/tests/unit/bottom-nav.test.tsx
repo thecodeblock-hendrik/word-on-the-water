@@ -12,44 +12,47 @@ afterEach(cleanup);
 
 const site = () => render(<BottomNav devotionalHref="/devotionals/advent-01" />);
 
+const tabNames = () =>
+  [...screen.getByRole("navigation", { name: "Quick links" }).querySelectorAll("a")].map(
+    (link) => link.textContent,
+  );
+
 describe("BottomNav on the site pages", () => {
-  it("is a labelled landmark that only shows on phones and stays fixed at the bottom", () => {
+  it("is a labelled landmark that only shows below lg and floats at the bottom", () => {
     site();
     const nav = screen.getByRole("navigation", { name: "Quick links" });
-    expect(nav.className).toMatch(/\bfixed\b/);
-    expect(nav.className).toMatch(/\bbottom-0\b/);
-    expect(nav.className).toMatch(/\blg:hidden\b/);
+    expect(nav).toHaveClass("fixed", "lg:hidden");
+  });
+
+  it("is a glass capsule, at most 440px wide and centred", () => {
+    site();
+    expect(screen.getByRole("navigation")).toHaveClass(
+      "glass-dock",
+      "glass-bar",
+      "mx-auto",
+      "max-w-[440px]",
+    );
   });
 
   it("has Devotional, Bible and Ask the Word", () => {
     site();
+    expect(tabNames()).toEqual(["Devotional", "Bible", "Ask the Word"]);
     expect(screen.getByRole("link", { name: "Devotional" })).toHaveAttribute(
       "href",
       "/devotionals/advent-01",
     );
     expect(screen.getByRole("link", { name: "Bible" })).toHaveAttribute("href", "/bible");
-    expect(screen.getByRole("link", { name: "Ask the Word" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Shore" })).toBeNull();
   });
 
-  it("puts Bible in the middle as a round 56px ink button inside a bump the top line follows", () => {
+  it("gives the three tabs equal shares, with no raised button and no filled one", () => {
     site();
-    const bible = screen.getByRole("link", { name: "Bible" });
-    const round = bible.querySelector("span");
-    expect(round?.className).toMatch(/\bbg-ink\b/);
-    expect(round?.className).toMatch(/\bsize-14\b/);
-    expect(round?.className).toMatch(/\brounded-full\b/);
-    const bump = screen.getByRole("navigation").querySelector("svg[data-bump]");
-    expect(bump?.getAttribute("aria-hidden")).toBe("true");
-    expect(bump?.querySelectorAll("path").length).toBe(2);
-  });
-
-  it("keeps the side buttons at least 44px tall and clear of the home bar", () => {
-    site();
-    for (const name of ["Devotional", "Ask the Word"]) {
-      expect(screen.getByRole("link", { name }).className).toMatch(/\bmin-h-12\b/);
+    const nav = screen.getByRole("navigation");
+    for (const link of nav.querySelectorAll("a")) {
+      expect(link).toHaveClass("flex-1", "flex-col", "text-ink");
+      expect(link.className).not.toMatch(/\bbg-/);
+      expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     }
-    expect(screen.getByRole("navigation").className).toMatch(/env\(safe-area-inset-bottom\)/);
+    expect(nav.querySelector("[data-bump]")).toBeNull();
   });
 });
 
@@ -66,27 +69,34 @@ describe("BottomNav Ask the Word", () => {
   });
 });
 
-describe("BottomNav current page", () => {
-  it("marks Devotional as the current page, in the accent colour", () => {
-    render(<BottomNav devotionalHref="/devotionals/advent-01" current="devotional" />);
-    const link = screen.getByRole("link", { name: "Devotional" });
-    expect(link).toHaveAttribute("aria-current", "page");
-    expect(link.className).toMatch(/\bborder-accent-ink\b/);
-    expect(link.className).toMatch(/\btext-accent-ink\b/);
+describe("BottomNav on a devotional page", () => {
+  const devotional = () =>
+    render(<BottomNav devotionalHref="/devotionals/advent-01" onDevotional />);
+
+  it("puts Shore, which goes to the landing page, where Devotional was", () => {
+    devotional();
+    expect(tabNames()).toEqual(["Shore", "Bible", "Ask the Word"]);
+    expect(screen.getByRole("link", { name: "Shore" })).toHaveAttribute("href", "/");
   });
 
-  it("marks nothing as current by default", () => {
-    site();
+  it.each([
+    ["a devotional page", true],
+    ["any other page", false],
+  ])("marks no tab as the current page on %s", (_, onDevotional) => {
+    render(<BottomNav devotionalHref="/devotionals/advent-01" onDevotional={onDevotional} />);
     expect(screen.getByRole("navigation").querySelector("[aria-current]")).toBeNull();
   });
 });
 
 describe("BottomNav on the chat screen", () => {
-  it("swaps Ask the Word for Shore, which goes to the landing page", () => {
+  it("swaps Ask the Word for Shore on the right", () => {
     render(<BottomNav devotionalHref="/devotionals/advent-01" variant="chat" />);
+    expect(tabNames()).toEqual(["Devotional", "Bible", "Shore"]);
     expect(screen.getByRole("link", { name: "Shore" })).toHaveAttribute("href", "/");
-    expect(screen.queryByRole("link", { name: "Ask the Word" })).toBeNull();
-    expect(screen.getByRole("link", { name: "Devotional" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Bible" })).toBeInTheDocument();
+  });
+
+  it("keeps Devotional on the left even over a devotional page", () => {
+    render(<BottomNav devotionalHref="/devotionals/advent-01" variant="chat" onDevotional />);
+    expect(tabNames()).toEqual(["Devotional", "Bible", "Shore"]);
   });
 });

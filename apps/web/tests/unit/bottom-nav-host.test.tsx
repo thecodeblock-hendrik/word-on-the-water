@@ -18,15 +18,14 @@ describe("BottomNavHost", () => {
   it.each(["/", "/privacy", "/thank-you", "/no-such-page"])("shows the bar on %s", (path) => {
     show(path);
     expect(screen.getByRole("navigation", { name: "Quick links" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Devotional" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Devotional" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Shore" })).toBeNull();
   });
 
-  it("marks Devotional as current on a devotional page", () => {
+  it("shows Shore in place of Devotional on a devotional page", () => {
     show("/devotionals/advent-01");
-    expect(screen.getByRole("link", { name: "Devotional" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    expect(screen.getByRole("link", { name: "Shore" })).toHaveAttribute("href", "/");
+    expect(screen.queryByRole("link", { name: "Devotional" })).toBeNull();
   });
 
   it("is left out of the Bible reader, which has its own bar", () => {

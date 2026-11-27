@@ -4,6 +4,7 @@ import { expect, type Page, test } from "@playwright/test";
 // The bar needs the Bible reader and the chat both on, which is the second server (port 3102).
 const CHAT = "http://localhost:3102";
 const labels = ["Devotional", "Bible", "Ask the Word"];
+const devotionalLabels = ["Shore", "Bible", "Ask the Word"];
 
 test.beforeEach(({ viewport }) => {
   test.skip((viewport?.width ?? 0) >= 1024, "The bottom bar is for phones");
@@ -35,7 +36,9 @@ for (const [name, path] of pages) {
       await page.emulateMedia({ colorScheme: scheme });
       await page.goto(`${CHAT}${path}`);
       const bar = page.getByRole("navigation", { name: "Quick links" });
-      for (const label of labels) await expect(bar.getByText(label, { exact: true })).toBeVisible();
+      for (const label of name === "devotional" ? devotionalLabels : labels) {
+        await expect(bar.getByText(label, { exact: true })).toBeVisible();
+      }
       await noSeriousProblems(page, `${name} ${scheme}`);
     }
   });
@@ -101,8 +104,8 @@ test("the undo toast is announced politely, is clear of the bar and has no serio
     await expect(status).toContainText("Chat cleared");
     const undo = status.getByRole("button", { name: "Undo" });
     const toast = (await undo.boundingBox())!;
-    const bump = (await page.locator("nav[data-bottom-nav] svg[data-bump]").boundingBox())!;
-    expect(toast.y + toast.height).toBeLessThanOrEqual(bump.y);
+    const barBox = (await page.locator("nav[data-bottom-nav]").boundingBox())!;
+    expect(toast.y + toast.height).toBeLessThanOrEqual(barBox.y);
     expect(toast.height).toBeGreaterThanOrEqual(44);
     // Axe reads colours mid-fade as low contrast, so let the fade-in finish first.
     await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
@@ -110,6 +113,66 @@ test("the undo toast is announced politely, is clear of the bar and has no serio
     await undo.click();
     // Undo reopens the chat, which hides the rest of the page from the accessibility tree.
     await expect(page.getByRole("status", { includeHidden: true })).toBeEmpty();
+  }
+});
+
+test.describe("the glass capsule", () => {
+  test("is a 64px frosted bar with three tap targets of at least 44px", async ({ page }) => {
+    await page.goto(`${CHAT}/privacy`);
+    const nav = bar(page);
+    expect((await nav.boundingBox())!.height).toBe(64);
+    const blur = await nav.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return (
+        style.getPropertyValue("backdrop-filter") ||
+        style.getPropertyValue("-webkit-backdrop-filter")
+      );
+    });
+    expect(blur).toContain("blur(18px)");
+    const boxes = await nav
+      .getByRole("link")
+      .evaluateAll((links) =>
+        links.map((link) => link.getBoundingClientRect().toJSON() as DOMRect),
+      );
+    expect(boxes).toHaveLength(3);
+    for (const box of boxes) {
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(Math.abs(box.width - boxes[0].width)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  for (const [name, path] of pages) {
+    test(`${name}: the end of the page scrolls clear of the bar`, async ({ page }) => {
+      await page.goto(`${CHAT}${path}`);
+      await page.evaluate(() =>
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+      );
+      await expect(async () => {
+        const footer = (await page.locator("footer").boundingBox())!;
+        const nav = (await bar(page).boundingBox())!;
+        expect(footer.y + footer.height).toBeLessThanOrEqual(nav.y);
+      }).toPass();
+    });
+  }
+
+  for (const size of [
+    { width: 744, height: 1133 },
+    { width: 820, height: 1180 },
+  ]) {
+    test(`on a ${size.width} wide tablet it is 440px wide and centred`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(
+        !["pixel-7", "iphone-13"].includes(testInfo.project.name),
+        "one mobile Chromium and one mobile WebKit are enough",
+      );
+      await page.setViewportSize(size);
+      await page.goto(`${CHAT}/privacy`);
+      const box = (await bar(page).boundingBox())!;
+      const pageWidth = await page.evaluate(() => document.documentElement.clientWidth);
+      expect(box.width).toBe(440);
+      expect(Math.abs(box.x - (pageWidth - box.x - box.width))).toBeLessThanOrEqual(1);
+    });
   }
 });
 
@@ -133,14 +196,14 @@ async function askJesus(page: Page) {
 }
 
 test.describe("where each button goes", () => {
-  test("Devotional, Bible and Ask the Word on the landing page", async ({ page }) => {
+  test("Devotional, Shore, Bible and Ask the Word from the landing page", async ({ page }) => {
     await page.goto(`${CHAT}/`);
     await bar(page).getByRole("link", { name: "Devotional" }).click();
     await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
-    await expect(bar(page).getByRole("link", { name: "Devotional" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    await expect(bar(page).getByRole("link", { name: "Devotional" })).toHaveCount(0);
+    await expect(bar(page).locator("[aria-current]")).toHaveCount(0);
+    await bar(page).getByRole("link", { name: "Shore" }).click();
+    await expect(page).toHaveURL(`${CHAT}/`);
 
     await bar(page).getByRole("link", { name: "Bible" }).click();
     await expect(page).toHaveURL(/\/bible\/[a-z]+\/[a-z0-9-]+\/\d+/);

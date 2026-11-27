@@ -26,7 +26,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first: a contrast test that reads `tokens.css` and proves ink labels reach 4.5:1 on the glass over black (light) and white (dark), and on the pill.
   - Done when: the test passes in both schemes.
 
-- [ ] **2. Site bar.** `BottomNav` becomes three equal tabs in the capsule, for both the site and chat variants. On a devotional page (`/devotionals/...`) the site bar shows Shore, linking to `/`, in place of Devotional; the chat bar does not change. No tab is ever marked current. Page bottom padding in `layout.tsx` fits the floating bar and the safe area.
+- [x] **2. Site bar.** `BottomNav` becomes three equal tabs in the capsule, for both the site and chat variants. On a devotional page (`/devotionals/...`) the site bar shows Shore, linking to `/`, in place of Devotional; the chat bar does not change. No tab is ever marked current. Page bottom padding in `layout.tsx` fits the floating bar and the safe area.
   - Test first (`bottom-nav.test.tsx`, `bottom-nav-host.test.tsx`): capsule, `lg:hidden`, three tabs, no raised circle, no accent fill, Shore instead of Devotional on a devotional page only, no `aria-current` anywhere, 440px maximum width and centred. In `bottom-nav.spec.ts`, replace the current-page check with: Shore on a devotional goes to `/`. In `bottom-nav.spec.ts`, at 744 and 820 wide the bar is 440px with equal space on both sides.
   - Done when: unit tests and `bottom-nav.spec.ts` pass, and the footer scrolls clear of the bar.
 
