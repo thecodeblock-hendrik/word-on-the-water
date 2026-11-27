@@ -9,6 +9,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 ## How to work
 
 - One branch for the whole plan (`feat/liquid-glass-nav`), one commit per step with its box ticked. Merge only when the plan is done.
+- Push only when the whole build is complete (decided 27 November, after the step 0 push). CI does not run until then, so the local checks after each step matter; desktop Firefox is only checked by CI.
 - In each step: write the tests, see them fail for the right reason, write the code, see them pass.
 - A step that breaks an old test updates it in the same commit.
 - End every step with `make lint typecheck test`, plus the named e2e spec when there is one, and a look at 375px in light and dark.
@@ -18,7 +19,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 
 ## Part 1: the glass bar (no movement yet)
 
-- [ ] **0. Baseline.** Run `make lint typecheck test e2e`. Make the CI Lighthouse job run with `BIBLE_ENABLED=1` and `CHAT_ENABLED=1` (open item in PLAN.md 1.10b). Record landing JS size (budget 165 KB gzipped), LCP, CLS and TBT.
+- [x] **0. Baseline.** Run `make lint typecheck test e2e`. Make the CI Lighthouse job run with `BIBLE_ENABLED=1` and `CHAT_ENABLED=1` (open item in PLAN.md 1.10b). Record landing JS size (budget 165 KB gzipped), LCP, CLS and TBT.
   - Done when: everything is green and the figures are written under "Measurements".
 
 - [ ] **1. Glass surface.** One shared set of classes for the capsule (64px high, 16px side margins, 72% surface tint, blur, rim, shadow), built only from design tokens.
@@ -89,6 +90,9 @@ If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen
 | When | Landing JS (gzipped) | LCP | CLS | TBT |
 |---|---|---|---|---|
 | Before (step 0) | 163,496 bytes (159.7 KiB; 5,464 bytes under the limit) | landing 1.67 s, devotional 1.66 s | 0.0002, 0.0001 | 47 ms, 51 ms |
+| Before (step 0), CI | not printed by CI (the size check passed) | landing 1.76 s, devotional 1.72 s | 0.0004, 0.0009 | 95 ms, 98 ms |
 | After (step 12) | | | | |
 
 Step 0, 27 November, local macOS, Bible and chat on. Lighthouse: median of 3 runs, performance 99, accessibility 100, best practices 96, SEO 100 on both pages. JS: measured by the `chat.spec.ts` size check in desktop Chromium. End to end: five local projects (not desktop Firefox), 986 passed, 184 skipped, 10 WebKit tests failed in the parallel run and passed when rerun one at a time. CI is the check for all six.
+
+CI on `86f88bd` (PR 182): every check passed, including end to end on all six projects. CI Lighthouse: median of 3 runs, performance 98 on both pages. Compare CI figures with CI figures and local with local.

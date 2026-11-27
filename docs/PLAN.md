@@ -397,7 +397,7 @@ Plan, behaviour and the 15 steps (all done except the real phone check): [landin
 - [x] Fixed: a page change from the top of the landing page landed at the Subscribe band (`data-scroll-behavior="smooth"` on `<html>`)
 - [ ] Real phone check: VoiceOver on iPhone, TalkBack on Android, the keyboard hiding the bar in the chat **(Hendrik)**
 - [ ] Decide on the auto-hide of the bar while reading (mockups in section H), then build it as its own step
-- [ ] Make the CI Lighthouse job run with `BIBLE_ENABLED=1` and `CHAT_ENABLED=1`, so it sees the bar
+- [x] Make the CI Lighthouse job run with `BIBLE_ENABLED=1` and `CHAT_ENABLED=1`, so it sees the bar (2026-11-27, step 0 of [nav_new.md](nav_new.md))
 
 ### 1.11 Landing page final review (from the retired landing page checklist)
 Checked against the code and the tests on 2026-11-16: what is proven is ticked with its evidence; what needs a person, a real phone or a fix stays open. Two defects were found (marked **found**). Reading the copy is **(Hendrik)**.
