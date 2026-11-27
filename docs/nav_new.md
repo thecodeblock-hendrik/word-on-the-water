@@ -76,7 +76,9 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 
 ## Part 4: prove and finish
 
-- [ ] **12. Quality gates.** Full `make e2e`, axe in both schemes, Lighthouse with the bar showing. Compare with step 0: landing JS under 165 KB gzipped, CLS under 0.05, LCP no worse. About 5 KB of JS room was left on 22 November.
+- [x] **12. Quality gates.** Full `make e2e`, axe in both schemes, Lighthouse with the bar showing. Compare with step 0: landing JS under 165 KB gzipped, CLS under 0.05, LCP no worse. About 5 KB of JS room was left on 22 November.
+  - Result (local, 27 November, after the fix below): five projects in parallel, 1,084 passed, 306 skipped, none failed, in 4.0 minutes. Axe checks in light and dark are part of that run. **Desktop Firefox is not checked:** it does not launch on this Mac (`browserType.launch: Failed to launch`, seen today); CI at the final push is its first run. Lighthouse passed with the bar on screen (seen in its screenshots), figures below. `make lint typecheck test types-check` pass: 1,007 web and 671 API tests.
+  - Fixed on the way: the WebKit failures seen since step 0 (parallel or one at a time; a one-at-a-time full run had 13). Tests opened browser contexts and did not close them; in the layout test, closing each took it from times rising past 12 s to a steady 0.5 s. `tests/e2e/fixtures.ts` closes them after every test. Not established: why the devotional page slowed far more than the landing page, and the one Chromium picker failure in step 9 (20 repeats passed) is not explained by this.
 - [ ] **13. Real phones (Hendrik).** iPhone Safari (also as an installed PWA) and a mid-range Android phone:
   - [ ] Scrolling stays smooth with the blur on
   - [ ] No flicker when Safari's toolbar collapses
@@ -96,7 +98,7 @@ If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen
 |---|---|---|---|---|
 | Before (step 0) | 163,496 bytes (159.7 KiB; 5,464 bytes under the limit) | landing 1.67 s, devotional 1.66 s | 0.0002, 0.0001 | 47 ms, 51 ms |
 | Before (step 0), CI | not printed by CI (the size check passed) | landing 1.76 s, devotional 1.72 s | 0.0004, 0.0009 | 95 ms, 98 ms |
-| After (step 12) | | | | |
+| After (step 12), local | 164,948 bytes (161.1 KiB; 4,012 bytes under the limit; 1,452 more than step 0) | landing 1.63 s, devotional 1.62 s | 0.0002, 0.0001 | 20 ms, 19 ms |
 
 Step 0, 27 November, local macOS, Bible and chat on. Lighthouse: median of 3 runs, performance 99, accessibility 100, best practices 96, SEO 100 on both pages. JS: measured by the `chat.spec.ts` size check in desktop Chromium. End to end: five local projects (not desktop Firefox), 986 passed, 184 skipped, 10 WebKit tests failed in the parallel run and passed when rerun one at a time. CI is the check for all six.
 
