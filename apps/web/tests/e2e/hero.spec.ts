@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // Plain (non-mobile) windows so the width is exactly what is asked for.
 const hero = "section[aria-labelledby=hero-verse]";

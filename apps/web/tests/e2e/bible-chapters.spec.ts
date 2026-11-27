@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 const john3 = "/bible/bsb/john/3";
 
@@ -123,7 +123,16 @@ test.describe("on a phone or tablet (below 1024px)", () => {
     await page.goto("/bible/bsb/psalms/119");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     const height = page.viewportSize()!.height;
-    // The bar leaves during the long smooth scroll and slides back at the end: wait for it to land.
+    // The scroll is smooth and takes a while. Wait for the end first: at the top, before anything
+    // has moved, the bar sits in the very place it lands on at the end.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          Math.round(document.documentElement.scrollHeight - innerHeight - scrollY),
+        ),
+      )
+      .toBeLessThanOrEqual(1);
+    // The bar left during the scroll and slides back at the end: wait for it to land.
     await expect
       .poll(async () => {
         const box = (await barOf(page).boundingBox())!;

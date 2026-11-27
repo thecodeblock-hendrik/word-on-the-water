@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // Phones turned sideways: the menu is taller than the screen and must scroll.
 const LANDSCAPE = [
