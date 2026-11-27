@@ -49,7 +49,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 
 ## Part 2: liquid movement
 
-- [ ] **7. Spring maths.** A pure module in `src/lib/nav/`: one step moves the pill's left and right edges. The leading edge is stiffer (520, damping 34) than the trailing edge (190, damping 21). Vertical squash never goes below 0.82.
+- [x] **7. Spring maths.** A pure module in `src/lib/nav/`: one step moves the pill's left and right edges. The leading edge is stiffer (520, damping 34) than the trailing edge (190, damping 21). Vertical squash never goes below 0.82.
   - Test first: fixed time steps, no real clock. It stretches in both directions, overshoots a little, settles exactly on the target and stops; a long frame cannot make it fly off.
   - Done when: unit tests pass.
 
