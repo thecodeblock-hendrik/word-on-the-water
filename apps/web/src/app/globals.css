@@ -65,28 +65,29 @@ body {
   }
 }
 
-/* The phone navigation's floating glass capsule (docs/design/landing_nav_new.html). */
+/* The floating glass capsule of the phone and tablet navigation (docs/design/landing_nav_new.html).
+   Utilities, so a breakpoint can limit them: the Bible reader drops the capsule from lg. */
+@utility glass-dock {
+  left: max(1rem, env(safe-area-inset-left));
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(0.875rem, env(safe-area-inset-bottom));
+}
+
+@utility glass-bar {
+  height: 4rem;
+  padding: 4px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--surface) var(--glass-tint), transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 var(--glass-rim),
+    inset 0 -1px 0 color-mix(in srgb, var(--glass-rim) 35%, transparent);
+}
+
 @layer components {
-  .glass-dock {
-    left: max(1rem, env(safe-area-inset-left));
-    right: max(1rem, env(safe-area-inset-right));
-    bottom: max(0.875rem, env(safe-area-inset-bottom));
-  }
-
-  .glass-bar {
-    height: 4rem;
-    padding: 4px;
-    border: 1px solid var(--glass-edge);
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--surface) var(--glass-tint), transparent);
-    -webkit-backdrop-filter: blur(18px) saturate(180%);
-    backdrop-filter: blur(18px) saturate(180%);
-    box-shadow:
-      var(--glass-shadow),
-      inset 0 1px 0 var(--glass-rim),
-      inset 0 -1px 0 color-mix(in srgb, var(--glass-rim) 35%, transparent);
-  }
-
   .glass-pill {
     border-radius: 9999px;
     background: var(--glass-lens);

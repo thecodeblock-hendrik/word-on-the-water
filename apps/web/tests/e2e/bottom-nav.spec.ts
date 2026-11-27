@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
+import { BOOKS } from "../../src/lib/bible/books";
+
 // The bar needs the Bible reader and the chat both on, which is the second server (port 3102).
 const CHAT = "http://localhost:3102";
 const labels = ["Devotional", "Bible", "Ask the Word"];
@@ -221,6 +223,49 @@ for (const size of [
     expect(toast.width).toBeCloseTo(440, 0);
     expect(toast.x).toBeCloseTo(siteBar.x, 0);
     expect(siteBar.y - (toast.y + toast.height)).toBeCloseTo(12, 0);
+  });
+}
+
+const chapterBar = (page: Page) =>
+  page.getByRole("navigation", { name: "Previous and next chapter" });
+
+test("every book's short name fits its tab on one line at 320 wide", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto(`${CHAT}/bible/web/john/3`);
+  await page.evaluate(() => document.fonts.ready);
+  // The widest label of each book: its short name with its last chapter.
+  const labels = BOOKS.map((book) => `${book.short} ${book.chapters}`);
+  const tooWide = await chapterBar(page)
+    .getByRole("link", { name: /^Next chapter/ })
+    .evaluate((link, names) => {
+      const place = link.querySelector<HTMLElement>(".truncate")!;
+      const short = place.querySelector<HTMLElement>("span:last-child")!;
+      return names.filter((name) => {
+        short.textContent = name;
+        return place.scrollWidth > place.clientWidth || place.getBoundingClientRect().height > 20;
+      });
+    }, labels);
+  expect(tooWide).toEqual([]);
+});
+
+for (const size of [
+  { width: 744, height: 1133 },
+  { width: 820, height: 1180 },
+]) {
+  test(`on a ${size.width} wide tablet the Bible reader's bar is 440px and centred`, async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      !["pixel-7", "iphone-13"].includes(testInfo.project.name),
+      "one mobile Chromium and one mobile WebKit are enough",
+    );
+    await page.setViewportSize(size);
+    await page.goto(`${CHAT}/bible/web/john/3`);
+    const box = (await chapterBar(page).boundingBox())!;
+    const pageWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(box.width).toBeCloseTo(440, 0);
+    expect(box.height).toBe(64);
+    expect(Math.abs(box.x - (pageWidth - box.x - box.width))).toBeLessThanOrEqual(1);
   });
 }
 

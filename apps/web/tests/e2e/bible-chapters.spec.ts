@@ -89,15 +89,17 @@ test.describe("on a phone or tablet (below 1024px)", () => {
     "from 1024px the buttons sit under the text",
   );
 
-  test("the bar is pinned to the bottom of the screen with two tall buttons in thumb reach", async ({
+  // The glass capsule floats this far above the bottom edge where there is no home indicator.
+  const FLOAT = 14;
+
+  test("the bar floats at the bottom of the screen with two tall buttons in thumb reach", async ({
     page,
   }) => {
     await page.goto(john3);
     const bar = page.getByRole("navigation", { name: "Previous and next chapter" });
     const box = (await bar.boundingBox())!;
     const height = page.viewportSize()!.height;
-    expect(box.y + box.height).toBeGreaterThanOrEqual(height - 1);
-    expect(box.y + box.height).toBeLessThanOrEqual(height + 1);
+    expect(box.y + box.height).toBeCloseTo(height - FLOAT, 0);
     const links = await bar.getByRole("link", { name: /chapter/ }).all();
     expect(links).toHaveLength(2);
     for (const link of links) expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -123,8 +125,7 @@ test.describe("on a phone or tablet (below 1024px)", () => {
     await page.waitForTimeout(300);
     const height = page.viewportSize()!.height;
     const bar = (await barOf(page).boundingBox())!;
-    expect(bar.y + bar.height).toBeGreaterThanOrEqual(height - 1);
-    expect(bar.y + bar.height).toBeLessThanOrEqual(height + 1);
+    expect(bar.y + bar.height).toBeCloseTo(height - FLOAT, 0);
     // Nothing is hidden behind the bar: the last line of the page (the credit) ends above it.
     const credit = (await page.getByText("Berean Standard Bible (BSB), dedicated").boundingBox())!;
     expect(credit.y + credit.height).toBeLessThanOrEqual(bar.y + 1);
@@ -140,8 +141,7 @@ test.describe("on a phone or tablet (below 1024px)", () => {
         await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
       await page.waitForTimeout(200);
       const bar = (await barOf(page).boundingBox())!;
-      expect(bar.y + bar.height).toBeGreaterThanOrEqual(height - 1);
-      expect(bar.y + bar.height).toBeLessThanOrEqual(height + 1);
+      expect(bar.y + bar.height).toBeCloseTo(height - FLOAT, 0);
     }
   });
 
@@ -249,9 +249,12 @@ for (const width of [320, 360, 375, 390, 412]) {
         .getByRole("link", { name: /chapter/ });
       for (const link of await links.all()) {
         const label = `${path}: ${await link.innerText()}`;
-        expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
+        expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(54);
+        expect((await link.locator(".truncate").boundingBox())!.height, label).toBeLessThanOrEqual(
+          20,
+        );
         expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-        await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
+        await expect(link.locator("svg"), label).toBeVisible();
         // On a phone the short form shows (the middle button needs room), and it all fits.
         expect(await link.locator(".truncate").innerText(), label).toMatch(/[A-Za-z]{3,}/);
         expect(

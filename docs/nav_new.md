@@ -34,7 +34,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first: `chat-input-pill.test.tsx`, `undo-toast.test.tsx`, and in `bottom-nav.spec.ts` replace the bump check with "the toast and message pill do not overlap the bar". At 744 and 820 wide, the pill and the toast are 440px, centred and in line with the bar.
   - Done when: both pass, the keyboard still hides the bar, the pill and toast look as before at 375px, the chat thread is unchanged, and the desktop drawer looks as before.
 
-- [ ] **4. Bible reader bar.** Below `lg`, `ChapterNav`, `ShoreButton` and `ChatReturn` use the capsule: a chevron above the short name ("John 2"), with Shore or Your chat in the middle. Disabled ends read "Start" and "End". Use one bottom padding rule in place of the extra `--chat-extra` space.
+- [x] **4. Bible reader bar.** Below `lg`, `ChapterNav`, `ShoreButton` and `ChatReturn` use the capsule: a chevron above the short name ("John 2"), with Shore or Your chat in the middle. Disabled ends read "Start" and "End". Use one bottom padding rule in place of the extra `--chat-extra` space.
   - Test first (`bible-chapter-nav.test.tsx`, `shore-button.test.tsx`, `chat-return.test.tsx`): chevrons and short names on phones; spoken names "Previous chapter: John 2", "Start of the Bible", "End of the Bible"; desktop classes and text unchanged. Update the old geometry checks in `chat.spec.ts`. At 744 and 820 wide, the reader bar is 440px and centred.
   - Done when: the specs pass, no label wraps or is cut off for any book at 320px, and arrow keys still change chapter.
 

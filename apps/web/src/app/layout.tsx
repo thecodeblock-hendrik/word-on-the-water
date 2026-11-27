@@ -63,7 +63,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       className={`${barlow.variable} ${barlowCondensed.variable} ${lora.variable}`}
     >
-      <body className="flex min-h-dvh flex-col has-[[data-chapter-nav]]:pb-[calc(3.6rem+var(--chat-extra,0rem)+max(.5rem,env(safe-area-inset-bottom)))] has-[[data-bar-middle]]:[--chat-extra:1.8rem] lg:has-[[data-chapter-nav]]:pb-0 [&:has([data-chapter-nav])>footer]:hidden has-[[data-bottom-nav]]:pb-[calc(4.5rem+max(.875rem,env(safe-area-inset-bottom)))] lg:has-[[data-bottom-nav]]:pb-0">
+      <body className="flex min-h-dvh flex-col has-[[data-chapter-nav]]:pb-[calc(4.5rem+max(.875rem,env(safe-area-inset-bottom)))] lg:has-[[data-chapter-nav]]:pb-0 [&:has([data-chapter-nav])>footer]:hidden has-[[data-bottom-nav]]:pb-[calc(4.5rem+max(.875rem,env(safe-area-inset-bottom)))] lg:has-[[data-bottom-nav]]:pb-0">
         <CspNonce />
         <LogoSprite />
         <SkipLink />

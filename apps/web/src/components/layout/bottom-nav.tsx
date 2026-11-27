@@ -4,10 +4,7 @@ import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { bottomNav } from "@/content/bottom-nav";
 
 import { BibleIcon, ChatIcon, DevotionalIcon, ShoreIcon } from "./bottom-nav-icons";
-
-const tab =
-  "flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 whitespace-nowrap rounded-full px-0.5 font-ui text-xs font-semibold leading-[15px] text-ink";
-const icon = "size-[26px]";
+import { glassTab, glassTabIcon } from "./glass-tab";
 
 /**
  * The phone and tablet bottom bar, a floating glass capsule with three equal tabs: Devotional,
@@ -29,8 +26,8 @@ export function BottomNav({
   variant?: "site" | "chat";
 }) {
   const shore = (
-    <Link href="/" onClick={onNavigate} className={tab}>
-      <ShoreIcon className={icon} />
+    <Link href="/" onClick={onNavigate} className={glassTab}>
+      <ShoreIcon className={glassTabIcon} />
       {bottomNav.shore}
     </Link>
   );
@@ -43,20 +40,20 @@ export function BottomNav({
       {variant === "site" && onDevotional ? (
         shore
       ) : (
-        <Link href={devotionalHref} onClick={onNavigate} className={tab}>
-          <DevotionalIcon className={icon} />
+        <Link href={devotionalHref} onClick={onNavigate} className={glassTab}>
+          <DevotionalIcon className={glassTabIcon} />
           {bottomNav.devotional}
         </Link>
       )}
-      <Link href="/bible" onClick={onNavigate} prefetch={false} className={tab}>
-        <BibleIcon className={icon} />
+      <Link href="/bible" onClick={onNavigate} prefetch={false} className={glassTab}>
+        <BibleIcon className={glassTabIcon} />
         {bottomNav.bible}
       </Link>
       {variant === "chat" ? (
         shore
       ) : (
-        <ChatLauncher className={tab}>
-          <ChatIcon className={icon} />
+        <ChatLauncher className={glassTab}>
+          <ChatIcon className={glassTabIcon} />
           {bottomNav.askTheWord}
         </ChatLauncher>
       )}

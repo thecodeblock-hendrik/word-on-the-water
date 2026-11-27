@@ -15,24 +15,17 @@ describe("ShoreButton, the middle of the Bible reader's bar", () => {
     expect(screen.getByRole("link", { name: "Shore" })).toHaveAttribute("href", "/");
   });
 
-  it("is a round ink button of 56px with its word under it, in a bump the top line follows", () => {
+  it("is an equal tab like the others: a surfboard above its name, no round button", () => {
     render(<ShoreButton />);
     const link = screen.getByRole("link", { name: "Shore" });
-    const round = link.querySelector("span");
-    expect(round?.className).toMatch(/\bbg-ink\b/);
-    expect(round?.className).toMatch(/\bsize-14\b/);
-    expect(round?.className).toMatch(/\brounded-full\b/);
-    const root = link.closest("[data-bar-middle]")!;
-    const bump = root.querySelector("svg[data-bump]");
-    expect(bump?.getAttribute("aria-hidden")).toBe("true");
-    expect(bump?.querySelectorAll("path").length).toBe(2);
+    expect(link).toHaveClass("flex-1", "flex-col", "text-ink");
+    expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(link.querySelector(".bg-ink")).toBeNull();
   });
 
   it("is for phones only", () => {
     render(<ShoreButton />);
-    expect(
-      screen.getByRole("link", { name: "Shore" }).closest("[data-bar-middle]")?.className,
-    ).toMatch(/\blg:hidden\b/);
+    expect(screen.getByRole("link", { name: "Shore" })).toHaveClass("lg:hidden");
   });
 });
 

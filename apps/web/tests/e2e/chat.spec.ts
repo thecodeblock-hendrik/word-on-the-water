@@ -219,13 +219,14 @@ test.describe("with the chat on", () => {
       await expect(fresh.getByRole("button", { name: "Your chat", exact: true })).toHaveCount(0);
     });
 
-    test("on a phone it is a round button between Previous and Next, inside a bump the bar's top line follows", async ({
+    test("on a phone it is the middle tab of the glass bar, between Previous and Next", async ({
       page,
     }) => {
-      test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
+      test.skip(page.viewportSize()!.width >= 1024, "the glass bar is for phones");
       await readVerse(page);
       const button = page.getByRole("button", { name: "Your chat", exact: true });
-      const round = (await button.locator("span").first().boundingBox())!;
+      await expect(button).toBeVisible();
+      const tab = (await button.boundingBox())!;
       const bar = page.getByRole("navigation", { name: "Previous and next chapter" });
       const barBox = (await bar.boundingBox())!;
       const prev = (await bar.getByRole("link", { name: /Previous chapter/ }).boundingBox())!;
@@ -238,53 +239,40 @@ test.describe("with the chat on", () => {
           text,
         );
       }
-      const bump = (await bar.locator("svg[data-chat-bump]").boundingBox())!;
       const width = page.viewportSize()!.width;
 
-      // Between the two chapter buttons and clear of both, centred, 44px or more to tap.
-      expect(Math.abs(round.x + round.width / 2 - width / 2)).toBeLessThan(4);
-      expect(round.x).toBeGreaterThanOrEqual(prev.x + prev.width);
-      expect(round.x + round.width).toBeLessThanOrEqual(next.x);
-      expect(round.width).toBeGreaterThanOrEqual(44);
-      expect(round.height).toBeGreaterThanOrEqual(44);
-      // Rises out of the bar, and the bump encloses it and meets the bar's top line.
-      expect(round.y).toBeLessThan(barBox.y);
-      expect(round.y + round.height).toBeGreaterThan(barBox.y + 20);
-      expect(bump.y).toBeLessThan(round.y);
-      expect(bump.x).toBeLessThan(round.x);
-      expect(bump.x + bump.width).toBeGreaterThan(round.x + round.width);
-      expect(Math.abs(bump.y + bump.height - (barBox.y + 1.5))).toBeLessThanOrEqual(2);
-      // Neither chapter button is covered by it.
-      for (const point of [
-        { x: prev.x + prev.width / 2, y: prev.y + prev.height / 2 },
-        { x: next.x + next.width / 2, y: next.y + next.height / 2 },
-      ]) {
-        const hit = await page.evaluate(
-          ({ x, y }) => document.elementFromPoint(x, y)?.closest("a")?.getAttribute("href"),
-          point,
-        );
-        expect(hit).toMatch(/^\/bible\/web\/john\/\d+$/);
+      // A 64px capsule with three equal tabs inside it, Your chat centred between the other two.
+      expect(barBox.height).toBe(64);
+      expect(Math.abs(tab.x + tab.width / 2 - width / 2)).toBeLessThan(4);
+      expect(tab.x).toBeGreaterThanOrEqual(prev.x + prev.width);
+      expect(tab.x + tab.width).toBeLessThanOrEqual(next.x);
+      expect(tab.height).toBeGreaterThanOrEqual(44);
+      expect(tab.y).toBeGreaterThanOrEqual(barBox.y);
+      expect(tab.y + tab.height).toBeLessThanOrEqual(barBox.y + barBox.height);
+      for (const side of [prev, next]) {
+        expect(Math.abs(side.width - tab.width)).toBeLessThanOrEqual(1);
       }
       await expect(page.getByRole("button", { name: /Hide the Your chat button/ })).toBeHidden();
     });
 
-    test("at the end of a long chapter the passage credit is clear of the bump", async ({
+    test("at the end of a long chapter the passage credit is clear of the bar", async ({
       page,
     }) => {
-      test.skip(page.viewportSize()!.width >= 1024, "the round button is for phones");
+      test.skip(page.viewportSize()!.width >= 1024, "the glass bar is for phones");
       await readVerse(page);
       await page.goto("/bible/web/psalms/119");
-      // The bump, and the room the page keeps for it, appear when the page hydrates: scroll only
-      // after that, or the page grows below the point just scrolled to (seen on a slow CI runner).
+      // Your chat appears when the page hydrates: scroll only after that.
       await expect(page.getByRole("button", { name: "Your chat", exact: true })).toBeVisible();
       await page.evaluate(() =>
         window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
       );
-      const bump = (await page.locator("svg[data-chat-bump]").boundingBox())!;
+      const bar = (await page
+        .getByRole("navigation", { name: "Previous and next chapter" })
+        .boundingBox())!;
       const credit = (await page
         .getByText("World English Bible (WEB), public domain")
         .boundingBox())!;
-      expect(credit.y + credit.height).toBeLessThanOrEqual(bump.y + 1);
+      expect(credit.y + credit.height).toBeLessThanOrEqual(bar.y);
     });
 
     test("on a phone the chapter buttons use the short names, with Your chat or Shore between them, and are named for what is shown", async ({
@@ -353,9 +341,13 @@ test.describe("with the chat on", () => {
           const nav = page.getByRole("navigation", { name: "Previous and next chapter" });
           for (const link of await nav.getByRole("link").all()) {
             const label = `${path}: ${await link.innerText()}`;
-            expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(50);
+            expect((await link.boundingBox())!.height, label).toBeLessThanOrEqual(54);
+            expect(
+              (await link.locator(".truncate").boundingBox())!.height,
+              label,
+            ).toBeLessThanOrEqual(20);
             expect(await link.evaluate((el) => el.scrollWidth <= el.clientWidth), label).toBe(true);
-            await expect(link.locator("[aria-hidden='true']"), label).toBeVisible();
+            await expect(link.locator("svg"), label).toBeVisible();
             // The chat button is in the bar, so the names are the standard short forms, and they show.
             const shown = await link.locator(".truncate").innerText();
             expect(shown, label).toMatch(/^(\d )?[A-Z][A-Za-z]+ \d+$/);

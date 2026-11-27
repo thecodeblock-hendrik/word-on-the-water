@@ -82,7 +82,7 @@ describe("the two dark blocks", () => {
 
 describe("the shared glass classes", () => {
   it("make a 64px capsule, tinted and blurred, from tokens only", () => {
-    const bar = rule(globals, ".glass-bar");
+    const bar = rule(globals, "@utility glass-bar");
     expect(bar).toContain("height: 4rem;");
     expect(bar).toContain("color-mix(in srgb, var(--surface) var(--glass-tint), transparent)");
     expect(bar).toContain("-webkit-backdrop-filter: blur(18px) saturate(180%);");
@@ -92,7 +92,7 @@ describe("the shared glass classes", () => {
   });
 
   it("float it 1rem in from the sides and clear of the home indicator", () => {
-    const dock = rule(globals, ".glass-dock");
+    const dock = rule(globals, "@utility glass-dock");
     expect(dock).toContain("left: max(1rem, env(safe-area-inset-left));");
     expect(dock).toContain("right: max(1rem, env(safe-area-inset-right));");
     expect(dock).toContain("bottom: max(0.875rem, env(safe-area-inset-bottom));");
