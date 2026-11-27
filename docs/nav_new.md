@@ -22,7 +22,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 - [x] **0. Baseline.** Run `make lint typecheck test e2e`. Make the CI Lighthouse job run with `BIBLE_ENABLED=1` and `CHAT_ENABLED=1` (open item in PLAN.md 1.10b). Record landing JS size (budget 165 KB gzipped), LCP, CLS and TBT.
   - Done when: everything is green and the figures are written under "Measurements".
 
-- [ ] **1. Glass surface.** One shared set of classes for the capsule (64px high, 16px side margins, 72% surface tint, blur, rim, shadow), built only from design tokens.
+- [x] **1. Glass surface.** One shared set of classes for the capsule (64px high, 16px side margins, 72% surface tint, blur, rim, shadow), built only from design tokens.
   - Test first: a contrast test that reads `tokens.css` and proves ink labels reach 4.5:1 on the glass over black (light) and white (dark), and on the pill.
   - Done when: the test passes in both schemes.
 
