@@ -15,6 +15,18 @@ function rule(css: string, selector: string) {
   return lines.slice(start + 1, end).join("\n");
 }
 
+/** A whole block, nested rules included, found by its first line. */
+function wholeBlock(css: string, opening: string) {
+  const start = css.indexOf(`${opening} {`);
+  if (start < 0) throw new Error(`no block ${opening}`);
+  let depth = 0;
+  for (let i = css.indexOf("{", start); i < css.length; i++) {
+    if (css[i] === "{") depth++;
+    else if (css[i] === "}" && --depth === 0) return css.slice(start, i + 1);
+  }
+  throw new Error(`unclosed block ${opening}`);
+}
+
 function token(block: string, name: string) {
   const found = block.match(new RegExp(`--${name}:\\s*([^;]+);`));
   if (!found) throw new Error(`no token --${name}`);
@@ -102,5 +114,37 @@ describe("the shared glass classes", () => {
     const pill = rule(globals, ".glass-pill");
     expect(pill).toContain("background: var(--glass-lens);");
     expect(pill).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
+  });
+});
+
+describe("the solid fallbacks", () => {
+  const bar = () => wholeBlock(globals, "@utility glass-bar");
+
+  it("is solid in a browser that cannot blur what is behind it", () => {
+    const rule = wholeBlock(
+      bar(),
+      "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))",
+    );
+    expect(rule).toContain("background: var(--surface);");
+  });
+
+  it("is solid, with a stronger edge, for reduced transparency or increased contrast", () => {
+    const rule = wholeBlock(
+      bar(),
+      "@media (prefers-reduced-transparency: reduce), (prefers-contrast: more)",
+    );
+    expect(rule).toContain("background: var(--surface);");
+    expect(rule).toContain("backdrop-filter: none;");
+    expect(rule).toContain("-webkit-backdrop-filter: none;");
+    expect(rule).toContain("border-color: var(--muted);");
+  });
+
+  it("uses system colours in forced-colours mode, for the bar and the pill", () => {
+    const rule = wholeBlock(bar(), "@media (forced-colors: active)");
+    expect(rule).toContain("background: Canvas;");
+    expect(rule).toContain("border-color: CanvasText;");
+    expect(wholeBlock(globals, "@layer components")).toMatch(
+      /@media \(forced-colors: active\) \{\s*\.glass-pill \{\s*border: 2px solid Highlight;/,
+    );
   });
 });

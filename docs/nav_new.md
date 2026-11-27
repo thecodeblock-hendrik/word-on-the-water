@@ -13,6 +13,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 - In each step: write the tests, see them fail for the right reason, write the code, see them pass.
 - A step that breaks an old test updates it in the same commit.
 - End every step with `make lint typecheck test`, plus the named e2e spec when there is one, and a look at 375px in light and dark.
+- After changing `globals.css`, delete `apps/web/.next` before judging the result. In step 6 an incremental build left out the new nested rules; a clean build had them (why the cache did not refresh is not known). At the final push, also check them in the preview's CSS.
 - Read the bundled Next docs before using a Next API. Add no animation library.
 - Unit tests live in `apps/web/tests/unit`, e2e specs in `apps/web/tests/e2e`.
 - Tablet tests set the viewport to 744 x 1133 and 820 x 1180 inside the spec; no new Playwright project. Run them in one mobile Chromium and one mobile WebKit project (`pixel-7`, `iphone-13`). Use a maximum width, not a new breakpoint.
@@ -42,8 +43,8 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Done when: a search finds no `RaisedBump`, `data-bump` or `data-chat-bump`, and the full e2e run is green.
   - Result (local, 27 November): the search is clean. Five projects in parallel: 1,019 passed, 218 skipped, 13 WebKit failures in tests outside the bar (as in the step 0 baseline), all passing one at a time. Not proven: why WebKit fails in parallel on this Mac. Desktop Firefox and a clean parallel run are left to CI at the final push.
 
-- [ ] **6. Solid fallbacks.** Solid bar for reduced transparency, increased contrast and no `backdrop-filter`; system colours in forced-colours mode.
-  - Test first: e2e with emulated contrast and forced colours; check the other two rules by hand in browser tools.
+- [x] **6. Solid fallbacks.** Solid bar for reduced transparency, increased contrast and no `backdrop-filter`; system colours in forced-colours mode.
+  - Test first: e2e with emulated contrast, forced colours and reduced transparency (Chromium emulates it, so no hand check); a browser without blur cannot be emulated, so a unit test and a look at the built CSS cover that rule.
   - Done when: axe is clean on every page with the bar, in light and dark.
 
 ## Part 2: liquid movement

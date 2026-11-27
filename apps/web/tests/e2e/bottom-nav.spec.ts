@@ -398,3 +398,63 @@ test.describe("the chat, the Bible and back", () => {
     await expect(page.getByRole("status", { includeHidden: true })).toBeEmpty();
   });
 });
+
+test.describe("the solid fallbacks", () => {
+  /** What decides whether a bar is see-through: its blur, and the alpha of its background. */
+  const look = (nav: ReturnType<typeof bar>) =>
+    nav.evaluate((el) => {
+      const style = getComputedStyle(el);
+      const background = style.backgroundColor;
+      const alpha = background.match(/\/\s*([\d.]+)\)$|^rgba\([^)]*,\s*([\d.]+)\)$/);
+      return {
+        blur: style.getPropertyValue("backdrop-filter") || "none",
+        alpha: alpha ? Number(alpha[1] ?? alpha[2]) : 1,
+      };
+    });
+
+  const bars = [
+    ["the site bar", "/privacy", bar],
+    ["the Bible reader's bar", "/bible/web/john/3", chapterBar],
+  ] as const;
+
+  for (const [name, path, find] of bars) {
+    test(`${name} is see-through by default`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== "pixel-7", "measured in one mobile Chromium");
+      await page.goto(`${CHAT}${path}`);
+      const { blur, alpha } = await look(find(page));
+      expect(blur).toContain("blur(18px)");
+      expect(alpha).toBeCloseTo(0.72, 2);
+    });
+
+    test(`${name} is solid with increased contrast`, async ({ page }, testInfo) => {
+      test.skip(
+        !["pixel-7", "iphone-13"].includes(testInfo.project.name),
+        "one mobile Chromium and one mobile WebKit are enough",
+      );
+      await page.emulateMedia({ contrast: "more" });
+      await page.goto(`${CHAT}${path}`);
+      expect(await page.evaluate(() => matchMedia("(prefers-contrast: more)").matches)).toBe(true);
+      await expect.poll(() => look(find(page))).toEqual({ blur: "none", alpha: 1 });
+    });
+
+    test(`${name} is solid with reduced transparency`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== "pixel-7", "only Chromium can emulate this setting");
+      const session = await page.context().newCDPSession(page);
+      await session.send("Emulation.setEmulatedMedia", {
+        features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
+      });
+      await page.goto(`${CHAT}${path}`);
+      expect(
+        await page.evaluate(() => matchMedia("(prefers-reduced-transparency: reduce)").matches),
+      ).toBe(true);
+      await expect.poll(() => look(find(page))).toEqual({ blur: "none", alpha: 1 });
+    });
+
+    test(`${name} is solid in forced-colours mode`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== "pixel-7", "measured in one mobile Chromium");
+      await page.emulateMedia({ forcedColors: "active" });
+      await page.goto(`${CHAT}${path}`);
+      await expect.poll(() => look(find(page))).toEqual({ blur: "none", alpha: 1 });
+    });
+  }
+});
