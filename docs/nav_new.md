@@ -65,7 +65,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
 
 ## Part 3: hide while scrolling
 
-- [ ] **10. The rule.** A pure function in `src/lib/nav/`: shown within 8px of the top or 24px of the end; hidden after more than 40px down; shown after 4px or more up; positions are clamped so the iPhone bounce is ignored; a page too short to scroll never hides.
+- [x] **10. The rule.** A pure function in `src/lib/nav/`: shown within 8px of the top or 24px of the end; hidden after more than 40px down; shown after 4px or more up; positions are clamped so the iPhone bounce is ignored; a page too short to scroll never hides.
   - Test first: one case for each rule, plus small jitters in both directions.
   - Done when: unit tests pass.
 
