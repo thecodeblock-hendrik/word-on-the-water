@@ -71,6 +71,20 @@ describe("UndoToast", () => {
     expect(toast.className).not.toMatch(/translate/);
   });
 
+  it("is a capsule 12px above the bar, as wide as it and centred", () => {
+    render(<UndoToast />);
+    clearChat();
+    expect(undo().parentElement).toHaveClass(
+      "fixed",
+      "rounded-full",
+      "mx-auto",
+      "max-w-[440px]",
+      "left-[max(1rem,env(safe-area-inset-left))]",
+      "right-[max(1rem,env(safe-area-inset-right))]",
+      "bottom-[calc(4.75rem+max(.875rem,env(safe-area-inset-bottom)))]",
+    );
+  });
+
   it("goes after 8 seconds, and what was cleared is forgotten", () => {
     render(<UndoToast />);
     clearChat();

@@ -30,7 +30,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first (`bottom-nav.test.tsx`, `bottom-nav-host.test.tsx`): capsule, `lg:hidden`, three tabs, no raised circle, no accent fill, Shore instead of Devotional on a devotional page only, no `aria-current` anywhere, 440px maximum width and centred. In `bottom-nav.spec.ts`, replace the current-page check with: Shore on a devotional goes to `/`. In `bottom-nav.spec.ts`, at 744 and 820 wide the bar is 440px with equal space on both sides.
   - Done when: unit tests and `bottom-nav.spec.ts` pass, and the footer scrolls clear of the bar.
 
-- [ ] **3. Chat spacing and Undo toast.** The message pill sits 12px above the capsule. The toast becomes a capsule 12px above the bar.
+- [x] **3. Chat spacing and Undo toast.** The message pill sits 12px above the capsule. The toast becomes a capsule 12px above the bar.
   - Test first: `chat-input-pill.test.tsx`, `undo-toast.test.tsx`, and in `bottom-nav.spec.ts` replace the bump check with "the toast and message pill do not overlap the bar". At 744 and 820 wide, the pill and the toast are 440px, centred and in line with the bar.
   - Done when: both pass, the keyboard still hides the bar, the pill and toast look as before at 375px, the chat thread is unchanged, and the desktop drawer looks as before.
 

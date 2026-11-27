@@ -104,9 +104,10 @@ test("the undo toast is announced politely, is clear of the bar and has no serio
     await expect(status).toContainText("Chat cleared");
     const undo = status.getByRole("button", { name: "Undo" });
     const toast = (await undo.boundingBox())!;
-    const barBox = (await page.locator("nav[data-bottom-nav]").boundingBox())!;
-    expect(toast.y + toast.height).toBeLessThanOrEqual(barBox.y);
     expect(toast.height).toBeGreaterThanOrEqual(44);
+    const barBox = (await page.locator("nav[data-bottom-nav]").boundingBox())!;
+    const pillBox = (await undo.locator("..").boundingBox())!;
+    expect(barBox.y - (pillBox.y + pillBox.height), "toast to bar").toBeCloseTo(12, 0);
     // Axe reads colours mid-fade as low contrast, so let the fade-in finish first.
     await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
     await noSeriousProblems(page, `toast ${scheme}`);
@@ -175,6 +176,53 @@ test.describe("the glass capsule", () => {
     });
   }
 });
+
+/** The message box row of the open chat, and the bar under it. */
+async function chatRowAndBar(page: Page) {
+  await page.goto(`${CHAT}/privacy`);
+  await bar(page).getByText("Ask the Word").click();
+  const dialog = page.getByRole("dialog", { name: "Ask the Word" });
+  const row = dialog.getByRole("textbox", { name: "Your question" }).locator("..");
+  await expect(row).toBeVisible();
+  return {
+    dialog,
+    row: (await row.boundingBox())!,
+    nav: (await dialog.getByRole("navigation", { name: "Quick links" }).boundingBox())!,
+  };
+}
+
+test("the chat's message pill sits 12px above the bar and lines up with it", async ({ page }) => {
+  const { row, nav } = await chatRowAndBar(page);
+  expect(nav.y - (row.y + row.height)).toBeCloseTo(12, 0);
+  expect(row.x).toBeCloseTo(nav.x, 0);
+  expect(row.width).toBeCloseTo(nav.width, 0);
+});
+
+for (const size of [
+  { width: 744, height: 1133 },
+  { width: 820, height: 1180 },
+]) {
+  test(`on a ${size.width} wide tablet the message pill and the toast match the bar`, async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      !["pixel-7", "iphone-13"].includes(testInfo.project.name),
+      "one mobile Chromium and one mobile WebKit are enough",
+    );
+    await page.setViewportSize(size);
+    const { dialog, row, nav } = await chatRowAndBar(page);
+    expect(row.width).toBeCloseTo(440, 0);
+    expect(row.x).toBeCloseTo(nav.x, 0);
+
+    await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
+    await dialog.getByRole("button", { name: "Close" }).click();
+    const toast = (await page.getByRole("button", { name: "Undo" }).locator("..").boundingBox())!;
+    const siteBar = (await bar(page).boundingBox())!;
+    expect(toast.width).toBeCloseTo(440, 0);
+    expect(toast.x).toBeCloseTo(siteBar.x, 0);
+    expect(siteBar.y - (toast.y + toast.height)).toBeCloseTo(12, 0);
+  });
+}
 
 // The latest published devotional on the pinned test day (5 December 2026).
 const DEVOTIONAL = "/devotionals/advent-02-the-long-wait";
