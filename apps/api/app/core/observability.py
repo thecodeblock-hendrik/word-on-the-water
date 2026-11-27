@@ -46,10 +46,11 @@ def _scrub_log_entry(entry: dict[str, Any]) -> None:
 
 
 def scrub_event(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any] | None:
-    """Sentry before_send: drop bodies, cookies, auth headers, locals and email addresses."""
+    """Sentry before_send: drop bodies, cookies, auth headers, locals, extras and addresses."""
     if "request" in event:
         _scrub_request(event["request"])
     event.pop("user", None)
+    event.pop("extra", None)  # fields passed with a log line; the app sets none itself
     if "message" in event:
         event["message"] = _mask(event["message"])
     _scrub_stacks(event)

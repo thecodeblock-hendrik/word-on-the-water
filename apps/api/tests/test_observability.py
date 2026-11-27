@@ -157,3 +157,12 @@ def test_log_lines_are_not_shipped_to_sentry_as_logs(sent: Sent) -> None:
     sentry_sdk.get_client().close()
 
     assert {kind for kind, _ in sent.items} <= {"event", "sessions", "client_report"}
+
+
+def test_fields_passed_with_a_log_line_are_not_sent(sent: Sent) -> None:
+    logging.getLogger("some.library").error("send failed", extra={"recipient": EMAIL})
+    sentry_sdk.flush()
+
+    (event,) = sent.events()
+    assert "send failed" in event
+    assert EMAIL not in sent.text()
