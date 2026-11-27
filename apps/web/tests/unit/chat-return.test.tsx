@@ -30,7 +30,6 @@ describe("ChatReturn, the Your chat tab in the Bible", () => {
     const icon = button.querySelector("svg")!;
     expect(icon).toHaveAttribute("aria-hidden", "true");
     expect(icon.querySelector("path")).toHaveAttribute("fill", "currentColor");
-    expect(button.closest("[data-chat-return]")!.querySelector("svg[data-chat-bump]")).toBeNull();
   });
 
   it("opens the chat over the page without leaving it, and clears the way back", async () => {

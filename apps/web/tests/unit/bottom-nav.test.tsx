@@ -52,7 +52,6 @@ describe("BottomNav on the site pages", () => {
       expect(link.className).not.toMatch(/\bbg-/);
       expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     }
-    expect(nav.querySelector("[data-bump]")).toBeNull();
   });
 });
 

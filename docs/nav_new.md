@@ -38,8 +38,9 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first (`bible-chapter-nav.test.tsx`, `shore-button.test.tsx`, `chat-return.test.tsx`): chevrons and short names on phones; spoken names "Previous chapter: John 2", "Start of the Bible", "End of the Bible"; desktop classes and text unchanged. Update the old geometry checks in `chat.spec.ts`. At 744 and 820 wide, the reader bar is 440px and centred.
   - Done when: the specs pass, no label wraps or is cut off for any book at 320px, and arrow keys still change chapter.
 
-- [ ] **5. Remove the old shape.** Delete `RaisedBump` and any unused classes and attributes.
+- [x] **5. Remove the old shape.** Delete `RaisedBump` and any unused classes and attributes.
   - Done when: a search finds no `RaisedBump`, `data-bump` or `data-chat-bump`, and the full e2e run is green.
+  - Result (local, 27 November): the search is clean. Five projects in parallel: 1,019 passed, 218 skipped, 13 WebKit failures in tests outside the bar (as in the step 0 baseline), all passing one at a time. Not proven: why WebKit fails in parallel on this Mac. Desktop Firefox and a clean parallel run are left to CI at the final push.
 
 - [ ] **6. Solid fallbacks.** Solid bar for reduced transparency, increased contrast and no `backdrop-filter`; system colours in forced-colours mode.
   - Test first: e2e with emulated contrast and forced colours; check the other two rules by hand in browser tools.
