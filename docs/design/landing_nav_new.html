@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid glass bottom navigation</title>
+<style>
+/* Tokens copied from apps/web/src/styles/tokens.css */
+.phone{--bg:#fbf3e8;--surface:#fffaf3;--ink:#2b2d42;--muted:#5c5e70;--line:#e9dccb;--accent:#d9703a;--accent-ink:#a9501f;--deep:#2b2d42;--on-deep:#fbf3e8;--accent-on-deep:#f0955f;
+  --lens:rgb(43 45 66 / .10);--rim:rgb(255 255 255 / .85);--edge:rgb(43 45 66 / .16);--glass-shadow:0 8px 28px rgb(43 45 66 / .22)}
+.phone.night{--bg:#0f2233;--surface:#152c40;--ink:#f4f1ea;--muted:#a9b7c2;--line:#28425a;--accent:#4fa9a6;--accent-ink:#6fc0bc;--deep:#0a1825;--on-deep:#f4f1ea;--accent-on-deep:#4fa9a6;
+  --lens:rgb(10 24 37 / .45);--rim:rgb(255 255 255 / .22);--edge:rgb(255 255 255 / .12);--glass-shadow:0 8px 28px rgb(0 0 0 / .45)}
+
+*{box-sizing:border-box}
+body{margin:0;background:#e7e2da;color:#2b2d42;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px 16px 80px}
+main{max-width:1240px;margin:0 auto}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:20px;margin:44px 0 4px}h3{font-size:16px;margin:24px 0 0}
+p.lead{color:#4a4c5c;margin:0 0 8px;max-width:80ch}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:14px}
+figure{margin:0;width:375px}
+figcaption{font-size:13px;color:#3b3d4e;margin-top:8px}
+table{border-collapse:collapse;font-size:14px;background:#fffdf9;margin-top:10px;max-width:100%}
+th,td{border:1px solid #d9d0c3;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0e8db}
+li{margin:3px 0;max-width:84ch}
+.tag{display:inline-block;background:#2b2d42;color:#fff;border-radius:4px;padding:1px 8px;font:700 11px system-ui;letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
+
+.controls{position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;gap:16px;align-items:center;background:#fffdf9;border:1px solid #d9d0c3;border-radius:12px;padding:10px 14px;margin:14px 0;font-size:14px}
+.controls label{display:flex;gap:6px;align-items:center;min-height:32px}
+.controls select{font:inherit;min-height:32px}
+
+/* ---------- phone frame ---------- */
+.phone{width:375px;height:740px;border-radius:34px;border:8px solid #111;overflow:clip;position:relative;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;isolation:isolate}
+.status{height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font:600 12px system-ui}
+.top{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.logo{flex:1;white-space:nowrap;font:700 15px "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.1em;text-transform:uppercase}
+.sub{min-height:40px;display:inline-flex;align-items:center;padding:0 12px;border-radius:6px;background:var(--accent-ink);color:var(--bg);font:700 14px system-ui}
+.ib{min-width:44px;min-height:44px;display:grid;place-items:center;border:0;background:none;color:var(--ink);font:600 18px system-ui;cursor:pointer}
+.view{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+.scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:16px 16px 108px}
+.scroll::-webkit-scrollbar{display:none}
+.eyebrow{font:700 12px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin:0}
+.title{font:700 34px/1.1 "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;margin:6px 0 12px}
+.serif{font:17px/1.7 Georgia,"Times New Roman",serif;margin:0 0 14px}
+.quote{font:italic 22px/1.4 Georgia,serif;margin:8px 0}
+.card{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:0 0 12px}
+.card h4{font:700 23px/1.15 "Barlow Condensed","Arial Narrow",system-ui;margin:4px 0}
+.card p{margin:0;font-size:15px;color:var(--muted)}
+.sea{height:150px;border-radius:12px;margin:12px 0;background:linear-gradient(180deg,#f2b27a 0%,#d9703a 38%,#2b5d77 39%,#123048 100%)}
+.cta{display:flex;width:100%;min-height:48px;align-items:center;justify-content:center;border-radius:8px;background:var(--accent-ink);color:var(--bg);font:700 16px system-ui;margin:0 0 12px}
+.big{font:700 80px/1 "Barlow Condensed","Arial Narrow",system-ui;color:var(--accent-ink);margin:0}
+.pick{display:flex;gap:8px;margin:-4px 0 14px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.pick span,.pick button{min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 14px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:600 15px system-ui}
+.vtext sup{font:700 11px system-ui;color:var(--accent-ink);margin-right:3px}
+.vtext mark{background:color-mix(in srgb,var(--accent) 22%,transparent);color:inherit}
+.credit{font-size:12px;color:var(--muted)}
+
+/* ---------- THE NAVIGATION (the only part that changes) ---------- */
+.dock{position:absolute;left:16px;right:16px;bottom:14px;z-index:5;transition:transform .2s ease}
+.toast{transition:bottom .2s ease}
+/* Never wider than 440px: centred on tablets and landscape phones. */
+.dock,.toast{max-width:440px;margin-inline:auto}
+/* Hidden while reading. Keyboard focus in the bar always brings it back. */
+.bar-away:not(:has(.dock :focus-visible)) .dock{transform:translateY(calc(100% + 24px))}
+.bar-away:not(:has(.dock :focus-visible)) .toast{bottom:14px}
+.bar-mid .dock{transform:translateY(55%)}
+.still .dock,.still .toast{transition:none}
+@media (prefers-reduced-motion:reduce){.dock,.toast{transition:none}}
+.glass{position:relative;display:flex;height:64px;padding:4px;border-radius:32px;
+  background:color-mix(in srgb,var(--surface) 72%,transparent);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);
+  border:1px solid var(--edge);
+  box-shadow:var(--glass-shadow),inset 0 1px 0 var(--rim),inset 0 -1px 0 color-mix(in srgb,var(--rim) 35%,transparent);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+.lens{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:28px;background:var(--lens);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--edge);opacity:0;pointer-events:none;transition:opacity .18s ease;will-change:transform}
+.lens.on{opacity:1}
+.tab{position:relative;z-index:1;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:none;padding:0 2px;border-radius:28px;color:var(--ink);font:600 12px/15px "Barlow",system-ui;white-space:nowrap;cursor:pointer}
+.tab:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.tab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.tab .solid{display:none}
+.tab.sel{font-weight:800}
+.tab.sel .line{display:none}
+.tab.sel .solid{display:inline}
+.tab.under svg{transform:scale(1.14)}
+.tab[aria-disabled="true"]{opacity:.4;cursor:default}
+.solid .f{fill:currentColor}
+
+/* Reduce transparency / increase contrast / no backdrop-filter: a solid bar */
+body.solidmode .glass{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border-color:var(--muted)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:var(--surface)}}
+@media (prefers-reduced-transparency:reduce),(prefers-contrast:more){.glass{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border-color:var(--muted)}}
+@media (forced-colors:active){.glass{background:Canvas;border:1px solid CanvasText}.lens{border:2px solid Highlight}}
+@media (prefers-reduced-motion:reduce){.tab svg{transition:none}}
+
+/* ---------- chat ---------- */
+.chat-h{flex:none;display:flex;align-items:center;gap:4px;padding:6px 8px 6px 16px;border-bottom:1px solid var(--line)}
+.chat-h strong{flex:1;font:700 21px "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;letter-spacing:.05em}
+.thread{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:14px 16px 170px;display:flex;flex-direction:column;gap:12px}
+.thread>*{flex:none}
+.thread.kb-open{padding-bottom:80px}
+.me{align-self:flex-end;max-width:82%;background:var(--accent-ink);color:var(--bg);padding:10px 14px;border-radius:18px 18px 4px 18px}
+.bot{background:var(--surface);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.bot p{margin:0}
+.verses{display:flex;gap:8px;flex-wrap:wrap}
+.verse,.chip{min-height:44px;border:1px solid var(--line);background:var(--bg);color:var(--accent-ink);border-radius:22px;padding:0 14px;font:600 14px system-ui;display:inline-flex;align-items:center;cursor:pointer}
+.chip{background:var(--surface);color:var(--ink);text-align:left}
+.starters{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.comp{position:absolute;left:12px;right:12px;bottom:90px;z-index:4;display:flex;align-items:center;gap:8px;min-height:52px;padding:0 4px 0 18px;border:1.5px solid var(--line);border-radius:26px;background:var(--surface);box-shadow:0 6px 18px rgb(0 0 0 / .16);color:var(--muted)}
+.comp span:first-child{flex:1}
+.comp span.draft{color:var(--ink)}
+.send{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent-ink);color:var(--bg);display:grid;place-items:center;font-weight:700}
+.send.off{opacity:.4}
+.privacy{position:absolute;left:0;right:0;bottom:148px;z-index:3;margin:0;padding:4px 20px;font-size:12px;color:var(--muted);background:var(--bg);text-align:center}
+.kbd{flex:none;height:250px;background:#cfd3da;color:#2b2d42;display:grid;place-items:center;font:600 14px system-ui}
+.night .kbd{background:#2a2f38;color:#c8ccd4}
+.comp.typing-pos{bottom:10px}
+
+/* ---------- toast, menu, sheet ---------- */
+.toast{position:absolute;left:16px;right:16px;bottom:90px;z-index:6;min-height:52px;display:flex;align-items:center;gap:8px;padding:0 4px 0 18px;border-radius:26px;background:var(--deep);color:var(--on-deep);border:1px solid rgb(255 255 255 / .18);box-shadow:0 8px 22px rgb(0 0 0 / .35);font:600 15px system-ui}
+.toast span{flex:1}
+.toast button{min-height:44px;min-width:64px;border:0;background:none;color:var(--accent-on-deep);font:700 15px system-ui;cursor:pointer}
+.menu{position:absolute;left:0;right:0;top:0;z-index:4;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:0 12px 24px rgb(0 0 0 / .18);padding:6px 16px 10px}
+.menu div{min-height:46px;display:flex;align-items:center;border-bottom:1px solid var(--line);font-weight:600}
+.scrim{position:absolute;inset:0;background:rgb(10 24 37 / .6);z-index:7}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:70%;z-index:8;background:var(--bg);border-radius:20px 20px 0 0;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.sheet .tabs{display:flex;gap:6px}
+.sheet .tabs span{flex:1;min-height:44px;display:grid;place-items:center;border:1.5px solid var(--line);border-radius:6px;font:600 13px system-ui}
+.sheet .tabs span:first-child{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.sheet .books{flex:1;overflow:hidden}
+.sheet .books div{min-height:44px;display:flex;align-items:center;border-bottom:1px solid var(--line)}
+
+.film{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px}
+.film .phone{height:104px;width:345px;border-width:0;border-radius:14px}
+.film .dock{bottom:20px;left:10px;right:10px}
+.film .bgtext{padding:6px 14px;font:700 22px/1.25 Georgia,serif;color:var(--ink);opacity:.8}
+.film figure{width:345px}
+
+/* ---------- tablet frames: real CSS size, scaled down to fit the page ---------- */
+:root{--tscale:.6}
+body.actual{--tscale:1}
+.tfig{width:calc(var(--w) * var(--tscale))}
+.tbox{width:calc(var(--w) * var(--tscale));height:calc(var(--h) * var(--tscale))}
+.phone.tablet{width:var(--w);height:var(--h);max-width:none;border-width:14px;border-radius:40px;transform:scale(var(--tscale));transform-origin:0 0;box-sizing:border-box}
+.tablet .scroll{padding:24px max(24px,calc((100% - 640px) / 2)) 108px}
+.tablet .thread{padding-left:24px;padding-right:24px}
+.tablet .comp{left:16px;right:16px;max-width:440px;margin-inline:auto}
+.tablet .top{padding:10px 24px}
+.tablet .sheet{left:50%;right:auto;width:544px;transform:translateX(-50%)}
+.tablet .dnav{display:flex;align-items:center;gap:18px;flex:none;padding:8px 24px;border-bottom:1px solid var(--line);font:500 15px system-ui;white-space:nowrap}
+.tablet .dnav .logo{flex:none;margin-right:auto}
+.edge-tab{position:absolute;right:0;top:50%;transform:translateY(-50%);width:48px;min-height:190px;border-radius:16px 0 0 16px;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font:700 14px system-ui}
+.chapters{display:flex;justify-content:space-between;margin:20px 0}
+.chapters span{min-height:48px;display:inline-flex;align-items:center;padding:0 16px;border:1.5px solid var(--line);border-radius:4px;background:var(--bg);font:600 16px system-ui}
+.chapters span:last-child{background:var(--accent-ink);border-color:var(--accent-ink);color:var(--bg)}
+</style>
+</head>
+<body>
+<main>
+<h1>Bottom navigation: liquid glass (proposal)</h1>
+<p class="lead">Only the phone navigation changes (below <code>lg</code>). Routes, page content, header, chat and Bible reader behaviour stay as they are. Page content in these frames is placeholder text. Light is Dawn patrol, dark is Night swell, 375px. Every bar on this page is live: tap it, or hold and slide your finger or mouse across it. Scroll inside a phone: content passes under the glass, and the bar hides on the way down and returns on the way up. The current design stays in <a href="landing_nav.html">landing_nav.html</a>.</p>
+
+<div class="controls">
+  <label><input type="checkbox" id="slow"> Slow motion</label>
+  <label><input type="checkbox" id="solid"> Reduce transparency</label>
+  <label><input type="checkbox" id="still"> Reduce motion</label>
+</div>
+
+<h2>Journeys and routes (unchanged)</h2>
+<table>
+<tr><th>Screen</th><th>Left</th><th>Middle</th><th>Right</th><th>Selected at rest</th></tr>
+<tr><td>Landing</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td><td>None</td></tr>
+<tr><td>Devotional</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td><td>Devotional (<code>aria-current="page"</code>)</td></tr>
+<tr><td>Privacy, thank you, not found</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td><td>None</td></tr>
+<tr><td>Chat</td><td>Devotional</td><td>Bible</td><td>Shore</td><td>None</td></tr>
+<tr><td>Bible reader</td><td>Previous chapter</td><td>Shore</td><td>Next chapter</td><td>None: these are actions</td></tr>
+<tr><td>Bible reader, from the chat</td><td>Previous chapter</td><td>Your chat</td><td>Next chapter</td><td>None: these are actions</td></tr>
+</table>
+<p class="lead">None of the three buttons is a "Home" tab, so on most screens no pill rests anywhere. It appears under your finger on touch. It stays only where the button is the page you are on.</p>
+
+<h2>1. Clickable prototype</h2>
+<p class="lead">Walk every journey: Devotional, Bible, Previous and Next, Shore, Ask the Word, ask a starter question, tap a verse, Your chat, close the chat, Undo.</p>
+<div class="row" id="proto"></div>
+
+<h2>2. Landing page</h2><div class="row" id="s-landing"></div>
+<h2>3. Devotional page (current page)</h2><div class="row" id="s-devotional"></div>
+<h2>4. Privacy, thank you, not found</h2><div class="row" id="s-other"></div>
+<h2>5. Ask the Word</h2>
+<p class="lead">The message pill stays a separate, solid control above the glass, with a 12px gap now that there is no bump. The bar hides while the keyboard is open.</p>
+<div class="row" id="s-chat"></div>
+<h2>6. Bible reader from the Bible button</h2>
+<p class="lead">The chapter bar uses the same capsule. Each chapter button is a chevron with the short book name and chapter under it, such as "Matt 15" or "1 Thess 2".</p>
+<div class="row" id="s-bible"></div>
+<h2>7. Bible reader from a chat verse</h2><div class="row" id="s-yourchat"></div>
+<h2>8. Leaving the chat: undo toast</h2>
+<p class="lead">Same behaviour as now: 8 seconds, paused while Undo has focus, only when there was an answer or a draft. Its shape now matches the capsule.</p>
+<div class="row" id="s-toast"></div>
+<h2>9. With the header menu or the passage picker open</h2><div class="row" id="s-overlay"></div>
+
+<h2>10. Hiding while you scroll</h2>
+<p class="lead">On every page with the bar, and in the Bible reader, the bar slides away as you read down and returns as soon as you scroll up. The chat keeps its bar: it only hides for the keyboard, as today. Every page frame above is live too.</p>
+<table>
+<tr><th>When</th><th>Bar</th></tr>
+<tr><td>At the top of the page (within 8px)</td><td>Shown</td></tr>
+<tr><td>More than 40px of scrolling down</td><td>Slides out in 200ms. The 40px stops a small wobble from hiding it</td></tr>
+<tr><td>Scrolling up 4px or more</td><td>Slides back in 200ms</td></tr>
+<tr><td>At the end of the page or chapter (within 24px)</td><td>Shown, ready for the next step</td></tr>
+<tr><td>iPhone bounce past either end</td><td>Ignored, so the bar does not flicker</td></tr>
+<tr><td>Page too short to scroll</td><td>Always shown</td></tr>
+<tr><td>A new page or chapter opens</td><td>Shown</td></tr>
+<tr><td>Keyboard focus enters the bar</td><td>Shown. The hidden bar is <b>not</b> <code>inert</code> or <code>aria-hidden</code>, so keyboard and screen reader users can still reach it. This corrects the old proposal, where an inert bar could never receive focus</td></tr>
+<tr><td>Undo toast showing</td><td>The toast stays visible and drops into the bar's place</td></tr>
+<tr><td>Reduced motion</td><td>No slide: the bar simply disappears and appears</td></tr>
+<tr><td>The page itself</td><td>Keeps its bottom padding, so nothing jumps</td></tr>
+</table>
+<h3>Devotional page</h3><div class="row" id="s-hide-devotional"></div>
+<h3>Bible reader</h3><div class="row" id="s-hide-bible"></div>
+<h3>Bible reader from a chat verse</h3><div class="row" id="s-hide-yourchat"></div>
+<h3>With the undo toast</h3><div class="row" id="s-hide-toast"></div>
+
+<h2>11. Liquid motion</h2>
+<p class="lead">One pill, two springs. The edge facing the target moves faster than the trailing edge, so the pill stretches, thins a little, then settles with a small overshoot.</p>
+<div class="film" id="s-film"></div>
+<table>
+<tr><th>Moment</th><th>What happens</th></tr>
+<tr><td>Touch down</td><td>The pill blooms under the finger (or flows there from the current tab) and lifts to 106%. The icon grows to 114%.</td></tr>
+<tr><td>Slide while held</td><td>The pill follows from tab to tab, stretching. Nothing opens yet.</td></tr>
+<tr><td>Release on a tab</td><td>That tab opens at once. Navigation never waits for the animation.</td></tr>
+<tr><td>Release outside the bar</td><td>Cancelled, nothing opens (WCAG 2.5.2). The pill returns to the current tab or fades.</td></tr>
+<tr><td>Keyboard</td><td>Enter or Space opens the tab and the pill flows to it. Focus has its own visible ring.</td></tr>
+<tr><td>Reduced motion</td><td>No stretch or bounce: the pill appears in its new place.</td></tr>
+</table>
+
+<h2>12. Glass, readability and accessibility</h2>
+<p class="lead">Contrast is worked out here from the same values the bars use, against the worst possible backdrop: solid black behind the light bar, solid white behind the dark one. Blur only averages what is behind, so a real page cannot be worse than this. The saturation boost is not part of the sum and needs a check in a real browser.</p>
+<table id="contrast"><tr><th>Scheme</th><th>Label on glass</th><th>Label on the pill</th><th>Accent text on the pill</th></tr></table>
+<ul>
+<li>So every label uses the ink colour. Selection shows as the pill, a filled icon and a heavier label, never as colour alone. Orange text on the pill fails in light mode.</li>
+<li>Ask the Word loses its solid accent fill and Bible loses its raised circle: all three are equals, as in your picture.</li>
+<li>Targets: the bar is 64px high and each tab is at least 90px wide at 320px, well over 44px.</li>
+<li>Solid bar for reduced transparency, increased contrast and browsers without backdrop blur; system colours in forced-colours mode.</li>
+<li>The bar floats 14px above the bottom, or above the home indicator (<code>env(safe-area-inset-bottom)</code>) where there is one. Pages keep bottom padding so the last line and the footer can scroll clear of it.</li>
+<li>Web limit: this is frosted glass (blur, saturation, a light rim). Apple's native glass also bends the content at its edges. I have left that out because iPhone Safari cannot apply that distortion filter to a backdrop.</li>
+<li>Desktop is unchanged, including the "Your chat" edge tab from <code>lg</code>.</li>
+<li>Without JavaScript the bar never hides.</li>
+<li>Hiding has a cost: someone who only scrolls down may not notice the bar until they scroll up. It is always there at the top and the end, and the header stays on screen.</li>
+<li>Still to test on real phones: Safari's own toolbar collapsing during a scroll, and VoiceOver and TalkBack reaching the hidden bar.</li>
+<li>Without JavaScript the links still work and the current tab still shows its pill (drawn with CSS), with no movement. Ask the Word stays a mail link.</li>
+</ul>
+
+<h2 id="tablet">13. Tablet</h2>
+<p class="lead">Yes: a tablet uses the new bar whenever the page is narrower than 1024px, which is where the current bar already shows. From 1024px it gets the desktop header and no bar, as today. The width decides, not the device.</p>
+<table>
+<tr><th>Screen (CSS width)</th><th>Navigation</th></tr>
+<tr><td>iPad mini portrait (744), 11-inch iPad portrait (820)</td><td>New bar, centred</td></tr>
+<tr><td>Narrow split-screen window, landscape phone under 1024</td><td>New bar, centred</td></tr>
+<tr><td>13-inch iPad portrait (1032), iPad landscape (1133, 1180)</td><td>Desktop header, no bar (unchanged)</td></tr>
+</table>
+<ul>
+<li><b>One change for tablets:</b> the capsule stops at 440px and is centred. Stretched to 800px, the buttons would sit far apart and the liquid pill would travel across the whole screen. The message pill and Undo toast use the same width, so the three line up.</li>
+<li>It stays at the bottom, in the same place as on a phone: one component and one set of tests. A top tab bar would compete with the header, and a side rail would be a second navigation to build.</li>
+<li>It needs no new breakpoint: a maximum width does it, and phones are unaffected.</li>
+<li>As today, below 1024px the chat fills the screen and leaving it clears it. Hide on scroll works as on a phone. The passage picker stays a centred 544px sheet.</li>
+<li>Rotating an iPad from portrait to landscape can swap the bar for the desktop header.</li>
+</ul>
+<p><label><input type="checkbox" id="actual"> Show tablets at actual size</label> (otherwise 60%)</p>
+<h3>Portrait, 744 wide (iPad mini)</h3><div class="row" id="s-tab-mini"></div>
+<h3>Portrait, 820 wide (11-inch iPad)</h3><div class="row" id="s-tab-11"></div>
+<h3>Landscape, 1180 wide: desktop navigation, unchanged</h3>
+<p class="lead">Shown for comparison. This is a simplified drawing of what exists today, not a new design.</p>
+<div class="row" id="s-tab-land"></div>
+
+<h2>14. Decisions</h2>
+<ul>
+<li>Light glass for Dawn patrol and dark glass for Night swell, following the theme.</li>
+<li>Chapter buttons use plain chevrons.</li>
+<li>No resting pill: it stays only where a button is the current page.</li>
+<li>The bar hides while scrolling down.</li>
+</ul>
+</main>
+
+<script>
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+const opts = { slow: false, still: matchMedia("(prefers-reduced-motion: reduce)").matches };
+
+/* ---------- icons: outline when idle, filled when selected ---------- */
+const surfer = '<circle cx="12" cy="7.5" r="3.5"/>';
+const waves = '<path d="M2 15c3 0 3-2 5.5-2s2.5 2 4.5 2 3-2 5.5-2 2.5 2 4.5 2M2 20c3 0 3-2 5.5-2s3 2 5.5 2 3-2 5.5-2"/>';
+const book = "M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z";
+const bubble = "M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z";
+const board = "M12 2c3 3 3.5 9 0 15-3.500-6-3-12 0-15z";
+const ICON = {
+  devotional: [surfer + waves, '<circle class="f" cx="12" cy="7.5" r="3.5"/><g style="stroke-width:2.8">' + waves + "</g>"],
+  bible: ['<path d="' + book + 'M12 6.5v13"/>', '<path class="f" d="M11.200 6.200C9.300 5 6.700 4.600 4 5v13c2.700-.4 5.300 0 7.200 1.200zM12.800 6.200C14.700 5 17.300 4.600 20 5v13c-2.700-.4-5.300 0-7.200 1.200z"/>'],
+  ask: ['<path d="' + bubble + '"/>', '<path class="f" d="' + bubble + '"/>'],
+  yourchat: ['<path class="f" d="' + bubble + '"/>', '<path class="f" d="' + bubble + '"/>'],
+  shore: ['<path d="' + board + 'M12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/>', '<path class="f" d="' + board + '"/><path d="M3 21h18M7 21l2-2M17 21l-2-2"/>'],
+};
+const CHAPTER = { prev: '<path style="stroke-width:2.6" d="M15 5l-7 7 7 7"/>', next: '<path style="stroke-width:2.6" d="M9 5l7 7-7 7"/>' };
+const svg = (inner, cls = "", extra = "") => `<svg viewBox="0 0 24 24" aria-hidden="true" class="${cls}" ${extra}>${inner}</svg>`;
+const iconHtml = (key) => {
+  if (key === "prev" || key === "next") return svg(CHAPTER[key]);
+  return svg(ICON[key][0], "line") + svg(ICON[key][1], "solid");
+};
+
+/* ---------- liquid bar ---------- */
+function spring(s, target, k, c, dt) { s.v += (k * (target - s.x) - c * s.v) * dt; s.x += s.v * dt; }
+
+function liquidBar(items, { selected = null, label = "Quick links", onPick } = {}) {
+  const dock = el(`<div class="dock"><nav class="glass" aria-label="${label}"><span class="lens" aria-hidden="true"></span></nav></div>`);
+  const nav = dock.firstChild, lens = nav.firstChild;
+  const tabs = items.map((it, i) => {
+    const b = el(`<button type="button" class="tab">${iconHtml(it.icon)}<span>${it.text}</span></button>`);
+    if (it.aria) b.setAttribute("aria-label", it.aria);
+    if (it.disabled) b.setAttribute("aria-disabled", "true");
+    if (i === selected) { b.classList.add("sel"); b.setAttribute("aria-current", "page"); }
+    nav.append(b);
+    return b;
+  });
+  const L = { x: 0, v: 0 }, R = { x: 0, v: 0 };
+  let goal = null, frame = 0, last = 0, held = false, rest = selected;
+
+  const box = (i) => ({ l: tabs[i].offsetLeft, r: tabs[i].offsetLeft + tabs[i].offsetWidth });
+  const draw = () => {
+    const w = Math.max(24, R.x - L.x), base = goal ? goal.r - goal.l : w;
+    const squash = Math.max(.82, Math.min(1, 1 - (w - base) / (base * 3.5)));
+    lens.style.width = w + "px";
+    lens.style.transform = `translateX(${L.x}px) scale(${held ? 1.02 : 1},${held ? squash * 1.06 : squash})`;
+  };
+  function tick(now) {
+    let dt = Math.min(.032, (now - last) / 1000); last = now;
+    if (opts.slow) dt /= 5;
+    const right = goal.l + goal.r > L.x + R.x;
+    for (let n = 0; n < 4; n++) {
+      spring(L, goal.l, right ? 190 : 520, right ? 21 : 34, dt / 4);
+      spring(R, goal.r, right ? 520 : 190, right ? 34 : 21, dt / 4);
+    }
+    draw();
+    const moving = Math.abs(L.x - goal.l) + Math.abs(R.x - goal.r) > .4 || Math.abs(L.v) + Math.abs(R.v) > 4;
+    frame = moving ? requestAnimationFrame(tick) : 0;
+    if (!moving) { L.x = goal.l; R.x = goal.r; draw(); }
+  }
+  function moveTo(i, jump) {
+    goal = box(i);
+    const fresh = !lens.classList.contains("on");
+    lens.classList.add("on");
+    if (jump || opts.still || fresh) {
+      const pinch = jump || opts.still ? 0 : (goal.r - goal.l) * .22;
+      L.x = goal.l + pinch; R.x = goal.r - pinch; L.v = R.v = 0;
+      if (!pinch) { cancelAnimationFrame(frame); frame = 0; draw(); return; }
+    }
+    if (!frame) { last = performance.now(); frame = requestAnimationFrame(tick); }
+  }
+  function settle() {
+    tabs.forEach((t) => t.classList.remove("under"));
+    held = false;
+    if (rest === null) lens.classList.remove("on"); else moveTo(rest);
+  }
+  const at = (e) => {
+    const r = nav.getBoundingClientRect();
+    if (e.clientY < r.top - 24 || e.clientY > r.bottom + 24 || e.clientX < r.left || e.clientX > r.right) return -1;
+    return tabs.findIndex((t) => { const b = t.getBoundingClientRect(); return e.clientX >= b.left && e.clientX <= b.right && !items[tabs.indexOf(t)].disabled; });
+  };
+  const hover = (i) => { tabs.forEach((t, n) => t.classList.toggle("under", n === i)); if (i >= 0) moveTo(i); };
+  function pick(i) {
+    if (items[i].disabled) return;
+    moveTo(i);
+    const wait = onPick ? (opts.still ? 0 : opts.slow ? 900 : 230) : 700;
+    // The mockup waits a moment so the movement can be seen; the real site opens the page at once.
+    setTimeout(() => (onPick ? onPick(items[i], i) : settle()), wait);
+    tabs.forEach((t) => t.classList.remove("under"));
+    held = false;
+  }
+  nav.addEventListener("pointerdown", (e) => { const i = at(e); if (i < 0) return; held = true; nav.setPointerCapture(e.pointerId); hover(i); });
+  nav.addEventListener("pointermove", (e) => { if (held) hover(at(e)); });
+  nav.addEventListener("pointerup", (e) => { if (!held) return; const i = at(e); if (i < 0) settle(); else pick(i); });
+  nav.addEventListener("pointercancel", settle);
+  tabs.forEach((t, i) => t.addEventListener("click", (e) => { if (e.detail === 0) pick(i); }));
+
+  dock.rest = () => { if (rest !== null) moveTo(rest, true); };
+  dock.force = (l, r) => { goal = box(1); lens.classList.add("on"); L.x = l * nav.clientWidth; R.x = r * nav.clientWidth; draw(); };
+  return dock;
+}
+
+/* ---------- hide while reading ---------- */
+function autoHide(view) {
+  const scroller = $(".scroll", view);
+  if (!scroller || !$(".dock", view)) return;
+  const limit = () => scroller.scrollHeight - scroller.clientHeight;
+  const position = () => Math.max(0, Math.min(limit(), scroller.scrollTop)); // ignores the bounce
+  // The furthest point reached in the current direction: highest while shown, lowest while hidden.
+  let turn = position();
+  scroller.addEventListener("scroll", () => {
+    const y = position(), away = view.classList.contains("bar-away");
+    const show = () => { view.classList.remove("bar-away", "bar-mid"); turn = y; };
+    if (y <= 8 || y >= limit() - 24) show();
+    else if (away) { if (turn - y >= 4) show(); else turn = Math.max(turn, y); }
+    else if (y - turn > 40) { view.classList.remove("bar-mid"); view.classList.add("bar-away"); turn = y; }
+    else turn = Math.min(turn, y);
+  }, { passive: true });
+}
+
+/* ---------- bar presets (same journeys as today) ---------- */
+const site = { devotional: { id: "devotional", icon: "devotional", text: "Devotional" }, bible: { id: "bible", icon: "bible", text: "Bible" } };
+const siteItems = () => [site.devotional, site.bible, { id: "ask", icon: "ask", text: "Ask the Word" }];
+const chatItems = () => [site.devotional, site.bible, { id: "shore", icon: "shore", text: "Shore" }];
+function readerItems(chapter, fromChat, book = "John", last = 21) {
+  const prev = chapter > 1 ? { id: "prev", icon: "prev", text: `${book} ${chapter - 1}`, aria: `Previous chapter: ${book} ${chapter - 1}` } : { id: "prev", icon: "prev", text: "Start", aria: "Start of the Bible", disabled: true };
+  const next = chapter < last ? { id: "next", icon: "next", text: `${book} ${chapter + 1}`, aria: `Next chapter: ${book} ${chapter + 1}` } : { id: "next", icon: "next", text: "End", aria: "End of the Bible", disabled: true };
+  const mid = fromChat ? { id: "yourchat", icon: "yourchat", text: "Your chat" } : { id: "shore", icon: "shore", text: "Shore" };
+  return [prev, mid, next];
+}
+
+/* ---------- page content (placeholders) ---------- */
+const header = '<div class="top"><span class="logo">Word on the Water</span><span class="sub">Subscribe</span><button class="ib" data-act="none" aria-label="Menu">&#9776;</button></div>';
+const para = "The night watch knows the dark will end, because it has seen the sun rise before. Hope is not a feeling that the wave will be small. It is the memory of every morning the water went flat and gold.";
+const paras = (n) => `<p class="serif">${para}</p>`.repeat(n);
+const PAGE = {
+  landing: () => `<p class="eyebrow">For surfers and everyone who feels the swell</p><p class="quote">&ldquo;Who then is this, that even the wind and the sea obey him?&rdquo;</p><p class="credit">Mark 4:41 (ESV)</p><div class="sea"></div><div class="card"><p class="eyebrow">This week</p><h4>More Than Watchmen</h4><p>An Advent devotional for the long wait before dawn.</p></div><div class="card"><p class="eyebrow">New to faith?</p><h4>Start here</h4><p>The gospel in four steps.</p></div><span class="cta">Get the devotional</span><div class="card"><p class="eyebrow">What we believe</p><h4>Our hope</h4><p>${para}</p></div>`,
+  devotional: () => `<p class="eyebrow">Advent &middot; Part 1</p><h3 class="title">More Than Watchmen</h3><p class="credit">28 November 2026</p><div class="sea"></div>${paras(5)}`,
+  privacy: () => `<p class="eyebrow">Privacy</p><h3 class="title">Privacy policy</h3>${paras(5)}`,
+  thanks: () => `<p class="eyebrow">Confirmed</p><h3 class="title">You are in</h3><p class="serif">Placeholder text for the thank-you page.</p><span class="cta">Read the devotional</span>`,
+  notfound: () => `<p class="big">404</p><h3 class="title">Page not found</h3><p class="serif">Placeholder text for the not-found page.</p><span class="cta">Back to the landing page</span>`,
+  bible: (chapter = 3, book = "John") => `<div class="pick"><span>${book} ${chapter} &#9662;</span><span>BSB</span><span>WEB</span></div><p class="eyebrow">World English Bible</p><h3 class="title">${book} ${chapter}</h3><p class="serif vtext"><sup>${book === "John" && chapter === 3 ? 16 : 17}</sup>${book === "John" && chapter === 3 ? "<mark>For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</mark> <sup>17</sup>For God didn&rsquo;t send his Son into the world to judge the world, but that the world should be saved through him." : para}</p>${[18, 19, 20, 21, 22].map((n) => `<p class="serif vtext"><sup>${n}</sup>${para}</p>`).join("")}<p class="credit">World English Bible, public domain.</p>`,
+};
+
+const starters = '<p style="margin:0"><strong>Ask anything about the Christian faith.</strong> Answers come from our own notes.</p><div class="starters"><button class="chip" data-act="ask">Who is Jesus?</button><button class="chip" data-act="ask">How do I become a Christian?</button><button class="chip" data-act="ask">Why does God allow suffering?</button></div>';
+const turn = '<div class="me">Does God love me?</div><div class="bot"><p>Yes. God loved the world so much that he gave his Son, so that everyone who believes in him has eternal life.</p><div class="verses"><button class="verse" data-act="verse">John 3:16</button><button class="verse" data-act="verse">Romans 5:8</button></div></div>';
+const chatHead = '<div class="chat-h"><strong>Ask the Word</strong><button class="ib" style="font-size:14px" data-act="clear">Clear</button><button class="ib" data-act="close" aria-label="Close chat">&#10005;</button></div>';
+
+/* ---------- frames ---------- */
+function phone(night, inner) { return el(`<div class="phone ${night ? "night" : ""}"><div class="status"><span>9:41</span><span>5G 100%</span></div>${inner}</div>`); }
+
+function pageScreen({ page, chapter, book, items, selected, label, top = 0, onPick, extra = "" }) {
+  const view = el(`<div class="view">${header}<div class="view"><div class="scroll">${PAGE[page](chapter, book)}</div>${extra}</div></div>`);
+  const bar = liquidBar(items, { selected, label, onPick });
+  view.lastChild.insertBefore(bar, view.lastChild.children[1] || null);
+  view.dataset.top = top;
+  return view;
+}
+function chatScreen({ thread, draft, keyboard, onPick }) {
+  const long = thread ? turn + '<div class="me">Tell me more</div><div class="bot"><p>' + para + "</p></div>" : starters;
+  const view = el(`<div class="view">${chatHead}<div class="view"><div class="thread ${keyboard ? "kb-open" : ""}">${long}</div>${keyboard ? "" : '<p class="privacy">Please do not share personal details.</p>'}<div class="comp ${keyboard ? "typing-pos" : ""}"><span class="${draft ? "draft" : ""}">${draft || "Ask a question"}</span><span class="send ${draft ? "" : "off"}">&uarr;</span></div></div>${keyboard ? '<div class="kbd">keyboard</div>' : ""}</div>`);
+  if (!keyboard) view.children[1].append(liquidBar(chatItems(), { onPick }));
+  return view;
+}
+
+function fig(parent, night, screen, caption) {
+  const f = el("<figure></figure>"), p = phone(night, "");
+  p.append(screen);
+  f.append(p, el(`<figcaption><span class="tag">${night ? "Dark" : "Light"}</span>${caption}</figcaption>`));
+  $(parent).append(f);
+}
+function both(parent, make, caption) { fig(parent, false, make(), caption); fig(parent, true, make(), caption); }
+
+const siteShot = (page, selected, top) => () => pageScreen({ page, items: siteItems(), selected, top });
+const readerShot = (chapter, fromChat, top, book, last) => () => pageScreen({ page: "bible", chapter, book, items: readerItems(chapter, fromChat, book, last), label: "Previous and next chapter", top });
+
+both("#s-landing", siteShot("landing", null, 0), "At the top. No tab is selected.");
+both("#s-landing", siteShot("landing", null, 210), "Scrolled: the picture and cards pass under the glass.");
+both("#s-devotional", siteShot("devotional", 0, 190), "Devotional is the current page, so the pill rests on it.");
+both("#s-other", siteShot("privacy", null, 40), "Privacy.");
+both("#s-other", siteShot("thanks", null, 0), "Thank you.");
+both("#s-other", siteShot("notfound", null, 0), "Not found.");
+both("#s-chat", () => chatScreen({}), "Just opened. Shore is on the right.");
+both("#s-chat", () => chatScreen({ thread: true }), "After an answer. Scroll the thread under the pill and bar.");
+both("#s-chat", () => chatScreen({ thread: true, draft: "Why did Jesus die?", keyboard: true }), "Typing: the bar is hidden.");
+both("#s-bible", readerShot(3, false, 110), "Previous, Shore, Next.");
+both("#s-bible", readerShot(1, false, 0, "Gen", 50), "Start of the Bible: Previous is disabled.");
+both("#s-bible", readerShot(22, false, 0, "Rev", 22), "End of the Bible: Next is disabled.");
+both("#s-bible", readerShot(2, false, 60, "1 Thess", 5), "A long short name still fits on one line.");
+both("#s-yourchat", readerShot(3, true, 110), "Your chat takes Shore's place, with a filled bubble. It reopens the same thread.");
+const toast = '<div class="toast" role="status"><span>Chat cleared</span><button type="button">Undo</button></div>';
+both("#s-toast", () => pageScreen({ page: "devotional", items: siteItems(), selected: 0, extra: toast }), "Left the chat by tapping Devotional.");
+both("#s-toast", () => pageScreen({ page: "bible", chapter: 3, items: readerItems(3, false), label: "Previous and next chapter", top: 110, extra: toast }), "Left the chat by tapping Bible.");
+const menu = '<div class="menu"><div>About</div><div>What is coming</div><div>Start here</div><div>What we believe</div><div>Bible</div><div>Ask the Word</div><div>Theme</div></div>';
+both("#s-overlay", () => pageScreen({ page: "landing", items: siteItems(), selected: null, extra: menu }), "Header menu open (illustrative list): the bar stays.");
+both("#s-overlay", () => {
+  const v = readerShot(3, false, 110)();
+  v.append(el('<div class="scrim"></div>'), el('<div class="sheet"><div class="tabs"><span>Book: John</span><span>Chapter: 3</span><span>Verses: all</span></div><div class="books"><div>Matthew</div><div>Mark</div><div>Luke</div><div>John</div><div>Acts</div><div>Romans</div></div><span class="cta">Read</span></div>'));
+  return v;
+}, "Passage picker open: it covers the bar, as today.");
+
+const hideStates = [
+  [0, "", "At the top: shown."],
+  [260, "bar-away", "Scrolling down: hidden, the text has the whole screen."],
+  [220, "bar-mid", "A small scroll up: sliding back (mid-slide)."],
+  [99999, "", "At the end: shown, and the last line scrolls clear of it."],
+];
+function hideShot(make, top, state) {
+  return () => { const v = make(top)(); if (state) v.classList.add(state); return v; };
+}
+for (const [id, make] of [["#s-hide-devotional", (top) => siteShot("devotional", 0, top)], ["#s-hide-bible", (top) => readerShot(3, false, top)], ["#s-hide-yourchat", (top) => readerShot(3, true, top)]]) {
+  for (const night of [false, true]) for (const [top, state, caption] of hideStates) fig(id, night, hideShot(make, top, state)(), caption);
+}
+const hiddenToast = () => { const v = pageScreen({ page: "devotional", items: siteItems(), selected: 0, top: 260, extra: toast }); v.classList.add("bar-away"); return v; };
+both("#s-hide-toast", hiddenToast, "Scrolling with the toast up: the bar leaves and the toast drops into its place.");
+
+/* ---------- clickable prototype ---------- */
+function prototype(night) {
+  const p = phone(night, '<div class="view"></div>'), host = p.lastChild;
+  const f = el("<figure></figure>"), cap = el("<figcaption></figcaption>");
+  const s = { page: "landing", chapter: 3, chat: false, thread: false, fromChat: false, undo: false };
+  let timer = 0;
+  const leave = () => {
+    if (!s.chat) return;
+    s.chat = false; s.fromChat = false;
+    if (s.thread) { s.undo = true; s.thread = false; clearTimeout(timer); timer = setTimeout(() => { s.undo = false; show(); }, 8000); }
+  };
+  const openChat = () => { s.chat = true; if (!s.fromChat) s.undo = false; };
+  function go(item) {
+    if (item.id === "ask" || item.id === "yourchat") openChat();
+    else {
+      leave();
+      if (item.id === "devotional") s.page = "devotional";
+      if (item.id === "bible") s.page = "bible";
+      if (item.id === "shore") { s.page = "landing"; s.fromChat = false; }
+      if (item.id === "prev") { s.chapter--; s.page = "bible"; }
+      if (item.id === "next") { s.chapter++; s.page = "bible"; }
+    }
+    show();
+  }
+  function show() {
+    const extra = s.undo ? '<div class="toast" role="status"><span>Chat cleared</span><button type="button" data-act="undo">Undo</button></div>' : "";
+    let screen, name;
+    if (s.chat) { screen = chatScreen({ thread: s.thread, onPick: go }); name = "Chat"; }
+    else if (s.page === "bible") { screen = pageScreen({ page: "bible", chapter: s.chapter, items: readerItems(s.chapter, s.fromChat), label: "Previous and next chapter", onPick: go, extra }); name = "Bible reader"; }
+    else { screen = pageScreen({ page: s.page, items: siteItems(), selected: s.page === "devotional" ? 0 : null, onPick: go, extra }); name = s.page === "devotional" ? "Devotional page" : "Landing page"; }
+    host.replaceChildren(screen);
+    screen.querySelectorAll(".dock").forEach((d) => d.rest());
+    autoHide(screen);
+    cap.innerHTML = `<span class="tag">${night ? "Dark" : "Light"}</span>Now showing: ${name}`;
+  }
+  host.addEventListener("click", (e) => {
+    const act = e.target.closest("[data-act]")?.dataset.act;
+    if (act === "ask") { s.thread = true; show(); }
+    if (act === "clear") { s.thread = false; show(); }
+    if (act === "close") { leave(); show(); }
+    if (act === "verse") { s.chat = false; s.fromChat = true; s.page = "bible"; s.chapter = 3; show(); }
+    if (act === "undo") { s.undo = false; s.thread = true; s.chat = true; show(); }
+  });
+  f.append(p, cap); $("#proto").append(f); show();
+}
+prototype(false); prototype(true);
+
+/* ---------- motion filmstrip ---------- */
+const film = [["1. At rest on Devotional", .012, .335, 0], ["2. Leading edge races ahead", .05, .62, null], ["3. Stretched and thinner", .17, .665, null], ["4. Overshoots a little", .345, .685, 1], ["5. Settled on Bible", .339, .661, 1]];
+const frames = [];
+for (const night of [false, true]) for (const [text, l, r, sel] of film) {
+  const f = el("<figure></figure>"), p = el(`<div class="phone ${night ? "night" : ""}"><div class="bgtext">Even the wind and the sea obey him. Even the wind and the sea.</div></div>`);
+  const bar = liquidBar(siteItems(), { selected: sel });
+  p.append(bar); f.append(p, el(`<figcaption>${text}</figcaption>`)); $("#s-film").append(f);
+  frames.push([bar, l, r]);
+}
+
+/* ---------- contrast table ---------- */
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const mix = (t, a, u) => t.map((v, i) => v * a + u[i] * (1 - a));
+const lum = (c) => c.map((v) => { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + .05) / (y + .05); };
+for (const [name, surface, ink, accent, worst, lc, la] of [["Dawn patrol", "#fffaf3", "#2b2d42", "#a9501f", "#000000", "#2b2d42", .10], ["Night swell", "#152c40", "#f4f1ea", "#6fc0bc", "#ffffff", "#0a1825", .45]]) {
+  const glass = mix(hex(surface), .72, hex(worst)), pill = mix(hex(lc), la, glass);
+  const cell = (fg, bg) => { const r = ratio(hex(fg), bg); return `<td>${r.toFixed(1)}:1 ${r >= 4.5 ? "passes AA" : "fails AA"}</td>`; };
+  $("#contrast").insertAdjacentHTML("beforeend", `<tr><td>${name}</td>${cell(ink, glass)}${cell(ink, pill)}${cell(accent, pill)}</tr>`);
+}
+
+/* ---------- tablet frames ---------- */
+function tabletFig(parent, night, w, h, screen, caption) {
+  const frame = phone(night, ""), box = el('<div class="tbox"></div>');
+  const f = el(`<figure class="tfig" style="--w:${w}px;--h:${h}px"></figure>`);
+  frame.classList.add("tablet");
+  frame.append(screen); box.append(frame);
+  // A tablet is tall: add placeholder text so portrait pages have something to scroll.
+  const scroller = h > w && $(".scroll", screen);
+  if (scroller) {
+    const more = el(`<div>${paras(10)}</div>`);
+    if ($(".vtext", scroller)) scroller.insertBefore(more, scroller.lastElementChild); else scroller.append(more);
+  }
+  f.append(box, el(`<figcaption><span class="tag">${night ? "Dark" : "Light"}</span>${caption}</figcaption>`));
+  $(parent).append(f);
+}
+const wideHeader = (screen) => { $(".sub", screen).textContent = "Get the devotional"; return screen; };
+const wide = (make) => () => { const v = make(); if ($(".sub", v)) wideHeader(v); return v; };
+for (const [make, caption] of [
+  [wide(siteShot("landing", null, 0)), "Landing page. The bar is centred, 440px wide."],
+  [wide(siteShot("devotional", 0, 200)), "Devotional: the pill rests on the current page."],
+  [() => chatScreen({ thread: true }), "Chat: the message pill lines up with the bar."],
+  [wide(() => pageScreen({ page: "devotional", items: siteItems(), selected: 0, extra: toast })), "Undo toast, the same width as the bar."],
+  [wide(hideShot((top) => siteShot("devotional", 0, top), 300, "bar-away")), "Scrolling down: the bar is hidden."],
+]) for (const night of [false, true]) tabletFig("#s-tab-mini", night, 744, 1133, make(), caption);
+
+for (const [make, caption] of [
+  [wide(readerShot(3, false, 0)), "Bible reader: chevrons, Shore in the middle."],
+  [wide(readerShot(3, true, 0)), "From a chat verse: Your chat in the middle."],
+]) for (const night of [false, true]) tabletFig("#s-tab-11", night, 820, 1180, make(), caption);
+
+const desktopHeader = '<div class="dnav"><span class="logo">Word on the Water</span><span>About</span><span>Devotionals</span><span>Bible</span><span>Start here</span><span>What we believe</span><span>Ask the Word</span><span class="sub">Subscribe</span><span>&#9680;</span></div>';
+for (const night of [false, true]) {
+  tabletFig("#s-tab-land", night, 1180, 820, el(`<div class="view">${desktopHeader}<div class="scroll">${PAGE.devotional()}</div></div>`), "Devotional: header links, no bottom bar.");
+  tabletFig("#s-tab-land", night, 1180, 820, el(`<div class="view">${desktopHeader}<div class="view"><div class="scroll">${PAGE.bible(3)}<div class="chapters"><span>&larr; John 2</span><span>John 4 &rarr;</span></div></div><span class="edge-tab">Your chat</span></div></div>`), "Bible from a chat verse: chapter buttons under the text, Your chat on the right edge.");
+}
+$("#actual").onchange = (e) => { document.body.classList.toggle("actual", e.target.checked); };
+
+/* ---------- start and controls ---------- */
+document.querySelectorAll(".view[data-top]").forEach((v) => { $(".scroll", v).scrollTop = Number(v.dataset.top); autoHide(v); });
+document.querySelectorAll(".dock").forEach((d) => d.rest());
+frames.forEach(([bar, l, r]) => bar.force(l, r));
+$("#still").checked = opts.still;
+$("#slow").onchange = (e) => { opts.slow = e.target.checked; };
+$("#still").onchange = (e) => { opts.still = e.target.checked; document.body.classList.toggle("still", opts.still); };
+$("#solid").onchange = (e) => { document.body.classList.toggle("solidmode", e.target.checked); };
+</script>
+</body>
+</html>
