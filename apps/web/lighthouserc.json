@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "DEVOTIONAL_TODAY=2026-12-05 SITE_URL=http://localhost:3200 pnpm start -p 3200",
+      "startServerCommand": "BIBLE_ENABLED=1 CHAT_ENABLED=1 DEVOTIONAL_TODAY=2026-12-05 SITE_URL=http://localhost:3200 pnpm start -p 3200",
       "startServerReadyPattern": "Ready",
       "url": [
         "http://localhost:3200/",

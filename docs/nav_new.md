@@ -88,5 +88,7 @@ If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen
 
 | When | Landing JS (gzipped) | LCP | CLS | TBT |
 |---|---|---|---|---|
-| Before (step 0) | | | | |
+| Before (step 0) | 163,496 bytes (159.7 KiB; 5,464 bytes under the limit) | landing 1.67 s, devotional 1.66 s | 0.0002, 0.0001 | 47 ms, 51 ms |
 | After (step 12) | | | | |
+
+Step 0, 27 November, local macOS, Bible and chat on. Lighthouse: median of 3 runs, performance 99, accessibility 100, best practices 96, SEO 100 on both pages. JS: measured by the `chat.spec.ts` size check in desktop Chromium. End to end: five local projects (not desktop Firefox), 986 passed, 184 skipped, 10 WebKit tests failed in the parallel run and passed when rerun one at a time. CI is the check for all six.
