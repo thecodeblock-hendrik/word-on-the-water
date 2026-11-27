@@ -324,6 +324,12 @@ test.describe("where each button goes", () => {
   }
 });
 
+/** Two frames: the scroll event has been delivered and the page has drawn. No fixed sleeps. */
+const frames = (page: Page) =>
+  page.evaluate(
+    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  );
+
 test("Devotional opens the devotional at its top, wherever the landing page was scrolled to", async ({
   page,
 }) => {
@@ -340,6 +346,11 @@ test("Devotional opens the devotional at its top, wherever the landing page was 
         }),
       fraction,
     );
+    await frames(page); // or the next scroll could merge with this one into a single event
+    // Partway down, the bar is away: a little scroll up brings it back, as a visitor would.
+    await page.evaluate(() => window.scrollBy({ top: -10, behavior: "instant" }));
+    await frames(page);
+    await expect(page.locator("html")).not.toHaveAttribute("data-nav-away", "");
     await bar(page).getByRole("link", { name: "Devotional" }).click();
     await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
     await page.waitForTimeout(1500);
@@ -665,5 +676,138 @@ test.describe("hold and slide", () => {
       await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
       expect(await entries(page)).toBe(before + 1);
     });
+  });
+});
+
+test.describe("hiding while scrolling", () => {
+  async function scroll(page: Page, top: number) {
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top);
+    await frames(page);
+  }
+
+  async function ready(page: Page, path: string) {
+    await page.goto(`${CHAT}${path}`);
+    await page.waitForLoadState("networkidle");
+  }
+
+  /** How far the top of a bar is above the bottom of the screen: 0 or less when fully away. */
+  const showing = (nav: ReturnType<Page["locator"]>) =>
+    nav.evaluate((el) => Math.round(window.innerHeight - el.getBoundingClientRect().top));
+  const SHOWN = 78; // 64px of bar, 14px up where there is no home indicator
+
+  const expectShown = (nav: ReturnType<Page["locator"]>) =>
+    expect.poll(() => showing(nav)).toBe(SHOWN);
+  const expectAway = (nav: ReturnType<Page["locator"]>) =>
+    expect.poll(() => showing(nav)).toBeLessThanOrEqual(0);
+
+  for (const [name, path, find] of [
+    ["the site bar", "/privacy", bar],
+    ["the Bible reader's bar", "/bible/web/psalms/119", chapterBar],
+  ] as const) {
+    test(`${name} leaves on the way down, returns on the way up and is there at the end`, async ({
+      page,
+    }) => {
+      await ready(page, path);
+      const nav = find(page);
+      await expectShown(nav);
+      const padding = () => page.evaluate(() => getComputedStyle(document.body).paddingBottom);
+      const before = await padding();
+
+      await scroll(page, 600);
+      await expectAway(nav);
+      expect(await padding()).toBe(before); // nothing jumps
+
+      await scroll(page, 590);
+      await expectShown(nav);
+      await scroll(page, 700);
+      await expectAway(nav);
+
+      await scroll(page, 1_000_000);
+      await expectShown(nav);
+    });
+  }
+
+  test("a new chapter shows the bar again", async ({ page }) => {
+    await ready(page, "/bible/web/psalms/119");
+    await scroll(page, 600);
+    await expectAway(chapterBar(page));
+    await page.keyboard.press("ArrowRight");
+    await expect(page).toHaveURL(`${CHAT}/bible/web/psalms/120`);
+    await expectShown(chapterBar(page));
+  });
+
+  test("keyboard focus brings a hidden bar back, and it is still in the accessibility tree", async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName === "webkit", "Safari does not Tab to links unless asked to");
+    await ready(page, "/privacy");
+    await scroll(page, 600);
+    const nav = bar(page);
+    await expectAway(nav);
+    await expect(nav.getByRole("link")).toHaveCount(3);
+    // Tab on from the last link before the bar, without scrolling to it.
+    await page
+      .locator("footer a")
+      .last()
+      .evaluate((el: HTMLElement) => el.focus({ preventScroll: true }));
+    await page.keyboard.press("Tab");
+    await expect(nav.getByRole("link", { name: "Devotional" })).toBeFocused();
+    await expectShown(nav);
+    await page.keyboard.press("Shift+Tab");
+    await expect(nav.getByRole("link", { name: "Devotional" })).not.toBeFocused();
+  });
+
+  test("the Undo toast stays, drops into the bar's place and goes back up with it", async ({
+    page,
+  }) => {
+    await ready(page, "/privacy");
+    await bar(page).getByText("Ask the Word").click();
+    await chatDialog(page).getByRole("textbox", { name: "Your question" }).fill("a draft");
+    await chatDialog(page).getByRole("button", { name: "Close" }).click();
+    const toast = page.getByRole("button", { name: "Undo" }).locator("..");
+    const fromBottom = () =>
+      toast.evaluate((el) => Math.round(window.innerHeight - el.getBoundingClientRect().bottom));
+    await expect.poll(fromBottom).toBe(SHOWN + 12);
+    // Focus on Undo holds the toast's timer, so it cannot expire while this is measured.
+    await page.getByRole("button", { name: "Undo" }).focus();
+    await scroll(page, 600);
+    await expectAway(bar(page));
+    await expect.poll(fromBottom).toBe(14);
+    await scroll(page, 580);
+    await expect.poll(fromBottom).toBe(SHOWN + 12);
+  });
+
+  test("the chat's bar stays, even opened over a page whose bar is away", async ({ page }) => {
+    await ready(page, "/privacy");
+    await scroll(page, 600);
+    await expectAway(bar(page));
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByTestId("mobile-menu").getByRole("link", { name: "Ask the Word" }).click();
+    await expectShown(chatDialog(page).getByRole("navigation", { name: "Quick links" }));
+  });
+
+  test("with reduced motion the bar does not slide", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await ready(page, "/privacy");
+    const seconds = await bar(page).evaluate((el) =>
+      parseFloat(getComputedStyle(el).transitionDuration),
+    );
+    expect(seconds).toBeLessThanOrEqual(0.00001);
+    await scroll(page, 600);
+    await expectAway(bar(page));
+  });
+});
+
+test.describe("on a wide screen", () => {
+  test.use({ viewport: { width: 1280, height: 700 } });
+
+  test("the chapter buttons under the text are never moved", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "pixel-7", "one run is enough");
+    await page.goto(`${CHAT}/bible/web/psalms/119`);
+    await page.waitForLoadState("networkidle");
+    await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
+    await expect(page.locator("html")).toHaveAttribute("data-nav-away", "");
+    expect(await chapterBar(page).evaluate((el) => getComputedStyle(el).transform)).toBe("none");
   });
 });

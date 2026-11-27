@@ -122,10 +122,15 @@ test.describe("on a phone or tablet (below 1024px)", () => {
   }) => {
     await page.goto("/bible/bsb/psalms/119");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    await page.waitForTimeout(300);
     const height = page.viewportSize()!.height;
+    // The bar leaves during the long smooth scroll and slides back at the end: wait for it to land.
+    await expect
+      .poll(async () => {
+        const box = (await barOf(page).boundingBox())!;
+        return Math.round(box.y + box.height);
+      })
+      .toBe(height - FLOAT);
     const bar = (await barOf(page).boundingBox())!;
-    expect(bar.y + bar.height).toBeCloseTo(height - FLOAT, 0);
     // Nothing is hidden behind the bar: the last line of the page (the credit) ends above it.
     const credit = (await page.getByText("Berean Standard Bible (BSB), dedicated").boundingBox())!;
     expect(credit.y + credit.height).toBeLessThanOrEqual(bar.y + 1);

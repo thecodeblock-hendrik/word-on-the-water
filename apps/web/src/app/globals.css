@@ -128,6 +128,27 @@ body {
   }
 }
 
+/* Hide on scroll, below lg only (lib/nav/follow-scroll.ts sets data-nav-away). The hidden bar is
+   still in the page: keyboard focus in it brings it straight back. */
+@media (width < 64rem) {
+  [data-hides] {
+    transition: transform 200ms ease;
+  }
+
+  [data-follows-bar] {
+    transition: bottom 200ms ease;
+  }
+
+  /* Down by its own height, its distance from the edge, and room for the shadow above it. */
+  :root[data-nav-away] [data-hides]:not(:has(:focus-visible)) {
+    transform: translateY(calc(100% + max(0.875rem, env(safe-area-inset-bottom)) + 1.5rem));
+  }
+
+  :root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-follows-bar] {
+    bottom: max(0.875rem, env(safe-area-inset-bottom));
+  }
+}
+
 /* Logo colours: set --logo-ring, --logo-wave and --logo-gap on a parent to recolour it. */
 .ring {
   stroke: var(--logo-ring, var(--ink));

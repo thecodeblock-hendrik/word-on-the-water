@@ -69,9 +69,10 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first: one case for each rule, plus small jitters in both directions.
   - Done when: unit tests pass.
 
-- [ ] **11. Connect it.** A passive window scroll listener for the site and reader bars, not the chat bar. The state resets on every new page or chapter. The bar slides in 200ms (no slide with reduced motion). The toast stays and moves into the bar's place. The hidden bar is not `inert` or `aria-hidden`; keyboard focus (`:focus-visible`) shows it. Page padding does not change. Desktop never hides.
+- [x] **11. Connect it.** A passive window scroll listener for the site and reader bars, not the chat bar. The state resets on every new page or chapter. The bar slides in 200ms (no slide with reduced motion). The toast stays and moves into the bar's place. The hidden bar is not `inert` or `aria-hidden`; keyboard focus (`:focus-visible`) shows it. Page padding does not change. Desktop never hides.
   - Test first: unit tests for the reset and the chat exception; e2e on the phone projects for hide, return, end of page, keyboard focus, the toast, the reader and reduced motion.
   - Done when: the e2e journeys pass without fixed sleeps and CLS is unchanged.
+  - Result: journeys pass on the three phone projects (keyboard focus in Chromium only: Safari does not Tab to links). The hidden bar moves by its height, its distance from the edge (with the home indicator) and its shadow; the mockup's height plus 24px would have left a strip showing on an iPhone, which only a real phone can confirm (step 13). The watcher is mounted whenever the Bible reader is on, since the reader has its bar without the chat. Two older tests were updated: one tapped the bar while it is now hidden, one measured it mid-slide after a fixed wait. Local Lighthouse: CLS 0.0002 and 0.0001, as at step 0; LCP 1.63 s and 1.62 s. Landing JS 164,948 bytes, 4,012 under the limit.
 
 ## Part 4: prove and finish
 

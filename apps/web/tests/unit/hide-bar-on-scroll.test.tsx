@@ -1,0 +1,166 @@
+// @vitest-environment jsdom
+import { readFileSync } from "node:fs";
+
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ChapterNav } from "@/components/bible/chapter-nav";
+import { UndoToast } from "@/components/chat/undo-toast";
+import { BottomNav } from "@/components/layout/bottom-nav";
+import { HideBarOnScroll } from "@/components/layout/hide-bar-on-scroll";
+import { findBook } from "@/lib/bible/books";
+import { dropCleared, stashCleared } from "@/lib/chat/cleared";
+
+let pathname = "/privacy";
+vi.mock("next/navigation", () => ({ usePathname: () => pathname }));
+
+/** jsdom has no layout: a 3000px page in an 800px window, so it can scroll 2200px. */
+let scrollY = 0;
+function scrollTo(y: number) {
+  scrollY = y;
+  fireEvent.scroll(window);
+}
+
+const away = () => document.documentElement.hasAttribute("data-nav-away");
+
+beforeEach(() => {
+  pathname = "/privacy";
+  scrollY = 0;
+  vi.spyOn(window, "scrollY", "get").mockImplementation(() => scrollY);
+  vi.spyOn(window, "innerHeight", "get").mockReturnValue(800);
+  vi.spyOn(document.documentElement, "scrollHeight", "get").mockReturnValue(3000);
+});
+
+afterEach(() => {
+  cleanup();
+  dropCleared();
+  vi.restoreAllMocks();
+});
+
+describe("HideBarOnScroll", () => {
+  it("marks the page while the bar should be away, on the way down and not on the way up", () => {
+    render(<HideBarOnScroll />);
+    expect(away()).toBe(false);
+    scrollTo(300);
+    expect(away()).toBe(true);
+    scrollTo(290);
+    expect(away()).toBe(false);
+  });
+
+  it("brings the bar back at the end of the page", () => {
+    render(<HideBarOnScroll />);
+    scrollTo(300);
+    scrollTo(2200);
+    expect(away()).toBe(false);
+  });
+
+  it("listens passively, so it never holds up scrolling", () => {
+    const add = vi.spyOn(window, "addEventListener");
+    render(<HideBarOnScroll />);
+    const scroll = add.mock.calls.find(([type]) => type === "scroll");
+    expect(scroll?.[2]).toEqual({ passive: true });
+  });
+
+  it("shows the bar on a new page or chapter, and measures from where that page is", () => {
+    const view = render(<HideBarOnScroll />);
+    scrollTo(900);
+    expect(away()).toBe(true);
+    pathname = "/bible/bsb/john/4";
+    view.rerender(<HideBarOnScroll />);
+    expect(away()).toBe(false);
+    scrollTo(930);
+    expect(away()).toBe(false);
+    scrollTo(960);
+    expect(away()).toBe(true);
+  });
+
+  it("keeps its state when the same page renders again", () => {
+    const view = render(<HideBarOnScroll />);
+    scrollTo(300);
+    view.rerender(<HideBarOnScroll />);
+    expect(away()).toBe(true);
+  });
+
+  it("shows the bar and stops listening when it goes", () => {
+    const view = render(<HideBarOnScroll />);
+    scrollTo(300);
+    view.unmount();
+    expect(away()).toBe(false);
+    scrollTo(900);
+    expect(away()).toBe(false);
+  });
+
+  it("leaves a hidden bar reachable by keyboard and screen reader", () => {
+    render(
+      <>
+        <HideBarOnScroll />
+        <BottomNav devotionalHref="/devotionals/advent-01" />
+      </>,
+    );
+    scrollTo(300);
+    const nav = screen.getByRole("navigation", { name: "Quick links" });
+    expect(nav).not.toHaveAttribute("inert");
+    expect(nav).not.toHaveAttribute("aria-hidden");
+  });
+});
+
+describe("which bars hide", () => {
+  const nav = () => screen.getByRole("navigation");
+
+  it("the site bar does", () => {
+    render(<BottomNav devotionalHref="/devotionals/advent-01" />);
+    expect(nav()).toHaveAttribute("data-hides");
+  });
+
+  it("the chat's bar does not", () => {
+    render(<BottomNav devotionalHref="/devotionals/advent-01" variant="chat" />);
+    expect(nav()).not.toHaveAttribute("data-hides");
+  });
+
+  it("the Bible reader's bar does", () => {
+    render(<ChapterNav version="bsb" book={findBook("john")!} chapter={3} />);
+    expect(nav()).toHaveAttribute("data-hides");
+  });
+
+  it("the Undo toast follows the bar", () => {
+    stashCleared({ thread: [], draft: "a draft" });
+    render(<UndoToast />);
+    const toast = screen.getByRole("button", { name: "Undo" }).parentElement;
+    expect(toast).toHaveAttribute("data-follows-bar");
+  });
+});
+
+describe("the styles that move the bar", () => {
+  // The rules only: comments may name anything.
+  const css = readFileSync("src/app/globals.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  /** Everything about hiding, which must apply below lg only. */
+  const below = css.slice(css.indexOf("@media (width < 64rem)"), css.indexOf(".ring {"));
+  const flat = below.replace(/\s+/g, " ");
+
+  it("only apply below lg", () => {
+    expect(css.indexOf("@media (width < 64rem)")).toBeGreaterThan(0);
+    expect(css.slice(0, css.indexOf("@media (width < 64rem)"))).not.toContain("data-nav-away");
+  });
+
+  it("move the bar its height, its distance from the edge and its shadow, so none peeks out", () => {
+    expect(flat).toContain(
+      "transform: translateY(calc(100% + max(0.875rem, env(safe-area-inset-bottom)) + 1.5rem));",
+    );
+  });
+
+  it("never hide a bar that has keyboard focus", () => {
+    expect(flat).toContain(":root[data-nav-away] [data-hides]:not(:has(:focus-visible))");
+  });
+
+  it("drop the toast into the bar's place, unless the bar is showing for the keyboard", () => {
+    expect(flat).toContain(
+      ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-follows-bar] { bottom: max(0.875rem, env(safe-area-inset-bottom)); }",
+    );
+  });
+
+  it("slide in 200ms (the reduced motion rule above removes the slide)", () => {
+    expect(flat).toContain("[data-hides] { transition: transform 200ms ease; }");
+    expect(flat).toContain("[data-follows-bar] { transition: bottom 200ms ease; }");
+    expect(css).toContain("transition-duration: 0.01ms !important;");
+  });
+});

@@ -31,7 +31,10 @@ export function UndoToast() {
   return (
     <div role="status">
       {visible && (
-        <div className="fixed bottom-[calc(4.75rem+max(.875rem,env(safe-area-inset-bottom)))] left-[max(1rem,env(safe-area-inset-left))] right-[max(1rem,env(safe-area-inset-right))] z-40 mx-auto flex min-h-13 max-w-[440px] items-center gap-2 rounded-full border border-on-deep-muted/40 bg-deep pl-[18px] pr-1 font-ui text-[15px] font-semibold text-on-deep shadow-menu motion-safe:animate-toast-in lg:hidden">
+        <div
+          data-follows-bar=""
+          className="fixed bottom-[calc(4.75rem+max(.875rem,env(safe-area-inset-bottom)))] left-[max(1rem,env(safe-area-inset-left))] right-[max(1rem,env(safe-area-inset-right))] z-40 mx-auto flex min-h-13 max-w-[440px] items-center gap-2 rounded-full border border-on-deep-muted/40 bg-deep pl-[18px] pr-1 font-ui text-[15px] font-semibold text-on-deep shadow-menu motion-safe:animate-toast-in lg:hidden"
+        >
           <span className="flex-1">{bottomNav.cleared}</span>
           <button
             type="button"

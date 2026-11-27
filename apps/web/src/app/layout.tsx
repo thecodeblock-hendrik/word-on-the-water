@@ -9,6 +9,7 @@ import { UndoToast } from "@/components/chat/undo-toast";
 import { CspNonce } from "@/components/csp-nonce";
 import { LogoSprite } from "@/components/logo";
 import { BottomNavHost } from "@/components/layout/bottom-nav-host";
+import { HideBarOnScroll } from "@/components/layout/hide-bar-on-scroll";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/layout/skip-link";
@@ -74,6 +75,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         {bottomNav && <BottomNavHost devotionalHref={devotionalHref} />}
         {bottomNav && <UndoToast />}
+        {/* The Bible reader has its bar even when the chat, and so the site bar, is off. */}
+        {isBibleEnabled() && <HideBarOnScroll />}
         {isChatEnabled() && (
           <ChatHost
             bibleLinks={isBibleEnabled()}
