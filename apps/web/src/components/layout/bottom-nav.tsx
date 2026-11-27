@@ -4,6 +4,7 @@ import { ChatLauncher } from "@/components/chat/chat-launcher";
 import { bottomNav } from "@/content/bottom-nav";
 
 import { BibleIcon, ChatIcon, DevotionalIcon, ShoreIcon } from "./bottom-nav-icons";
+import { GlassPill } from "./glass-pill";
 import { glassTab, glassTabIcon } from "./glass-tab";
 
 /**
@@ -37,6 +38,7 @@ export function BottomNav({
       data-bottom-nav
       className="glass-dock glass-bar fixed z-30 mx-auto flex max-w-[440px] lg:hidden"
     >
+      <GlassPill />
       {variant === "site" && onDevotional ? (
         shore
       ) : (

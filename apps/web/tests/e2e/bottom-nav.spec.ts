@@ -458,3 +458,91 @@ test.describe("the solid fallbacks", () => {
     });
   }
 });
+
+test.describe("the liquid pill", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(
+      !["pixel-7", "iphone-13"].includes(testInfo.project.name),
+      "one mobile Chromium and one mobile WebKit are enough",
+    );
+  });
+
+  const pillOf = (nav: ReturnType<typeof bar>) => nav.locator("[data-pill]");
+
+  /** Presses on a tab, without letting go. */
+  async function press(page: Page, tab: ReturnType<Page["locator"]>) {
+    const box = (await tab.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    return box;
+  }
+
+  const centre = (box: { x: number; width: number }) => box.x + box.width / 2;
+
+  for (const [name, path, find, tabName] of [
+    ["the site bar", "/privacy", bar, "Bible"],
+    ["the Bible reader's bar", "/bible/web/john/3", chapterBar, "Shore"],
+  ] as const) {
+    test(`on ${name} it sits under the pressed tab, then fades, with no CSP violation`, async ({
+      page,
+    }) => {
+      const violations: string[] = [];
+      page.on("console", (m) => {
+        if (m.text().includes("Content Security Policy")) violations.push(m.text());
+      });
+      await page.goto(`${CHAT}${path}`);
+      await page.waitForLoadState("networkidle");
+      const nav = find(page);
+      const pill = pillOf(nav);
+      await expect(pill).toHaveCSS("opacity", "0");
+
+      const tab = await press(page, nav.getByRole("link", { name: tabName }));
+      await expect(pill).toHaveCSS("opacity", "1");
+      await expect
+        .poll(async () => Math.abs(centre((await pill.boundingBox())!) - centre(tab)))
+        .toBeLessThan(1.5);
+
+      // Letting go away from the tab opens nothing.
+      await page.mouse.move(tab.x + tab.width / 2, tab.y - 200, { steps: 4 });
+      await page.mouse.up();
+      await expect(pill).toHaveCSS("opacity", "0");
+      await expect(page).toHaveURL(`${CHAT}${path}`);
+      expect(violations).toEqual([]);
+    });
+  }
+
+  test("a tap opens the page, and the pill on the bar there fades", async ({ page }) => {
+    await page.goto(`${CHAT}/`);
+    await page.waitForLoadState("networkidle");
+    await bar(page).getByRole("link", { name: "Devotional" }).click();
+    await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
+    await expect(pillOf(bar(page))).toHaveCSS("opacity", "0");
+  });
+
+  test("Enter on a tab shows the pill and opens the page", async ({ page }) => {
+    await page.goto(`${CHAT}/privacy`);
+    await page.waitForLoadState("networkidle");
+    await bar(page).getByRole("link", { name: "Devotional" }).focus();
+    // The pill shows only briefly, so note that it did rather than try to catch it on screen.
+    await pillOf(bar(page)).evaluate((pill) => {
+      new MutationObserver(() => {
+        if (pill.hasAttribute("data-on")) document.body.dataset.pillShown = "yes";
+      }).observe(pill, { attributes: true });
+    });
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
+    await expect(page.locator("body")).toHaveAttribute("data-pill-shown", "yes");
+    await expect(pillOf(bar(page))).toHaveCSS("opacity", "0");
+  });
+
+  test("with reduced motion it is exactly on the tab at once", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`${CHAT}/privacy`);
+    await page.waitForLoadState("networkidle");
+    const tab = await press(page, bar(page).getByRole("link", { name: "Bible" }));
+    const pill = (await pillOf(bar(page)).boundingBox())!;
+    expect(pill.x).toBeCloseTo(tab.x, 0);
+    expect(pill.width).toBeCloseTo(tab.width, 0);
+    await page.mouse.up();
+  });
+});

@@ -53,9 +53,10 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first: fixed time steps, no real clock. It stretches in both directions, overshoots a little, settles exactly on the target and stops; a long frame cannot make it fly off.
   - Done when: unit tests pass.
 
-- [ ] **8. Pill on tap and keyboard.** A small client hook moves one pill element with `requestAnimationFrame`. Set styles from JavaScript only: the nonce CSP blocks server-rendered `style` attributes. Links stay real links and navigation is never delayed. The pill fades out afterwards. Reduced motion moves it with no stretch.
+- [x] **8. Pill on tap and keyboard.** A small client hook moves one pill element with `requestAnimationFrame`. Set styles from JavaScript only: the nonce CSP blocks server-rendered `style` attributes. Links stay real links and navigation is never delayed. The pill fades out afterwards. Reduced motion moves it with no stretch.
   - Test first: tap, Enter, the fade afterwards, reduced motion, animation stops on unmount. Ask the Word still opens the chat in place.
   - Done when: the pill shows on the tapped tab and fades, there are no CSP errors (`csp.spec.ts`) and landing JS is within budget. It does not need to flow into the Bible reader or the chat, which have their own bars.
+  - Result: landing JS 164,289 bytes, 4,671 under the limit. Found and fixed: iPhone WebKit starts a native link drag when a press moves off a tab, then sends neither `pointerup` nor `pointercancel`, so the pill stayed on. The bar now cancels `dragstart` (this was the link dragging part of step 9; link previews are still to do).
 
 - [ ] **9. Hold and slide.** The pill follows the finger; releasing over a tab opens it, releasing outside cancels. A native click does not fire when the press ends on a different link, so call that link's `click()` once. Stop iOS link previews and link dragging on the bar.
   - Test first: slide to another tab, release outside, `pointercancel`, disabled tab, plain tap opens only once.

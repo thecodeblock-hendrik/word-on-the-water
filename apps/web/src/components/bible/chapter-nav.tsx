@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { GlassPill } from "@/components/layout/glass-pill";
 import { glassTab, glassTabIcon } from "@/components/layout/glass-tab";
 import { type Book, type ChapterRef, findBook, neighbours } from "@/lib/bible/books";
 import { chapterPath } from "@/lib/bible/reference";
@@ -83,6 +84,7 @@ export function ChapterNav({
       data-chapter-nav
       className="max-lg:glass-dock max-lg:glass-bar fixed z-30 mx-auto flex max-w-[440px] lg:static lg:z-auto lg:w-full lg:max-w-[62ch] lg:justify-between lg:gap-2 lg:pb-16"
     >
+      <GlassPill />
       {previous ? (
         <Link href={href(previous)} className={`${button} ${outlined} lg:justify-start`}>
           <span className="sr-only">Previous chapter:</span> <Chevron to="left" />
