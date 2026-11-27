@@ -69,7 +69,13 @@ function bar() {
     </nav>,
   );
   const tabs = [...view.container.querySelectorAll<HTMLElement>("a, button")];
+  const rect = (left: number, top: number, width: number, height: number) => () =>
+    ({ left, top, width, height, right: left + width, bottom: top + height }) as DOMRect;
+  view.container.querySelector("nav")!.getBoundingClientRect = rect(0, TOP, 342, 64);
+  const opened: string[] = [];
   tabs.forEach((tab, i) => {
+    tab.getBoundingClientRect = rect(4 + i * TAB, TOP + 4, TAB, 56);
+    tab.addEventListener("click", () => opened.push(tab.textContent!));
     Object.defineProperty(tab, "offsetLeft", { value: 4 + i * TAB });
     Object.defineProperty(tab, "offsetWidth", { value: TAB });
   });
@@ -81,8 +87,14 @@ function bar() {
   };
   const on = () => pill.hasAttribute("data-on");
   const [one, two, three] = tabs;
-  return { ...view, pill, place, on, one, two, three };
+  return { ...view, pill, place, on, opened, one, two, three };
 }
+
+const TOP = 600;
+/** A point over the middle of tab `i`, `above` pixels over the top of the bar. */
+const over = (i: number, above = -32) => ({ clientX: 4 + i * TAB + TAB / 2, clientY: TOP - above });
+/** The click a browser sends after a press: pointer clicks count 1 or more, the keyboard's 0. */
+const browserClick = (tab: Element) => fireEvent.click(tab, { detail: 1 });
 
 describe("GlassPill", () => {
   it("renders hidden, with no style attribute (the CSP would block one)", () => {
@@ -202,6 +214,108 @@ describe("GlassPill", () => {
     expect(frames.size).toBe(0);
     expect(vi.getTimerCount()).toBe(0);
     expect(pill.isConnected).toBe(false);
+  });
+});
+
+describe("hold and slide", () => {
+  function slide(from: Element, ...points: { clientX: number; clientY: number }[]) {
+    fireEvent.pointerDown(from, over(0));
+    for (const point of points) fireEvent.pointerMove(window, point);
+  }
+
+  it("takes the pill and the lifted icon along to the tab under the finger", () => {
+    const { one, two, place } = bar();
+    slide(one, over(1));
+    run(120);
+    expect(place()).toMatchObject({ x: 4 + TAB, width: TAB });
+    expect(two).toHaveAttribute("data-under");
+    expect(one).not.toHaveAttribute("data-under");
+  });
+
+  it("opens the tab it is let go over, once, and nothing before", () => {
+    const { one, opened } = bar();
+    slide(one, over(1));
+    expect(opened).toEqual([]);
+    fireEvent.pointerUp(window, over(1));
+    expect(opened).toEqual(["Two"]);
+  });
+
+  it("blocks the click a phone may still send to the tab the slide began on", () => {
+    const { one, opened } = bar();
+    slide(one, over(1));
+    fireEvent.pointerUp(window, over(1));
+    expect(browserClick(one)).toBe(false);
+    expect(opened).toEqual(["Two"]);
+  });
+
+  it("opens nothing when let go well above the bar, and the pill fades", () => {
+    const { one, opened, on } = bar();
+    slide(one, over(1), over(1, 200));
+    fireEvent.pointerUp(window, over(1, 200));
+    browserClick(one);
+    expect(opened).toEqual([]);
+    vi.advanceTimersByTime(LINGER);
+    expect(on()).toBe(false);
+  });
+
+  it("still counts a finger that strays a little above the bar", () => {
+    const { one, opened } = bar();
+    slide(one, over(1, 20));
+    fireEvent.pointerUp(window, over(1, 20));
+    expect(opened).toEqual(["Two"]);
+  });
+
+  it("opens the first tab once after sliding away and back", () => {
+    const { one, opened } = bar();
+    slide(one, over(1), over(0));
+    fireEvent.pointerUp(window, over(0));
+    browserClick(one);
+    expect(opened).toEqual(["One"]);
+  });
+
+  it("leaves a plain tap, even a slightly shaky one, to the browser, which opens it once", () => {
+    const { one, opened } = bar();
+    const start = over(0);
+    slide(one, { clientX: start.clientX + 6, clientY: start.clientY + 3 });
+    fireEvent.pointerUp(window, start);
+    expect(opened).toEqual([]);
+    expect(browserClick(one)).toBe(true);
+    expect(opened).toEqual(["One"]);
+  });
+
+  it("opens nothing when the browser cancels the slide", () => {
+    const { one, opened } = bar();
+    slide(one, over(1));
+    fireEvent.pointerCancel(window, over(1));
+    expect(opened).toEqual([]);
+  });
+
+  it("does not open or move to a disabled tab", () => {
+    const { one, opened, three } = bar();
+    slide(one, over(2));
+    expect(three).not.toHaveAttribute("data-under");
+    fireEvent.pointerUp(window, over(2));
+    expect(opened).toEqual([]);
+  });
+
+  it("ignores a second finger", () => {
+    const { one, two, opened } = bar();
+    fireEvent.pointerDown(one, { ...over(0), pointerId: 1 });
+    fireEvent.pointerDown(two, { ...over(1), pointerId: 2 });
+    fireEvent.pointerUp(window, { ...over(1, 200), pointerId: 2 });
+    expect(one).toHaveAttribute("data-under");
+    expect(opened).toEqual([]);
+  });
+
+  it("does not block the keyboard, or the next tap, after a slide", () => {
+    const { one, two, opened } = bar();
+    slide(one, over(1, 200));
+    fireEvent.pointerUp(window, over(1, 200));
+    expect(fireEvent.click(two, { detail: 0 })).toBe(true);
+    fireEvent.pointerDown(one, over(0));
+    fireEvent.pointerUp(window, over(0));
+    expect(browserClick(one)).toBe(true);
+    expect(opened).toEqual(["Two", "One"]);
   });
 });
 

@@ -117,6 +117,17 @@ describe("the shared glass classes", () => {
   });
 });
 
+describe("holding and sliding on the bar", () => {
+  it.each([
+    "touch-action: none;",
+    "-webkit-user-select: none;",
+    "user-select: none;",
+    "-webkit-touch-callout: none;",
+  ])("is not interrupted by scrolling, text selection or link previews: %s", (declaration) => {
+    expect(rule(globals, "@utility glass-bar")).toContain(declaration);
+  });
+});
+
 describe("the solid fallbacks", () => {
   const bar = () => wholeBlock(globals, "@utility glass-bar");
 

@@ -58,9 +58,10 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Done when: the pill shows on the tapped tab and fades, there are no CSP errors (`csp.spec.ts`) and landing JS is within budget. It does not need to flow into the Bible reader or the chat, which have their own bars.
   - Result: landing JS 164,289 bytes, 4,671 under the limit. Found and fixed: iPhone WebKit starts a native link drag when a press moves off a tab, then sends neither `pointerup` nor `pointercancel`, so the pill stayed on. The bar now cancels `dragstart` (this was the link dragging part of step 9; link previews are still to do).
 
-- [ ] **9. Hold and slide.** The pill follows the finger; releasing over a tab opens it, releasing outside cancels. A native click does not fire when the press ends on a different link, so call that link's `click()` once. Stop iOS link previews and link dragging on the bar.
+- [x] **9. Hold and slide.** The pill follows the finger; releasing over a tab opens it, releasing outside cancels. A native click does not fire when the press ends on a different link, so call that link's `click()` once. Stop iOS link previews and link dragging on the bar.
   - Test first: slide to another tab, release outside, `pointercancel`, disabled tab, plain tap opens only once.
   - Done when: unit tests and a new e2e journey pass on the three phone projects.
+  - Result: unit tests and journeys pass on the three phone projects, with real touch sequences in Chromium (a 14px slide over a tab boundary opens one page). After a slide the bar opens the tab itself and blocks the browser's own click, so it opens once. Link previews cannot be tested in an emulator (step 13). Landing JS 164,668 bytes, 4,292 under the limit.
 
 ## Part 3: hide while scrolling
 

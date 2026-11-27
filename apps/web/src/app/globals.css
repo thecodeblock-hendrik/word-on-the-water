@@ -76,6 +76,11 @@ body {
 @utility glass-bar {
   height: 4rem;
   padding: 4px;
+  /* Hold and slide: no scrolling, text selection or iOS link preview takes the finger over. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   border: 1px solid var(--glass-edge);
   border-radius: 9999px;
   background: color-mix(in srgb, var(--surface) var(--glass-tint), transparent);

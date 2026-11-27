@@ -546,3 +546,124 @@ test.describe("the liquid pill", () => {
     await page.mouse.up();
   });
 });
+
+test.describe("hold and slide", () => {
+  /** The middle of a tab on screen. */
+  async function middle(tab: ReturnType<Page["locator"]>) {
+    const box = (await tab.boundingBox())!;
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2, box };
+  }
+
+  async function ready(page: Page, path: string) {
+    await page.goto(`${CHAT}${path}`);
+    await page.waitForLoadState("networkidle");
+  }
+
+  const entries = (page: Page) => page.evaluate(() => history.length);
+
+  async function slideWithMouse(
+    page: Page,
+    from: ReturnType<Page["locator"]>,
+    to: ReturnType<Page["locator"]>,
+  ) {
+    const start = await middle(from);
+    const end = await middle(to);
+    await page.mouse.move(start.x, start.y);
+    await page.mouse.down();
+    await page.mouse.move(end.x, end.y, { steps: 8 });
+    await page.mouse.up();
+  }
+
+  test("from Devotional to Bible opens the Bible, once", async ({ page }) => {
+    await ready(page, "/privacy");
+    const before = await entries(page);
+    const link = (name: string) => bar(page).getByRole("link", { name });
+    await slideWithMouse(page, link("Devotional"), link("Bible"));
+    await expect(page).toHaveURL(/\/bible\/[a-z]+\/[a-z0-9-]+\/\d+/);
+    await expect(chapterBar(page)).toBeVisible();
+    expect(await entries(page)).toBe(before + 1);
+  });
+
+  test("on to Ask the Word opens the chat in place", async ({ page }) => {
+    await ready(page, "/privacy");
+    const link = (name: string) => bar(page).getByRole("link", { name });
+    await slideWithMouse(page, link("Devotional"), link("Ask the Word"));
+    await expect(chatDialog(page)).toHaveCount(1);
+    await expect(page).toHaveURL(`${CHAT}/privacy`);
+  });
+
+  test("in the Bible reader from Shore to Next opens the next chapter", async ({ page }) => {
+    await ready(page, "/bible/web/john/3");
+    const nav = chapterBar(page);
+    await slideWithMouse(
+      page,
+      nav.getByRole("link", { name: "Shore" }),
+      nav.getByRole("link", { name: /^Next chapter/ }),
+    );
+    await expect(page).toHaveURL(`${CHAT}/bible/web/john/4`);
+  });
+
+  test.describe("with real touches", () => {
+    test.beforeEach(({}, testInfo) => {
+      test.skip(testInfo.project.name !== "pixel-7", "only Chromium can send touch sequences");
+    });
+
+    async function swipe(page: Page, from: { x: number; y: number }, to: { x: number; y: number }) {
+      const session = await page.context().newCDPSession(page);
+      const send = (type: "touchStart" | "touchMove" | "touchEnd", point?: typeof from) =>
+        session.send("Input.dispatchTouchEvent", {
+          type,
+          touchPoints: point ? [{ x: point.x, y: point.y }] : [],
+        });
+      await send("touchStart", from);
+      for (let step = 1; step <= 8; step++) {
+        await send("touchMove", {
+          x: from.x + ((to.x - from.x) * step) / 8,
+          y: from.y + ((to.y - from.y) * step) / 8,
+        });
+      }
+      await send("touchEnd");
+    }
+
+    test("a slide to the next tab opens it, once, and the page does not scroll", async ({
+      page,
+    }) => {
+      await ready(page, "/privacy");
+      const before = await entries(page);
+      const from = await middle(bar(page).getByRole("link", { name: "Devotional" }));
+      const to = await middle(bar(page).getByRole("link", { name: "Bible" }));
+      await swipe(page, from, to);
+      await expect(page).toHaveURL(/\/bible\//);
+      await expect(chapterBar(page)).toBeVisible();
+      expect(await entries(page)).toBe(before + 1);
+    });
+
+    test("a short slide over the line between two tabs opens only the second", async ({ page }) => {
+      await ready(page, "/privacy");
+      const before = await entries(page);
+      const first = await middle(bar(page).getByRole("link", { name: "Devotional" }));
+      const edge = first.box.x + first.box.width;
+      await swipe(page, { x: edge - 7, y: first.y }, { x: edge + 7, y: first.y });
+      await expect(page).toHaveURL(/\/bible\//);
+      await expect(chapterBar(page)).toBeVisible();
+      expect(await entries(page)).toBe(before + 1);
+    });
+
+    test("a slide up off the bar opens nothing and does not scroll the page", async ({ page }) => {
+      await ready(page, "/privacy");
+      const from = await middle(bar(page).getByRole("link", { name: "Devotional" }));
+      await swipe(page, from, { x: from.x, y: from.y - 250 });
+      await expect(bar(page).locator("[data-pill]")).toHaveCSS("opacity", "0");
+      await expect(page).toHaveURL(`${CHAT}/privacy`);
+      expect(await page.evaluate(() => scrollY)).toBe(0);
+    });
+
+    test("a plain tap still opens the tab, once", async ({ page }) => {
+      await ready(page, "/privacy");
+      const before = await entries(page);
+      await bar(page).getByRole("link", { name: "Devotional" }).tap();
+      await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
+      expect(await entries(page)).toBe(before + 1);
+    });
+  });
+});
