@@ -2,9 +2,9 @@
 
 Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces the raised-tab bar in [landing_page_nav.md](landing_page_nav.md). Build it after the 28 November launch.
 
-**Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill unless a button is the current page; the bar hides while scrolling down. Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
+**Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while scrolling down. Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
 
-**Unchanged:** routes, what each button does, clearing the chat with Undo, hiding for the chat keyboard, and everything from `lg` up (including the desktop chapter buttons and the "Your chat" edge tab). The bar still needs both `BIBLE_ENABLED` and `CHAT_ENABLED`.
+**Unchanged:** routes, what the other buttons do, clearing the chat with Undo, hiding for the chat keyboard, and everything from `lg` up (including the desktop chapter buttons and the "Your chat" edge tab). The bar still needs both `BIBLE_ENABLED` and `CHAT_ENABLED`.
 
 ## How to work
 
@@ -22,11 +22,11 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Done when: everything is green and the figures are written under "Measurements".
 
 - [ ] **1. Glass surface.** One shared set of classes for the capsule (64px high, 16px side margins, 72% surface tint, blur, rim, shadow), built only from design tokens.
-  - Test first: a contrast test that reads `tokens.css` and proves ink labels reach 4.5:1 on the glass over black (light) and white (dark), and on the selected pill.
+  - Test first: a contrast test that reads `tokens.css` and proves ink labels reach 4.5:1 on the glass over black (light) and white (dark), and on the pill.
   - Done when: the test passes in both schemes.
 
-- [ ] **2. Site bar.** `BottomNav` becomes three equal tabs in the capsule, for both the site and chat variants. Add filled icons for the selected state. The current page gets a still pill drawn with CSS, so it works without JavaScript. Page bottom padding in `layout.tsx` fits the floating bar and the safe area.
-  - Test first (`bottom-nav.test.tsx`): capsule, `lg:hidden`, three tabs, no raised circle, `aria-current` with filled icon and pill, no accent fill, nothing selected by default, 440px maximum width and centred. In `bottom-nav.spec.ts`, at 744 and 820 wide the bar is 440px with equal space on both sides.
+- [ ] **2. Site bar.** `BottomNav` becomes three equal tabs in the capsule, for both the site and chat variants. On a devotional page (`/devotionals/...`) the site bar shows Shore, linking to `/`, in place of Devotional; the chat bar does not change. No tab is ever marked current. Page bottom padding in `layout.tsx` fits the floating bar and the safe area.
+  - Test first (`bottom-nav.test.tsx`, `bottom-nav-host.test.tsx`): capsule, `lg:hidden`, three tabs, no raised circle, no accent fill, Shore instead of Devotional on a devotional page only, no `aria-current` anywhere, 440px maximum width and centred. In `bottom-nav.spec.ts`, replace the current-page check with: Shore on a devotional goes to `/`. In `bottom-nav.spec.ts`, at 744 and 820 wide the bar is 440px with equal space on both sides.
   - Done when: unit tests and `bottom-nav.spec.ts` pass, and the footer scrolls clear of the bar.
 
 - [ ] **3. Chat spacing and Undo toast.** The message pill sits 12px above the capsule. The toast becomes a capsule 12px above the bar.
@@ -50,9 +50,9 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first: fixed time steps, no real clock. It stretches in both directions, overshoots a little, settles exactly on the target and stops; a long frame cannot make it fly off.
   - Done when: unit tests pass.
 
-- [ ] **8. Pill on tap and keyboard.** A small client hook moves one pill element with `requestAnimationFrame`. Set styles from JavaScript only: the nonce CSP blocks server-rendered `style` attributes. Links stay real links and navigation is never delayed. With no current page the pill fades out afterwards. Reduced motion moves it with no stretch.
-  - Test first: tap, Enter, current page, no current page, reduced motion, animation stops on unmount. Ask the Word still opens the chat in place.
-  - Done when: the pill flows from the landing page to a devotional, there are no CSP errors (`csp.spec.ts`) and landing JS is within budget. It does not need to flow into the Bible reader or the chat, which have their own bars.
+- [ ] **8. Pill on tap and keyboard.** A small client hook moves one pill element with `requestAnimationFrame`. Set styles from JavaScript only: the nonce CSP blocks server-rendered `style` attributes. Links stay real links and navigation is never delayed. The pill fades out afterwards. Reduced motion moves it with no stretch.
+  - Test first: tap, Enter, the fade afterwards, reduced motion, animation stops on unmount. Ask the Word still opens the chat in place.
+  - Done when: the pill shows on the tapped tab and fades, there are no CSP errors (`csp.spec.ts`) and landing JS is within budget. It does not need to flow into the Bible reader or the chat, which have their own bars.
 
 - [ ] **9. Hold and slide.** The pill follows the finger; releasing over a tab opens it, releasing outside cancels. A native click does not fire when the press ends on a different link, so call that link's `click()` once. Stop iOS link previews and link dragging on the bar.
   - Test first: slide to another tab, release outside, `pointercancel`, disabled tab, plain tap opens only once.
