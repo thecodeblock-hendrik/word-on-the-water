@@ -113,7 +113,7 @@ describe("/videos/advent", () => {
           .getByRole("link", { name: "Watch on BibleProject", hidden: true })
           .getAttribute("href"),
       ).toBe(`https://bibleproject.com/videos/${pages[i]}/`);
-      expect(row.textContent).toContain("YouTube, which then receives data");
+      expect(row.textContent).toContain("YouTube, a Google service, which then receives data");
       expect(inside.getByRole("link", { name: "Privacy", hidden: true }).getAttribute("href")).toBe(
         "/privacy",
       );

@@ -134,6 +134,26 @@ test("the desktop header stays one row at 1024px with every link", async ({ page
   expect(Math.max(...heights)).toBeLessThanOrEqual(46);
 });
 
+test("the privacy page links Google's and YouTube's terms and fits a 320px phone", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto(`${ON}/privacy`);
+  await expect(page.getByText("Watching videos", { exact: true })).toBeVisible();
+  for (const url of [
+    "https://www.youtube.com/t/terms",
+    "https://www.google.com/policies/privacy",
+  ]) {
+    await expect(page.getByRole("link", { name: url })).toHaveAttribute("href", url);
+  }
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+  const { violations } = await new AxeBuilder({ page }).analyze();
+  expect(violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+});
+
 test("the shelf leads to the weekly path, with this week open", async ({ page }) => {
   await page.goto(`${ON}/videos`);
   await page.getByRole("link", { name: /Advent word studies/ }).click();

@@ -8,7 +8,7 @@ vi.mock("next/server", async (importOriginal) => ({
 
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
-import { PRIVACY_UPDATED } from "@/content/privacy";
+import { PRIVACY_UPDATED, privacyUpdated } from "@/content/privacy";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 
 afterEach(() => vi.unstubAllEnvs());
@@ -83,6 +83,13 @@ describe("sitemap.xml", () => {
     const on = await urls("2026-12-21");
     expect(on.filter((url) => url.includes("/videos"))).toEqual(videos);
     expect(on.filter((url) => !url.includes("/videos"))).toEqual(off);
+  });
+
+  it("dates the privacy page by the policy that is shown", async () => {
+    vi.stubEnv("DEVOTIONAL_TODAY", "2026-12-21");
+    vi.stubEnv("VIDEOS_ENABLED", "1");
+    const entry = (await sitemap()).find((e) => e.url === privacy);
+    expect(entry?.lastModified).toBe(privacyUpdated(true));
   });
 
   it("never lists the thank-you page or API routes, and every address is absolute", async () => {

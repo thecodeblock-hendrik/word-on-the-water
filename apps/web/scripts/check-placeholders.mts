@@ -2,7 +2,10 @@ import { landing } from "../src/content/landing.ts";
 import { privacyPolicy } from "../src/content/privacy.ts";
 import { findPlaceholders } from "../src/lib/placeholders.ts";
 
-const found = findPlaceholders({ landing, privacy: privacyPolicy({ bibleEnabled: true }) });
+const found = findPlaceholders({
+  landing,
+  privacy: privacyPolicy({ bibleEnabled: true, videosEnabled: true }),
+});
 
 if (found.length > 0) {
   console.error(`${found.length} placeholder(s) still in the landing and privacy content:`);

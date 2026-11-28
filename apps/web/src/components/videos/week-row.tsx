@@ -83,8 +83,8 @@ export function WeekRow({ video, number, open, thisWeek, linked }: Props) {
             </a>
           </p>
           <p className="font-ui text-sm text-muted">
-            Pressing play loads the video from YouTube, which then receives data such as your IP
-            address.{" "}
+            Pressing play loads the video from YouTube, a Google service, which then receives data
+            such as your IP address.{" "}
             <Link href="/privacy" className={link}>
               Privacy
             </Link>

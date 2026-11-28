@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { connection } from "next/server";
 
 import { today } from "@/lib/devotionals/format";
-import { PRIVACY_UPDATED } from "@/content/privacy";
+import { privacyUpdated } from "@/content/privacy";
 import { isViewable, loadContent } from "@/lib/devotionals/load";
 import { absoluteUrl } from "@/lib/site";
 import { isVideosEnabled } from "@/lib/videos/flag";
@@ -28,6 +28,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(isVideosEnabled()
       ? [{ url: absoluteUrl("/videos") }, { url: absoluteUrl(SERIES_PATH) }]
       : []),
-    { url: absoluteUrl("/privacy"), lastModified: PRIVACY_UPDATED },
+    { url: absoluteUrl("/privacy"), lastModified: privacyUpdated(isVideosEnabled()) },
   ];
 }

@@ -153,6 +153,7 @@ No database, API, new secret or paid service is expected.
 - Playing a video sends data (such as the visitor's IP address and device details) to Google. Say so beside the player and add Google/YouTube to `docs/privacy.md` and `apps/web/src/content/privacy.ts`.
 - [Privacy-enhanced mode](https://support.google.com/youtube/answer/171780?expand=PrivacyEnhancedMode) stops these views personalising YouTube. We did **not** confirm that it sets no cookies, so do not claim that.
 - **(Hendrik)** Have someone qualified confirm that tapping Play, with the notice, is enough under POPIA and the GDPR.
+- YouTube's own terms also ask for certain wording and links in the privacy policy (step 8 and [privacy.md](privacy.md)).
 - We add no video tracking of our own.
 
 ### Records
@@ -175,10 +176,12 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
   - Checked 2026-11-28 on a local build with the real player, headless desktop Chromium, muted, 375px: no request to Google before the tap, all four played, no policy messages. After a tap the browser contacted `www.youtube-nocookie.com`, `www.google.com`, `googlevideo.com`, `i.ytimg.com`, `yt3.ggpht.com` and `jnn-pa.googleapis.com`: step 8 should name Google as well as YouTube. Not checked: sound, captions, phones, a preview or the live domain.
 - [x] 7. Menu, header and card links, sitemap. Test that the header stays one row at 1024px. With the flag off, nothing changes.
   - 2026-11-28: with the Bible and chat on too, the header was one row at 1024px in desktop Chromium and WebKit. The mockup's "New" label on the menu link is not built: this list never asked for it, and it would need its own date rule.
-- [ ] 8. Privacy policy text. **(Hendrik)** qualified check.
+- [x] 8. Privacy policy text, shown only while videos are on, with its own date. The notice beside Play now names Google.
+  - 2026-11-28: YouTube says its API terms and developer policies apply to the embedded player, which this plan had not covered. The text now includes what they ask a privacy policy to say and link; [privacy.md](privacy.md) lists each point. One is not met: they say users must agree to the privacy policy before using the features, and nothing asks them to.
+- [ ] 8a. **(Hendrik)** Read the new policy text, and get a qualified check: consent under POPIA and the GDPR, whether a cookie banner is needed, and the "agree before access" point.
 - [ ] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
 - [ ] 10. On a preview with the flag on, **(Hendrik)** play all four on an iPhone (browser and installed app) and an Android phone: sound, fullscreen and captions. Check each video's captions; do not promise them before this.
-- [ ] 11. **(Hendrik)** Read the terms again, merge, set `VIDEOS_ENABLED` in Production, and promote.
+- [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), set the videos policy date to the release day, merge, set `VIDEOS_ENABLED` in Production, and promote.
 
 **Turning it off:** unset `VIDEOS_ENABLED` and redeploy. Do this at once if BibleProject asks.
 
