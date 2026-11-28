@@ -92,6 +92,48 @@ test("the video pages are not found while videos are off", async ({ page }) => {
   }
 });
 
+test("the menu or header, and the What's coming card, lead to the videos", async ({ page }) => {
+  await page.goto(`${ON}/`);
+  const card = page.getByRole("link", { name: "Watch the Advent series" });
+  await expect(card).toHaveAttribute("href", "/videos");
+  const wide = page.viewportSize()!.width >= 1024;
+  if (!wide) await page.getByRole("button", { name: "Menu" }).click();
+  const nav = page.getByRole("navigation", { name: wide ? "Main" : "Main menu", exact: true });
+  await nav.getByRole("link", { name: "Videos" }).click();
+  await expect(page).toHaveURL(`${ON}/videos`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Videos");
+});
+
+test("with videos off there is no way in", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('a[href^="/videos"]')).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Audio and video" })).toBeAttached();
+  expect(await (await page.request.get("/sitemap.xml")).text()).not.toContain("/videos");
+});
+
+test("the desktop header stays one row at 1024px with every link", async ({ page, isMobile }) => {
+  test.skip(isMobile, "phones use the menu");
+  await page.setViewportSize({ width: 1024, height: 800 });
+  await page.goto(`${ON}/`);
+  await page.evaluate(() => document.fonts.ready);
+  const header = page.getByRole("banner");
+  await expect(header.getByRole("link", { name: "Videos" })).toBeVisible();
+  const { overflow, centres, heights } = await header.evaluate((banner) => {
+    const row = [...banner.firstElementChild!.querySelectorAll("a, button")]
+      .map((el) => el.getBoundingClientRect())
+      .filter((box) => box.width > 0);
+    return {
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      centres: row.map((box) => box.top + box.height / 2),
+      heights: row.map((box) => box.height),
+    };
+  });
+  expect(overflow).toBeLessThanOrEqual(0);
+  expect(Math.max(...centres) - Math.min(...centres)).toBeLessThanOrEqual(2);
+  // A label that wrapped onto two lines would make its link taller than the 44px target.
+  expect(Math.max(...heights)).toBeLessThanOrEqual(46);
+});
+
 test("the shelf leads to the weekly path, with this week open", async ({ page }) => {
   await page.goto(`${ON}/videos`);
   await page.getByRole("link", { name: /Advent word studies/ }).click();

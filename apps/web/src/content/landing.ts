@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "../lib/site.ts";
 import type { Scripture } from "@/lib/scripture";
 
-type Link = { label: string; href: string };
+export type Link = { label: string; href: string };
 
 export const hero = {
   eyebrow: "Devotionals and Bible teaching for surfers",
@@ -68,6 +68,13 @@ export const coming = {
       body: "Short readings recorded at the beach for the drive to the coast.",
     },
   ],
+  /** Takes the place of the last offer while videos are on. */
+  videos: {
+    status: "Watch now",
+    title: "Advent videos",
+    body: "Hope, peace, joy and love in four short videos.",
+    link: { label: "Watch the Advent series", href: "/videos" } satisfies Link,
+  },
 };
 
 export const start = {

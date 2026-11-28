@@ -11,6 +11,7 @@ import { isChatEnabled } from "@/lib/chat/flag";
 import { today } from "@/lib/devotionals/format";
 import { featured, loadContent } from "@/lib/devotionals/load";
 import { siteJsonLd } from "@/lib/seo";
+import { isVideosEnabled } from "@/lib/videos/flag";
 
 // The home page is its own canonical address; everything else it inherits from the layout.
 export const metadata: Metadata = { alternates: { canonical: "/" } };
@@ -25,7 +26,7 @@ export default function Home() {
       <Hero />
       <About />
       <hr className="border-0 border-t border-line max-lg:hidden" />
-      <Coming devotional={devotional} series={devotionalSeries} />
+      <Coming devotional={devotional} series={devotionalSeries} videos={isVideosEnabled()} />
       <Start chatEnabled={isChatEnabled()} />
       <BeliefsFounder />
       <SubscribeBand source="landing_closing" />

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { InlineMarkdown } from "@/components/inline-markdown";
 import { PlaceholderText } from "@/components/placeholder-text";
 import { buttonClasses } from "@/components/ui/button";
-import { coming } from "@/content/landing";
+import { coming, type Link as OfferLink } from "@/content/landing";
 import type { Devotional } from "@/lib/devotionals/parse";
 import { reportRows } from "@/lib/devotionals/report";
 import type { Series } from "@/lib/devotionals/series";
@@ -14,11 +14,21 @@ const eyebrow = "font-display text-sm font-semibold uppercase tracking-[.18em] t
 const h3 = "font-display text-[1.35rem] font-semibold uppercase leading-[1.05] tracking-[.05em]";
 
 /** The weekly devotional, the latest one so readers can see what they will get, then what is planned. */
-export function Coming({ devotional, series }: { devotional: Devotional; series: Series }) {
+export function Coming({
+  devotional,
+  series,
+  videos = false,
+}: {
+  devotional: Devotional;
+  series: Series;
+  /** Replace the last offer with the way in to the videos. */
+  videos?: boolean;
+}) {
   const { meta } = devotional;
   const report = reportRows(devotional, series);
   const excerpt = devotional.sections[0].markdown.split("\n\n");
-  const [weekly, ...later] = coming.offers;
+  const [weekly, teaching, audio] = coming.offers;
+  const later: Offer[] = [teaching, videos ? coming.videos : audio];
   return (
     <section id="coming" aria-labelledby="coming-h" className="py-10 md:py-[72px]">
       <div className="mx-auto max-w-[1120px] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
@@ -83,9 +93,13 @@ export function Coming({ devotional, series }: { devotional: Devotional; series:
   );
 }
 
-function OfferCard({ offer }: { offer: (typeof coming.offers)[number] }) {
+type Offer = { status: string; title: string; body: string; link?: OfferLink };
+
+function OfferCard({ offer }: { offer: Offer }) {
   return (
-    <article className="grid content-start gap-3 rounded-md border border-line bg-surface p-6">
+    <article
+      className={`grid content-start gap-3 rounded-md border bg-surface p-6 ${offer.link ? "border-accent" : "border-line"}`}
+    >
       <span className="flex items-center gap-2 font-ui text-xs font-semibold uppercase tracking-[.08em] text-muted">
         <span aria-hidden="true" className="size-2 rounded-full bg-accent" />
         <span>
@@ -96,6 +110,14 @@ function OfferCard({ offer }: { offer: (typeof coming.offers)[number] }) {
       <p className="text-[.98rem] text-muted">
         <PlaceholderText>{offer.body}</PlaceholderText>
       </p>
+      {offer.link && (
+        <Link
+          href={offer.link.href}
+          className="inline-flex min-h-11 items-center justify-self-start font-ui font-semibold text-accent-ink underline underline-offset-4"
+        >
+          {offer.link.label}
+        </Link>
+      )}
     </article>
   );
 }

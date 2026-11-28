@@ -11,9 +11,10 @@ import { chat } from "@/content/chat";
 import { setTheme } from "@/lib/actions/theme";
 import { isBibleEnabled } from "@/lib/bible/flag";
 import { isChatEnabled } from "@/lib/chat/flag";
+import { isVideosEnabled } from "@/lib/videos/flag";
 
 export function Header() {
-  const links = navLinks(isBibleEnabled());
+  const links = navLinks(isBibleEnabled(), isVideosEnabled());
   const chatEnabled = isChatEnabled();
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg pt-[env(safe-area-inset-top)]">
