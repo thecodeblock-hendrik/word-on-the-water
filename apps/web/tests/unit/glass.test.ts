@@ -93,14 +93,26 @@ describe("the two dark blocks", () => {
 });
 
 describe("the shared glass classes", () => {
-  it("make a 64px capsule, tinted and blurred, from tokens only", () => {
+  it("make the glass, tinted and blurred, from tokens only", () => {
+    const surface = rule(globals, "@utility glass-surface");
+    expect(surface).toContain("color-mix(in srgb, var(--surface) var(--glass-tint), transparent)");
+    expect(surface).toContain("-webkit-backdrop-filter: blur(18px) saturate(180%);");
+    expect(surface).toMatch(/^\s*backdrop-filter: blur\(18px\) saturate\(180%\);/m);
+    expect(surface).toContain("var(--glass-rim)");
+    expect(surface).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
+  });
+
+  it("give the glass alone no size and no hold on touches, for the Undo shelf", () => {
+    expect(wholeBlock(globals, "@utility glass-surface")).not.toMatch(
+      /height|padding|touch-action|user-select|border-radius/,
+    );
+  });
+
+  it("make the bar a 64px capsule of that glass", () => {
     const bar = rule(globals, "@utility glass-bar");
     expect(bar).toContain("height: 4rem;");
-    expect(bar).toContain("color-mix(in srgb, var(--surface) var(--glass-tint), transparent)");
-    expect(bar).toContain("-webkit-backdrop-filter: blur(18px) saturate(180%);");
-    expect(bar).toMatch(/^\s*backdrop-filter: blur\(18px\) saturate\(180%\);/m);
-    expect(bar).toContain("var(--glass-rim)");
-    expect(bar).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
+    expect(bar).toContain("border-radius: 9999px;");
+    expect(bar).toContain("@apply glass-surface;");
   });
 
   it("float it 1rem in from the sides and clear of the home indicator", () => {
@@ -129,7 +141,7 @@ describe("holding and sliding on the bar", () => {
 });
 
 describe("the solid fallbacks", () => {
-  const bar = () => wholeBlock(globals, "@utility glass-bar");
+  const bar = () => wholeBlock(globals, "@utility glass-surface");
 
   it("is solid in a browser that cannot blur what is behind it", () => {
     const rule = wholeBlock(
@@ -157,5 +169,39 @@ describe("the solid fallbacks", () => {
     expect(wholeBlock(globals, "@layer components")).toMatch(
       /@media \(forced-colors: active\) \{\s*\.glass-pill \{\s*border: 2px solid Highlight;/,
     );
+  });
+});
+
+describe("the Undo shelf and the bar under it", () => {
+  const css = globals.replace(/\/\*[\s\S]*?\*\//g, "");
+  const below = wholeBlock(css, "@media (width < 64rem)");
+  const outside = css.replace(below, "");
+  const flat = below.replace(/\s+/g, " ");
+
+  it("only touch each other below lg", () => {
+    expect(outside).not.toContain("data-shelf");
+  });
+
+  it("make the shelf 52px alone, and 52px more than the bar where there is one", () => {
+    expect(flat).toContain("[data-shelf] { height: calc(3.25rem + 2px);");
+    expect(flat).toContain(
+      ":root:has(nav[data-hides]) [data-shelf] { height: calc(3.25rem + 4rem); }",
+    );
+  });
+
+  it("switch off the bar's own glass only while the shelf is there, so there is one pane", () => {
+    expect(flat).toContain(
+      ":root:has([data-shelf]) nav[data-hides] { border-color: transparent; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }",
+    );
+  });
+
+  it("draw a hairline between them, from the glass edge", () => {
+    expect(flat).toContain(
+      ":root:has(nav[data-hides]) [data-shelf-row] { border-bottom: 1px solid var(--glass-edge); }",
+    );
+  });
+
+  it("leave no trace of the old popup's fade", () => {
+    expect(css).not.toContain("toast-in");
   });
 });

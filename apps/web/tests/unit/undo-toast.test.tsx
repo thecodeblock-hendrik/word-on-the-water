@@ -2,13 +2,17 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ChapterNav } from "@/components/bible/chapter-nav";
 import { ChatHost } from "@/components/chat/chat-host";
 import { UndoToast } from "@/components/chat/undo-toast";
+import { BottomNav } from "@/components/layout/bottom-nav";
+import { findBook } from "@/lib/bible/books";
 import { dropCleared, stashCleared, takeCleared } from "@/lib/chat/cleared";
 import { openChat } from "@/lib/chat/open";
 import type { ChatReply, Thread } from "@/lib/chat/thread";
 
 vi.mock("@/lib/actions/chat", () => ({ sendChat: vi.fn(), warmChat: vi.fn() }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/privacy" }));
 
 const reply: ChatReply = {
   kind: "answer",
@@ -62,27 +66,52 @@ describe("UndoToast", () => {
     expect(undo()).toBeInTheDocument();
   });
 
-  it("is only for phones and fades in without sliding, and not at all when motion is reduced", () => {
+  const shelf = () => undo().closest("[data-shelf]")!;
+
+  it("is only for phones, and stands still", () => {
     render(<UndoToast />);
     clearChat();
-    const toast = undo().parentElement!;
-    expect(toast.className).toMatch(/\blg:hidden\b/);
-    expect(toast.className).toMatch(/\bmotion-safe:animate-toast-in\b/);
-    expect(toast.className).not.toMatch(/translate/);
+    expect(shelf()).toHaveClass("lg:hidden");
+    expect(shelf().className).not.toMatch(/animate-|translate/);
   });
 
-  it("is a capsule 12px above the bar, as wide as it and centred", () => {
+  it("is a pane of the bar's glass where the bar is, as wide as it and centred", () => {
     render(<UndoToast />);
     clearChat();
-    expect(undo().parentElement).toHaveClass(
+    expect(shelf()).toHaveClass(
+      "glass-dock",
+      "glass-surface",
       "fixed",
-      "rounded-full",
+      "z-[29]", // just behind the bar, which is 30
       "mx-auto",
       "max-w-[440px]",
-      "left-[max(1rem,env(safe-area-inset-left))]",
-      "right-[max(1rem,env(safe-area-inset-right))]",
-      "bottom-[calc(4.75rem+max(.875rem,env(safe-area-inset-bottom)))]",
+      "rounded-[32px]",
     );
+    expect(shelf().className).not.toMatch(/\bbg-|text-on-deep|shadow-menu/);
+  });
+
+  it("holds the words and Undo in a 52px row, Undo in the same lens as the liquid pill", () => {
+    render(<UndoToast />);
+    clearChat();
+    const row = shelf().querySelector("[data-shelf-row]")!;
+    expect(row).toHaveClass("h-13", "text-ink");
+    expect(row).toContainElement(undo());
+    expect(row).toHaveTextContent("Chat cleared");
+    expect(undo()).toHaveClass("glass-pill", "text-ink");
+  });
+
+  it("keeps Undo outside both bars, so it is never taken for a tab", () => {
+    render(
+      <>
+        <BottomNav devotionalHref="/devotionals/advent-01" />
+        <ChapterNav version="bsb" book={findBook("john")!} chapter={3} />
+        <UndoToast />
+      </>,
+    );
+    clearChat();
+    expect(screen.getAllByRole("navigation")).toHaveLength(2);
+    expect(undo().closest("nav")).toBeNull();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
   });
 
   it("goes after 8 seconds, and what was cleared is forgotten", () => {

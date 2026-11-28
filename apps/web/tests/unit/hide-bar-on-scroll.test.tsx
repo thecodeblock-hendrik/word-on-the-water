@@ -173,11 +173,12 @@ describe("which bars hide", () => {
     expect(nav()).toHaveAttribute("data-hides");
   });
 
-  it("the Undo toast follows the bar", () => {
+  it("the Undo shelf stays: it is marked as the shelf, not as something that hides", () => {
     stashCleared({ thread: [], draft: "a draft" });
     render(<UndoToast />);
-    const toast = screen.getByRole("button", { name: "Undo" }).parentElement;
-    expect(toast).toHaveAttribute("data-follows-bar");
+    const shelf = screen.getByRole("button", { name: "Undo" }).closest("[data-shelf]");
+    expect(shelf).not.toBeNull();
+    expect(shelf).not.toHaveAttribute("data-hides");
   });
 });
 
@@ -203,15 +204,20 @@ describe("the styles that move the bar", () => {
     expect(flat).toContain(":root[data-nav-away] [data-hides]:not(:has(:focus-visible))");
   });
 
-  it("drop the toast into the bar's place, unless the bar is showing for the keyboard", () => {
+  it("shrink the shelf to itself while the bar is away, unless it shows for the keyboard", () => {
     expect(flat).toContain(
-      ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-follows-bar] { bottom: max(0.875rem, env(safe-area-inset-bottom)); }",
+      ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf] { height: calc(3.25rem + 2px); }",
+    );
+    expect(flat).toContain(
+      ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf-row] { border-bottom-color: transparent; }",
     );
   });
 
   it("slide in 200ms (the reduced motion rule above removes the slide)", () => {
     expect(flat).toContain("[data-hides] { transition: transform 200ms ease; }");
-    expect(flat).toContain("[data-follows-bar] { transition: bottom 200ms ease; }");
+    expect(flat).toContain(
+      "[data-shelf] { height: calc(3.25rem + 2px); transition: height 200ms ease; }",
+    );
     expect(css).toContain("transition-duration: 0.01ms !important;");
   });
 });

@@ -10,8 +10,10 @@ import { restoreChat } from "@/lib/chat/open";
 const VISIBLE_MS = 8000;
 
 /**
- * "Chat cleared" with Undo, shown on a phone after the chat was left with something in it. The
- * status area is always there and empty until then, so screen readers announce the change.
+ * "Chat cleared" with Undo, shown on a phone after the chat was left with something in it, as a
+ * shelf on the bottom bar. It is its own pane of glass behind the bar (globals.css joins the two),
+ * not part of it: the status area is always there and empty until then, so screen readers announce
+ * the change, and Undo is never taken for one of the bar's tabs.
  */
 export function UndoToast() {
   const visible = useSyncExternalStore(subscribeCleared, hasCleared, () => false);
@@ -32,19 +34,24 @@ export function UndoToast() {
     <div role="status">
       {visible && (
         <div
-          data-follows-bar=""
-          className="fixed bottom-[calc(4.75rem+max(.875rem,env(safe-area-inset-bottom)))] left-[max(1rem,env(safe-area-inset-left))] right-[max(1rem,env(safe-area-inset-right))] z-40 mx-auto flex min-h-13 max-w-[440px] items-center gap-2 rounded-full border border-on-deep-muted/40 bg-deep pl-[18px] pr-1 font-ui text-[15px] font-semibold text-on-deep shadow-menu motion-safe:animate-toast-in lg:hidden"
+          data-shelf=""
+          className="glass-dock glass-surface fixed z-[29] mx-auto max-w-[440px] rounded-[32px] lg:hidden"
         >
-          <span className="flex-1">{bottomNav.cleared}</span>
-          <button
-            type="button"
-            onClick={undo}
-            onFocus={() => setPaused(true)}
-            onBlur={() => setPaused(false)}
-            className="inline-flex min-h-11 min-w-16 items-center justify-center rounded-sm px-3 font-bold text-accent-on-deep"
+          <div
+            data-shelf-row=""
+            className="flex h-13 items-center gap-2 pl-[22px] pr-1.5 font-ui text-[15px] font-semibold text-ink"
           >
-            {bottomNav.undo}
-          </button>
+            <span className="flex-1">{bottomNav.cleared}</span>
+            <button
+              type="button"
+              onClick={undo}
+              onFocus={() => setPaused(true)}
+              onBlur={() => setPaused(false)}
+              className="glass-pill inline-flex min-h-11 min-w-16 items-center justify-center px-4 font-bold text-ink"
+            >
+              {bottomNav.undo}
+            </button>
+          </div>
         </div>
       )}
     </div>

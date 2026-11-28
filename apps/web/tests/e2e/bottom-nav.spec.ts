@@ -92,91 +92,135 @@ test("the chat screen with its bar has no serious axe problem, in light and dark
   }
 });
 
-test("the undo toast is announced politely, is clear of the bar and has no serious axe problem", async ({
+/** Leaves the chat with a draft in it, by its Close button, so the Undo shelf is up. */
+async function leaveChatWithDraft(page: Page) {
+  const dialog = page.getByRole("dialog", { name: "Ask the Word" });
+  await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
+  await dialog.getByRole("button", { name: "Close" }).click();
+  await expect(dialog).toHaveCount(0);
+}
+
+/** The shelf up over the site bar of `/privacy`, or over the Bible reader's bar. */
+async function openShelf(page: Page, on: "site" | "reader") {
+  await page.goto(`${CHAT}/privacy`);
+  await page.waitForLoadState("networkidle");
+  const quick = page.getByRole("navigation", { name: "Quick links" });
+  await quick.getByText("Ask the Word").click();
+  const dialog = page.getByRole("dialog", { name: "Ask the Word" });
+  if (on === "reader") {
+    await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
+    await dialog.getByRole("link", { name: "Bible" }).click();
+    await expect(page).toHaveURL(/\/bible\/[a-z]+\//);
+  } else {
+    await leaveChatWithDraft(page);
+  }
+  const undo = page.getByRole("button", { name: "Undo" });
+  await expect(undo).toBeVisible();
+  const bar =
+    on === "reader" ? page.getByRole("navigation", { name: "Previous and next chapter" }) : quick;
+  // Focus on Undo holds the 8 second timer, so the shelf cannot go while it is measured.
+  await undo.focus();
+  const shelf = page.locator("[data-shelf]");
+  // On the way to the reader there can be a moment with no bar, when the shelf shrinks to itself
+  // and then grows back as the new bar arrives. Wait until it has joined before measuring.
+  await expect.poll(async () => Math.round((await shelf.boundingBox())!.height)).toBe(116);
+  return { undo, bar, shelf };
+}
+
+/** How the bar's own glass is drawn. */
+const glassOf = (bar: ReturnType<Page["locator"]>) =>
+  bar.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return [
+      style.backgroundColor,
+      style.backdropFilter || style.getPropertyValue("-webkit-backdrop-filter"),
+      style.boxShadow,
+    ];
+  });
+const NO_GLASS = ["rgba(0, 0, 0, 0)", "none", "none"];
+
+test("the Undo shelf is announced politely and has no serious axe problem, in light and dark", async ({
   page,
 }) => {
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
-    await page.goto(`${CHAT}/`);
-    await page.getByRole("navigation", { name: "Quick links" }).getByText("Ask the Word").click();
-    const dialog = page.getByRole("dialog", { name: "Ask the Word" });
-    await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
-    await dialog.getByRole("button", { name: "Close" }).click();
-    const status = page.getByRole("status");
-    await expect(status).toContainText("Chat cleared");
-    const undo = status.getByRole("button", { name: "Undo" });
-    const toast = (await undo.boundingBox())!;
-    expect(toast.height).toBeGreaterThanOrEqual(44);
-    const barBox = (await page.locator("nav[data-bottom-nav]").boundingBox())!;
-    const pillBox = (await undo.locator("..").boundingBox())!;
-    expect(barBox.y - (pillBox.y + pillBox.height), "toast to bar").toBeCloseTo(12, 0);
-    // Axe reads colours mid-fade as low contrast, so let the fade-in finish first.
-    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
-    await noSeriousProblems(page, `toast ${scheme}`);
+    const { undo } = await openShelf(page, "site");
+    await expect(page.getByRole("status")).toContainText("Chat cleared");
+    expect((await undo.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await noSeriousProblems(page, `shelf ${scheme}`);
     await undo.click();
     // Undo reopens the chat, which hides the rest of the page from the accessibility tree.
     await expect(page.getByRole("status", { includeHidden: true })).toBeEmpty();
   }
 });
 
-test.describe("the glass capsule", () => {
-  test("is a 64px frosted bar with three tap targets of at least 44px", async ({ page }) => {
-    await page.goto(`${CHAT}/privacy`);
-    const nav = bar(page);
-    expect((await nav.boundingBox())!.height).toBe(64);
-    const blur = await nav.evaluate((el) => {
-      const style = getComputedStyle(el);
-      return (
-        style.getPropertyValue("backdrop-filter") ||
-        style.getPropertyValue("-webkit-backdrop-filter")
-      );
-    });
-    expect(blur).toContain("blur(18px)");
-    const boxes = await nav
-      .getByRole("link")
-      .evaluateAll((links) =>
-        links.map((link) => link.getBoundingClientRect().toJSON() as DOMRect),
-      );
-    expect(boxes).toHaveLength(3);
-    for (const box of boxes) {
-      expect(box.height).toBeGreaterThanOrEqual(44);
-      expect(Math.abs(box.width - boxes[0].width)).toBeLessThanOrEqual(1);
-    }
-  });
-
-  for (const [name, path] of pages) {
-    test(`${name}: the end of the page scrolls clear of the bar`, async ({ page }) => {
-      await page.goto(`${CHAT}${path}`);
-      await page.evaluate(() =>
-        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
-      );
-      await expect(async () => {
-        const footer = (await page.locator("footer").boundingBox())!;
-        const nav = (await bar(page).boundingBox())!;
-        expect(footer.y + footer.height).toBeLessThanOrEqual(nav.y);
-      }).toPass();
-    });
-  }
-
-  for (const size of [
-    { width: 744, height: 1133 },
-    { width: 820, height: 1180 },
-  ]) {
-    test(`on a ${size.width} wide tablet it is 440px wide and centred`, async ({
+for (const on of ["site", "reader"] as const) {
+  for (const width of [320, 375, 744, 820]) {
+    test(`the shelf and the ${on} bar are one pane at ${width} wide, and everything can be tapped`, async ({
       page,
     }, testInfo) => {
       test.skip(
         !["pixel-7", "iphone-13"].includes(testInfo.project.name),
         "one mobile Chromium and one mobile WebKit are enough",
       );
-      await page.setViewportSize(size);
-      await page.goto(`${CHAT}/privacy`);
-      const box = (await bar(page).boundingBox())!;
-      const pageWidth = await page.evaluate(() => document.documentElement.clientWidth);
-      expect(box.width).toBe(440);
-      expect(Math.abs(box.x - (pageWidth - box.x - box.width))).toBeLessThanOrEqual(1);
+      await page.setViewportSize({ width, height: width < 700 ? 700 : 1133 });
+      const { undo, bar, shelf } = await openShelf(page, on);
+      const pane = (await shelf.boundingBox())!;
+      const barBox = (await bar.boundingBox())!;
+      expect(pane.x).toBeCloseTo(barBox.x, 0);
+      expect(pane.width).toBeCloseTo(barBox.width, 0);
+      expect(pane.width).toBeLessThanOrEqual(440);
+      expect(barBox.y - pane.y, "shelf above the bar").toBeCloseTo(52, 0);
+      expect(pane.y + pane.height, "same bottom edge").toBeCloseTo(barBox.y + barBox.height, 0);
+      expect(await glassOf(bar), "the bar draws no second pane").toEqual(NO_GLASS);
+
+      const tabs = bar.locator("a, button");
+      await expect(tabs).toHaveCount(3);
+      const undoBox = (await undo.boundingBox())!;
+      for (const tab of await tabs.all()) {
+        const box = (await tab.boundingBox())!;
+        expect(box.y, "tabs start under Undo").toBeGreaterThanOrEqual(undoBox.y + undoBox.height);
+      }
+      // What a finger would land on, in the middle of each, is that thing itself.
+      for (const target of [undo, ...(await tabs.all())]) {
+        const hit = await target.evaluate((el) => {
+          const { x, y, width, height } = el.getBoundingClientRect();
+          return el.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+        });
+        expect(hit).toBe(true);
+      }
     });
   }
+}
+
+test("without the shelf the bar has its own glass, and it comes back when the shelf goes", async ({
+  page,
+}) => {
+  await page.goto(`${CHAT}/privacy`);
+  const quick = page.getByRole("navigation", { name: "Quick links" });
+  const own = await glassOf(quick);
+  expect(own).not.toEqual(NO_GLASS);
+  const { bar, shelf } = await openShelf(page, "site");
+  expect(await glassOf(bar)).toEqual(NO_GLASS);
+  await page.evaluate(() => (document.activeElement as HTMLElement).blur());
+  await expect(shelf).toHaveCount(0, { timeout: 10_000 }); // the 8 seconds run out
+  expect(await glassOf(bar)).toEqual(own);
+});
+
+test("a slide along the bar and up to Undo does not undo, or open anything", async ({ page }) => {
+  const { undo, bar, shelf } = await openShelf(page, "site");
+  const tab = (await bar.getByRole("link", { name: "Ask the Word" }).boundingBox())!;
+  const target = (await undo.boundingBox())!;
+  const before = await page.evaluate(() => history.length);
+  await page.mouse.move(tab.x + tab.width / 2, tab.y + tab.height / 2);
+  await page.mouse.down();
+  // Up to the middle of Undo: further above the bar than a finger may stray and still be on it.
+  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(shelf).toHaveCount(1);
+  await expect(page).toHaveURL(`${CHAT}/privacy`);
+  expect(await page.evaluate(() => history.length)).toBe(before);
 });
 
 /** The message box row of the open chat, and the bar under it. */
@@ -204,7 +248,7 @@ for (const size of [
   { width: 744, height: 1133 },
   { width: 820, height: 1180 },
 ]) {
-  test(`on a ${size.width} wide tablet the message pill and the toast match the bar`, async ({
+  test(`on a ${size.width} wide tablet the message pill and the shelf match the bar`, async ({
     page,
   }, testInfo) => {
     test.skip(
@@ -218,11 +262,10 @@ for (const size of [
 
     await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
     await dialog.getByRole("button", { name: "Close" }).click();
-    const toast = (await page.getByRole("button", { name: "Undo" }).locator("..").boundingBox())!;
+    const toast = (await page.locator("[data-shelf]").boundingBox())!;
     const siteBar = (await bar(page).boundingBox())!;
     expect(toast.width).toBeCloseTo(440, 0);
     expect(toast.x).toBeCloseTo(siteBar.x, 0);
-    expect(siteBar.y - (toast.y + toast.height)).toBeCloseTo(12, 0);
   });
 }
 
@@ -792,24 +835,27 @@ test.describe("hiding while scrolling", () => {
     await expect(nav.getByRole("link", { name: "Devotional" })).not.toBeFocused();
   });
 
-  test("the Undo toast stays, drops into the bar's place and goes back up with it", async ({
+  test("the Undo shelf stays alone in the bar's place, and joins the bar again", async ({
     page,
   }) => {
     await ready(page, "/privacy");
     await bar(page).getByText("Ask the Word").click();
     await chatDialog(page).getByRole("textbox", { name: "Your question" }).fill("a draft");
     await chatDialog(page).getByRole("button", { name: "Close" }).click();
-    const toast = page.getByRole("button", { name: "Undo" }).locator("..");
-    const fromBottom = () =>
-      toast.evaluate((el) => Math.round(window.innerHeight - el.getBoundingClientRect().bottom));
-    await expect.poll(fromBottom).toBe(SHOWN + 12);
+    const shelf = page.locator("[data-shelf]");
+    const place = () =>
+      shelf.evaluate((el) => {
+        const box = el.getBoundingClientRect();
+        return [Math.round(window.innerHeight - box.bottom), Math.round(box.height)];
+      });
+    await expect.poll(place).toEqual([14, 116]);
     // Focus on Undo holds the toast's timer, so it cannot expire while this is measured.
     await page.getByRole("button", { name: "Undo" }).focus();
     await scroll(page, 600);
     await expectAway(bar(page));
-    await expect.poll(fromBottom).toBe(14);
+    await expect.poll(place).toEqual([14, 54]);
     await scroll(page, 0); // the top shows the bar
-    await expect.poll(fromBottom).toBe(SHOWN + 12);
+    await expect.poll(place).toEqual([14, 116]);
   });
 
   test("the chat's bar stays, even opened over a page whose bar is away", async ({ page }) => {
