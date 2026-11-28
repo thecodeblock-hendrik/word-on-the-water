@@ -19,6 +19,8 @@ const video = z.strictObject({
 
 const videoSeries = z
   .strictObject({
+    /** The short name on the series cover, such as "Advent". */
+    season: text,
     title: text,
     introduction: text.max(200),
     /** From this day no week is current. */

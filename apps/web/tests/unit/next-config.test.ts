@@ -29,6 +29,8 @@ describe("next.config file tracing", () => {
       "/devotionals/*": articles,
       "/content/**": articles,
       "/bible/**": ["./content/bibles/**/*"],
+      "/videos": ["./content/videos/*.yml"],
+      "/videos/advent": ["./content/videos/*.yml"],
     });
   });
 

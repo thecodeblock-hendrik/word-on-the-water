@@ -1,7 +1,8 @@
 # BibleProject's Advent word studies (docs/bibleproject.md). IDs and lengths checked on YouTube
 # on 2026-11-28. The introductions are drafts: check each against its video before release.
+season: Advent
 title: Advent word studies
-introduction: Four short videos on hope, peace, joy and love.
+introduction: Hope, peace, joy and love, one Bible word each.
 noCurrentWeekFrom: 2026-12-27
 videos:
   - theme: Hope

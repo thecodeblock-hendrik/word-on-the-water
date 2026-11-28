@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { loadVideoSeries } from "@/lib/videos/load";
 import { parseVideoSeries, totalMinutes, weekState } from "@/lib/videos/series";
 
-const source = `title: Advent word studies
+const source = `season: Advent
+title: Advent word studies
 introduction: Four short videos.
 noCurrentWeekFrom: 2026-12-27
 videos:
@@ -28,7 +29,7 @@ describe("parseVideoSeries", () => {
     },
   );
 
-  it.each(["title", "introduction", "noCurrentWeekFrom"])("fails without %s", (field) => {
+  it.each(["season", "title", "introduction", "noCurrentWeekFrom"])("fails without %s", (field) => {
     const without = source.replace(new RegExp(`^${field}: .*\n`, "m"), "");
     expect(() => parseVideoSeries(without, "advent")).toThrow(new RegExp(field));
   });

@@ -19,6 +19,8 @@ const devotionalFiles = [
   "./content/site/**/*",
 ];
 
+const videoFiles = ["./content/videos/*.yml"];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Hostnames besides localhost that may use the dev server, e.g. a phone on the same Wi-Fi.
@@ -37,6 +39,8 @@ const nextConfig: NextConfig = {
     "/content/**": devotionalFiles,
     // The Bible reader reads its chapter files the same way; keep them out of every other route.
     "/bible/**": ["./content/bibles/**/*"],
+    "/videos": videoFiles,
+    "/videos/advent": videoFiles,
   },
   turbopack: {
     rules: {
