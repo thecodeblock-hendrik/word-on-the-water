@@ -31,6 +31,7 @@ Built on the live header and liquid glass bar ([nav_new.md](nav_new.md)). All of
 - The site bar has four tabs, each sized to its words (decision 21), for **every** visitor: Devotional, Bible, **Prayer** (praying hands icon), Ask the Word.
 - A signed-out visitor who opens Prayer gets a public welcome page that explains crews, with one button, **Sign in or create an account**. It is not a form straight away.
 - The hamburger menu and the desktop header have a Prayer link after Bible.
+  - **Since 28 November the videos also add a link there** (Videos, after Bible, while `VIDEOS_ENABLED` is on; merged, not released). The order of Prayer and Videos is not decided.
 - The chat bar and the Bible reader bar do not change. From the reader, Prayer is in the header menu. From the chat it is one step further: Shore, then Prayer.
 
 **Also in the mockups.** Shore on Prayer pages is decided (22). The other rows are proposals:
@@ -49,6 +50,7 @@ Built on the live header and liquid glass bar ([nav_new.md](nav_new.md)). All of
 - **The cost:** icons are not evenly spaced, and swapping a label moves them. On a devotional page (Shore for Devotional) icons move 3 to 15px compared with the landing page; on Prayer pages (Shore for Prayer) by 1.2px at most. Not yet tried: the moving pill and hold and slide, larger text settings, and real phones.
 - Only the four-tab site bar changes. The chat bar, the reader bar and the bar with `CREW_ENABLED` off keep equal tabs.
 - Header: a Prayer link fits in one row at 1024px. A Prayer link **plus** an account button is 32px too wide at 1024px, and makes the row taller at 1280px. The link with its badge still has to be measured.
+- Header with videos on: measured on 28 November on the live site, with copied links, a Videos link **and** a Prayer link make the page 29px too wide at 1024px and the row taller at 1280px. With "About" removed both fitted (without Prayer's badge). Removing "About" is a proposal, to decide before the header links are built ([bibleproject.md](bibleproject.md), "Desktop header").
 
 **Routes:** `/prayer` (welcome when signed out, home when signed in), `/signin`, `/signin/verify`, `/invite/[token]`, `/prayer/requests` and `/prayer/requests/[id]`, `/prayer/crews/[id]`, `/prayer/account`. Only the welcome page is meant to be indexed.
 

@@ -76,6 +76,8 @@ Vercel's "Improve models with my data" setting was on until 2026-11-18 and was s
 
 ## BibleProject videos (behind `VIDEOS_ENABLED`, not live, ADR 0013)
 
+Merged 2026-11-28 (#188). With the flag off, the next promotion still changes the public page: its date, and the removal of the line that no cookie banner is needed.
+
 The public policy describes the videos only while the flag is on. Its "Last updated" date is 28 November 2026 with videos on or off (`PRIVACY_UPDATED` in `src/content/privacy.ts`, set by Hendrik); move it if the text changes again, including if the videos go live with different wording.
 
 [YouTube's help page](https://support.google.com/youtube/answer/171780) says the API Services Terms and the Developer Policies apply to the embedded player (read 2026-11-28). What the [Developer Policies](https://developers.google.com/youtube/terms/developer-policies), III.A, ask of a privacy policy, and where we stand. Part of that page was read word for word and the rest only in summary.

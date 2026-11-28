@@ -20,6 +20,8 @@ Built and checked on the live domain:
 - a Bible reader (BSB and WEB) and an installable PWA (no offline mode yet);
 - the weekly email as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email and creates a Kit draft that you review and schedule in Kit. A test broadcast reached the inbox with SPF, DKIM and DMARC passing.
 
+Built but not released: a videos section (`/videos`) with BibleProject's four Advent word studies, behind `VIDEOS_ENABLED` ([docs/bibleproject.md](docs/bibleproject.md)).
+
 The prayer request form and the contact form come after launch; until then the page shows `hello@wordonthewater.net`. Production deployments are promoted by hand (auto-promotion is off), see [docs/runbooks/deploy.md](docs/runbooks/deploy.md).
 
 ## Stack
@@ -74,4 +76,4 @@ make down        # stop services
 
 In `apps/web`: `pnpm make:icons` and `pnpm make:screenshots` rebuild the app icons and the manifest screenshots, `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, `pnpm build:bible` regenerates the Bible data, and `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a Kit draft for the weekly email (never sends; steps in [devotional format](docs/devotional_format.md)).
 
-Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `VIDEOS_ENABLED=1` turns on the video pages while they are being built (plan in [docs/bibleproject.md](docs/bibleproject.md)), `CHAT_ENABLED=1` shows the Ask the Word chat (see [docs/chat.md](docs/archive/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` `DEVOTIONAL_TODAY`, `BIBLE_ENABLED`, `CHAT_ENABLED` or `VIDEOS_ENABLED` in your shell: the unit tests read them and fail (run them with `env -u DEVOTIONAL_TODAY -u BIBLE_ENABLED -u CHAT_ENABLED -u VIDEOS_ENABLED` if you did). CI has no `.env` and is the judge.
+Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `VIDEOS_ENABLED=1` shows the video pages (built, not released; plan and open steps in [docs/bibleproject.md](docs/bibleproject.md)), `CHAT_ENABLED=1` shows the Ask the Word chat (see [docs/chat.md](docs/archive/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` `DEVOTIONAL_TODAY`, `BIBLE_ENABLED`, `CHAT_ENABLED` or `VIDEOS_ENABLED` in your shell: the unit tests read them and fail (run them with `env -u DEVOTIONAL_TODAY -u BIBLE_ENABLED -u CHAT_ENABLED -u VIDEOS_ENABLED` if you did). CI has no `.env` and is the judge.
