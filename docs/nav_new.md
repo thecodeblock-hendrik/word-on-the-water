@@ -2,7 +2,7 @@
 
 Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces the raised-tab bar in [landing_page_nav.md](landing_page_nav.md). Build it after the 28 November launch.
 
-**Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while the page scrolls, down or up, and returns when the scrolling stops (changed 28 November, after the first phone test). Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
+**Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while the page scrolls, down or up, and returns when the scrolling stops (changed 28 November, after the first phone test). The "Chat cleared" popup becomes a shelf on the bar (option C in [design/new_nav_chat.html](design/new_nav_chat.html), chosen 28 November). Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
 
 **Unchanged:** routes, what the other buttons do, clearing the chat with Undo, hiding for the chat keyboard, and everything from `lg` up (including the desktop chapter buttons and the "Your chat" edge tab). The bar still needs both `BIBLE_ENABLED` and `CHAT_ENABLED`.
 
@@ -76,7 +76,49 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Change after the first phone test (28 November): the bar stayed away after scrolling down stopped. It now returns once no scroll event has arrived for 400 ms (600 ms at first, shortened the same day; `RETURN_AFTER` in `follow-scroll.ts`, a timer, so it does not depend on the `scrollend` event), and hides again after another 40px down. Browser tests that need the bar to stay away hold back that one timer.
   - Second change the same day: scrolling up no longer shows the bar at once. It hides after more than 40px of scrolling either way from where it was last shown, and returns on stopping, or at the top (8px) or end (24px) of the page. This replaces the step 10 rule that 4px or more up shows it. Full run on five projects: 1,090 passed, 310 skipped, none failed; 1,011 web unit tests pass.
 
-## Part 4: prove and finish
+## Part 4: the Undo shelf (option C)
+
+Design: option C in [design/new_nav_chat.html](design/new_nav_chat.html). After the chat is left, the bar grows a 52px shelf with "Chat cleared" and Undo, as one piece of glass, then settles back. Build it before step 13, so the phone checks cover it. Steps are numbered S1 to S6.
+
+**Unchanged:** when it appears (only with an answer or a draft to lose), the 8 seconds, Undo itself, the memory-only copy, the wording, the spoken announcement, all tabs, page padding, the chat screen and desktop.
+
+**How to build it.** The shelf is not put inside the `<nav>` elements. `UndoToast` stays where it is, once in the layout, and becomes the glass pane: it sits just behind the bar and reaches from the bar's bottom edge to 52px above its top. While it is there, the bar drops its own glass (CSS `:has`), so only one pane is drawn. The bar's markup does not change. Reasons, from reading the code:
+
+- The announcement works because the `role="status"` area stays in the page while pages change. A shelf inside a bar would be created already filled on a new page or chapter, which screen readers may not announce.
+- The liquid pill and hold and slide treat every link and button in a bar as a tab (`tabs.ts`, matched by horizontal position). Undo inside the bar would become a fourth tab lying over the others.
+- A `/bible/...` address that is not found has no bar at all (`BottomNavHost` leaves `/bible` out, and there is no chapter bar). A separate pane can still offer Undo there, on its own.
+
+**Two differences from the mockup:**
+
+- While Undo has focus, the ring shows full and starts again on leaving, because the real timer gives a full 8 seconds again. The mockup's ring resumes where it paused.
+- While scrolling, the bar slides away as it does now and the pane shrinks to the shelf in the bar's place. The mockup folds the tabs; the result looks the same.
+
+- [ ] **S1. Prove the one pane.** A throwaway check before any app code: a page with the real `glass-bar` styles, a pane behind it and the bar's glass switched off, on mobile Chromium and WebKit, light and dark.
+  - Check: no seam, double blur or double shadow where tabs meet shelf; text behind is blurred under both parts; the pill still shows behind its tab.
+  - Done when: screenshots show one piece of glass. If they do not, stop and decide the approach again before S2.
+
+- [ ] **S2. The shelf, standing still.** The pane joins the bar below `lg`: same width and edges (440px at most), 52px shelf, a hairline above the tabs, Undo in a lens at least 44px high. The old navy popup style and any unused `toast-in` animation go.
+  - Test first (`undo-toast.test.tsx`, `glass.test.ts`): glass classes, not the navy ones; still one `role="status"` that is there and empty before anything is cleared; Undo is outside both bars; the CSS that switches off the bar's glass applies below `lg` only and only while the shelf is there; label contrast on the lens reaches 4.5:1 in both schemes.
+  - Test first (`bottom-nav.spec.ts`, replacing "clear of the bar"): shelf and bar meet with no gap or overlap of tabs and Undo, on the site bar and the Bible reader's bar, at 320, 375, 744 and 820 wide. All three tabs and Undo can be tapped. A slide along the bar never reaches Undo.
+  - Done when: those pass, axe is clean in light and dark with the shelf open, and without a shelf the bar looks exactly as before.
+
+- [ ] **S3. Scrolling, focus and no bar.** Scrolling moves the bar away and leaves the shelf, with all corners round, in its place; stopping joins them again.
+  - Test first (`bottom-nav.spec.ts`, updating "drops into the bar's place"): shelf alone while away and joined again after; keyboard focus in the hidden bar brings both back joined; focus on Undo keeps working while scrolling; on a `/bible` address that is not found, the shelf stands alone with Undo; opening the chat removes it and the chat's bar keeps its own glass.
+  - Done when: those pass on the three phone projects, repeated five times.
+
+- [ ] **S4. Countdown ring.** A ring with an undo arrow inside Undo, emptying over the 8 seconds. Decoration only (`aria-hidden`); the button's name stays "Undo". Animate with CSS classes, since the CSP blocks `style` attributes.
+  - Test first: the ring's time comes from the same value as the timer; it is full and still while Undo has focus and starts again on leaving; **with reduced motion it stays full** (the global reduced motion rule would otherwise empty it at once); the existing 8 second and focus tests stay green.
+  - Done when: unit tests pass and `csp.spec.ts` is clean.
+
+- [ ] **S5. Grow and settle.** The pane grows from the bar when the shelf appears and settles back when time runs out, in about 350ms, with no movement under reduced motion. No animation library. If settling back needs the element kept after the offer ends, it must not be tappable, focusable or spoken during that time.
+  - Test first: Undo cannot be used once the 8 seconds are over, even while the pane is still closing; a second clear during the close opens it again; with reduced motion it appears and goes at once; the bar gets its own glass back afterwards.
+  - Done when: the tests pass without fixed sleeps and CLS is unchanged.
+
+- [ ] **S6. Gates and fallbacks.** Full run on five projects, `make lint typecheck test`, Lighthouse, landing JS (4,012 bytes were left after step 12). Solid pane for reduced transparency, increased contrast and no `backdrop-filter`; system colours in forced colours, with a visible edge and Undo outline.
+  - Test first: extend the fallback tests of step 6 to the shelf.
+  - Done when: all pass and the figures are under "Measurements".
+
+## Part 5: prove and finish
 
 - [x] **12. Quality gates.** Full `make e2e`, axe in both schemes, Lighthouse with the bar showing. Compare with step 0: landing JS under 165 KB gzipped, CLS under 0.05, LCP no worse. About 5 KB of JS room was left on 22 November.
   - Result (local, 27 November, after the fix below): five projects in parallel, 1,084 passed, 306 skipped, none failed, in 4.0 minutes. Axe checks in light and dark are part of that run. **Desktop Firefox is not checked:** it does not launch on this Mac (`browserType.launch: Failed to launch`, seen today); CI at the final push is its first run. Lighthouse passed with the bar on screen (seen in its screenshots), figures below. `make lint typecheck test types-check` pass: 1,007 web and 671 API tests.
@@ -86,6 +128,7 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - [ ] No flicker when Safari's toolbar collapses
   - [ ] Safe area above the home indicator
   - [ ] Hold and slide, with no link preview
+  - [ ] Leaving the chat: the shelf looks like one piece with the bar, "Chat cleared" is spoken by VoiceOver and TalkBack, Undo works, and the shelf stays usable while scrolling
   - [ ] VoiceOver and TalkBack reach and use the bar, including when hidden
   - [ ] Chat keyboard hides the bar and brings it back
   - [ ] Readable in sunlight, in both themes
