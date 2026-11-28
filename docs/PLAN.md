@@ -430,6 +430,9 @@ Checked against the code and the tests on 2026-11-16: what is proven is ticked w
 ### 1.12 Prayer crew (proposed 2026-11-22, after launch, no date)
 Private prayer for registered users: crews, invites, per-person sharing. Design in [prayer_crew.md](prayer_crew.md), decision in [ADR 0012](adr/0012-prayer-crews.md), the step-by-step build in [prayer_crew_checklist.md](prayer_crew_checklist.md). It brings public accounts forward from Phase 2 and needs Postmark first. 2026-11-28: Prayer gets a tab in the phone bar and a menu link for everyone, with a welcome page for visitors; the mockups were redrawn for the liquid glass navigation. The same day: 18 and over, email invites bound to their address, old shares never return, sessions of 90 days at most, four bar tabs sized to their words, Shore on Prayer pages. Separate from 1.4 (the public form to `prayer@`). Not started.
 
+### 1.13 BibleProject videos (being built, behind `VIDEOS_ENABLED`)
+The four Advent word study videos on `/videos`. Plan and build checklist, which this plan does not repeat: [bibleproject.md](bibleproject.md); decision in [ADR 0013](adr/0013-third-party-video-embeds.md).
+
 ## Phase 2 - Devotionals and admin
 
 ### 2.1 Auth and RBAC

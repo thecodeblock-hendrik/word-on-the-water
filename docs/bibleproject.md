@@ -1,6 +1,6 @@
 # BibleProject videos
 
-Status: **planned, nothing built** (2026-11-28). Pages were read on this date; check the terms again before release.
+Status: **being built** on `feat/videos-page`, nothing live (2026-11-28). Pages were read on this date; check the terms again before release.
 
 **Decided:** videos are **embedded** on a **new `/videos` page**. The first series is the **Advent word studies** (option A below), laid out as **concept C, a series shelf and then a weekly path**: all four weeks are listed in order, with the current week's open. Mockups: [design/bible_project_advent.html](design/bible_project_advent.html): C first, with its date states and tablet and desktop screens; A and B at the end.
 
@@ -167,7 +167,7 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
 - [x] 0. **(Hendrik)** Series A and layout C chosen (2026-11-28).
 - [x] 1. Collect and check the four YouTube IDs (2026-11-28, results under "Video source").
 - [ ] 1a. **(Hendrik)** Watch all four through, with sound and English captions.
-- [ ] 2. ADR 0013 and threat model rows.
+- [x] 2. [ADR 0013](adr/0013-third-party-video-embeds.md) and threat model rows V1 to V6.
 - [ ] 3. `VIDEOS_ENABLED`, off by default.
 - [ ] 4. Content file, loader and check. Tests: a missing field or badly formed ID fails; the open week and label on the day before Advent, on each Sunday and the day before it, and from 27 December; a known and an unknown `?week=`.
 - [ ] 5. The shelf and the weekly path, with covers, credits, links and notice. Tests: the shelf links to the path; four rows in week order; the right row open and labelled; a credit with every video; no player before a tap; rows open and close, one at a time, without JavaScript; the column is centred and no wider than 640px at 744, 1024 and 1280px.

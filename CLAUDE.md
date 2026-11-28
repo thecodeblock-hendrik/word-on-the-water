@@ -143,7 +143,7 @@ word-on-the-water/                (items marked "planned" do not exist yet)
 │   ├── bible_feature.md, PWA_checklist.md, web_push.md, prayer_crew.md, prayer_crew_checklist.md, devotional_format.md   ← Bible reader plan, PWA steps, Web Push plan (decided 2026-11-16, planned after the PWA), devotional file format
 │   ├── design/                   ← landing page document and mockup, landing_nav_new.html (the bar) and new_nav_chat.html (the Undo shelf, option C), bible_mockups.html, chat_mockups.html; landing_nav.html is the replaced bar
 │   ├── reviews/                  ← dated code reviews
-│   ├── adr/                      ← 0001 to 0012
+│   ├── adr/                      ← 0001 to 0013
 │   ├── runbooks/                 ← deploy.md, incident.md, restore-db.md, rotate-secrets.md, chat.md
 │   └── threat-model.md, privacy.md
 ├── apps/
