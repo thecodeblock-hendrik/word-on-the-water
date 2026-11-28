@@ -86,7 +86,7 @@ test.describe("the sign-up form", () => {
     await expect(band.getByRole("status")).toContainText("Check your inbox");
     await expect(band.getByLabel("Email")).toHaveCount(0);
 
-    const last = await (await fetch(`${STUB}/__last`)).json();
+    const last = await (await fetch(`${STUB}/__last_signup?email=reader@example.com`)).json();
     expect(last.body).toMatchObject({
       email: "reader@example.com",
       first_name: "Ann",

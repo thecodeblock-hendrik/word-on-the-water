@@ -78,13 +78,9 @@ li{margin:3px 0;max-width:84ch}
 .tab{position:relative;z-index:1;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:none;padding:0 2px;border-radius:28px;color:var(--ink);font:600 12px/15px "Barlow",system-ui;white-space:nowrap;cursor:pointer}
 .tab:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
 .tab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
-.tab .solid{display:none}
-.tab.sel{font-weight:800}
-.tab.sel .line{display:none}
-.tab.sel .solid{display:inline}
 .tab.under svg{transform:scale(1.14)}
 .tab[aria-disabled="true"]{opacity:.4;cursor:default}
-.solid .f{fill:currentColor}
+.tab svg .f{fill:currentColor}
 
 /* Reduce transparency / increase contrast / no backdrop-filter: a solid bar */
 body.solidmode .glass{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border-color:var(--muted)}
@@ -170,20 +166,20 @@ body.actual{--tscale:1}
 <table>
 <tr><th>Screen</th><th>Left</th><th>Middle</th><th>Right</th><th>Selected at rest</th></tr>
 <tr><td>Landing</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td><td>None</td></tr>
-<tr><td>Devotional</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td><td>Devotional (<code>aria-current="page"</code>)</td></tr>
+<tr><td>Devotional page</td><td><b>Shore</b> (to the landing page)</td><td>Bible</td><td>Ask the Word</td><td>None</td></tr>
 <tr><td>Privacy, thank you, not found</td><td>Devotional</td><td>Bible</td><td>Ask the Word</td><td>None</td></tr>
 <tr><td>Chat</td><td>Devotional</td><td>Bible</td><td>Shore</td><td>None</td></tr>
 <tr><td>Bible reader</td><td>Previous chapter</td><td>Shore</td><td>Next chapter</td><td>None: these are actions</td></tr>
 <tr><td>Bible reader, from the chat</td><td>Previous chapter</td><td>Your chat</td><td>Next chapter</td><td>None: these are actions</td></tr>
 </table>
-<p class="lead">None of the three buttons is a "Home" tab, so on most screens no pill rests anywhere. It appears under your finger on touch. It stays only where the button is the page you are on.</p>
+<p class="lead">On a devotional page, Shore takes the place of Devotional, so you can get back to the landing page. No button is ever the page you are on, so no pill rests anywhere: it appears under your finger and fades after.</p>
 
 <h2>1. Clickable prototype</h2>
 <p class="lead">Walk every journey: Devotional, Bible, Previous and Next, Shore, Ask the Word, ask a starter question, tap a verse, Your chat, close the chat, Undo.</p>
 <div class="row" id="proto"></div>
 
 <h2>2. Landing page</h2><div class="row" id="s-landing"></div>
-<h2>3. Devotional page (current page)</h2><div class="row" id="s-devotional"></div>
+<h2>3. Devotional page: Shore on the left</h2><div class="row" id="s-devotional"></div>
 <h2>4. Privacy, thank you, not found</h2><div class="row" id="s-other"></div>
 <h2>5. Ask the Word</h2>
 <p class="lead">The message pill stays a separate, solid control above the glass, with a 12px gap now that there is no bump. The bar hides while the keyboard is open.</p>
@@ -223,11 +219,11 @@ body.actual{--tscale:1}
 <div class="film" id="s-film"></div>
 <table>
 <tr><th>Moment</th><th>What happens</th></tr>
-<tr><td>Touch down</td><td>The pill blooms under the finger (or flows there from the current tab) and lifts to 106%. The icon grows to 114%.</td></tr>
+<tr><td>Touch down</td><td>The pill blooms under the finger and lifts to 106%. The icon grows to 114%.</td></tr>
 <tr><td>Slide while held</td><td>The pill follows from tab to tab, stretching. Nothing opens yet.</td></tr>
 <tr><td>Release on a tab</td><td>That tab opens at once. Navigation never waits for the animation.</td></tr>
-<tr><td>Release outside the bar</td><td>Cancelled, nothing opens (WCAG 2.5.2). The pill returns to the current tab or fades.</td></tr>
-<tr><td>Keyboard</td><td>Enter or Space opens the tab and the pill flows to it. Focus has its own visible ring.</td></tr>
+<tr><td>Release outside the bar</td><td>Cancelled, nothing opens (WCAG 2.5.2). The pill fades.</td></tr>
+<tr><td>Keyboard</td><td>Enter or Space opens the tab and the pill shows on it. Focus has its own visible ring.</td></tr>
 <tr><td>Reduced motion</td><td>No stretch or bounce: the pill appears in its new place.</td></tr>
 </table>
 
@@ -235,7 +231,7 @@ body.actual{--tscale:1}
 <p class="lead">Contrast is worked out here from the same values the bars use, against the worst possible backdrop: solid black behind the light bar, solid white behind the dark one. Blur only averages what is behind, so a real page cannot be worse than this. The saturation boost is not part of the sum and needs a check in a real browser.</p>
 <table id="contrast"><tr><th>Scheme</th><th>Label on glass</th><th>Label on the pill</th><th>Accent text on the pill</th></tr></table>
 <ul>
-<li>So every label uses the ink colour. Selection shows as the pill, a filled icon and a heavier label, never as colour alone. Orange text on the pill fails in light mode.</li>
+<li>So every label uses the ink colour. Orange text on the pill fails in light mode.</li>
 <li>Ask the Word loses its solid accent fill and Bible loses its raised circle: all three are equals, as in your picture.</li>
 <li>Targets: the bar is 64px high and each tab is at least 90px wide at 320px, well over 44px.</li>
 <li>Solid bar for reduced transparency, increased contrast and browsers without backdrop blur; system colours in forced-colours mode.</li>
@@ -245,7 +241,7 @@ body.actual{--tscale:1}
 <li>Without JavaScript the bar never hides.</li>
 <li>Hiding has a cost: someone who only scrolls down may not notice the bar until they scroll up. It is always there at the top and the end, and the header stays on screen.</li>
 <li>Still to test on real phones: Safari's own toolbar collapsing during a scroll, and VoiceOver and TalkBack reaching the hidden bar.</li>
-<li>Without JavaScript the links still work and the current tab still shows its pill (drawn with CSS), with no movement. Ask the Word stays a mail link.</li>
+<li>Without JavaScript the links still work, with no pill and no movement. Ask the Word stays a mail link.</li>
 </ul>
 
 <h2 id="tablet">13. Tablet</h2>
@@ -274,7 +270,8 @@ body.actual{--tscale:1}
 <ul>
 <li>Light glass for Dawn patrol and dark glass for Night swell, following the theme.</li>
 <li>Chapter buttons use plain chevrons.</li>
-<li>No resting pill: it stays only where a button is the current page.</li>
+<li>No resting pill on any screen.</li>
+<li>On a devotional page, the Devotional button becomes Shore and opens the landing page.</li>
 <li>The bar hides while scrolling down.</li>
 </ul>
 </main>
@@ -285,42 +282,38 @@ const $ = (s, el = document) => el.querySelector(s);
 const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
 const opts = { slow: false, still: matchMedia("(prefers-reduced-motion: reduce)").matches };
 
-/* ---------- icons: outline when idle, filled when selected ---------- */
+/* ---------- icons ---------- */
 const surfer = '<circle cx="12" cy="7.5" r="3.5"/>';
 const waves = '<path d="M2 15c3 0 3-2 5.5-2s2.5 2 4.5 2 3-2 5.5-2 2.5 2 4.5 2M2 20c3 0 3-2 5.5-2s3 2 5.5 2 3-2 5.5-2"/>';
 const book = "M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z";
 const bubble = "M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z";
 const board = "M12 2c3 3 3.5 9 0 15-3.500-6-3-12 0-15z";
 const ICON = {
-  devotional: [surfer + waves, '<circle class="f" cx="12" cy="7.5" r="3.5"/><g style="stroke-width:2.8">' + waves + "</g>"],
-  bible: ['<path d="' + book + 'M12 6.5v13"/>', '<path class="f" d="M11.200 6.200C9.300 5 6.700 4.600 4 5v13c2.700-.4 5.300 0 7.200 1.200zM12.800 6.200C14.700 5 17.300 4.600 20 5v13c-2.700-.4-5.300 0-7.200 1.200z"/>'],
-  ask: ['<path d="' + bubble + '"/>', '<path class="f" d="' + bubble + '"/>'],
-  yourchat: ['<path class="f" d="' + bubble + '"/>', '<path class="f" d="' + bubble + '"/>'],
-  shore: ['<path d="' + board + 'M12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/>', '<path class="f" d="' + board + '"/><path d="M3 21h18M7 21l2-2M17 21l-2-2"/>'],
+  devotional: surfer + waves,
+  bible: '<path d="' + book + 'M12 6.5v13"/>',
+  ask: '<path d="' + bubble + '"/>',
+  yourchat: '<path class="f" d="' + bubble + '"/>',
+  shore: '<path d="' + board + 'M12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/>',
 };
 const CHAPTER = { prev: '<path style="stroke-width:2.6" d="M15 5l-7 7 7 7"/>', next: '<path style="stroke-width:2.6" d="M9 5l7 7-7 7"/>' };
-const svg = (inner, cls = "", extra = "") => `<svg viewBox="0 0 24 24" aria-hidden="true" class="${cls}" ${extra}>${inner}</svg>`;
-const iconHtml = (key) => {
-  if (key === "prev" || key === "next") return svg(CHAPTER[key]);
-  return svg(ICON[key][0], "line") + svg(ICON[key][1], "solid");
-};
+const svg = (inner) => `<svg viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
+const iconHtml = (key) => svg(key === "prev" || key === "next" ? CHAPTER[key] : ICON[key]);
 
 /* ---------- liquid bar ---------- */
 function spring(s, target, k, c, dt) { s.v += (k * (target - s.x) - c * s.v) * dt; s.x += s.v * dt; }
 
-function liquidBar(items, { selected = null, label = "Quick links", onPick } = {}) {
+function liquidBar(items, { label = "Quick links", onPick } = {}) {
   const dock = el(`<div class="dock"><nav class="glass" aria-label="${label}"><span class="lens" aria-hidden="true"></span></nav></div>`);
   const nav = dock.firstChild, lens = nav.firstChild;
   const tabs = items.map((it, i) => {
     const b = el(`<button type="button" class="tab">${iconHtml(it.icon)}<span>${it.text}</span></button>`);
     if (it.aria) b.setAttribute("aria-label", it.aria);
     if (it.disabled) b.setAttribute("aria-disabled", "true");
-    if (i === selected) { b.classList.add("sel"); b.setAttribute("aria-current", "page"); }
     nav.append(b);
     return b;
   });
   const L = { x: 0, v: 0 }, R = { x: 0, v: 0 };
-  let goal = null, frame = 0, last = 0, held = false, rest = selected;
+  let goal = null, frame = 0, last = 0, held = false;
 
   const box = (i) => ({ l: tabs[i].offsetLeft, r: tabs[i].offsetLeft + tabs[i].offsetWidth });
   const draw = () => {
@@ -356,7 +349,7 @@ function liquidBar(items, { selected = null, label = "Quick links", onPick } = {
   function settle() {
     tabs.forEach((t) => t.classList.remove("under"));
     held = false;
-    if (rest === null) lens.classList.remove("on"); else moveTo(rest);
+    lens.classList.remove("on");
   }
   const at = (e) => {
     const r = nav.getBoundingClientRect();
@@ -379,7 +372,6 @@ function liquidBar(items, { selected = null, label = "Quick links", onPick } = {
   nav.addEventListener("pointercancel", settle);
   tabs.forEach((t, i) => t.addEventListener("click", (e) => { if (e.detail === 0) pick(i); }));
 
-  dock.rest = () => { if (rest !== null) moveTo(rest, true); };
   dock.force = (l, r) => { goal = box(1); lens.classList.add("on"); L.x = l * nav.clientWidth; R.x = r * nav.clientWidth; draw(); };
   return dock;
 }
@@ -405,7 +397,10 @@ function autoHide(view) {
 /* ---------- bar presets (same journeys as today) ---------- */
 const site = { devotional: { id: "devotional", icon: "devotional", text: "Devotional" }, bible: { id: "bible", icon: "bible", text: "Bible" } };
 const siteItems = () => [site.devotional, site.bible, { id: "ask", icon: "ask", text: "Ask the Word" }];
-const chatItems = () => [site.devotional, site.bible, { id: "shore", icon: "shore", text: "Shore" }];
+const shore = { id: "shore", icon: "shore", text: "Shore" };
+const chatItems = () => [site.devotional, site.bible, shore];
+/** On a devotional page, Shore (back to the landing page) takes the place of Devotional. */
+const itemsFor = (page) => (page === "devotional" ? [shore, ...siteItems().slice(1)] : siteItems());
 function readerItems(chapter, fromChat, book = "John", last = 21) {
   const prev = chapter > 1 ? { id: "prev", icon: "prev", text: `${book} ${chapter - 1}`, aria: `Previous chapter: ${book} ${chapter - 1}` } : { id: "prev", icon: "prev", text: "Start", aria: "Start of the Bible", disabled: true };
   const next = chapter < last ? { id: "next", icon: "next", text: `${book} ${chapter + 1}`, aria: `Next chapter: ${book} ${chapter + 1}` } : { id: "next", icon: "next", text: "End", aria: "End of the Bible", disabled: true };
@@ -433,9 +428,9 @@ const chatHead = '<div class="chat-h"><strong>Ask the Word</strong><button class
 /* ---------- frames ---------- */
 function phone(night, inner) { return el(`<div class="phone ${night ? "night" : ""}"><div class="status"><span>9:41</span><span>5G 100%</span></div>${inner}</div>`); }
 
-function pageScreen({ page, chapter, book, items, selected, label, top = 0, onPick, extra = "" }) {
+function pageScreen({ page, chapter, book, items, label, top = 0, onPick, extra = "" }) {
   const view = el(`<div class="view">${header}<div class="view"><div class="scroll">${PAGE[page](chapter, book)}</div>${extra}</div></div>`);
-  const bar = liquidBar(items, { selected, label, onPick });
+  const bar = liquidBar(items, { label, onPick });
   view.lastChild.insertBefore(bar, view.lastChild.children[1] || null);
   view.dataset.top = top;
   return view;
@@ -455,15 +450,15 @@ function fig(parent, night, screen, caption) {
 }
 function both(parent, make, caption) { fig(parent, false, make(), caption); fig(parent, true, make(), caption); }
 
-const siteShot = (page, selected, top) => () => pageScreen({ page, items: siteItems(), selected, top });
+const siteShot = (page, top) => () => pageScreen({ page, items: itemsFor(page), top });
 const readerShot = (chapter, fromChat, top, book, last) => () => pageScreen({ page: "bible", chapter, book, items: readerItems(chapter, fromChat, book, last), label: "Previous and next chapter", top });
 
-both("#s-landing", siteShot("landing", null, 0), "At the top. No tab is selected.");
-both("#s-landing", siteShot("landing", null, 210), "Scrolled: the picture and cards pass under the glass.");
-both("#s-devotional", siteShot("devotional", 0, 190), "Devotional is the current page, so the pill rests on it.");
-both("#s-other", siteShot("privacy", null, 40), "Privacy.");
-both("#s-other", siteShot("thanks", null, 0), "Thank you.");
-both("#s-other", siteShot("notfound", null, 0), "Not found.");
+both("#s-landing", siteShot("landing", 0), "At the top. No tab is selected.");
+both("#s-landing", siteShot("landing", 210), "Scrolled: the picture and cards pass under the glass.");
+both("#s-devotional", siteShot("devotional", 190), "Shore takes the place of Devotional and opens the landing page.");
+both("#s-other", siteShot("privacy", 40), "Privacy.");
+both("#s-other", siteShot("thanks", 0), "Thank you.");
+both("#s-other", siteShot("notfound", 0), "Not found.");
 both("#s-chat", () => chatScreen({}), "Just opened. Shore is on the right.");
 both("#s-chat", () => chatScreen({ thread: true }), "After an answer. Scroll the thread under the pill and bar.");
 both("#s-chat", () => chatScreen({ thread: true, draft: "Why did Jesus die?", keyboard: true }), "Typing: the bar is hidden.");
@@ -473,10 +468,10 @@ both("#s-bible", readerShot(22, false, 0, "Rev", 22), "End of the Bible: Next is
 both("#s-bible", readerShot(2, false, 60, "1 Thess", 5), "A long short name still fits on one line.");
 both("#s-yourchat", readerShot(3, true, 110), "Your chat takes Shore's place, with a filled bubble. It reopens the same thread.");
 const toast = '<div class="toast" role="status"><span>Chat cleared</span><button type="button">Undo</button></div>';
-both("#s-toast", () => pageScreen({ page: "devotional", items: siteItems(), selected: 0, extra: toast }), "Left the chat by tapping Devotional.");
+both("#s-toast", () => pageScreen({ page: "devotional", items: itemsFor("devotional"), extra: toast }), "Left the chat by tapping Devotional.");
 both("#s-toast", () => pageScreen({ page: "bible", chapter: 3, items: readerItems(3, false), label: "Previous and next chapter", top: 110, extra: toast }), "Left the chat by tapping Bible.");
 const menu = '<div class="menu"><div>About</div><div>What is coming</div><div>Start here</div><div>What we believe</div><div>Bible</div><div>Ask the Word</div><div>Theme</div></div>';
-both("#s-overlay", () => pageScreen({ page: "landing", items: siteItems(), selected: null, extra: menu }), "Header menu open (illustrative list): the bar stays.");
+both("#s-overlay", () => pageScreen({ page: "landing", items: siteItems(), extra: menu }), "Header menu open (illustrative list): the bar stays.");
 both("#s-overlay", () => {
   const v = readerShot(3, false, 110)();
   v.append(el('<div class="scrim"></div>'), el('<div class="sheet"><div class="tabs"><span>Book: John</span><span>Chapter: 3</span><span>Verses: all</span></div><div class="books"><div>Matthew</div><div>Mark</div><div>Luke</div><div>John</div><div>Acts</div><div>Romans</div></div><span class="cta">Read</span></div>'));
@@ -492,10 +487,10 @@ const hideStates = [
 function hideShot(make, top, state) {
   return () => { const v = make(top)(); if (state) v.classList.add(state); return v; };
 }
-for (const [id, make] of [["#s-hide-devotional", (top) => siteShot("devotional", 0, top)], ["#s-hide-bible", (top) => readerShot(3, false, top)], ["#s-hide-yourchat", (top) => readerShot(3, true, top)]]) {
+for (const [id, make] of [["#s-hide-devotional", (top) => siteShot("devotional", top)], ["#s-hide-bible", (top) => readerShot(3, false, top)], ["#s-hide-yourchat", (top) => readerShot(3, true, top)]]) {
   for (const night of [false, true]) for (const [top, state, caption] of hideStates) fig(id, night, hideShot(make, top, state)(), caption);
 }
-const hiddenToast = () => { const v = pageScreen({ page: "devotional", items: siteItems(), selected: 0, top: 260, extra: toast }); v.classList.add("bar-away"); return v; };
+const hiddenToast = () => { const v = pageScreen({ page: "devotional", items: itemsFor("devotional"), top: 260, extra: toast }); v.classList.add("bar-away"); return v; };
 both("#s-hide-toast", hiddenToast, "Scrolling with the toast up: the bar leaves and the toast drops into its place.");
 
 /* ---------- clickable prototype ---------- */
@@ -527,9 +522,8 @@ function prototype(night) {
     let screen, name;
     if (s.chat) { screen = chatScreen({ thread: s.thread, onPick: go }); name = "Chat"; }
     else if (s.page === "bible") { screen = pageScreen({ page: "bible", chapter: s.chapter, items: readerItems(s.chapter, s.fromChat), label: "Previous and next chapter", onPick: go, extra }); name = "Bible reader"; }
-    else { screen = pageScreen({ page: s.page, items: siteItems(), selected: s.page === "devotional" ? 0 : null, onPick: go, extra }); name = s.page === "devotional" ? "Devotional page" : "Landing page"; }
+    else { screen = pageScreen({ page: s.page, items: itemsFor(s.page), onPick: go, extra }); name = s.page === "devotional" ? "Devotional page" : "Landing page"; }
     host.replaceChildren(screen);
-    screen.querySelectorAll(".dock").forEach((d) => d.rest());
     autoHide(screen);
     cap.innerHTML = `<span class="tag">${night ? "Dark" : "Light"}</span>Now showing: ${name}`;
   }
@@ -546,11 +540,11 @@ function prototype(night) {
 prototype(false); prototype(true);
 
 /* ---------- motion filmstrip ---------- */
-const film = [["1. At rest on Devotional", .012, .335, 0], ["2. Leading edge races ahead", .05, .62, null], ["3. Stretched and thinner", .17, .665, null], ["4. Overshoots a little", .345, .685, 1], ["5. Settled on Bible", .339, .661, 1]];
+const film = [["1. Finger down on Devotional", .012, .335], ["2. Slides: leading edge races ahead", .05, .62], ["3. Stretched and thinner", .17, .665], ["4. Overshoots a little", .345, .685], ["5. Settled on Bible", .339, .661]];
 const frames = [];
-for (const night of [false, true]) for (const [text, l, r, sel] of film) {
+for (const night of [false, true]) for (const [text, l, r] of film) {
   const f = el("<figure></figure>"), p = el(`<div class="phone ${night ? "night" : ""}"><div class="bgtext">Even the wind and the sea obey him. Even the wind and the sea.</div></div>`);
-  const bar = liquidBar(siteItems(), { selected: sel });
+  const bar = liquidBar(siteItems());
   p.append(bar); f.append(p, el(`<figcaption>${text}</figcaption>`)); $("#s-film").append(f);
   frames.push([bar, l, r]);
 }
@@ -584,11 +578,11 @@ function tabletFig(parent, night, w, h, screen, caption) {
 const wideHeader = (screen) => { $(".sub", screen).textContent = "Get the devotional"; return screen; };
 const wide = (make) => () => { const v = make(); if ($(".sub", v)) wideHeader(v); return v; };
 for (const [make, caption] of [
-  [wide(siteShot("landing", null, 0)), "Landing page. The bar is centred, 440px wide."],
-  [wide(siteShot("devotional", 0, 200)), "Devotional: the pill rests on the current page."],
+  [wide(siteShot("landing", 0)), "Landing page. The bar is centred, 440px wide."],
+  [wide(siteShot("devotional", 200)), "Devotional page: Shore is on the left."],
   [() => chatScreen({ thread: true }), "Chat: the message pill lines up with the bar."],
-  [wide(() => pageScreen({ page: "devotional", items: siteItems(), selected: 0, extra: toast })), "Undo toast, the same width as the bar."],
-  [wide(hideShot((top) => siteShot("devotional", 0, top), 300, "bar-away")), "Scrolling down: the bar is hidden."],
+  [wide(() => pageScreen({ page: "devotional", items: itemsFor("devotional"), extra: toast })), "Undo toast, the same width as the bar."],
+  [wide(hideShot((top) => siteShot("devotional", top), 300, "bar-away")), "Scrolling down: the bar is hidden."],
 ]) for (const night of [false, true]) tabletFig("#s-tab-mini", night, 744, 1133, make(), caption);
 
 for (const [make, caption] of [
@@ -605,7 +599,6 @@ $("#actual").onchange = (e) => { document.body.classList.toggle("actual", e.targ
 
 /* ---------- start and controls ---------- */
 document.querySelectorAll(".view[data-top]").forEach((v) => { $(".scroll", v).scrollTop = Number(v.dataset.top); autoHide(v); });
-document.querySelectorAll(".dock").forEach((d) => d.rest());
 frames.forEach(([bar, l, r]) => bar.force(l, r));
 $("#still").checked = opts.still;
 $("#slow").onchange = (e) => { opts.slow = e.target.checked; };

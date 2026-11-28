@@ -153,7 +153,7 @@ def test_a_body_over_the_limit_is_a_413() -> None:
 
 
 def test_chat_off_is_a_503(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("CHAT_ENABLED", "")
+    monkeypatch.setenv("CHAT_ENABLED", "0")  # an empty value is ignored, so .env would apply
     get_settings.cache_clear()
 
     response = post({"message": "who is jesus"})

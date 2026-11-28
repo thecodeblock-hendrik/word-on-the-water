@@ -2,10 +2,11 @@ import { useId, type KeyboardEvent, type RefObject } from "react";
 
 import { chat } from "@/content/chat";
 
-// The bar is 3.6rem plus the home-bar inset; the pill sits 34px above it so the bar's curve rises
-// into clear space. From lg the chat is a drawer with no bar and keeps its strip.
+// The pill sits 12px (.75rem) above the capsule, which is 4rem tall and max(.875rem, home-bar
+// inset) up, and is capped at the capsule's width. From lg the chat is a drawer with no bar and
+// keeps its strip.
 const WITH_BAR =
-  "max-lg:border-0 max-lg:bg-transparent max-lg:pb-[calc(3.6rem+34px+max(.5rem,env(safe-area-inset-bottom)))] lg:pb-[max(1rem,env(safe-area-inset-bottom))]";
+  "max-lg:grid-cols-[minmax(0,440px)] max-lg:justify-center max-lg:border-0 max-lg:bg-transparent max-lg:pb-[calc(4.75rem+max(.875rem,env(safe-area-inset-bottom)))] lg:pb-[max(1rem,env(safe-area-inset-bottom))]";
 
 type Props = {
   value: string;

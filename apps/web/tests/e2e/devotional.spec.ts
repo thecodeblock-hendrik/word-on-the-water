@@ -1,4 +1,6 @@
-import { expect, type Page, test } from "@playwright/test";
+import { type Page } from "@playwright/test";
+
+import { expect, test } from "./fixtures";
 
 const path = "/devotionals/advent-01-more-than-watchmen";
 const week2 = "/devotionals/advent-02-the-long-wait";

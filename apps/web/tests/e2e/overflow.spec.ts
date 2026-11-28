@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 // Plain (non-mobile) windows: a mobile profile widens its layout viewport to fit
 // overflowing content, so it can never show a sideways scroll.

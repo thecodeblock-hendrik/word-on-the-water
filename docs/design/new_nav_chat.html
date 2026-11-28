@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaving the chat: five options for "Chat cleared"</title>
+<style>
+/* Tokens copied from apps/web/src/styles/tokens.css */
+.phone{--bg:#fbf3e8;--surface:#fffaf3;--ink:#2b2d42;--muted:#5c5e70;--line:#e9dccb;--accent:#d9703a;--accent-ink:#a9501f;--deep:#2b2d42;--on-deep:#fbf3e8;--accent-on-deep:#f0955f;
+  --lens:rgb(43 45 66 / .10);--rim:rgb(255 255 255 / .85);--edge:rgb(43 45 66 / .16);--glass-shadow:0 8px 28px rgb(43 45 66 / .22)}
+.phone.night{--bg:#0f2233;--surface:#152c40;--ink:#f4f1ea;--muted:#a9b7c2;--line:#28425a;--accent:#4fa9a6;--accent-ink:#6fc0bc;--deep:#0a1825;--on-deep:#f4f1ea;--accent-on-deep:#4fa9a6;
+  --lens:rgb(10 24 37 / .45);--rim:rgb(255 255 255 / .22);--edge:rgb(255 255 255 / .12);--glass-shadow:0 8px 28px rgb(0 0 0 / .45)}
+
+*{box-sizing:border-box}
+body{margin:0;background:#e7e2da;color:#2b2d42;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px 16px 80px}
+main{max-width:1590px;margin:0 auto}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:20px;margin:48px 0 4px}
+p.lead{color:#4a4c5c;margin:0 0 8px;max-width:84ch}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0;max-width:84ch}
+.row{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start;margin-top:14px}
+figure{margin:0;width:var(--w,375px)}
+figcaption{font-size:13px;color:#3b3d4e;margin-top:8px}
+.wrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:14px;background:#fffdf9;margin-top:10px;min-width:720px}
+th,td{border:1px solid #d9d0c3;padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#f0e8db}
+.tag{display:inline-block;background:#2b2d42;color:#fff;border-radius:4px;padding:1px 8px;font:700 11px system-ui;letter-spacing:.06em;text-transform:uppercase;margin-left:8px;vertical-align:2px}
+.controls{position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;gap:16px;align-items:center;background:#fffdf9;border:1px solid #d9d0c3;border-radius:12px;padding:10px 14px;margin:14px 0;font-size:14px}
+.controls label{display:flex;gap:6px;align-items:center;min-height:32px}
+.replay{font:600 13px system-ui;min-height:44px;padding:0 14px;margin-top:8px;border:1px solid #2b2d42;border-radius:8px;background:#fffdf9;color:#2b2d42;cursor:pointer}
+
+/* ---------- phone frame ---------- */
+.phone{width:var(--w,375px);height:620px;border-radius:34px;border:8px solid #111;overflow:clip;position:relative;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;isolation:isolate}
+.status{height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font:600 12px system-ui}
+.top{flex:none;display:flex;align-items:center;gap:10px;padding:8px 14px;min-height:52px;border-bottom:1px solid var(--line);font:700 15px "Barlow Condensed","Arial Narrow",system-ui;letter-spacing:.1em;text-transform:uppercase}
+.view{flex:1;min-height:0;position:relative;overflow:hidden}
+.page{padding:16px}
+.page.scrolled{margin-top:-120px}
+.eyebrow{font:700 12px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin:0}
+.title{font:700 32px/1.1 "Barlow Condensed","Arial Narrow",system-ui;text-transform:uppercase;margin:6px 0 12px}
+.serif{font:17px/1.7 Georgia,"Times New Roman",serif;margin:0 0 14px}
+.sea{height:130px;border-radius:12px;margin:12px 0;background:linear-gradient(180deg,#f2b27a 0%,#d9703a 38%,#2b5d77 39%,#123048 100%)}
+
+/* ---------- the glass, as built ---------- */
+.glassy{background:color-mix(in srgb,var(--surface) 72%,transparent);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);
+  border:1px solid var(--edge);
+  box-shadow:var(--glass-shadow),inset 0 1px 0 var(--rim),inset 0 -1px 0 color-mix(in srgb,var(--rim) 35%,transparent)}
+body.solid .glassy{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border-color:var(--muted)}
+.dock{position:absolute;left:16px;right:16px;bottom:14px;z-index:5;max-width:440px;margin-inline:auto;transition:transform .2s ease}
+.bar{display:flex;height:64px;padding:4px;border-radius:32px}
+.tab{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:none;padding:0;border-radius:28px;color:var(--ink);font:600 12px/15px "Barlow",system-ui;white-space:nowrap;cursor:pointer}
+svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.away .dock.hides{transform:translateY(calc(100% + 40px))}
+
+/* ---------- the countdown, shared: pauses while Undo has focus, as now ---------- */
+.ring{position:relative;display:grid;place-items:center;width:30px;height:30px;flex:none}
+.ring svg{position:absolute;inset:0;width:30px;height:30px;stroke-width:2.2}
+.ring .arrow{inset:7px;width:16px;height:16px;stroke-width:2.4}
+.ring .time{stroke-dasharray:100;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:center;stroke:var(--accent)}
+.running .time{animation:count 8s linear forwards}
+.running .drain{animation:drain 8s linear forwards}
+.frozen .time{stroke-dashoffset:34}
+.frozen .drain{transform:scaleX(.66)}
+.msgbox:focus-within .time,.msgbox:focus-within .drain{animation-play-state:paused}
+@keyframes count{to{stroke-dashoffset:100}}
+@keyframes drain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+/* A. Glass twin */
+.a-toast{position:absolute;left:16px;right:16px;bottom:90px;z-index:6;max-width:440px;margin-inline:auto;height:56px;border-radius:28px;display:flex;align-items:center;gap:10px;padding:0 6px 0 20px;font:600 15px system-ui;transition:bottom .2s ease}
+.a-toast .say{flex:1}
+.lensbtn{min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px 0 10px;border:0;border-radius:22px;background:var(--lens);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--edge);color:var(--ink);font:700 14px system-ui;cursor:pointer}
+.away .a-toast{bottom:14px}
+
+/* B. Droplet chip */
+.b-chip{position:absolute;left:50%;bottom:90px;z-index:6;transform:translateX(-50%);height:46px;border-radius:23px;display:flex;align-items:center;gap:0;padding:0 2px 0 16px;white-space:nowrap;font:600 14px system-ui;transition:bottom .2s ease;overflow:hidden}
+.b-chip i{width:1px;height:20px;background:var(--edge);margin-left:14px}
+.b-chip button{height:44px;min-width:72px;border:0;background:none;border-radius:22px;color:var(--accent-ink);font:700 14px system-ui;cursor:pointer}
+.b-chip .drain{position:absolute;left:18px;right:18px;bottom:2px;height:2px;border-radius:2px;background:var(--accent);transform-origin:left}
+.away .b-chip{bottom:14px}
+
+/* C. Bar shelf: one piece of glass, a message row on top of the tabs */
+.c-dock .shell{border-radius:32px;overflow:hidden}
+.c-dock .shelf{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s cubic-bezier(.3,1.3,.5,1),opacity .2s}
+.c-dock .shelf>div{overflow:hidden;min-height:0}
+.c-dock .shelfrow{height:52px;display:flex;align-items:center;gap:10px;padding:0 6px 0 22px;font:600 15px system-ui;border-bottom:1px solid var(--edge)}
+.c-dock .shelfrow .say{flex:1}
+.c-dock.closed .shelf{grid-template-rows:0fr;opacity:0}
+.c-dock .tabs{display:flex;height:62px;padding:4px}
+/* While scrolling, the tabs fold away and the message stays, as the popup does today. */
+.away .c-dock .tabs{height:0;padding:0;overflow:hidden;visibility:hidden}
+.away .c-dock .shelfrow{border-bottom:0;height:54px}
+.away .c-dock.closed{transform:translateY(calc(100% + 40px))}
+.c-dock .tabs{transition:height .2s ease,padding .2s ease}
+
+/* D. Undo in the tab */
+.d-tab{background:var(--lens);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--edge)}
+.d-tab .ring{height:26px;width:26px}.d-tab .ring svg{width:26px;height:26px}.d-tab .ring .arrow{width:14px;height:14px;inset:6px}
+.d-note{position:absolute;right:20px;bottom:88px;z-index:6;padding:5px 12px;border-radius:14px;font:600 12px system-ui;white-space:nowrap;transition:bottom .2s ease,opacity .3s}
+.d-note.mid{right:auto;left:50%;transform:translateX(-50%)}
+/* The bar cannot hide while it holds the only Undo. */
+.away .dock.holds{transform:none}
+.away .d-note{bottom:88px}
+
+/* E. Side droplet: the bar narrows and a round button splits off */
+.e-dock{display:flex;gap:8px;align-items:stretch}
+.e-dock .bar{flex:1;min-width:0}
+.e-drop{flex:none;width:64px;height:64px;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink);font:700 12px/15px system-ui;cursor:pointer;overflow:hidden;transition:width .35s cubic-bezier(.3,1.3,.5,1),opacity .2s,margin .35s}
+.e-dock.closed .e-drop{width:0;opacity:0;margin-left:-8px;border-width:0}
+.e-note{position:absolute;right:16px;bottom:88px;z-index:6;padding:5px 12px;border-radius:14px;font:600 12px system-ui;white-space:nowrap}
+.away .dock.e-dock .bar{visibility:hidden}
+.away .e-note{bottom:88px}
+
+.enter{animation:rise .35s cubic-bezier(.3,1.3,.5,1)}
+@keyframes rise{from{translate:0 14px;opacity:0}}
+.restored{position:absolute;inset:0;z-index:9;display:grid;place-items:center;background:var(--bg);font:600 16px system-ui;padding:24px;text-align:center}
+body.still *{animation-duration:.001s!important;transition:none!important}
+body.still .running .time,body.still .running .drain{animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.enter{animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+<h1>Leaving the chat: five options for &ldquo;Chat cleared&rdquo;</h1>
+<p class="lead">Today a solid navy pill floats above the glass bar. Each option below makes the message belong to the bar. These are mockups only: nothing in the app has changed. Page text is placeholder. Light is Dawn patrol, dark is Night swell.</p>
+<p class="lead"><b>The same in all five:</b> it appears only when there was an answer or a draft to lose, Undo is offered for 8 seconds, the countdown pauses while Undo has focus, screen readers are told &ldquo;Chat cleared&rdquo;, and a cleared chat is gone for good afterwards.</p>
+<p class="lead">In each row the first phone is live: press <b>Undo</b>, or let the 8 seconds run out, then <b>Show again</b>. The other three are still pictures: dark mode, the Bible reader, and while the page is scrolling.</p>
+
+<div class="controls">
+  <label>Phone width <select id="width"><option value="375">375</option><option value="320">320 (smallest)</option><option value="430">430</option></select></label>
+  <label><input type="checkbox" id="solid"> Reduce transparency</label>
+  <label><input type="checkbox" id="still"> Reduce motion</label>
+</div>
+
+<h2>A. Glass twin <span class="tag">smallest change</span></h2>
+<p class="lead">The same popup in the same place, made of the bar&rsquo;s glass: same width, same edge and shine. Undo sits in a lens like the liquid pill, with a ring that empties over the 8 seconds.</p>
+<ul><li><b>Good:</b> familiar, clear, works the same on every screen.</li><li><b>Watch:</b> two glass shapes stacked cover the most page, and text behind glass is a little softer than on navy.</li></ul>
+<div class="row" data-option="A"></div>
+
+<h2>B. Droplet chip <span class="tag">lightest</span></h2>
+<p class="lead">A small glass chip, only as wide as its words, floating over the middle of the bar. A thin line under it shrinks as the time runs out.</p>
+<ul><li><b>Good:</b> covers the least page and feels like a passing note, not a second bar.</li><li><b>Watch:</b> easier to miss, and Undo is a smaller target (still over 44px).</li></ul>
+<div class="row" data-option="B"></div>
+
+<h2>C. Bar shelf <span class="tag">recommended</span></h2>
+<p class="lead">The glass bar grows taller and shows the message on its top shelf, then settles back. It is one piece of glass. All tabs keep working. While you scroll, the tabs fold away and only the message stays.</p>
+<ul><li><b>Good:</b> looks most like part of the new bar, suits the liquid movement, covers a little less than today, and works the same on the Bible reader&rsquo;s bar.</li><li><b>Watch:</b> the most new behaviour to build, mainly the folding while scrolling.</li></ul>
+<div class="row" data-option="C"></div>
+
+<h2>D. Undo in the tab <span class="tag">nothing floats</span></h2>
+<p class="lead">The Ask the Word tab turns into <b>Undo chat</b> with a countdown ring, under a tiny &ldquo;Chat cleared&rdquo; label. After 8 seconds it turns back.</p>
+<ul><li><b>Good:</b> the quietest: Undo is where the chat lives.</li><li><b>Watch:</b> for 8 seconds you cannot start a new chat from the bar. The Bible reader has no Ask the Word tab, so Undo would have to take Shore&rsquo;s place there. The bar cannot hide while it holds Undo.</li></ul>
+<div class="row" data-option="D"></div>
+
+<h2>E. Side droplet <span class="tag">most liquid</span></h2>
+<p class="lead">The bar narrows and a round glass button splits off to the right, holding Undo and its countdown ring. It merges back afterwards.</p>
+<ul><li><b>Good:</b> playful, and close to the separate round button in newer iOS bars. All tabs stay.</li><li><b>Watch:</b> every tab moves twice, so a tap can land on the wrong one. &ldquo;Ask the Word&rdquo; is already tight at 375 wide and does not fit at 320 (choose 320 above).</li></ul>
+<div class="row" data-option="E"></div>
+
+<h2>Side by side</h2>
+<div class="wrap"><table>
+<tr><th></th><th>A. Glass twin</th><th>B. Droplet chip</th><th>C. Bar shelf</th><th>D. Undo in the tab</th><th>E. Side droplet</th></tr>
+<tr><th>Fits the new bar</th><td>Good</td><td>Good</td><td>Best</td><td>Good</td><td>Good</td></tr>
+<tr><th>Easy to notice</th><td>Yes</td><td>Fair</td><td>Yes</td><td>Weakest</td><td>Fair</td></tr>
+<tr><th>Height covered from the bottom edge</th><td>146px</td><td>136px</td><td>about 130px</td><td>about 115px</td><td>about 115px</td></tr>
+<tr><th>Tabs stay where they are</th><td>Yes</td><td>Yes</td><td>Yes</td><td>One changes</td><td>No</td></tr>
+<tr><th>Build effort</th><td>Small</td><td>Small</td><td>Medium to large</td><td>Medium to large</td><td>Medium</td></tr>
+</table></div>
+<p class="lead">Today the popup reaches 142px from the bottom edge. Heights are for a phone with no home indicator.</p>
+
+<h2>Recommendation</h2>
+<p class="lead"><b>C, the bar shelf.</b> It removes the separate popup that looks out of place, without taking a tab away or moving one sideways. If you want the quickest, lowest-risk change, take <b>A</b>.</p>
+</main>
+
+<script>
+const icon = {
+  devotional: '<circle cx="12" cy="9" r="3.5"/><path d="M2 17c3 0 3-2 5.5-2S10.5 17 12 17s3-2 5.5-2 2.5 2 4.5 2M2 21c3 0 3-2 5.5-2s3 2 5.5 2 3-2 5.5-2"/>',
+  bible: '<path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/>',
+  chat: '<path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>',
+  shore: '<path d="M12 2c3 3 3.5 9 0 15-3.5-6-3-12 0-15zM12 6v11M3 21h18M7 21l2-2M17 21l-2-2"/>',
+  prev: '<path d="M15 5l-7 7 7 7"/>',
+  next: '<path d="M9 5l7 7-7 7"/>',
+};
+const svg = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${icon[name]}</svg>`;
+const ring = () => '<span class="ring" aria-hidden="true"><svg viewBox="0 0 30 30"><circle class="time" cx="15" cy="15" r="13" pathLength="100"/></svg><svg class="arrow" viewBox="0 0 24 24"><path d="M8 5L4 9l4 4M4 9h10a6 6 0 0 1 0 12h-3"/></svg></span>';
+const tab = (name, label) => `<button type="button" class="tab">${svg(name)}${label}</button>`;
+const items = (reader) => reader
+  ? [["prev", "John 2"], ["shore", "Shore"], ["next", "John 4"]]
+  : [["shore", "Shore"], ["bible", "Bible"], ["chat", "Ask the Word"]];
+const tabs = (reader) => items(reader).map(([n, l]) => tab(n, l)).join("");
+const bar = (reader) => `<div class="bar glassy">${tabs(reader)}</div>`;
+
+/* What each option draws at the bottom of the screen: with the message, and after it has gone. */
+const draw = {
+  A: (reader, on) => `<div class="dock hides">${bar(reader)}</div>` + (on ? `<div class="a-toast glassy msgbox enter"><span class="say">Chat cleared</span><button type="button" class="lensbtn" data-undo>${ring()}Undo</button></div>` : ""),
+  B: (reader, on) => `<div class="dock hides">${bar(reader)}</div>` + (on ? `<div class="b-chip glassy msgbox"><span>Chat cleared</span><i></i><button type="button" data-undo>Undo</button><span class="drain" aria-hidden="true"></span></div>` : ""),
+  C: (reader, on) => `<div class="dock c-dock ${on ? "msgbox" : "closed hides"}"><div class="shell glassy"><div class="shelf"><div><div class="shelfrow"><span class="say">Chat cleared</span><button type="button" class="lensbtn" data-undo ${on ? "" : "tabindex='-1'"}>${ring()}Undo</button></div></div></div><div class="tabs">${tabs(reader)}</div></div></div>`,
+  D: (reader, on) => {
+    const swap = reader ? 1 : 2; // the reader has no Ask the Word tab, so the middle one gives way
+    const html = items(reader).map(([n, l], i) => on && i === swap
+      ? `<button type="button" class="tab d-tab msgbox" data-undo>${ring()}Undo chat</button>` : tab(n, l)).join("");
+    return `<div class="dock ${on ? "holds" : "hides"}"><div class="bar glassy">${html}</div></div>` + (on ? `<div class="d-note glassy enter ${reader ? "mid" : ""}">Chat cleared</div>` : "");
+  },
+  E: (reader, on) => `<div class="dock e-dock ${on ? "" : "closed hides"}">${bar(reader)}<button type="button" class="e-drop glassy msgbox" data-undo ${on ? "" : "tabindex='-1'"} aria-label="Undo clearing the chat">${ring()}Undo</button></div>` + (on ? '<div class="e-note glassy enter">Chat cleared</div>' : ""),
+};
+
+const para = "Placeholder text for the page. It runs under the glass so you can judge how readable the bar and its message are over words.";
+function content(reader) {
+  return reader
+    ? `<p class="eyebrow">World English Bible</p><h3 class="title">John 3</h3>${`<p class="serif">${para}</p>`.repeat(6)}`
+    : `<p class="eyebrow">Advent &middot; Part 1</p><h3 class="title">More Than Watchmen</h3><div class="sea"></div>${`<p class="serif">${para}</p>`.repeat(5)}`;
+}
+
+function phone(option, { night, reader, away, live }) {
+  const el = document.createElement("div");
+  el.className = `phone ${night ? "night" : ""} ${away ? "away" : ""}`;
+  el.innerHTML = `<div class="status"><span>9:41</span><span>100%</span></div><div class="top">${reader ? "John 3" : "Word on the Water"}</div><div class="view"><div class="page ${away ? "scrolled" : ""}">${content(reader)}</div><div class="foot ${live ? "running" : "frozen"}">${draw[option](reader, true)}</div></div>`;
+  return el;
+}
+
+function figure(node, caption) {
+  const fig = document.createElement("figure");
+  const text = document.createElement("figcaption");
+  text.textContent = caption;
+  fig.append(node, text);
+  return fig;
+}
+
+function live(option) {
+  const el = phone(option, { live: true });
+  const view = el.querySelector(".view");
+  const foot = el.querySelector(".foot");
+  let timer;
+  let left;
+  let since;
+  const gone = () => { clearTimeout(timer); foot.innerHTML = draw[option](false, false); };
+  const run = (ms) => { left = ms; since = Date.now(); timer = setTimeout(gone, ms); };
+  // C and E animate between their two states, so start them closed and open a frame later.
+  function show() {
+    clearTimeout(timer);
+    view.querySelector(".restored")?.remove();
+    foot.innerHTML = draw[option](false, true);
+    const grows = foot.querySelector(".c-dock, .e-dock");
+    if (grows) {
+      grows.classList.add("closed");
+      grows.getBoundingClientRect();
+      grows.classList.remove("closed");
+    }
+    run(8000);
+  }
+  foot.addEventListener("focusin", (e) => { if (e.target.closest("[data-undo]")) { clearTimeout(timer); left -= Date.now() - since; } });
+  foot.addEventListener("focusout", (e) => { if (e.target.closest("[data-undo]")) run(left); });
+  foot.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-undo]")) return;
+    gone();
+    view.insertAdjacentHTML("beforeend", '<div class="restored">The chat opens again, with your thread and draft.</div>');
+  });
+  const wrap = figure(el, "Live: left the chat by tapping Devotional.");
+  const again = document.createElement("button");
+  again.type = "button";
+  again.className = "replay";
+  again.textContent = "Show again";
+  again.addEventListener("click", show);
+  wrap.append(again);
+  show();
+  return wrap;
+}
+
+for (const row of document.querySelectorAll("[data-option]")) {
+  const option = row.dataset.option;
+  row.append(
+    live(option),
+    figure(phone(option, { night: true }), "Dark mode."),
+    figure(phone(option, { reader: true }), "Bible reader, after tapping Bible."),
+    figure(phone(option, { away: true }), "While the page is scrolling."),
+  );
+}
+
+document.getElementById("width").addEventListener("change", (e) => document.body.style.setProperty("--w", `${e.target.value}px`));
+document.getElementById("solid").addEventListener("change", (e) => document.body.classList.toggle("solid", e.target.checked));
+document.getElementById("still").addEventListener("change", (e) => document.body.classList.toggle("still", e.target.checked));
+</script>
+</body>
+</html>

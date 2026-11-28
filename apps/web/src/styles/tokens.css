@@ -15,6 +15,11 @@
   --on-deep: #fbf3e8;
   --on-deep-muted: #c4c3cf;
   --accent-on-deep: #f0955f;
+  --glass-tint: 72%;
+  --glass-lens: rgb(43 45 66 / 0.1);
+  --glass-rim: rgb(255 255 255 / 0.85);
+  --glass-edge: rgb(43 45 66 / 0.16);
+  --glass-shadow: 0 8px 28px rgb(43 45 66 / 0.22);
   color-scheme: light;
 }
 
@@ -31,6 +36,11 @@
     --on-deep: #f4f1ea;
     --on-deep-muted: #9fb0bd;
     --accent-on-deep: #4fa9a6;
+    --glass-tint: 72%;
+    --glass-lens: rgb(10 24 37 / 0.45);
+    --glass-rim: rgb(255 255 255 / 0.22);
+    --glass-edge: rgb(255 255 255 / 0.12);
+    --glass-shadow: 0 8px 28px rgb(0 0 0 / 0.45);
     color-scheme: dark;
   }
 }
@@ -47,5 +57,10 @@
   --on-deep: #f4f1ea;
   --on-deep-muted: #9fb0bd;
   --accent-on-deep: #4fa9a6;
+  --glass-tint: 72%;
+  --glass-lens: rgb(10 24 37 / 0.45);
+  --glass-rim: rgb(255 255 255 / 0.22);
+  --glass-edge: rgb(255 255 255 / 0.12);
+  --glass-shadow: 0 8px 28px rgb(0 0 0 / 0.45);
   color-scheme: dark;
 }

@@ -19,14 +19,7 @@
   --radius-md: 6px;
   --shadow-menu: 0 12px 24px rgb(0 0 0 / 0.12);
   --animate-menu-in: menu-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-toast-in: toast-in 200ms ease-out;
   --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
-}
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-  }
 }
 
 @keyframes menu-in {
@@ -62,6 +55,229 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* The floating glass capsule of the phone and tablet navigation (docs/design/landing_nav_new.html).
+   Utilities, so a breakpoint can limit them: the Bible reader drops the capsule from lg. */
+@utility glass-dock {
+  left: max(1rem, env(safe-area-inset-left));
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(0.875rem, env(safe-area-inset-bottom));
+}
+
+/* The glass itself, shared by the bar and the Undo shelf above it. */
+@utility glass-surface {
+  border: 1px solid var(--glass-edge);
+  background: color-mix(in srgb, var(--surface) var(--glass-tint), transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 var(--glass-rim),
+    inset 0 -1px 0 color-mix(in srgb, var(--glass-rim) 35%, transparent);
+
+  /* Solid where see-through would not work or is not wanted. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background: var(--surface);
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    background: var(--surface);
+    border-color: var(--muted);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  @media (forced-colors: active) {
+    background: Canvas;
+    border-color: CanvasText;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@utility glass-bar {
+  @apply glass-surface;
+  height: 4rem;
+  padding: 4px;
+  /* Hold and slide: no scrolling, text selection or iOS link preview takes the finger over. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  border-radius: 9999px;
+}
+
+@layer components {
+  .glass-pill {
+    border-radius: 9999px;
+    background: var(--glass-lens);
+    box-shadow:
+      inset 0 1px 0 var(--glass-rim),
+      inset 0 0 0 1px var(--glass-edge);
+  }
+
+  /* Shadows and tints vanish in forced colours: an outline keeps the pill visible. */
+  @media (forced-colors: active) {
+    .glass-pill {
+      border: 2px solid Highlight;
+    }
+  }
+}
+
+/* The ring in Undo that empties while the offer lasts (CountdownRing). It moves only where motion
+   is welcome: the reduced motion rule above would otherwise finish it, empty, at once. */
+.countdown-time {
+  stroke-dasharray: 100;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .countdown[data-running] .countdown-time {
+    animation: countdown var(--countdown) linear forwards;
+  }
+}
+
+@keyframes countdown {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* Hide on scroll, below lg only (lib/nav/follow-scroll.ts sets data-nav-away). The hidden bar is
+   still in the page: keyboard focus in it brings it straight back. */
+@media (width < 64rem) {
+  [data-hides] {
+    transition: transform 200ms ease;
+  }
+
+  /* The Undo shelf (UndoToast) is one pane of glass just behind the bar, with the same bottom edge
+     and 52px more height. While it is there the bar draws no glass of its own. With no bar, or
+     with the bar away, the pane is the shelf alone.
+
+     Its height is --shelf-h. In layout its top never moves, wherever that height goes: Chrome
+     counts every move of a top edge as a layout shift. It grows downwards from a top fixed where
+     the full pane's would be (7.25rem: the bar and the shelf), and a transform, which does not
+     count, lifts or lowers it so that its bottom edge stays where the bar's is. */
+  [data-shelf] {
+    --shelf-h: calc(3.25rem + 2px);
+    top: calc(100% - max(0.875rem, env(safe-area-inset-bottom)) - 7.25rem);
+    bottom: auto;
+    height: var(--shelf-h);
+    translate: 0 calc(7.25rem - var(--shelf-h));
+    transition: --shelf-h 200ms ease;
+  }
+
+  :root:has(nav[data-hides]) [data-shelf] {
+    --shelf-h: calc(3.25rem + 4rem);
+  }
+
+  :root:has(nav[data-hides]) [data-shelf-row] {
+    border-bottom: 1px solid var(--glass-edge);
+  }
+
+  :root:has([data-shelf]) nav[data-hides] {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* Down by its own height, its distance from the edge, and room for the shadow above it. */
+  :root[data-nav-away] [data-hides]:not(:has(:focus-visible)) {
+    transform: translateY(calc(100% + max(0.875rem, env(safe-area-inset-bottom)) + 1.5rem));
+  }
+
+  :root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf] {
+    --shelf-h: calc(3.25rem + 2px);
+  }
+
+  :root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf-row] {
+    border-bottom-color: transparent;
+  }
+
+  /* The shelf grows out of the bar as it appears and settles back when its time is up. Where it is
+     alone it rises and sinks instead. data-from is set once, as it arrives, so these never start
+     again while the page is scrolled. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-shelf][data-from="bar"] {
+      animation: shelf-grow var(--settle) cubic-bezier(0.3, 1.3, 0.5, 1) backwards;
+    }
+
+    [data-shelf][data-from="alone"] {
+      animation: shelf-rise var(--settle) ease-out backwards;
+    }
+
+    [data-shelf] [data-shelf-row] {
+      animation: shelf-words-in var(--settle) ease-out backwards;
+    }
+
+    [data-shelf="closing"][data-from="bar"] {
+      animation: shelf-settle var(--settle) ease-in-out forwards;
+    }
+
+    [data-shelf="closing"][data-from="alone"] {
+      animation: shelf-sink var(--settle) ease-in forwards;
+    }
+
+    [data-shelf="closing"] [data-shelf-row] {
+      animation: shelf-words-out var(--settle) ease-out forwards;
+    }
+  }
+
+  /* The picture that closes: its time has run out, so its ring is empty. */
+  [data-shelf="closing"] .countdown-time {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* A length the browser knows, so it can move smoothly between two of them. */
+@property --shelf-h {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes shelf-grow {
+  from {
+    --shelf-h: 4rem;
+  }
+}
+
+@keyframes shelf-settle {
+  to {
+    --shelf-h: 4rem;
+  }
+}
+
+/* Alone, it comes and goes by a transform of its own: translate holds it in its place. */
+@keyframes shelf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.875rem);
+  }
+}
+
+@keyframes shelf-sink {
+  to {
+    opacity: 0;
+    transform: translateY(0.875rem);
+  }
+}
+
+/* The words are the pane's top 52px: while it is low they would lie over the tabs. */
+@keyframes shelf-words-in {
+  0%,
+  40% {
+    opacity: 0;
+  }
+}
+
+@keyframes shelf-words-out {
+  40%,
+  100% {
+    opacity: 0;
   }
 }
 

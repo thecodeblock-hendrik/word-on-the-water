@@ -21,20 +21,15 @@ describe("ChatReturn, the Your chat tab in the Bible", () => {
     expect(screen.queryByRole("button", { name: /^your chat$/i })).toBeNull();
   });
 
-  it("is a round ink button of 56px with its words under it, in a bump the bar's top line follows", async () => {
+  it("is an equal tab below lg: a filled bubble above its words, no round button", async () => {
     markChatLeft("/");
     render(<ChatReturn />);
     const button = await screen.findByRole("button", { name: /^your chat$/i });
-    const round = button.querySelector("span");
-    expect(round?.className).toMatch(/\bbg-ink\b/);
-    expect(round?.className).toMatch(/max-lg:size-14/);
-    expect(round?.className).toMatch(/rounded-full/);
+    expect(button).toHaveClass("flex-1", "flex-col", "text-ink", "lg:text-bg");
     expect(button).toHaveTextContent("Your chat");
-    const root = button.closest("[data-chat-return]")!;
-    const bump = root.querySelector("svg[data-chat-bump]");
-    expect(bump).not.toBeNull();
-    expect(bump?.getAttribute("aria-hidden")).toBe("true");
-    expect(bump?.querySelectorAll("path").length).toBe(2);
+    const icon = button.querySelector("svg")!;
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+    expect(icon.querySelector("path")).toHaveAttribute("fill", "currentColor");
   });
 
   it("opens the chat over the page without leaving it, and clears the way back", async () => {
