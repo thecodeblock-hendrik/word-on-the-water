@@ -1,12 +1,15 @@
 /**
  * A stand-in for the FastAPI service in the e2e run, so the sign-up form can be submitted without
- * Postgres, Redis or Kit. It answers like the real API and remembers the last sign-up it got.
+ * Postgres, Redis or Kit. It answers like the real API and remembers what it got, so a test can ask.
  */
 import { createServer } from "node:http";
 
-let last: { body: Record<string, unknown>; headers: Record<string, string | undefined> } | null =
-  null;
-// Webhooks by signature: tests run in parallel, so one global slot would be overwritten by a neighbour.
+// Sign-ups by email and webhooks by signature: tests run in parallel, so one global slot would be
+// overwritten by a neighbour.
+const signups = new Map<
+  string,
+  { body: Record<string, unknown>; headers: Record<string, string | undefined> }
+>();
 const webhooks = new Map<string, { body: string; headers: Record<string, string | undefined> }>();
 
 const view = (id: string, extra: Record<string, unknown> = {}) => ({
@@ -69,8 +72,10 @@ createServer((request, response) => {
       response.end(JSON.stringify(body));
     };
     if (request.url === "/health/live") return send(200, { status: "ok" });
-    if (request.url === "/__last") return send(200, last);
     const url = new URL(request.url ?? "/", "http://stub");
+    if (url.pathname === "/__last_signup") {
+      return send(200, signups.get(url.searchParams.get("email") ?? "") ?? null);
+    }
     if (url.pathname === "/__last_webhook") {
       return send(200, webhooks.get(url.searchParams.get("signature") ?? "") ?? null);
     }
@@ -90,14 +95,14 @@ createServer((request, response) => {
     }
     if (request.url === "/v1/subscribers" && request.method === "POST") {
       const body = JSON.parse(Buffer.concat(chunks).toString() || "{}");
-      last = {
+      signups.set(String(body.email), {
         body,
         headers: {
           authorization: request.headers.authorization,
           "idempotency-key": request.headers["idempotency-key"] as string | undefined,
           "x-client-ip": request.headers["x-client-ip"] as string | undefined,
         },
-      };
+      });
       if (body.email === "limited@example.com") {
         return send(429, { error: { code: "rate_limited", message: "Too many requests." } });
       }
