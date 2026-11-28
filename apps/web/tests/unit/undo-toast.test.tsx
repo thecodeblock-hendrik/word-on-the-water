@@ -370,11 +370,10 @@ describe("the shelf's movement in the styles", () => {
     ['[data-shelf="closing"][data-from="alone"]', "shelf-sink", "forwards"],
     ['[data-shelf="closing"] [data-shelf-row]', "shelf-words-out", "forwards"],
   ])("moves %s with %s", (selector, name, fill) => {
-    expect(moving).toMatch(
-      new RegExp(
-        `${selector.replace(/[[\]]/g, "\\$&")} \\{ animation: ${name} var\\(--settle\\) [^;]*${fill}; \\}`,
-      ),
-    );
+    const rule = moving.split(`${selector} { `)[1]?.split(" }")[0];
+    expect(rule).toMatch(/^animation: [^;]+;$/);
+    expect(rule?.startsWith(`animation: ${name} var(--settle) `)).toBe(true);
+    expect(rule?.endsWith(` ${fill};`)).toBe(true);
     expect(flat).toContain(`@keyframes ${name} {`);
   });
 
