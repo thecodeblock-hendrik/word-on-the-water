@@ -168,7 +168,7 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
 - [x] 1. Collect and check the four YouTube IDs (2026-11-28, results under "Video source").
 - [ ] 1a. **(Hendrik)** Watch all four through, with sound and English captions.
 - [x] 2. [ADR 0013](adr/0013-third-party-video-embeds.md) and threat model rows V1 to V6.
-- [ ] 3. `VIDEOS_ENABLED`, off by default.
+- [x] 3. `VIDEOS_ENABLED`, off by default (`apps/web/src/lib/videos/flag.ts`).
 - [ ] 4. Content file, loader and check. Tests: a missing field or badly formed ID fails; the open week and label on the day before Advent, on each Sunday and the day before it, and from 27 December; a known and an unknown `?week=`.
 - [ ] 5. The shelf and the weekly path, with covers, credits, links and notice. Tests: the shelf links to the path; four rows in week order; the right row open and labelled; a credit with every video; no player before a tap; rows open and close, one at a time, without JavaScript; the column is centred and no wider than 640px at 744, 1024 and 1280px.
 - [ ] 6. Tap to play and the `frame-src` change. Tests: the player has the right address, title and referrer policy and is at least 200px high at 320px wide; closing a row or opening another removes the player; no policy errors; no request to Google before the tap.
