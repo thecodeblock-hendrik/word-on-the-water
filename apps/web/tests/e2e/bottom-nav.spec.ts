@@ -232,6 +232,26 @@ test.describe("the chat, the Bible and back", () => {
     await expect(chatDialog(page).getByText("Who is Jesus?").first()).toBeVisible();
   });
 
+  test("after Undo by keyboard, the next toast still goes when its time is up", async ({
+    page,
+  }) => {
+    const dialog = await openChatFromBar(page);
+    await askJesus(page);
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toHaveCount(0);
+    // The chat gives focus back a moment after closing; wait, or it can take it from Undo.
+    await expect
+      .poll(() => page.evaluate(() => document.activeElement !== document.body))
+      .toBe(true);
+    const undo = page.getByRole("button", { name: "Undo" });
+    await undo.focus();
+    await expect(undo).toBeFocused();
+    await page.keyboard.press("Enter");
+    await dialog.getByRole("button", { name: "Close" }).click(); // cleared again
+    await expect(undo).toBeVisible();
+    await expect(undo).toHaveCount(0, { timeout: 10_000 }); // 8 seconds are offered
+  });
+
   test("without Undo the cleared chat is gone for good", async ({ page }) => {
     const dialog = await openChatFromBar(page);
     await askJesus(page);
