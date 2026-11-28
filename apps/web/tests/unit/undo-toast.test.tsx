@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { readFileSync } from "node:fs";
+
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -152,6 +154,71 @@ describe("UndoToast", () => {
     render(<UndoToast />);
     clearChat();
     expect(undo().className).toMatch(/\bmin-h-11\b/);
+  });
+});
+
+describe("the countdown ring in Undo", () => {
+  const ring = () => undo().querySelector<SVGElement>("svg.countdown")!;
+  /** The time the ring takes to empty, in milliseconds. */
+  const ringTime = () => parseFloat(ring().style.getPropertyValue("--countdown"));
+  const running = () => ring().hasAttribute("data-running");
+
+  it("is decoration: the button is still named just Undo", () => {
+    render(<UndoToast />);
+    clearChat();
+    expect(ring()).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("button")).toHaveAccessibleName("Undo");
+  });
+
+  it("takes exactly as long to empty as Undo is offered", () => {
+    render(<UndoToast />);
+    clearChat();
+    const offered = ringTime();
+    expect(offered).toBeGreaterThan(0);
+    wait(offered - 100);
+    expect(status()).toHaveTextContent("Chat cleared");
+    wait(200);
+    expect(status()).toBeEmptyDOMElement();
+  });
+
+  it("stands still while Undo has focus, and starts again when focus leaves", () => {
+    render(<UndoToast />);
+    clearChat();
+    expect(running()).toBe(true);
+    fireEvent.focus(undo());
+    expect(running()).toBe(false);
+    fireEvent.blur(undo());
+    expect(running()).toBe(true);
+  });
+
+  it("starts running again for the next chat that is cleared", () => {
+    render(<UndoToast />);
+    clearChat();
+    fireEvent.focus(undo());
+    // Undo takes the shelf away without a blur; the next shelf must not start out paused.
+    fireEvent.click(undo());
+    clearChat();
+    expect(running()).toBe(true);
+    wait(ringTime() + 100);
+    expect(status()).toBeEmptyDOMElement();
+  });
+});
+
+describe("the countdown ring's styles", () => {
+  const css = readFileSync("src/app/globals.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const flat = css.replace(/\s+/g, " ");
+
+  it("empty it over the time it is given, only where motion is welcome", () => {
+    // Anywhere else, the reduced motion rule's 0.01ms would leave the ring empty at once.
+    expect(flat).toContain(
+      "@media (prefers-reduced-motion: no-preference) { .countdown[data-running] .countdown-time { animation: countdown var(--countdown) linear forwards; } }",
+    );
+    expect(flat.match(/animation: countdown /g)).toHaveLength(1);
+  });
+
+  it("go from a full circle to none of it", () => {
+    expect(flat).toContain("@keyframes countdown { to { stroke-dashoffset: 100; } }");
+    expect(flat).toContain(".countdown-time { stroke-dasharray: 100; }");
   });
 });
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+import { CountdownRing } from "@/components/chat/countdown-ring";
 import { bottomNav } from "@/content/bottom-nav";
 import { dropCleared, hasCleared, subscribeCleared, takeCleared } from "@/lib/chat/cleared";
 import { restoreChat } from "@/lib/chat/open";
@@ -53,8 +54,9 @@ function Shelf() {
           onClick={undo}
           onFocus={() => setPaused(true)}
           onBlur={() => setPaused(false)}
-          className="glass-pill inline-flex min-h-11 min-w-16 items-center justify-center px-4 font-bold text-ink"
+          className="glass-pill inline-flex min-h-11 min-w-16 items-center justify-center gap-2 pl-2.5 pr-4 font-bold text-ink"
         >
+          <CountdownRing running={!paused} ms={VISIBLE_MS} />
           {bottomNav.undo}
         </button>
       </div>

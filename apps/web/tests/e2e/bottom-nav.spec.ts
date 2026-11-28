@@ -98,6 +98,9 @@ async function leaveChatWithDraft(page: Page) {
   await dialog.getByRole("textbox", { name: "Your question" }).fill("a draft");
   await dialog.getByRole("button", { name: "Close" }).click();
   await expect(dialog).toHaveCount(0);
+  // The dialog hands focus back to what opened it a moment after it has gone. Wait for that, or it
+  // can arrive after a test has focused Undo, taking focus (and the hold on its timer) away again.
+  await expect.poll(() => page.evaluate(() => document.activeElement !== document.body)).toBe(true);
 }
 
 /** The shelf up over the site bar of `/privacy`, or over the Bible reader's bar. */
@@ -212,6 +215,60 @@ test("after Undo by keyboard, the next Undo shelf still goes when its time is up
   await dialog.getByRole("button", { name: "Close" }).click(); // the draft is cleared again
   await expect(undo).toBeVisible();
   await expect(shelf).toHaveCount(0, { timeout: 10_000 }); // 8 seconds are offered
+});
+
+test.describe("the countdown ring in Undo", () => {
+  /** How much of the ring has gone (0 to 100), and the animation doing it. */
+  const readRing = (page: Page) =>
+    page.locator("[data-shelf] .countdown-time").evaluate((el) => {
+      const [running] = el.getAnimations();
+      return {
+        gone: parseFloat(getComputedStyle(el).strokeDashoffset),
+        animation: getComputedStyle(el).animationName,
+        playedMs: running ? Number(running.currentTime) : null,
+      };
+    });
+
+  test("empties over the 8 seconds, is full while Undo has focus, and starts again, with no CSP violation", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const refused: string[] = [];
+      (window as unknown as { refused: string[] }).refused = refused;
+      document.addEventListener("securitypolicyviolation", (e) => {
+        // Opening the chat, Zod (which checks the replies) tries once whether it may use eval, in a
+        // try block, and does without it when the policy says no. Nothing else may be refused.
+        if (e.blockedURI !== "eval") refused.push(`${e.effectiveDirective} ${e.blockedURI}`);
+      });
+    });
+    const { undo } = await openShelf(page, "site"); // leaves focus on Undo
+    expect(await readRing(page)).toEqual({ gone: 0, animation: "none", playedMs: null });
+
+    await undo.evaluate((el: HTMLElement) => el.blur());
+    expect((await readRing(page)).animation).toBe("countdown");
+    await expect(page.locator("[data-shelf] .countdown-time")).toHaveCSS(
+      "animation-duration",
+      "8s",
+    );
+    await expect.poll(async () => (await readRing(page)).gone).toBeGreaterThan(10);
+
+    await undo.focus();
+    expect(await readRing(page)).toEqual({ gone: 0, animation: "none", playedMs: null });
+    await undo.evaluate((el: HTMLElement) => el.blur());
+    expect((await readRing(page)).playedMs, "from the beginning again").toBeLessThan(1000);
+
+    expect(await page.evaluate(() => (window as unknown as { refused: string[] }).refused)).toEqual(
+      [],
+    );
+  });
+
+  test("with reduced motion it stays full", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const { undo } = await openShelf(page, "site");
+    await undo.evaluate((el: HTMLElement) => el.blur());
+    await frames(page);
+    expect(await readRing(page)).toEqual({ gone: 0, animation: "none", playedMs: null });
+  });
 });
 
 test("a slide along the bar and up to Undo does not undo, or open anything", async ({ page }) => {

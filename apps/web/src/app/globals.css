@@ -126,6 +126,24 @@ body {
   }
 }
 
+/* The ring in Undo that empties while the offer lasts (CountdownRing). It moves only where motion
+   is welcome: the reduced motion rule above would otherwise finish it, empty, at once. */
+.countdown-time {
+  stroke-dasharray: 100;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .countdown[data-running] .countdown-time {
+    animation: countdown var(--countdown) linear forwards;
+  }
+}
+
+@keyframes countdown {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
 /* Hide on scroll, below lg only (lib/nav/follow-scroll.ts sets data-nav-away). The hidden bar is
    still in the page: keyboard focus in it brings it straight back. */
 @media (width < 64rem) {
