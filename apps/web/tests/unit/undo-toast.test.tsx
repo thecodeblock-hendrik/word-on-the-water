@@ -138,6 +138,16 @@ describe("UndoToast", () => {
     expect(status()).toBeEmptyDOMElement();
   });
 
+  it("still goes after 8 seconds the next time, when Undo had focus as it was used", () => {
+    render(<UndoToast />);
+    clearChat();
+    fireEvent.focus(undo()); // the keyboard, or a tap in Chrome on Android
+    fireEvent.click(undo()); // the button goes with its shelf, and no blur is reported
+    clearChat();
+    wait(8100);
+    expect(status()).toBeEmptyDOMElement();
+  });
+
   it("keeps its target at least 44px tall", () => {
     render(<UndoToast />);
     clearChat();

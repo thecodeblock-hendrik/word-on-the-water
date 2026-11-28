@@ -203,6 +203,17 @@ test("without the shelf the bar has its own glass, and it comes back when the sh
   expect(await glassOf(bar)).toEqual(own);
 });
 
+test("after Undo by keyboard, the next Undo shelf still goes when its time is up", async ({
+  page,
+}) => {
+  const { undo, shelf } = await openShelf(page, "site"); // leaves focus on Undo
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Ask the Word" });
+  await dialog.getByRole("button", { name: "Close" }).click(); // the draft is cleared again
+  await expect(undo).toBeVisible();
+  await expect(shelf).toHaveCount(0, { timeout: 10_000 }); // 8 seconds are offered
+});
+
 test("a slide along the bar and up to Undo does not undo, or open anything", async ({ page }) => {
   const { undo, bar, shelf } = await openShelf(page, "site");
   const tab = (await bar.getByRole("link", { name: "Ask the Word" }).boundingBox())!;

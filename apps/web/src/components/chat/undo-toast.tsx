@@ -17,13 +17,21 @@ const VISIBLE_MS = 8000;
  */
 export function UndoToast() {
   const visible = useSyncExternalStore(subscribeCleared, hasCleared, () => false);
+  return <div role="status">{visible && <Shelf />}</div>;
+}
+
+/**
+ * The offer itself and its timer. Whether Undo holds focus lives here, so it is forgotten with the
+ * shelf: a button that is removed reports no blur, and the next offer must not start out paused.
+ */
+function Shelf() {
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (!visible || paused) return;
+    if (paused) return;
     const timer = setTimeout(dropCleared, VISIBLE_MS);
     return () => clearTimeout(timer);
-  }, [visible, paused]);
+  }, [paused]);
 
   function undo() {
     const chat = takeCleared();
@@ -31,29 +39,25 @@ export function UndoToast() {
   }
 
   return (
-    <div role="status">
-      {visible && (
-        <div
-          data-shelf=""
-          className="glass-dock glass-surface fixed z-[29] mx-auto max-w-[440px] rounded-[32px] lg:hidden"
+    <div
+      data-shelf=""
+      className="glass-dock glass-surface fixed z-[29] mx-auto max-w-[440px] rounded-[32px] lg:hidden"
+    >
+      <div
+        data-shelf-row=""
+        className="flex h-13 items-center gap-2 pl-[22px] pr-1.5 font-ui text-[15px] font-semibold text-ink"
+      >
+        <span className="flex-1">{bottomNav.cleared}</span>
+        <button
+          type="button"
+          onClick={undo}
+          onFocus={() => setPaused(true)}
+          onBlur={() => setPaused(false)}
+          className="glass-pill inline-flex min-h-11 min-w-16 items-center justify-center px-4 font-bold text-ink"
         >
-          <div
-            data-shelf-row=""
-            className="flex h-13 items-center gap-2 pl-[22px] pr-1.5 font-ui text-[15px] font-semibold text-ink"
-          >
-            <span className="flex-1">{bottomNav.cleared}</span>
-            <button
-              type="button"
-              onClick={undo}
-              onFocus={() => setPaused(true)}
-              onBlur={() => setPaused(false)}
-              className="glass-pill inline-flex min-h-11 min-w-16 items-center justify-center px-4 font-bold text-ink"
-            >
-              {bottomNav.undo}
-            </button>
-          </div>
-        </div>
-      )}
+          {bottomNav.undo}
+        </button>
+      </div>
     </div>
   );
 }
