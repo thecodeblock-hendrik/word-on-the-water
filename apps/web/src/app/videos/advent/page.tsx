@@ -47,6 +47,7 @@ export default async function AdventVideosPage({ searchParams }: Props) {
           </h1>
           <p className="font-ui text-sm text-on-deep-muted">{series.introduction}</p>
         </header>
+        <h2 className="sr-only">The {series.videos.length} weeks</h2>
         <div className="grid gap-2">
           {series.videos.map((video, i) => (
             <WeekRow

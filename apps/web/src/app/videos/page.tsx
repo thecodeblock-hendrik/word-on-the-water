@@ -46,11 +46,11 @@ export default async function VideosPage() {
           </span>
           <span className="font-display text-5xl font-bold uppercase">{series.season}</span>
         </span>
-        <span className="grid justify-items-start gap-1.5 px-4 py-3.5">
+        <div className="grid justify-items-start gap-1.5 px-4 py-3.5">
           {thisWeek && <ThisWeek>This week: {thisWeek.theme}</ThisWeek>}
-          <span className="font-ui text-lg font-semibold">{series.title}</span>
+          <h2 className="font-ui text-lg font-semibold">{series.title}</h2>
           <span className="font-ui text-sm text-muted">{series.introduction} By BibleProject.</span>
-        </span>
+        </div>
       </Link>
       <p className="font-ui text-sm text-muted">
         Videos by BibleProject, their author and owner.{" "}

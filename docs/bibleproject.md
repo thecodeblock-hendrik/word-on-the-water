@@ -189,7 +189,12 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
   - Found at build: the "YouTube is off" panel is taller than the cover, and when Play was pressed low on a phone its buttons were left under the bottom bar. The panel now scrolls itself clear; a browser test covers it.
   - The video pages have no sign-up form, so they do not load Cloudflare Turnstile. Whether Turnstile sets cookies where it does load was not settled by the Cloudflare pages read on 2026-11-28; it is outside this banner.
   - The privacy policy describes the banner and its cookie while videos are on, and no longer says "no cookie banner is needed" with videos off.
-- [ ] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
+- [x] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
+  - 2026-11-28, on this branch: lint and type checks passed for both apps; 1,163 web unit tests and 671 API tests passed; browser tests 1,257 passed and 403 skipped on five projects, none failed. Firefox does not run on this Mac: CI covers it once there is a pull request.
+  - Two API config tests fail on this Mac only: they build production settings, and the Cloudflare test secret in the shell and the root `.env` is picked up. All 671 passed with that one value overridden by a placeholder. This branch does not change the API.
+  - Lighthouse (mobile, local build, videos on) passed on the home page, a devotional, `/videos` and `/videos/advent`: performance 99, accessibility 100, best practices 96, SEO 100. The first run scored the video pages 98 for accessibility (the footer's level 3 headings had no level 2 above them); fixed, with a unit test.
+  - Home page JavaScript: 161.71 KB gzipped, videos off and on (limit 165 KB, 3.29 KB free).
+  - The accessibility check was automatic. Nobody has done a keyboard or screen reader pass by hand.
 - [ ] 10. On a preview with the flag on, **(Hendrik)** play all four on an iPhone (browser and installed app) and an Android phone: sound, fullscreen and captions. Check each video's captions; do not promise them before this.
 - [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), check the privacy policy date, merge, set `VIDEOS_ENABLED` in Production, and promote.
 

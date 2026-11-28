@@ -59,6 +59,21 @@ describe("the cookie banner on the video pages", () => {
   });
 });
 
+// The footer's headings are level 3, so each page needs a level 2 above them.
+describe("the headings on the video pages", () => {
+  const levelTwo = () => screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
+
+  it("name the series on the shelf", async () => {
+    await shelf();
+    expect(levelTwo()).toEqual(["Advent word studies"]);
+  });
+
+  it("name the list of weeks on the path", async () => {
+    await path();
+    expect(levelTwo()).toEqual(["The 4 weeks"]);
+  });
+});
+
 describe("/videos", () => {
   it.each([VideosPage, () => AdventVideosPage({ searchParams: Promise.resolve({}) })])(
     "is not found while VIDEOS_ENABLED is off",
