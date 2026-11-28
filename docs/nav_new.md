@@ -2,7 +2,7 @@
 
 Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces the raised-tab bar in [landing_page_nav.md](landing_page_nav.md).
 
-**Status (28 November 2026):** the plan and mockup were merged on 27 November (#181); a timer fix (#183) and the build (#182, `ef08a71`) were merged on launch day, earlier than first planned, which was after the launch. Hendrik promoted it the same day and reported it working well. **Open: the rest of step 13, the checks on real phones.**
+**Status (28 November 2026):** the plan and mockup were merged on 27 November (#181); a timer fix (#183) and the build (#182, `ef08a71`) were merged on launch day, earlier than first planned, which was after the launch. Hendrik promoted it the same day, reported it working well, and reported all the real-phone checks (step 13) done and in order. **The plan is complete.**
 
 **Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while the page scrolls, down or up, and returns when the scrolling stops (changed 28 November, after the first phone test). The "Chat cleared" popup becomes a shelf on the bar (option C in [design/new_nav_chat.html](design/new_nav_chat.html), chosen 28 November). Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
 
@@ -145,17 +145,17 @@ Design: option C in [design/new_nav_chat.html](design/new_nav_chat.html). After 
 - [x] **12. Quality gates.** Full `make e2e`, axe in both schemes, Lighthouse with the bar showing. Compare with step 0: landing JS under 165 KB gzipped, CLS under 0.05, LCP no worse. About 5 KB of JS room was left on 22 November.
   - Result (local, 27 November, after the fix below): five projects in parallel, 1,084 passed, 306 skipped, none failed, in 4.0 minutes. Axe checks in light and dark are part of that run. **Desktop Firefox is not checked:** it does not launch on this Mac (`browserType.launch: Failed to launch`, seen today); CI at the final push is its first run. Lighthouse passed with the bar on screen (seen in its screenshots), figures below. `make lint typecheck test types-check` pass: 1,007 web and 671 API tests.
   - Fixed on the way: the WebKit failures seen since step 0 (parallel or one at a time; a one-at-a-time full run had 13). Tests opened browser contexts and did not close them; in the layout test, closing each took it from times rising past 12 s to a steady 0.5 s. `tests/e2e/fixtures.ts` closes them after every test. Not established: why the devotional page slowed far more than the landing page, and the one Chromium picker failure in step 9 (20 repeats passed) is not explained by this.
-- [ ] **13. Real phones (Hendrik).** iPhone Safari (also as an installed PWA) and a mid-range Android phone:
-  - A first look over Wi-Fi on 28 November led to the two hide-on-scroll changes under step 11. Later that day, after promoting, Hendrik reported the screen-reader check in order; the other boxes below have no recorded result, so they stay open. WebKit's blur and the shelf's look on an iPhone can only be judged there.
-  - [ ] Scrolling stays smooth with the blur on
-  - [ ] No flicker when Safari's toolbar collapses
-  - [ ] Safe area above the home indicator
-  - [ ] Hold and slide, with no link preview
-  - [ ] Leaving the chat: the shelf looks like one piece with the bar, "Chat cleared" is spoken by VoiceOver and TalkBack, Undo works, and the shelf stays usable while scrolling
-  - [x] VoiceOver and TalkBack reach and use the bar, including when hidden (reported in order by Hendrik, 28 November)
-  - [ ] Chat keyboard hides the bar and brings it back
-  - [ ] Readable in sunlight, in both themes
-  - [ ] iPad, if one is available: portrait shows the centred bar; check rotating with the chat open (a width of 1024px or more swaps to the desktop layout)
+- [x] **13. Real phones (Hendrik).** iPhone Safari (also as an installed PWA) and a mid-range Android phone:
+  - A first look over Wi-Fi on 28 November led to the two hide-on-scroll changes under step 11. After the build was promoted that day, all the phone checks below were done and found in order (reported by Hendrik on 28 November; devices were not recorded).
+  - [x] Scrolling stays smooth with the blur on
+  - [x] No flicker when Safari's toolbar collapses
+  - [x] Safe area above the home indicator
+  - [x] Hold and slide, with no link preview
+  - [x] Leaving the chat: the shelf looks like one piece with the bar, "Chat cleared" is spoken by VoiceOver and TalkBack, Undo works, and the shelf stays usable while scrolling
+  - [x] VoiceOver and TalkBack reach and use the bar, including when hidden
+  - [x] Chat keyboard hides the bar and brings it back
+  - [x] Readable in sunlight, in both themes
+  - [x] iPad, if one is available: portrait shows the centred bar; check rotating with the chat open (a width of 1024px or more swaps to the desktop layout)
 - [x] **14. Docs.** Update CLAUDE.md (section 5, Bible reader and chat notes, layout), PLAN.md 1.10b, and mark landing_page_nav.md as replaced. Then open the PR with phone screenshots.
   - Done 28 November, after the merge: CLAUDE.md, PLAN.md 1.10b, landing_page_nav.md marked replaced, and the other documents brought up to date. Phone screenshots were not attached to the pull request.
 

@@ -16,7 +16,7 @@ Built and checked on the live domain:
 - the landing page with its real copy, light and dark themes, the privacy page and the devotional pages (five Advent devotionals, the first published on launch day);
 - email sign-up with Kit double opt-in (Turnstile, rate limits, an outbox with retries, `/thank-you`) and a daily sync of the Kit list into our database (Kit's webhooks need a paid plan, so none is registered);
 - the Ask the Word chat, answering from our own knowledge base with nothing stored on the server;
-- on phones and tablets, a floating "liquid glass" bottom bar that hides while you scroll, with "Chat cleared" and Undo as a shelf on it (merged 2026-11-28; the checks on real phones are still open, [docs/nav_new.md](docs/nav_new.md));
+- on phones and tablets, a floating "liquid glass" bottom bar that hides while you scroll, with "Chat cleared" and Undo as a shelf on it (live since 2026-11-28, checked on real phones; [docs/nav_new.md](docs/nav_new.md));
 - a Bible reader (BSB and WEB) and an installable PWA (no offline mode yet);
 - the weekly email as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email and creates a Kit draft that you review and schedule in Kit. A test broadcast reached the inbox with SPF, DKIM and DMARC passing.
 
