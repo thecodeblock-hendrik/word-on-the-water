@@ -76,7 +76,7 @@ By UTC date, as devotionals are published (2am in South Africa). A week in the a
 
 ### Screens
 - **Phones from 320px:** as drawn. The player stays at least 200px high inside the block.
-- **Tablet and desktop (drawn 2026-11-28, a proposal until you approve it):** one centred column of at most 640px on both pages, so the player is never larger than about 640 by 360 and YouTube's fullscreen button gives a larger view. Below `lg`, including a 744px tablet, the header and bar are as on a phone, the bar 440px and centred. From `lg`, the desktop header and no bar. On a short desktop window, an open week pushes the later weeks below the fold.
+- **Tablet and desktop (drawn and approved 2026-11-28):** one centred column of at most 640px on both pages, so the player is never larger than about 640 by 360 and YouTube's fullscreen button gives a larger view. Below `lg`, including a 744px tablet, the header and bar are as on a phone, the bar 440px and centred. From `lg`, the desktop header and no bar. On a short desktop window, an open week pushes the later weeks below the fold.
 - **Night swell:** drawn, on phones and desktop.
 
 ### Ways in
