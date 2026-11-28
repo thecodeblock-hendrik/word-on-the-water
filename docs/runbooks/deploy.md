@@ -86,6 +86,14 @@ Set for **Preview and Production only**. Development is empty: local work uses t
 | web | `API_BASE_URL` | Production only |
 | web | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | The site key of the same widget (Preview widget in Preview, Production widget in Production); read at build time, so redeploy after changing it |
 
+**Feature switches** (`1` is on; unset or blank is off; redeploy after a change, and promote if it is Production):
+
+| Variable | Project | Shows | Notes |
+|---|---|---|---|
+| `BIBLE_ENABLED` | web | the Bible reader | the phone bottom bar needs this and the chat |
+| `CHAT_ENABLED` | web and api | Ask the Word | [chat.md](chat.md) |
+| `VIDEOS_ENABLED` | web | the videos pages, their links, the cookie banner, the video part of the privacy policy and YouTube in `frame-src` | **keep it unset in Production** until the release steps in [bibleproject.md](../bibleproject.md) are done. For phone tests set it for Preview only. Unset it and redeploy at once if BibleProject asks |
+
 `DB_MIGRATOR_PASSWORD` is never given to the deployed API: the runtime has no DDL credentials.
 
 ## One-off: Neon roles

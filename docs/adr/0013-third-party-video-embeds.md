@@ -1,6 +1,6 @@
 # 0013. Third-party video embeds
 
-Status: accepted 2026-11-28. The plan and build checklist are in [bibleproject.md](../bibleproject.md). Nothing is live until `VIDEOS_ENABLED` is set in Production.
+Status: accepted 2026-11-28. The plan and build checklist are in [bibleproject.md](../bibleproject.md). Built and merged the same day (#188). Nothing is shown to visitors until `VIDEOS_ENABLED` is set in Production.
 
 ## Context
 The site will show BibleProject's four Advent word study videos on `/videos`. BibleProject's terms allow embedding their video streams, with a credit and a link beside each video, no charge or required sign-up, and no copying or changing; they can ask for removal at any time. Until now the only third-party frame on the site is Cloudflare Turnstile, and nothing a visitor reads or watches contacts another company's player. A video player changes that: it adds a new third party (Google, through YouTube), a content security policy change and a privacy disclosure (CLAUDE.md section 14).

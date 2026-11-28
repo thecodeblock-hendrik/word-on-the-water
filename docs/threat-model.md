@@ -137,7 +137,7 @@ A visitor types free text; the API answers from a local knowledge base. No model
 | PC15 | Prayer text or names are kept by a browser or shared cache, or show in titles and history | `no-store`; no text or names in titles, addresses or events; unsaved text is not stored on the device | Planned |
 | PC16 | An old share reappears when two people join a crew together again | Shares and taps between the two are deleted in the same transaction that ends their last common crew; the read-time check stays; rejoin and concurrent-removal tests | Planned |
 
-### New in BibleProject videos (ADR 0013, behind `VIDEOS_ENABLED`, being built)
+### New in BibleProject videos (ADR 0013, merged 2026-11-28, off until `VIDEOS_ENABLED` is set)
 
 YouTube's player in a frame, loaded only when a visitor taps Play ([bibleproject.md](bibleproject.md)).
 

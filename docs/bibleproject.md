@@ -1,6 +1,6 @@
 # BibleProject videos
 
-Status: **being built** on `feat/videos-page`, nothing live (2026-11-28). Pages were read on this date; check the terms again before release.
+Status: **built and merged, not released** (2026-11-28, #188). Behind `VIDEOS_ENABLED`, to be set in Production only at release (Vercel's settings were not checked when this was written). Open: steps 1a, 8a, 10 and 11 of the build checklist. Pages were read on this date; check the terms again before release.
 
 **Decided:** videos are **embedded** on a **new `/videos` page**. The first series is the **Advent word studies** (option A below), laid out as **concept C, a series shelf and then a weekly path**: all four weeks are listed in order, with the current week's open. Mockups: [design/bible_project_advent.html](design/bible_project_advent.html): C first, with its date states and tablet and desktop screens; A and B at the end.
 
@@ -106,12 +106,12 @@ The permission, in their words: "You are permitted to embed streams of, or links
 | No upload to another server or streaming service | We host no video file |
 | Agree to the video host's terms | YouTube's terms apply |
 | Do not change the message or take content out of context | Our own titles and introductions stay faithful to the video |
-| Do not suggest affiliation or endorsement. No trademark licence (from a summary of that section) | No BibleProject logo, artwork or thumbnails; no wording such as "partner". Naming them in the credit is required |
+| Do not suggest affiliation or endorsement. No trademark licence (the section was read in full later that day: use of their name only to refer to them) | No BibleProject logo, artwork or thumbnails (our choice for the artwork, see "The Advent banner"); no wording such as "partner". Naming them in the credit is required |
 | Permission ends if the terms are broken or they ask us to remove it | The `VIDEOS_ENABLED` switch hides everything quickly |
 
 **Not verified**
-- About the first two thirds of the terms were read word for word. The rest, including the trademark section, was summarised.
-- Their two help-centre pages refused access, and the brand guidelines and privacy notice were not read. Read the brand guidelines before using their name in a heading.
+- At planning, about the first two thirds of the terms were read word for word. Later on 28 November the whole page and the [brand page](https://bibleproject.com/brand/) were read through a fetch tool, to answer a question about their artwork.
+- Their two help-centre pages refused access, and their privacy notice was not read.
 - The terms forbid "framing" their services in general, and separately allow embedding video streams. We read this as allowing a video player, not putting their web pages inside ours. Emailing them is optional and would settle it.
 
 ## What is required
@@ -133,7 +133,7 @@ No database, API, new secret or paid service is expected.
   - All four **played** in a `youtube-nocookie.com` player on a temporary local page, in headless desktop Chromium, muted, with our referrer policy.
   - **The longer YouTube lengths:** frames near the time BibleProject's site gives show the end logo; the extra 18 or 19 seconds are credits and a goodbye from the two presenters. The videos show their older logo and `thebibleproject.com`. Leave them as they are; our credit links to bibleproject.com.
   - The player shows its own "More videos" button and YouTube logo. Do not cover or hide them.
-  - **Not checked:** nobody has watched them through or listened to them (only a few frames were seen); caption quality; our own content security policy and domain; iPhone and Android.
+  - **Not checked:** nobody has watched them through or listened to them (only a few frames were seen); caption quality; our live domain; iPhone and Android. (Our content security policy was checked later with a local build, step 6.)
 - Their pages show download links on another video host (MUX). Do not build on those: they are offered as downloads, not as an embed.
 - Before release, confirm all four still play: a video can be removed or replaced.
 
@@ -171,7 +171,7 @@ No database, API, new secret or paid service is expected.
 
 ## Build checklist
 
-One branch (for example `feat/videos-page`), tests first, one commit per step, one pull request.
+Built on `feat/videos-page`: tests first, one commit per step, one pull request (#188).
 
 - [x] 0. **(Hendrik)** Series A and layout C chosen (2026-11-28).
 - [x] 1. Collect and check the four YouTube IDs (2026-11-28, results under "Video source").
@@ -202,8 +202,9 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
   - Lighthouse (mobile, local build, videos on) passed on the home page, a devotional, `/videos` and `/videos/advent`: performance 99, accessibility 100, best practices 96, SEO 100. The first run scored the video pages 98 for accessibility (the footer's level 3 headings had no level 2 above them); fixed, with a unit test.
   - Home page JavaScript: 161.71 KB gzipped, videos off and on (limit 165 KB, 3.29 KB free).
   - The accessibility check was automatic. Nobody has done a keyboard or screen reader pass by hand.
+  - Later the same day, after the banner: 1,171 web unit tests passed, and 1,267 browser tests passed with 403 skipped on the five local projects. On the pull request (#188) all 15 checks passed, Firefox and Lighthouse among them, and it was merged. CI's Lighthouse runs with videos off; the run with videos on was local.
 - [ ] 10. On a preview with the flag on, **(Hendrik)** play all four on an iPhone (browser and installed app) and an Android phone: sound, fullscreen and captions. Check each video's captions; do not promise them before this.
-- [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), check the privacy policy date, merge, set `VIDEOS_ENABLED` in Production, and promote.
+- [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), check the privacy policy date, set `VIDEOS_ENABLED=1` on `wotw-web` for Production, redeploy and promote. (The code is already merged.)
 
 **Turning it off:** unset `VIDEOS_ENABLED` and redeploy. Do this at once if BibleProject asks.
 
@@ -217,9 +218,9 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
 | 4 | All four at once. ~~The current week's first~~: replaced by 5 |
 | 5 | Layout C: a series shelf, then a weekly path in week order with the current week open |
 
-**Week one:** Advent starts on 29 November, before this can be built. Release when the checks pass. If something is needed sooner, a credited link to the Hope video is allowed by the same terms.
+**Week one:** Advent starts on 29 November, before the release checks are done. Release when they pass. If something is needed sooner, a credited link to the Hope video is allowed by the same terms.
 
-No questions are open. Watching the videos (step 1a) and the privacy check (step 8) are still to do.
+No design questions are open. Still to do: watching the videos (1a), the qualified privacy check (8a), the phone tests (10) and the release (11).
 
 ## Sources
 
