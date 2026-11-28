@@ -74,6 +74,11 @@ By UTC date, as devotionals are published (2am in South Africa). A week in the a
 | 20 to 26 December | Love | Love |
 | From 27 December | none | none, on the page and on the shelf |
 
+### The Advent banner (approved 2026-11-28)
+Mockup: [design/videos_advent_banner.html](design/videos_advent_banner.html). Our own Advent series art, the lighthouse (dawn in light, teal in Night swell), replaces the flat cover on the shelf and sits behind the heading of the weekly path. Hendrik confirmed that the image is free to use. The weekly covers keep their colours.
+
+BibleProject's artwork is not used. Their [brand page](https://bibleproject.com/brand/) (read 2026-11-28) says artwork is freely available, but not to be edited or used as a background for text or graphics, and to be cited; their terms give no trademark licence.
+
 ### Screens
 - **Phones from 320px:** as drawn. The player stays at least 200px high inside the block.
 - **Tablet and desktop (drawn and approved 2026-11-28):** one centred column of at most 640px on both pages, so the player is never larger than about 640 by 360 and YouTube's fullscreen button gives a larger view. Below `lg`, including a 744px tablet, the header and bar are as on a phone, the bar 440px and centred. From `lg`, the desktop header and no bar. On a short desktop window, an open week pushes the later weeks below the fold.
