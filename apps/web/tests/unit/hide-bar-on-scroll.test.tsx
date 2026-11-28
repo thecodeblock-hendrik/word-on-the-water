@@ -104,6 +104,54 @@ describe("HideBarOnScroll", () => {
   });
 });
 
+describe("when the scrolling stops", () => {
+  const wait = (ms: number) => vi.advanceTimersByTime(ms);
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("brings the bar back once the page has been still for 600ms, not before", () => {
+    render(<HideBarOnScroll />);
+    scrollTo(300);
+    wait(599);
+    expect(away()).toBe(true);
+    wait(1);
+    expect(away()).toBe(false);
+  });
+
+  it("waits again after every scroll, so the bar stays away while the page keeps moving", () => {
+    render(<HideBarOnScroll />);
+    for (const y of [300, 320, 340, 360]) {
+      scrollTo(y);
+      wait(500);
+      expect(away()).toBe(true);
+    }
+    wait(100);
+    expect(away()).toBe(false);
+  });
+
+  it("hides again only after more than 40px further down", () => {
+    render(<HideBarOnScroll />);
+    scrollTo(300);
+    wait(600);
+    scrollTo(340);
+    expect(away()).toBe(false);
+    scrollTo(341);
+    expect(away()).toBe(true);
+  });
+
+  it("leaves no timer running when it goes", () => {
+    const view = render(<HideBarOnScroll />);
+    scrollTo(300);
+    view.unmount();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
 describe("which bars hide", () => {
   const nav = () => screen.getByRole("navigation");
 

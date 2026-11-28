@@ -685,7 +685,19 @@ test.describe("hiding while scrolling", () => {
     await frames(page);
   }
 
-  async function ready(page: Page, path: string) {
+  /**
+   * Holds back the timer that brings the bar back when scrolling stops, so that a hidden bar stays
+   * hidden while a test looks at it. Otherwise "something else showed it" could pass by waiting.
+   */
+  const keepAway = (page: Page) =>
+    page.addInitScript(() => {
+      const later = window.setTimeout.bind(window);
+      window.setTimeout = ((run: TimerHandler, ms?: number, ...rest: unknown[]) =>
+        ms === 600 ? 0 : later(run, ms, ...rest)) as typeof window.setTimeout;
+    });
+
+  async function ready(page: Page, path: string, { returns = false } = {}) {
+    if (!returns) await keepAway(page);
     await page.goto(`${CHAT}${path}`);
     await page.waitForLoadState("networkidle");
   }
@@ -724,6 +736,22 @@ test.describe("hiding while scrolling", () => {
 
       await scroll(page, 1_000_000);
       await expectShown(nav);
+    });
+  }
+
+  for (const [name, path, find] of [
+    ["the site bar", "/privacy", bar],
+    ["the Bible reader's bar", "/bible/web/psalms/119", chapterBar],
+  ] as const) {
+    test(`${name} comes back when the scrolling stops, and leaves again`, async ({ page }) => {
+      await ready(page, path, { returns: true });
+      const nav = find(page);
+      await scroll(page, 600);
+      await expectAway(nav);
+      await expectShown(nav); // no more scrolling: it returns by itself
+      expect(await page.evaluate(() => Math.round(scrollY))).toBe(600);
+      await scroll(page, 700);
+      await expectAway(nav);
     });
   }
 
@@ -806,6 +834,7 @@ test.describe("on a wide screen", () => {
     test.skip(testInfo.project.name !== "pixel-7", "one run is enough");
     await page.goto(`${CHAT}/bible/web/psalms/119`);
     await page.waitForLoadState("networkidle");
+    // The mark is only there until the scrolling stops; the poll below sees it straight away.
     await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
     await expect(page.locator("html")).toHaveAttribute("data-nav-away", "");
     expect(await chapterBar(page).evaluate((el) => getComputedStyle(el).transform)).toBe("none");
