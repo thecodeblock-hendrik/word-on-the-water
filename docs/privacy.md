@@ -77,12 +77,14 @@ Written ahead so the policy page can follow when it is built. Details in [prayer
 
 | Data | Why | Where | Basis and retention |
 |---|---|---|---|
-| Account: email, first name, last sign-in | Let a person sign in and be recognised by their crew | Neon | Contract (the service they asked for). Kept until the account is deleted |
-| Session (opaque id in a `__Host-` cookie) | Keep a person signed in | Neon and a first-party cookie | Strictly necessary. 30 days idle, then deleted |
+| Account: email, first name, when the person confirmed being 18 or older, last sign-in | Let a person sign in and be recognised by their crew | Neon | Contract (the service they asked for). Kept until the account is deleted |
+| Session (opaque id in a `__Host-` cookie) | Keep a person signed in | Neon and a first-party cookie | Strictly necessary. Ends after 30 days idle, and 90 days after sign-in at most; then deleted |
 | Sign-in link token (hash only) | Magic-link sign-in | Neon | 15 minutes, single use, deleted by the retention job |
 | Crew, membership, invites | Let people pray together | Neon | Until the member leaves, the crew is deleted or the account is deleted |
 | Invitee email address (a person who is not yet a user) | Send one invite email | Neon, Postmark | Until the invite is accepted, declined, revoked or expires (7 days), then deleted |
-| Crew prayer requests and who they are shared with | Private prayer | Neon, encrypted in the application (ADR 0006); never logged or emailed | Consent. Kept until the author deletes them or the account is deleted. Readable only by the author and chosen recipients, never by the owner of the site |
+| Crew prayer requests and who they are shared with | Private prayer | Neon, encrypted in the application (ADR 0006); never logged or emailed | Consent. Kept until the author deletes them or the account is deleted. In the product, readable only by the author and chosen recipients; there is no admin view |
+
+The encryption is not end to end: the server holds the key. The policy and the pages must say "encrypted, with no admin view", never "nobody can read them". Prayer accounts are for people aged 18 and over (self-declared; an account found to be a child's is deleted); the wording needs a qualified check. Access between two people who stop sharing any crew is deleted. Sign-in and invite link tokens must be kept out of analytics and logs.
 
 New processor: Postmark (sign-in and invite emails; needs a DPA). Google is added only if Google sign-in is built. Rights: access, correction and deletion are met in the product (edit, delete a request, delete the account), with `hello@` as the fallback. The public policy and the consent wording are updated in `src/content/privacy.ts` in the same change that ships the feature.
 

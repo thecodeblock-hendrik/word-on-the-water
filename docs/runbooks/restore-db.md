@@ -61,7 +61,7 @@ Use this route when the point-in-time window has passed, or when Neon itself is 
 
 - `alembic_version` equals the head the deployed code expects.
 - Every application table is there (`audit_log`, `contact_messages`, `email_outbox`, `prayer_requests`, `subscribers`), with row counts close to production at the time of the dump. `n_live_tup` is an estimate (it can read 0 straight after a restore); compare exact `select count(*)` per table with the same query on `main` in the Neon SQL Editor.
-- When the prayer crew exists (ADR 0012), its tables (`users`, `sessions`, `crews`, `crew_members`, `crew_invites`, `crew_prayers`, `prayer_shares`) are checked the same way, and after a restore every erased account or deleted request must be erased again.
+- When the prayer crew exists (ADR 0012), its tables (`users`, `sessions`, `login_tokens`, `crews`, `crew_members`, `crew_invites`, `crew_prayers`, `prayer_shares`, `prayer_taps`) are checked the same way, and after a restore every erased account or deleted request must be erased again.
 - Prayer request bodies are still ciphertext: the dump holds them encrypted, and they are readable only with the application key.
 
 ## After any restore
