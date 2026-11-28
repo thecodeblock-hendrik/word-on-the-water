@@ -895,27 +895,159 @@ test.describe("hiding while scrolling", () => {
     await expect(nav.getByRole("link", { name: "Devotional" })).not.toBeFocused();
   });
 
-  test("the Undo shelf stays alone in the bar's place, and joins the bar again", async ({
+  /** How far the Undo shelf is from the bottom of the screen, and how tall it is. */
+  const place = (shelf: ReturnType<Page["locator"]>) =>
+    shelf.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      return [Math.round(window.innerHeight - box.bottom), Math.round(box.height)];
+    });
+  const JOINED = [14, 116]; // 52px of shelf over the 64px bar
+  const ALONE = [14, 54]; // the shelf by itself, in the bar's place
+
+  /** A line is seen along the shelf's bottom edge only if it has both width and colour. */
+  const hairline = (shelf: ReturnType<Page["locator"]>) =>
+    shelf.locator("[data-shelf-row]").evaluate((el) => {
+      const { borderBottomWidth, borderBottomColor } = getComputedStyle(el);
+      return parseFloat(borderBottomWidth) > 0 && borderBottomColor !== "rgba(0, 0, 0, 0)";
+    });
+
+  /** What a finger would land on in the middle of it is the thing itself. */
+  const reachable = (target: ReturnType<Page["locator"]>) =>
+    target.evaluate((el) => {
+      const { x, y, width, height } = el.getBoundingClientRect();
+      return el.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+    });
+
+  async function expectDraftBack(page: Page) {
+    await expect(chatDialog(page).getByRole("textbox", { name: "Your question" })).toHaveValue(
+      "a draft",
+    );
+    await expect(page.locator("[data-shelf]")).toHaveCount(0);
+  }
+
+  /** The shelf over a page long enough to scroll. */
+  async function openShelfToScroll(page: Page, on: "site" | "reader") {
+    const opened = await openShelf(page, on);
+    if (on === "reader") {
+      // From the chat the reader opens at John 3:16 alone, which has nothing to scroll.
+      await opened.bar.getByRole("link", { name: /^Next chapter/ }).click();
+      await expect(page).toHaveURL(/\/john\/4/);
+      await opened.undo.focus();
+    }
+    return opened;
+  }
+
+  for (const on of ["site", "reader"] as const) {
+    test(`with the ${on} bar away the Undo shelf stands alone, whole, and Undo works`, async ({
+      page,
+    }) => {
+      await keepAway(page);
+      const { undo, bar, shelf } = await openShelfToScroll(page, on);
+      await expect.poll(() => place(shelf)).toEqual(JOINED);
+      expect(await hairline(shelf)).toBe(true);
+
+      await scroll(page, 600);
+      await expectAway(bar);
+      await expect.poll(() => place(shelf)).toEqual(ALONE);
+      expect(await hairline(shelf), "no line along its bottom edge").toBe(false);
+      expect(await glassOf(shelf), "it keeps its own glass").not.toEqual(NO_GLASS);
+      await expect(shelf).toHaveCSS("border-radius", "32px");
+      expect(await reachable(undo)).toBe(true);
+
+      await scroll(page, 0); // the top shows the bar
+      await expect.poll(() => place(shelf)).toEqual(JOINED);
+      await scroll(page, 600);
+      await expect.poll(() => place(shelf)).toEqual(ALONE);
+      await undo.click();
+      await expectDraftBack(page);
+    });
+
+    test(`when the scrolling stops the ${on} bar and the Undo shelf join again`, async ({
+      page,
+    }) => {
+      const { bar, shelf } = await openShelfToScroll(page, on);
+      await page.waitForLoadState("networkidle");
+      await scroll(page, 600);
+      await expectAway(bar);
+      await expect.poll(() => place(shelf)).toEqual(JOINED); // no more scrolling
+      await expectShown(bar);
+    });
+  }
+
+  test("keyboard focus in the hidden bar brings it back with the shelf joined, and Tab goes on to Undo", async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName === "webkit", "Safari does not Tab to links unless asked to");
+    await keepAway(page);
+    const { undo, bar, shelf } = await openShelf(page, "site");
+    await scroll(page, 600);
+    await expect.poll(() => place(shelf)).toEqual(ALONE);
+    // Tab on from the last link before the bar, without scrolling to it.
+    await page
+      .locator("footer a")
+      .last()
+      .evaluate((el: HTMLElement) => el.focus({ preventScroll: true }));
+    await page.keyboard.press("Tab");
+    await expect(bar.getByRole("link", { name: "Devotional" })).toBeFocused();
+    await expectShown(bar);
+    await expect.poll(() => place(shelf)).toEqual(JOINED);
+    for (let presses = 0; presses < 3; presses++) await page.keyboard.press("Tab");
+    await expect(undo).toBeFocused();
+    // Focus has left the bar, so while the page is still scrolled down it goes away again.
+    await expect.poll(() => place(shelf)).toEqual(ALONE);
+  });
+
+  test("with keyboard focus on Undo, scrolling leaves the shelf alone and Enter still works", async ({
+    page,
+    browserName,
+  }) => {
+    await keepAway(page);
+    const { undo, bar, shelf } = await openShelf(page, "site");
+    await page.keyboard.press("Shift"); // from here on, focus counts as the keyboard's
+    await undo.evaluate((el: HTMLElement) => el.blur());
+    await undo.focus();
+    // Only Chromium counts focus set by a script as the keyboard's after a key press.
+    if (browserName === "chromium") {
+      expect(await undo.evaluate((el) => el.matches(":focus-visible"))).toBe(true);
+    }
+    await scroll(page, 600);
+    await expectAway(bar);
+    await expect.poll(() => place(shelf)).toEqual(ALONE);
+    await expect(undo).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expectDraftBack(page);
+  });
+
+  test("on a Bible address that is not found there is no bar, and the shelf stands alone with Undo", async ({
     page,
   }) => {
-    await ready(page, "/privacy");
-    await bar(page).getByText("Ask the Word").click();
-    await chatDialog(page).getByRole("textbox", { name: "Your question" }).fill("a draft");
-    await chatDialog(page).getByRole("button", { name: "Close" }).click();
+    await ready(page, "/bible/bsb/john/99");
+    await expect(page.locator("nav[data-hides]")).toHaveCount(0);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByTestId("mobile-menu").getByRole("link", { name: "Ask the Word" }).click();
+    await leaveChatWithDraft(page);
     const shelf = page.locator("[data-shelf]");
-    const place = () =>
-      shelf.evaluate((el) => {
-        const box = el.getBoundingClientRect();
-        return [Math.round(window.innerHeight - box.bottom), Math.round(box.height)];
-      });
-    await expect.poll(place).toEqual([14, 116]);
-    // Focus on Undo holds the toast's timer, so it cannot expire while this is measured.
-    await page.getByRole("button", { name: "Undo" }).focus();
-    await scroll(page, 600);
-    await expectAway(bar(page));
-    await expect.poll(place).toEqual([14, 54]);
-    await scroll(page, 0); // the top shows the bar
-    await expect.poll(place).toEqual([14, 116]);
+    const undo = page.getByRole("button", { name: "Undo" });
+    await undo.focus(); // holds the timer
+    await expect.poll(() => place(shelf)).toEqual(ALONE);
+    expect(await hairline(shelf)).toBe(false);
+    expect(await glassOf(shelf)).not.toEqual(NO_GLASS);
+    expect(await reachable(undo)).toBe(true);
+    await noSeriousProblems(page, "shelf alone");
+    await undo.click();
+    await expectDraftBack(page);
+  });
+
+  test("opening the chat from the bar takes the shelf away, and the chat's bar keeps its glass", async ({
+    page,
+  }) => {
+    const { bar, shelf } = await openShelf(page, "site");
+    await bar.getByText("Ask the Word").click();
+    await expect(chatDialog(page)).toBeVisible();
+    await expect(shelf).toHaveCount(0);
+    const chatBar = chatDialog(page).getByRole("navigation", { name: "Quick links" });
+    expect(await glassOf(chatBar)).not.toEqual(NO_GLASS);
   });
 
   test("the chat's bar stays, even opened over a page whose bar is away", async ({ page }) => {
