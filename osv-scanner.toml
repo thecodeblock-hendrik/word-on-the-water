@@ -4,13 +4,3 @@
 id = "GHSA-g3hv-75wg-m249"
 ignoreUntil = 2026-12-31
 reason = "minimatch DoS via globparts amplification (medium). Only patched in 11.0.1; the 3.x, 5.x and 10.x lines our dev tooling uses have no fix. Dev-only (no production dependency), and it only expands our own build globs, never user input."
-
-[[IgnoredVulns]]
-id = "GHSA-3g3m-2fjr-6pw4"
-ignoreUntil = 2026-12-01
-reason = "glob AbortSignal bypass (medium), fixed in 14.0.2. Reached only through @sentry/node -> @sentry/bundler-plugins, which pins glob ^13 and is a build-time source map tool we do not run. We never pass an AbortSignal to glob. Re-check when Sentry ships a glob 14 release."
-
-[[IgnoredVulns]]
-id = "GHSA-fc5q-39xc-vjpf"
-ignoreUntil = 2026-12-15
-reason = "picomatch ReDoS through single-branch repeated extglobs (high, 8.7). No patched version exists: it affects every release through 4.0.7, the latest. Dev-only, reached through eslint-config-next, typescript-eslint and tinyglobby (pnpm why --prod shows no production use); it only matches our own config globs, never visitor input. Re-check when a fixed picomatch is published."
