@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { formatDateShort } from "@/lib/devotionals/format";
-import { BIBLEPROJECT_URL } from "@/lib/videos/links";
+import { BIBLEPROJECT_URL, YOUTUBE_TERMS_URL } from "@/lib/videos/links";
 import type { Video } from "@/lib/videos/series";
 
 import { WEEK_COLOURS } from "./colours";
@@ -84,10 +84,15 @@ export function WeekRow({ video, number, open, thisWeek, linked }: Props) {
           </p>
           <p className="font-ui text-sm text-muted">
             Pressing play loads the video from YouTube, a Google service, which then receives data
-            such as your IP address.{" "}
+            such as your IP address. By playing, you agree to the{" "}
+            <a href={YOUTUBE_TERMS_URL} className={link}>
+              YouTube Terms
+            </a>{" "}
+            and our{" "}
             <Link href="/privacy" className={link}>
-              Privacy
+              Privacy policy
             </Link>
+            .
           </p>
           <p className="mt-2">{video.intro}</p>
         </div>

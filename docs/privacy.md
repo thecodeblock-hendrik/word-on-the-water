@@ -75,7 +75,7 @@ Vercel's "Improve models with my data" setting was on until 2026-11-18 and was s
 
 ## BibleProject videos (behind `VIDEOS_ENABLED`, not live, ADR 0013)
 
-The public policy describes the videos, with its own "Last updated" date, only while the flag is on (`privacyUpdated` in `src/content/privacy.ts`). Set that date to the day the videos go live.
+The public policy describes the videos only while the flag is on. Its "Last updated" date is 28 November 2026 with videos on or off (`PRIVACY_UPDATED` in `src/content/privacy.ts`, set by Hendrik); move it if the text changes again, including if the videos go live with different wording.
 
 [YouTube's help page](https://support.google.com/youtube/answer/171780) says the API Services Terms and the Developer Policies apply to the embedded player (read 2026-11-28). What the [Developer Policies](https://developers.google.com/youtube/terms/developer-policies), III.A, ask of a privacy policy, and where we stand. Part of that page was read word for word and the rest only in summary.
 
@@ -84,7 +84,7 @@ The public policy describes the videos, with its own "Last updated" date, only w
 | Link to YouTube's Terms of Service and say that users agree to be bound by them | In the "Watching videos" item of the privacy policy. We have no separate terms page |
 | Say that the site uses YouTube API Services; link the Google Privacy Policy | In the same item |
 | Say what is collected, that third parties may serve content including ads, and that cookies or similar may be used | In the same item |
-| Require users to agree to the privacy policy **before** they can use the features | **Not built.** The notice and a Privacy link sit beside Play, but nothing asks the visitor to agree. Part of the qualified check |
+| Require users to agree to the privacy policy **before** they can use the features | Beside Play: "By playing, you agree to the YouTube Terms and our Privacy policy", with both links (decided 2026-11-28). There is no separate tick or button. Whether this is enough is part of the qualified check |
 | Keep the policy easy to reach at all times | Linked in the footer of every page with a footer, and beside Play |
 
 ## Prayer crew (proposed 2026-11-22, not built, ADR 0012)
@@ -124,7 +124,7 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 4. ~~Upstash region and the mailbox provider.~~ Answered 2026-11-18: Upstash in Frankfurt, forwards received by Gmail.
 5. ~~A data processing agreement with each provider.~~ Checked 2026-11-18, see the table above. Open: print the Kit and Vercel DPAs to PDF, review the Vercel plan (Hobby is non-commercial), and decide on Neon's optional e-signature.
 
-6. **BibleProject videos:** a qualified person to confirm, before the videos go live, that tapping Play with the notice is enough consent under POPIA and the GDPR (and under the EU User Consent Policy that YouTube's terms point to, not yet read), whether a cookie banner is needed, and whether YouTube's "agree before access" rule needs an explicit agreement step. Open.
+6. **BibleProject videos:** a qualified person to confirm, before the videos go live, that tapping Play with the notice is enough consent under POPIA and the GDPR (and under the EU User Consent Policy that YouTube's terms point to, not yet read), and whether the line beside Play meets YouTube's "agree before access" rule. Open. Hendrik decided on 2026-11-28 that a cookie banner will be added; it is not designed or built.
 
 Keep this file in step with the code: when a feature adds a field, a service or a retention rule, update it in the same change.
 

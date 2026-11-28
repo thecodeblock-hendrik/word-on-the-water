@@ -177,11 +177,13 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
 - [x] 7. Menu, header and card links, sitemap. Test that the header stays one row at 1024px. With the flag off, nothing changes.
   - 2026-11-28: with the Bible and chat on too, the header was one row at 1024px in desktop Chromium and WebKit. The mockup's "New" label on the menu link is not built: this list never asked for it, and it would need its own date rule.
 - [x] 8. Privacy policy text, shown only while videos are on, with its own date. The notice beside Play now names Google.
-  - 2026-11-28: YouTube says its API terms and developer policies apply to the embedded player, which this plan had not covered. The text now includes what they ask a privacy policy to say and link; [privacy.md](privacy.md) lists each point. One is not met: they say users must agree to the privacy policy before using the features, and nothing asks them to.
-- [ ] 8a. **(Hendrik)** Read the new policy text, and get a qualified check: consent under POPIA and the GDPR, whether a cookie banner is needed, and the "agree before access" point.
+  - 2026-11-28: Hendrik read the new text, and chose to add "By playing, you agree to the YouTube Terms and our Privacy policy" to the notice beside Play. The policy date is 28 November 2026.
+  - 2026-11-28: YouTube says its API terms and developer policies apply to the embedded player, which this plan had not covered. The text now includes what they ask a privacy policy to say and link; [privacy.md](privacy.md) lists each point. They also say users must agree to the privacy policy before using the features; the line beside Play is our answer, with no separate tick or button.
+- [ ] 8a. **(Hendrik)** Get a qualified check: consent under POPIA and the GDPR, and whether the line beside Play is enough for the "agree before access" rule.
+- [ ] 8b. Cookie banner (**Hendrik** decided 2026-11-28 that one is needed). Not designed or built: what it asks, what it holds back and where it shows are still to be agreed.
 - [ ] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
 - [ ] 10. On a preview with the flag on, **(Hendrik)** play all four on an iPhone (browser and installed app) and an Android phone: sound, fullscreen and captions. Check each video's captions; do not promise them before this.
-- [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), set the videos policy date to the release day, merge, set `VIDEOS_ENABLED` in Production, and promote.
+- [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), check the privacy policy date, merge, set `VIDEOS_ENABLED` in Production, and promote.
 
 **Turning it off:** unset `VIDEOS_ENABLED` and redeploy. Do this at once if BibleProject asks.
 

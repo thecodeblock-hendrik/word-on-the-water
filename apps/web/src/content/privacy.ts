@@ -1,12 +1,7 @@
 import { CONTACT_EMAIL } from "../lib/site.ts";
 
 /** The day the policy was last changed. Change it whenever the text below changes. */
-export const PRIVACY_UPDATED = "2026-11-18";
-/** The same for the text shown while videos are on. Set it to the day they go live. */
-const VIDEOS_PRIVACY_UPDATED = "2026-11-28";
-
-export const privacyUpdated = (videosEnabled: boolean) =>
-  videosEnabled ? VIDEOS_PRIVACY_UPDATED : PRIVACY_UPDATED;
+export const PRIVACY_UPDATED = "2026-11-28";
 
 export type PolicyItem = { term: string; text: string };
 export type PolicySection = {

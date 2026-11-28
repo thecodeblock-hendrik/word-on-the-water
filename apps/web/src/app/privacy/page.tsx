@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { PlaceholderText } from "@/components/placeholder-text";
-import { privacyPolicy, privacyUpdated } from "@/content/privacy";
+import { PRIVACY_UPDATED, privacyPolicy } from "@/content/privacy";
 import { formatDate } from "@/lib/devotionals/format";
 import { isBibleEnabled } from "@/lib/bible/flag";
 import { isChatEnabled } from "@/lib/chat/flag";
@@ -38,20 +38,17 @@ const heading =
 
 /** What we collect, why, how long we keep it and your rights, in plain language. */
 export default function PrivacyPage() {
-  const videosEnabled = isVideosEnabled();
   const policy = privacyPolicy({
     bibleEnabled: isBibleEnabled(),
     chatEnabled: isChatEnabled(),
-    videosEnabled,
+    videosEnabled: isVideosEnabled(),
   });
   return (
     <article className="mx-auto max-w-[1080px] py-10 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:py-16">
       <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)] font-semibold uppercase leading-[1.05] tracking-[.03em] text-balance">
         {policy.title}
       </h1>
-      <p className="mt-3 font-ui text-sm text-muted">
-        Last updated {formatDate(privacyUpdated(videosEnabled))}
-      </p>
+      <p className="mt-3 font-ui text-sm text-muted">Last updated {formatDate(PRIVACY_UPDATED)}</p>
       <div className="mt-6 grid max-w-[62ch] gap-4">
         {policy.intro.map((text) => (
           <p key={text}>

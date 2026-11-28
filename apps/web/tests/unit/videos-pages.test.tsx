@@ -114,16 +114,21 @@ describe("/videos/advent", () => {
           .getAttribute("href"),
       ).toBe(`https://bibleproject.com/videos/${pages[i]}/`);
       expect(row.textContent).toContain("YouTube, a Google service, which then receives data");
-      expect(inside.getByRole("link", { name: "Privacy", hidden: true }).getAttribute("href")).toBe(
-        "/privacy",
+      expect(row.textContent).toContain(
+        "By playing, you agree to the YouTube Terms and our Privacy policy.",
       );
+      const href = (name: string) =>
+        inside.getByRole("link", { name, hidden: true }).getAttribute("href");
+      expect(href("YouTube Terms")).toBe("https://www.youtube.com/t/terms");
+      expect(href("Privacy policy")).toBe("/privacy");
     });
   });
 
   it("loads nothing from YouTube: no player and no image", async () => {
     const { container } = await path();
-    expect(container.querySelector("iframe, img")).toBeNull();
-    expect(container.innerHTML).not.toMatch(/youtube(-nocookie)?\.com|ytimg/);
+    // A link to YouTube's terms is fine: following it is the visitor's choice, and it loads nothing.
+    expect(container.querySelector("iframe, img, script, link, [src]")).toBeNull();
+    expect(container.innerHTML).not.toMatch(/youtube-nocookie\.com|ytimg/);
   });
 
   it("links back to the shelf", async () => {

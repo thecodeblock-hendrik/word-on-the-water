@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PRIVACY_UPDATED, privacyPolicy, privacyUpdated } from "@/content/privacy";
+import { PRIVACY_UPDATED, privacyPolicy } from "@/content/privacy";
 import { findPlaceholders } from "@/lib/placeholders";
 
 const policy = (bibleEnabled = false) => privacyPolicy({ bibleEnabled });
@@ -145,11 +145,13 @@ describe("the videos in the policy", () => {
   const item = part("what-we-collect").items!.find((i) => i.term === "Watching videos");
   const text = item?.text ?? "";
 
-  it("changes nothing, text or date, while videos are off", () => {
+  it("is dated 28 November 2026", () => {
+    expect(PRIVACY_UPDATED).toBe("2026-11-28");
+  });
+
+  it("changes nothing in the text while videos are off", () => {
     expect(privacyPolicy({ bibleEnabled: false, videosEnabled: false })).toEqual(policy());
     expect(everything()).not.toMatch(/video|YouTube/i);
-    expect(privacyUpdated(false)).toBe(PRIVACY_UPDATED);
-    expect(privacyUpdated(true) > PRIVACY_UPDATED).toBe(true);
   });
 
   it("says nothing is sent before play, then what Google receives and may store", () => {

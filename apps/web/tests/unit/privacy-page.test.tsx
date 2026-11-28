@@ -16,7 +16,7 @@ describe("the privacy page", () => {
     render(<PrivacyPage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Privacy policy" })).toBeInTheDocument();
-    expect(screen.getByText("Last updated 18 November 2026")).toBeInTheDocument();
+    expect(screen.getByText("Last updated 28 November 2026")).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(9);
   });
 
@@ -47,11 +47,10 @@ describe("the privacy page", () => {
     expect(within(cookies).getByText("bible-version and bible-passage")).toBeInTheDocument();
   });
 
-  it("describes the videos, with working links and a new date, only while they are on", () => {
+  it("describes the videos, with working links, only while they are on", () => {
     vi.stubEnv("VIDEOS_ENABLED", "1");
     render(<PrivacyPage />);
     expect(screen.getByText("Watching videos")).toBeInTheDocument();
-    expect(screen.getByText("Last updated 28 November 2026")).toBeInTheDocument();
     for (const url of [
       "https://www.youtube.com/t/terms",
       "https://www.google.com/policies/privacy",
