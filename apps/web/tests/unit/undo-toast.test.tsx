@@ -49,7 +49,16 @@ const wait = (ms: number) => act(() => void vi.advanceTimersByTime(ms));
 
 // The panel is a lazy chunk; load it once up front so the Undo tests do not wait for it.
 beforeAll(() => import("@/components/chat/chat-panel"));
+/** What the visitor asks of motion; jsdom has no matchMedia of its own. */
+let reducedMotion = false;
 beforeEach(() => {
+  reducedMotion = false;
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: reducedMotion && query === "(prefers-reduced-motion: reduce)",
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
   sessionStorage.clear();
   dropCleared();
   vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -57,6 +66,8 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  vi.unstubAllGlobals();
+  document.documentElement.removeAttribute("data-nav-away");
 });
 
 describe("UndoToast", () => {
@@ -219,6 +230,175 @@ describe("the countdown ring's styles", () => {
   it("go from a full circle to none of it", () => {
     expect(flat).toContain("@keyframes countdown { to { stroke-dashoffset: 100; } }");
     expect(flat).toContain(".countdown-time { stroke-dasharray: 100; }");
+  });
+});
+
+describe("the shelf growing out of the bar and settling back", () => {
+  const OFFERED = 8000;
+  const pane = () => document.querySelector<HTMLElement>("[data-shelf]");
+  const closing = () => document.querySelector<HTMLElement>('[data-shelf="closing"]');
+  /** The time the closing takes, as the styles are told it. */
+  const settleTime = () => parseFloat(pane()!.style.getPropertyValue("--settle"));
+  const withBar = () =>
+    render(
+      <>
+        <BottomNav devotionalHref="/devotionals/advent-01" />
+        <UndoToast />
+      </>,
+    );
+
+  it("takes about 350ms", () => {
+    render(<UndoToast />);
+    clearChat();
+    expect(settleTime()).toBe(350);
+  });
+
+  it("notes, as it appears, whether it grows out of a bar or rises on its own", () => {
+    withBar();
+    clearChat();
+    expect(pane()).toHaveAttribute("data-from", "bar");
+  });
+
+  it.each([
+    ["no bar", false],
+    ["the bar scrolled away", true],
+  ])("rises on its own with %s", (_, away) => {
+    if (away) {
+      withBar();
+      document.documentElement.setAttribute("data-nav-away", "");
+    } else render(<UndoToast />);
+    clearChat();
+    expect(pane()).toHaveAttribute("data-from", "alone");
+  });
+
+  it("keeps that note while it is there, so scrolling never plays the entrance again", () => {
+    withBar();
+    clearChat();
+    document.documentElement.setAttribute("data-nav-away", "");
+    fireEvent.focus(undo()); // draws it again
+    fireEvent.blur(undo());
+    expect(pane()).toHaveAttribute("data-from", "bar");
+  });
+
+  it("ends the offer at once when time runs out: no words to hear, no Undo, nothing kept", () => {
+    render(<UndoToast />);
+    clearChat();
+    wait(OFFERED);
+    expect(status()).toBeEmptyDOMElement();
+    expect(screen.queryByRole("button", { hidden: true })).toBeNull();
+    expect(takeCleared()).toBeNull();
+  });
+
+  it("then shows only a picture of the shelf closing, which cannot be tapped, focused or heard", () => {
+    render(<UndoToast />);
+    clearChat();
+    wait(OFFERED);
+    const picture = closing()!;
+    expect(picture).toHaveTextContent("Chat cleared");
+    expect(status()).not.toContainElement(picture);
+    expect(picture).toHaveAttribute("aria-hidden", "true");
+    expect(picture).toHaveAttribute("inert");
+    expect(picture).toHaveClass("pointer-events-none", "glass-surface", "lg:hidden");
+    expect(picture.querySelector("button, a, [tabindex]")).toBeNull();
+  });
+
+  it("takes the picture away when the closing is over", () => {
+    render(<UndoToast />);
+    clearChat();
+    const settle = settleTime();
+    wait(OFFERED);
+    wait(settle - 50);
+    expect(closing()).not.toBeNull();
+    wait(100);
+    expect(pane()).toBeNull();
+  });
+
+  it("opens again for a chat cleared during the closing, and no old picture comes back", () => {
+    render(<UndoToast />);
+    clearChat();
+    wait(OFFERED);
+    expect(closing()).not.toBeNull();
+    clearChat();
+    expect(document.querySelectorAll("[data-shelf]")).toHaveLength(1);
+    expect(closing()).toBeNull();
+    expect(status()).toContainElement(undo());
+    fireEvent.click(undo());
+    expect(pane()).toBeNull();
+  });
+
+  it("goes at once, with no picture, when Undo is used or the chat is opened", () => {
+    render(<UndoToast />);
+    clearChat();
+    fireEvent.click(undo());
+    expect(pane()).toBeNull();
+    clearChat();
+    act(() => dropCleared()); // what opening the chat does
+    expect(pane()).toBeNull();
+  });
+
+  it("goes at once when time runs out if motion is to be reduced", () => {
+    reducedMotion = true;
+    render(<UndoToast />);
+    clearChat();
+    wait(OFFERED);
+    expect(pane()).toBeNull();
+  });
+});
+
+describe("the shelf's movement in the styles", () => {
+  const css = readFileSync("src/app/globals.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const flat = css.replace(/\s+/g, " ");
+  const opening = "@media (prefers-reduced-motion: no-preference) {";
+  const belowLg = flat.slice(
+    flat.indexOf("@media (width < 64rem) {"),
+    flat.indexOf("@keyframes shelf-grow"),
+  );
+  /** The one block that moves the shelf. */
+  const moving = belowLg.slice(belowLg.indexOf(opening));
+
+  it("happens only below lg, and only where motion is welcome", () => {
+    expect(belowLg).toContain(opening);
+    const names = /animation: shelf-[a-z-]+ var\(--settle\)/g;
+    expect(moving.match(names)).toHaveLength(flat.match(names)!.length);
+  });
+
+  it.each([
+    ['[data-shelf][data-from="bar"]', "shelf-grow", "backwards"],
+    ['[data-shelf][data-from="alone"]', "shelf-rise", "backwards"],
+    ["[data-shelf] [data-shelf-row]", "shelf-words-in", "backwards"],
+    ['[data-shelf="closing"][data-from="bar"]', "shelf-settle", "forwards"],
+    ['[data-shelf="closing"][data-from="alone"]', "shelf-sink", "forwards"],
+    ['[data-shelf="closing"] [data-shelf-row]', "shelf-words-out", "forwards"],
+  ])("moves %s with %s", (selector, name, fill) => {
+    expect(moving).toMatch(
+      new RegExp(
+        `${selector.replace(/[[\]]/g, "\\$&")} \\{ animation: ${name} var\\(--settle\\) [^;]*${fill}; \\}`,
+      ),
+    );
+    expect(flat).toContain(`@keyframes ${name} {`);
+  });
+
+  it("starts and ends the growing at the bar's own height", () => {
+    expect(flat).toContain("@keyframes shelf-grow { from { --shelf-h: 4rem; } }");
+    expect(flat).toContain("@keyframes shelf-settle { to { --shelf-h: 4rem; } }");
+  });
+
+  it("keeps the words unseen while the pane is still low enough for them to lie over the tabs", () => {
+    expect(flat).toContain("@keyframes shelf-words-in { 0%, 40% { opacity: 0; } }");
+    expect(flat).toContain("@keyframes shelf-words-out { 40%, 100% { opacity: 0; } }");
+  });
+
+  it("rises and sinks with a transform, leaving translate to hold the shelf in its place", () => {
+    expect(flat).toContain(
+      "@keyframes shelf-rise { from { opacity: 0; transform: translateY(0.875rem); } }",
+    );
+    expect(flat).toContain(
+      "@keyframes shelf-sink { to { opacity: 0; transform: translateY(0.875rem); } }",
+    );
+  });
+
+  it("shows the ring empty in the closing picture", () => {
+    expect(flat).toContain('[data-shelf="closing"] .countdown-time { stroke-dashoffset: 100; }');
   });
 });
 

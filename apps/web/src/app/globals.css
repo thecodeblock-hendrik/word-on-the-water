@@ -153,14 +153,23 @@ body {
 
   /* The Undo shelf (UndoToast) is one pane of glass just behind the bar, with the same bottom edge
      and 52px more height. While it is there the bar draws no glass of its own. With no bar, or
-     with the bar away, the pane is the shelf alone. */
+     with the bar away, the pane is the shelf alone.
+
+     Its height is --shelf-h. In layout its top never moves, wherever that height goes: Chrome
+     counts every move of a top edge as a layout shift. It grows downwards from a top fixed where
+     the full pane's would be (7.25rem: the bar and the shelf), and a transform, which does not
+     count, lifts or lowers it so that its bottom edge stays where the bar's is. */
   [data-shelf] {
-    height: calc(3.25rem + 2px);
-    transition: height 200ms ease;
+    --shelf-h: calc(3.25rem + 2px);
+    top: calc(100% - max(0.875rem, env(safe-area-inset-bottom)) - 7.25rem);
+    bottom: auto;
+    height: var(--shelf-h);
+    translate: 0 calc(7.25rem - var(--shelf-h));
+    transition: --shelf-h 200ms ease;
   }
 
   :root:has(nav[data-hides]) [data-shelf] {
-    height: calc(3.25rem + 4rem);
+    --shelf-h: calc(3.25rem + 4rem);
   }
 
   :root:has(nav[data-hides]) [data-shelf-row] {
@@ -181,11 +190,94 @@ body {
   }
 
   :root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf] {
-    height: calc(3.25rem + 2px);
+    --shelf-h: calc(3.25rem + 2px);
   }
 
   :root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf-row] {
     border-bottom-color: transparent;
+  }
+
+  /* The shelf grows out of the bar as it appears and settles back when its time is up. Where it is
+     alone it rises and sinks instead. data-from is set once, as it arrives, so these never start
+     again while the page is scrolled. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-shelf][data-from="bar"] {
+      animation: shelf-grow var(--settle) cubic-bezier(0.3, 1.3, 0.5, 1) backwards;
+    }
+
+    [data-shelf][data-from="alone"] {
+      animation: shelf-rise var(--settle) ease-out backwards;
+    }
+
+    [data-shelf] [data-shelf-row] {
+      animation: shelf-words-in var(--settle) ease-out backwards;
+    }
+
+    [data-shelf="closing"][data-from="bar"] {
+      animation: shelf-settle var(--settle) ease-in-out forwards;
+    }
+
+    [data-shelf="closing"][data-from="alone"] {
+      animation: shelf-sink var(--settle) ease-in forwards;
+    }
+
+    [data-shelf="closing"] [data-shelf-row] {
+      animation: shelf-words-out var(--settle) ease-out forwards;
+    }
+  }
+
+  /* The picture that closes: its time has run out, so its ring is empty. */
+  [data-shelf="closing"] .countdown-time {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* A length the browser knows, so it can move smoothly between two of them. */
+@property --shelf-h {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes shelf-grow {
+  from {
+    --shelf-h: 4rem;
+  }
+}
+
+@keyframes shelf-settle {
+  to {
+    --shelf-h: 4rem;
+  }
+}
+
+/* Alone, it comes and goes by a transform of its own: translate holds it in its place. */
+@keyframes shelf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.875rem);
+  }
+}
+
+@keyframes shelf-sink {
+  to {
+    opacity: 0;
+    transform: translateY(0.875rem);
+  }
+}
+
+/* The words are the pane's top 52px: while it is low they would lie over the tabs. */
+@keyframes shelf-words-in {
+  0%,
+  40% {
+    opacity: 0;
+  }
+}
+
+@keyframes shelf-words-out {
+  40%,
+  100% {
+    opacity: 0;
   }
 }
 

@@ -206,7 +206,7 @@ describe("the styles that move the bar", () => {
 
   it("shrink the shelf to itself while the bar is away, unless it shows for the keyboard", () => {
     expect(flat).toContain(
-      ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf] { height: calc(3.25rem + 2px); }",
+      ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf] { --shelf-h: calc(3.25rem + 2px); }",
     );
     expect(flat).toContain(
       ":root[data-nav-away]:not(:has([data-hides] :focus-visible)) [data-shelf-row] { border-bottom-color: transparent; }",
@@ -215,9 +215,7 @@ describe("the styles that move the bar", () => {
 
   it("slide in 200ms (the reduced motion rule above removes the slide)", () => {
     expect(flat).toContain("[data-hides] { transition: transform 200ms ease; }");
-    expect(flat).toContain(
-      "[data-shelf] { height: calc(3.25rem + 2px); transition: height 200ms ease; }",
-    );
+    expect(flat).toContain("transition: --shelf-h 200ms ease; }");
     expect(css).toContain("transition-duration: 0.01ms !important;");
   });
 });

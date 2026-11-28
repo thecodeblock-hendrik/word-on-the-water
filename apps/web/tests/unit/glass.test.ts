@@ -183,9 +183,25 @@ describe("the Undo shelf and the bar under it", () => {
   });
 
   it("make the shelf 52px alone, and 52px more than the bar where there is one", () => {
-    expect(flat).toContain("[data-shelf] { height: calc(3.25rem + 2px);");
+    expect(flat).toContain("[data-shelf] { --shelf-h: calc(3.25rem + 2px);");
     expect(flat).toContain(
-      ":root:has(nav[data-hides]) [data-shelf] { height: calc(3.25rem + 4rem); }",
+      ":root:has(nav[data-hides]) [data-shelf] { --shelf-h: calc(3.25rem + 4rem); }",
+    );
+  });
+
+  // Chrome counts every move of a box's top edge as a layout shift. So the shelf's top never moves
+  // in layout: it changes height downwards, and a transform keeps its bottom edge in place.
+  it("change the shelf's height without ever moving it in layout", () => {
+    expect(flat).toContain(
+      "top: calc(100% - max(0.875rem, env(safe-area-inset-bottom)) - 7.25rem); bottom: auto; height: var(--shelf-h); translate: 0 calc(7.25rem - var(--shelf-h));",
+    );
+    // The height is set in one place only, so no rule or keyframe can move the top again.
+    expect(flat.match(/\[data-shelf[^{}]*\{[^}]*(?<![-a-z])height:/g)).toHaveLength(1);
+  });
+
+  it("drive the height and the move from one length the browser can animate", () => {
+    expect(css.replace(/\s+/g, " ")).toContain(
+      '@property --shelf-h { syntax: "<length>"; inherits: false; initial-value: 0px; }',
     );
   });
 
