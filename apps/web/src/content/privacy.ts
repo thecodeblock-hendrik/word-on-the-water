@@ -93,7 +93,7 @@ export function privacyPolicy({
             ? [
                 {
                   term: "Watching videos",
-                  text: "Our video pages show our own covers, so opening them sends nothing to YouTube or Google. When you press play, the video loads in YouTube's player from youtube-nocookie.com, YouTube's privacy-enhanced address. YouTube is a Google service, and this part of the site uses YouTube API Services. Google then receives data such as your IP address and details of your browser and device, and may set cookies or store similar data on your device. What the player shows, which may include other videos or advertising, is chosen by YouTube. We add no tracking of our own to the videos. By playing a video you agree to be bound by the YouTube Terms of Service (https://www.youtube.com/t/terms). Google handles your data under the Google Privacy Policy (https://www.google.com/policies/privacy). If you would rather not, do not press play.",
+                  text: "Our video pages show our own covers, so opening them sends nothing to YouTube or Google. A banner on the video pages asks whether you accept YouTube, and unless you accept, we load nothing from YouTube. You can change your choice with Cookie settings at the foot of the video pages. When you have accepted and you press play, the video loads in YouTube's player from youtube-nocookie.com, YouTube's privacy-enhanced address. YouTube is a Google service, and this part of the site uses YouTube API Services. Google then receives data such as your IP address and details of your browser and device, and may set cookies or store similar data on your device. What the player shows, which may include other videos or advertising, is chosen by YouTube. We add no tracking of our own to the videos. By playing a video you agree to be bound by the YouTube Terms of Service (https://www.youtube.com/t/terms). Google handles your data under the Google Privacy Policy (https://www.google.com/policies/privacy). If you would rather not, choose Decline: the pages and the links to BibleProject still work.",
                 },
               ]
             : []),
@@ -108,8 +108,8 @@ export function privacyPolicy({
         heading: "Cookies",
         paragraphs: [
           videosEnabled
-            ? "We set no advertising or tracking cookies of our own. If you press play on a video, YouTube may set cookies or store data on your device (see Watching videos). The cookies we set ourselves are small first-party ones that remember a choice you made:"
-            : "We use no advertising or tracking cookies. The only cookies are small first-party ones that remember a choice you made, so no cookie banner is needed:",
+            ? "We set no advertising or tracking cookies of our own. If you accept YouTube and press play on a video, YouTube may set cookies or store data on your device (see Watching videos). The cookies we set ourselves are small first-party ones that remember a choice you made:"
+            : "We use no advertising or tracking cookies. The only cookies are small first-party ones that remember a choice you made:",
         ],
         items: [
           {
@@ -121,6 +121,14 @@ export function privacyPolicy({
                 {
                   term: "bible-version and bible-passage",
                   text: "The Bible you read last and the passage you were reading, so that the Bible reader opens where you left off. Each lasts a year. They hold no personal details.",
+                },
+              ]
+            : []),
+          ...(videosEnabled
+            ? [
+                {
+                  term: "youtube-consent",
+                  text: "Whether you accepted or declined YouTube on the video pages. It holds only yes or no, and lasts six months.",
                 },
               ]
             : []),
@@ -186,7 +194,7 @@ export function privacyPolicy({
             ? [
                 {
                   term: "YouTube (Google)",
-                  text: "Plays our videos, only if you press play. Google uses the data it receives under its own privacy policy, not only for us.",
+                  text: "Plays our videos, only if you accept it and press play. Google uses the data it receives under its own privacy policy, not only for us.",
                 },
               ]
             : []),

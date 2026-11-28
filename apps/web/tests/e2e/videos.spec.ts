@@ -13,6 +13,11 @@ const summary = (page: Page, theme: string) => page.locator("summary", { hasText
 const play = (page: Page, theme: string) => page.getByRole("button", { name: `Play ${theme}` });
 const PLAYER = "https://www.youtube-nocookie.com/";
 
+const accept = (page: Page) =>
+  page.context().addCookies([{ name: "youtube-consent", value: "yes", url: ON }]);
+const banner = (page: Page) => page.getByRole("region", { name: "Cookies for videos" });
+const settings = (page: Page) => page.getByRole("button", { name: "Cookie settings" });
+
 /** Stands in for YouTube, so the tests do not depend on it. The page's CSP still applies. */
 async function stubPlayer(page: Page) {
   await page.route(`${PLAYER}**`, (route) =>
@@ -33,6 +38,7 @@ test("Play puts the player in, and closing or changing rows takes it out", async
   page.on("console", (m) => {
     if (m.text().includes("Content Security Policy")) violations.push(m.text());
   });
+  await accept(page);
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto(`${ON}/videos/advent`);
   const frames = page.locator("iframe");
@@ -132,6 +138,123 @@ test("the desktop header stays one row at 1024px with every link", async ({ page
   expect(Math.max(...centres) - Math.min(...centres)).toBeLessThanOrEqual(2);
   // A label that wrapped onto two lines would make its link taller than the 44px target.
   expect(Math.max(...heights)).toBeLessThanOrEqual(46);
+});
+
+test("Decline is remembered for six months, and Play then asks before loading YouTube", async ({
+  page,
+}) => {
+  const outside: string[] = [];
+  page.on("request", (request) => {
+    if (/youtube|google|ytimg/.test(new URL(request.url()).host)) outside.push(request.url());
+  });
+  await stubPlayer(page);
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto(`${ON}/videos`);
+  await banner(page).getByRole("button", { name: "Decline" }).click();
+  await expect(banner(page)).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+
+  const cookie = (await page.context().cookies(ON)).find((c) => c.name === "youtube-consent")!;
+  expect([cookie.value, cookie.sameSite, cookie.path]).toEqual(["no", "Lax", "/"]);
+  const days = (cookie.expires - Date.now() / 1000) / 86_400;
+  expect(days).toBeGreaterThan(181);
+  expect(days).toBeLessThanOrEqual(182);
+
+  await page.goto(`${ON}/videos/advent`);
+  await expect(banner(page)).toHaveCount(0);
+  await play(page, "Hope").click();
+  const panel = page.getByRole("group", { name: "YouTube is turned off" });
+  await expect(panel).toBeVisible();
+  const inside = await panel.evaluate((el) => el.scrollHeight - el.parentElement!.clientHeight);
+  expect(inside, "nothing in the panel is cut off").toBeLessThanOrEqual(0);
+  for (const name of ["Allow and play", "Not now"]) {
+    const box = (await panel.getByRole("button", { name }).boundingBox())!;
+    expect(box.height, name).toBeGreaterThanOrEqual(44);
+  }
+  const { violations } = await new AxeBuilder({ page }).analyze();
+  expect(violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+  await expect(page.locator("iframe")).toHaveCount(0);
+  expect(outside).toEqual([]);
+
+  await panel.getByRole("button", { name: "Allow and play" }).click();
+  await expect(page.locator("iframe")).toHaveCount(1);
+  await expect.poll(async () => (await page.context().cookies(ON))[0].value).toBe("yes");
+  await expect(page.locator("iframe")).toHaveCount(1);
+});
+
+test("the panel's buttons are not left under the bottom bar", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 740 });
+  await page.goto(`${ON}/videos/advent?week=love`);
+  const button = play(page, "Love");
+  const bar = page.locator("[data-bottom-nav]");
+  await page.waitForTimeout(1500); // let the smooth scroll to ?week= finish before measuring
+  // Put Play low on the screen, just clear of the bar, as a thumb would find it.
+  const gap = (await button.boundingBox())!.y + 68 - ((await bar.boundingBox())!.y - 4);
+  await page.evaluate((by) => window.scrollBy({ top: by, behavior: "instant" }), gap);
+  await page.waitForTimeout(800); // the bar hides while the page scrolls, then returns
+  await button.click();
+  await page.waitForTimeout(800); // look once any scroll has ended and the bar is back
+  for (const name of ["Allow and play", "Not now"]) {
+    const control = page.getByRole("button", { name });
+    const onTop = () =>
+      control.evaluate((el) => {
+        const { left, top, width, height } = el.getBoundingClientRect();
+        // The top, middle and bottom of the button are all the button, not something over it.
+        return [4, height / 2, height - 4].every((y) =>
+          el.contains(document.elementFromPoint(left + width / 2, top + y)),
+        );
+      });
+    await expect.poll(onTop, { message: name }).toBe(true);
+  }
+});
+
+test("Cookie settings brings the banner back, and Decline stops a playing video", async ({
+  page,
+}) => {
+  await stubPlayer(page);
+  await page.goto(`${ON}/videos/advent`);
+  await banner(page).getByRole("button", { name: "Accept" }).click();
+  await expect(banner(page)).toHaveCount(0);
+  await play(page, "Hope").click();
+  await expect(page.locator("iframe")).toHaveCount(1);
+
+  await settings(page).click();
+  await expect(banner(page)).toContainText("You accepted YouTube.");
+  await expect(banner(page)).toBeInViewport();
+  await expect(banner(page)).toBeFocused();
+  await expect(page.locator("iframe")).toHaveCount(1);
+
+  await banner(page).getByRole("button", { name: "Decline" }).click();
+  await expect(banner(page)).toHaveCount(0);
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await play(page, "Hope").click();
+  await expect(page.getByRole("group", { name: "YouTube is turned off" })).toBeVisible();
+
+  // Choosing the same again must close the reopened banner too.
+  await settings(page).click();
+  await banner(page).getByRole("button", { name: "Decline" }).click();
+  await expect(banner(page)).toHaveCount(0);
+});
+
+test("the banner and its settings are only on the video pages", async ({ page }) => {
+  for (const path of ["/", "/privacy"]) {
+    await page.goto(`${ON}${path}`);
+    await expect(banner(page), path).toHaveCount(0);
+    await expect(settings(page), path).toHaveCount(0);
+  }
+  await page.goto(`${ON}/videos`);
+  await expect(banner(page)).toBeVisible();
+  await expect(settings(page)).toBeVisible();
+});
+
+test("the banner saves a choice without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(`${ON}/videos/advent`);
+  await banner(page).getByRole("button", { name: "Decline" }).click();
+  await expect(banner(page)).toHaveCount(0);
+  await page.reload();
+  await expect(banner(page)).toHaveCount(0);
 });
 
 test("the privacy page links Google's and YouTube's terms and fits a 320px phone", async ({

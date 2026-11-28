@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { formatDateShort } from "@/lib/devotionals/format";
+import type { VideoConsent } from "@/lib/videos/consent";
 import { BIBLEPROJECT_URL, YOUTUBE_TERMS_URL } from "@/lib/videos/links";
 import type { Video } from "@/lib/videos/series";
 
@@ -17,13 +18,14 @@ type Props = {
   open: boolean;
   thisWeek: boolean;
   linked: boolean;
+  consent?: VideoConsent;
 };
 
 /**
  * One week of the path. The rows share a name, so the browser keeps only one open, with or
  * without JavaScript.
  */
-export function WeekRow({ video, number, open, thisWeek, linked }: Props) {
+export function WeekRow({ video, number, open, thisWeek, linked, consent }: Props) {
   const colour = WEEK_COLOURS[(number - 1) % WEEK_COLOURS.length];
   return (
     <details
@@ -60,6 +62,7 @@ export function WeekRow({ video, number, open, thisWeek, linked }: Props) {
           theme={video.theme}
           length={video.length}
           linked={linked}
+          consent={consent}
         >
           <div className={`video-cover flex size-full flex-col justify-end p-4 pr-16 ${colour}`}>
             <span aria-hidden="true" className="font-serif text-sm font-semibold italic">

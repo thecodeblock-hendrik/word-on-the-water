@@ -166,6 +166,16 @@ describe("the videos in the policy", () => {
     expect(text).toMatch(/add no tracking of our own to the videos/);
   });
 
+  it("describes the banner, how to change the choice and the cookie that keeps it", () => {
+    expect(text).toMatch(/banner on the video pages/);
+    expect(text).toMatch(/unless you accept, we load nothing from YouTube/i);
+    expect(text).toMatch(/Cookie settings at the foot of the video pages/);
+    const cookie = part("cookies").items!.find((i) => i.term === "youtube-consent")!;
+    expect(cookie.text).toMatch(/six months/);
+    expect(cookie.text).toMatch(/only yes or no/);
+    expect(terms("cookies")).not.toContain("youtube-consent");
+  });
+
   it("has what YouTube asks of a site that embeds its player", () => {
     expect(text).toContain("YouTube API Services");
     expect(text).toMatch(/agree to be bound by the YouTube Terms of Service/);
@@ -176,7 +186,7 @@ describe("the videos in the policy", () => {
   it("lists YouTube as a service that does not act only for us", () => {
     const who = part("who-else");
     expect(who.items!.at(-1)!.term).toBe("YouTube (Google)");
-    expect(who.items!.at(-1)!.text).toMatch(/only if you press play/i);
+    expect(who.items!.at(-1)!.text).toMatch(/only if you accept it and press play/i);
     expect(who.paragraphs!.join(" ")).toMatch(/only for us, except YouTube/);
   });
 
@@ -189,5 +199,11 @@ describe("the videos in the policy", () => {
 
   it("has no draft placeholders", () => {
     expect(findPlaceholders(withVideos)).toEqual([]);
+  });
+});
+
+describe("the cookies section", () => {
+  it("no longer says that no cookie banner is needed", () => {
+    expect(JSON.stringify(section("cookies"))).not.toMatch(/cookie banner/);
   });
 });

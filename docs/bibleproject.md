@@ -133,6 +133,7 @@ No database, API, new secret or paid service is expected.
 ### The pages
 - `/videos` and `/videos/advent`, as described in "Layout and flow", with each series stored in a content file (for example `apps/web/content/videos/advent.yml`): its name, introduction and the date after which no week is current; then for each video its week, title, theme, Bible word, length, start date, YouTube ID, BibleProject page and one-line introduction. A unit test on the real file fails CI if a field is missing or badly formed.
 - Check each introduction against its video before publishing; those in the mockup are drafts.
+- **Consent first:** the banner on both video pages, and no player without Accept (step 8b).
 - **Tap to play:** each video shows our own simple cover with a Play button. The player loads only after the tap, so opening a page does not contact YouTube and stays fast.
 - Under each player: the credit, a "Watch on BibleProject" link (also the fallback if the player fails or there is no JavaScript), and a short privacy line.
 - The shelf names BibleProject too, with a link, since it presents their videos.
@@ -180,13 +181,14 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
   - 2026-11-28: Hendrik read the new text, and chose to add "By playing, you agree to the YouTube Terms and our Privacy policy" to the notice beside Play. The policy date is 28 November 2026.
   - 2026-11-28: YouTube says its API terms and developer policies apply to the embedded player, which this plan had not covered. The text now includes what they ask a privacy policy to say and link; [privacy.md](privacy.md) lists each point. They also say users must agree to the privacy policy before using the features; the line beside Play is our answer, with no separate tick or button.
 - [ ] 8a. **(Hendrik)** Get a qualified check: consent under POPIA and the GDPR, and whether the line beside Play is enough for the "agree before access" rule.
-- [ ] 8b. Cookie banner. **Decided 2026-11-28 (Hendrik):** on the video pages only, with the recommendations below. **Placement A, in the page, and its wording approved 2026-11-28:** [design/cookie_banner_videos.html](design/cookie_banner_videos.html) (B, floating above the bar, was not chosen).
+- [x] 8b. Cookie banner, built 2026-11-28. **Decided 2026-11-28 (Hendrik):** on the video pages only, with the recommendations below. **Placement A, in the page, and its wording approved 2026-11-28:** [design/cookie_banner_videos.html](design/cookie_banner_videos.html) (B, floating above the bar, was not chosen).
   - Shown on `/videos` and `/videos/advent`, only while videos are on. Decline and Accept look alike, with a privacy policy link.
   - Without Accept the pages and BibleProject links work; Play says YouTube is turned off and offers to allow it. Accept does not load anything by itself: the player still waits for Play.
   - The choice is kept for six months in a cookie of our own and can be changed with "Cookie settings" in the footer of the video pages.
   - It must not cover Play or the bottom bar.
+  - Found at build: the "YouTube is off" panel is taller than the cover, and when Play was pressed low on a phone its buttons were left under the bottom bar. The panel now scrolls itself clear; a browser test covers it.
   - The video pages have no sign-up form, so they do not load Cloudflare Turnstile. Whether Turnstile sets cookies where it does load was not settled by the Cloudflare pages read on 2026-11-28; it is outside this banner.
-  - At build: update the privacy policy (including removing "no cookie banner is needed" from the videos-off text), [privacy.md](privacy.md), ADR 0013 and the threat model.
+  - The privacy policy describes the banner and its cookie while videos are on, and no longer says "no cookie banner is needed" with videos off.
 - [ ] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
 - [ ] 10. On a preview with the flag on, **(Hendrik)** play all four on an iPhone (browser and installed app) and an Android phone: sound, fullscreen and captions. Check each video's captions; do not promise them before this.
 - [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), check the privacy policy date, merge, set `VIDEOS_ENABLED` in Production, and promote.

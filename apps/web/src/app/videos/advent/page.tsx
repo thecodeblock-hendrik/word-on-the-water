@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ConsentBanner } from "@/components/videos/consent-banner";
 import { VideoColumn } from "@/components/videos/video-column";
 import { WeekRow } from "@/components/videos/week-row";
 import { today } from "@/lib/devotionals/format";
 import { isVideosEnabled } from "@/lib/videos/flag";
 import { SERIES_PATH } from "@/lib/videos/links";
 import { loadVideoSeries } from "@/lib/videos/load";
+import { savedVideoConsent } from "@/lib/videos/saved-consent";
 import { weekState } from "@/lib/videos/series";
 
 export const metadata: Metadata = {
@@ -24,6 +26,7 @@ export default async function AdventVideosPage({ searchParams }: Props) {
   const series = loadVideoSeries("advent");
   const { week } = await searchParams;
   const { open, current } = weekState(series, today(), week);
+  const consent = await savedVideoConsent();
   return (
     <VideoColumn>
       <Link
@@ -33,12 +36,13 @@ export default async function AdventVideosPage({ searchParams }: Props) {
         <span aria-hidden="true">‹</span>
         Videos
       </Link>
+      <ConsentBanner consent={consent} />
       <div className="grid gap-3 rounded-[20px] border border-white/10 bg-deep px-3 py-4 text-on-deep">
         <header className="grid gap-1 px-1">
           <p className="font-ui text-xs font-semibold uppercase tracking-[.14em] text-accent-on-deep">
             {series.season} {series.videos[0].from.slice(0, 4)}
           </p>
-          <h1 className="font-display text-3xl font-bold uppercase leading-[1.1]">
+          <h1 tabIndex={-1} className="font-display text-3xl font-bold uppercase leading-[1.1]">
             {series.title}
           </h1>
           <p className="font-ui text-sm text-on-deep-muted">{series.introduction}</p>
@@ -52,6 +56,7 @@ export default async function AdventVideosPage({ searchParams }: Props) {
               open={video.week === open}
               thisWeek={video.week === current}
               linked={video.week === week}
+              consent={consent}
             />
           ))}
         </div>

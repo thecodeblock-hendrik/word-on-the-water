@@ -5,7 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdventVideosPage from "@/app/videos/advent/page";
 import VideosPage from "@/app/videos/page";
 
+let saved: string | undefined;
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => (saved ? { value: saved } : undefined) }),
+}));
+
 beforeEach(() => {
+  saved = undefined;
   // jsdom has no layout, so it has no scrolling either.
   Element.prototype.scrollIntoView = () => {};
   vi.stubEnv("VIDEOS_ENABLED", "1");
@@ -28,6 +34,30 @@ const weeks = (root: HTMLElement) =>
     open: row.open,
     thisWeek: row.querySelector("summary")!.textContent!.includes("This week"),
   }));
+
+describe("the cookie banner on the video pages", () => {
+  const banner = () => screen.queryByRole("region", { name: "Cookies for videos" });
+
+  it.each([
+    ["the shelf", shelf],
+    ["the weekly path", () => path()],
+  ])("is on %s until there is a choice", async (_, page) => {
+    await page();
+    expect(banner()).not.toBeNull();
+    for (const choice of ["yes", "no"]) {
+      cleanup();
+      saved = choice;
+      await page();
+      expect(banner()).toBeNull();
+    }
+  });
+
+  it("comes before the videos", async () => {
+    const { container } = await path();
+    const row = container.querySelector("details")!;
+    expect(banner()!.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
 
 describe("/videos", () => {
   it.each([VideosPage, () => AdventVideosPage({ searchParams: Promise.resolve({}) })])(

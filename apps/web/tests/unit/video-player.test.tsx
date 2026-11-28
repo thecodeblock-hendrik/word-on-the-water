@@ -5,12 +5,23 @@ import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { VideoPlayer } from "@/components/videos/video-player";
+import type { VideoConsent } from "@/lib/videos/consent";
 import { playerUrl } from "@/lib/videos/links";
 
-const player = (linked = false) => (
+const allowVideos = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/actions/video-consent", () => ({ allowVideos }));
+
+/** `null` is a visitor who has made no choice yet. */
+const player = (linked = false, consent: VideoConsent | null = "yes") => (
   <details open>
     <summary>Peace</summary>
-    <VideoPlayer youtubeId="oLYORLZOaZE" theme="Peace" length="3:48" linked={linked}>
+    <VideoPlayer
+      youtubeId="oLYORLZOaZE"
+      theme="Peace"
+      length="3:48"
+      linked={linked}
+      consent={consent ?? undefined}
+    >
       <span>our cover</span>
     </VideoPlayer>
   </details>
@@ -23,6 +34,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   scrollIntoView.mockReset();
+  allowVideos.mockReset();
 });
 
 /** What the browser does when a row opens or closes, by a tap or because another one opened. */
@@ -93,5 +105,67 @@ describe("VideoPlayer", () => {
     row.getBoundingClientRect = () => ({ top }) as DOMRect;
     setOpen(row, true);
     expect(scrollIntoView).toHaveBeenCalledTimes(calls);
+  });
+});
+
+describe("VideoPlayer without Accept", () => {
+  const press = (name: string) => userEvent.click(screen.getByRole("button", { name }));
+  const choices = [
+    ["no choice yet", null],
+    ["Decline", "no"],
+  ] as const;
+
+  it.each(choices)("after %s, Play says YouTube is off and loads nothing", async (_, choice) => {
+    const { container } = render(player(false, choice));
+    await press("Play Peace");
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(screen.getByRole("group", { name: "YouTube is turned off" })).toHaveTextContent(
+      "To play this video here, allow YouTube. It may set cookies and receives data such as your IP address.",
+    );
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Allow and play" }));
+    expect(allowVideos).not.toHaveBeenCalled();
+  });
+
+  it("saves Accept and starts the video in one tap", async () => {
+    const { container } = render(player(false, "no"));
+    await press("Play Peace");
+    await press("Allow and play");
+    expect(allowVideos).toHaveBeenCalledTimes(1);
+    expect(container.querySelector("iframe")!.getAttribute("src")).toBe(playerUrl("oLYORLZOaZE"));
+  });
+
+  it("goes back to the cover on Not now, with focus on Play", async () => {
+    render(player(false, "no"));
+    await press("Play Peace");
+    await press("Not now");
+    expect(allowVideos).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Play Peace" }));
+  });
+
+  it("removes a playing video when the choice changes to Decline", async () => {
+    const { container, rerender } = render(player(false, "yes"));
+    await press("Play Peace");
+    rerender(player(false, "no"));
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(screen.getByRole("button", { name: "Play Peace" })).toBeTruthy();
+  });
+
+  it("keeps the video that Allow and play started once Accept is saved", async () => {
+    const { container, rerender } = render(player(false, "no"));
+    await press("Play Peace");
+    await press("Allow and play");
+    rerender(player(false, "yes"));
+    expect(container.querySelector("iframe")).not.toBeNull();
+  });
+
+  it("drops the panel when the banner's choice arrives, or the row closes", async () => {
+    const { container, rerender } = render(player(false, "no"));
+    await press("Play Peace");
+    rerender(player(false, "yes"));
+    expect(screen.queryByRole("group")?.textContent ?? "").not.toContain("turned off");
+    rerender(player(false, "no"));
+    await press("Play Peace");
+    setOpen(container.querySelector("details")!, false);
+    expect(container.textContent).not.toContain("turned off");
   });
 });

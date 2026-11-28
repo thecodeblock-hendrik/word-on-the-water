@@ -3,12 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SERIES_COLOURS } from "@/components/videos/colours";
+import { ConsentBanner } from "@/components/videos/consent-banner";
 import { ThisWeek } from "@/components/videos/this-week";
 import { VideoColumn } from "@/components/videos/video-column";
 import { today } from "@/lib/devotionals/format";
 import { isVideosEnabled } from "@/lib/videos/flag";
 import { BIBLEPROJECT_URL, SERIES_PATH } from "@/lib/videos/links";
 import { loadVideoSeries } from "@/lib/videos/load";
+import { savedVideoConsent } from "@/lib/videos/saved-consent";
 import { totalMinutes, weekState } from "@/lib/videos/series";
 
 export const metadata: Metadata = {
@@ -23,12 +25,17 @@ export default async function VideosPage() {
   const series = loadVideoSeries("advent");
   const { current } = weekState(series, today());
   const thisWeek = series.videos.find((v) => v.week === current);
+  const consent = await savedVideoConsent();
   return (
     <VideoColumn>
-      <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)] font-semibold uppercase leading-[1.05] tracking-[.03em]">
+      <h1
+        tabIndex={-1}
+        className="font-display text-[clamp(2.2rem,7vw,3.4rem)] font-semibold uppercase leading-[1.05] tracking-[.03em]"
+      >
         Videos
       </h1>
       <p className="text-muted">Short Bible videos to watch and share.</p>
+      <ConsentBanner consent={consent} />
       <Link
         href={SERIES_PATH}
         className="grid overflow-hidden rounded-[20px] border border-line bg-surface"
