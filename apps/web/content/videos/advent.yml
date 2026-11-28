@@ -1,0 +1,38 @@
+# BibleProject's Advent word studies (docs/bibleproject.md). IDs and lengths checked on YouTube
+# on 2026-11-28. The introductions are drafts: check each against its video before release.
+title: Advent word studies
+introduction: Four short videos on hope, peace, joy and love.
+noCurrentWeekFrom: 2026-12-27
+videos:
+  - theme: Hope
+    word: Yakhal
+    title: Hope
+    from: 2026-11-29
+    length: "4:33"
+    youtubeId: 4WYNBjJSYvE
+    sourceUrl: https://bibleproject.com/videos/yakhal-hope/
+    intro: Why Bible hope is more than optimism.
+  - theme: Peace
+    word: Shalom
+    title: Shalom - Peace
+    from: 2026-12-06
+    length: "3:48"
+    youtubeId: oLYORLZOaZE
+    sourceUrl: https://bibleproject.com/videos/shalom-peace/
+    intro: Peace as more than the end of conflict.
+  - theme: Joy
+    word: Chara
+    title: Joy
+    from: 2026-12-13
+    length: "4:32"
+    youtubeId: qvOhQTuD2e0
+    sourceUrl: https://bibleproject.com/videos/chara-joy/
+    intro: Joy as more than a happy mood.
+  - theme: Love
+    word: Agape
+    title: Agape - Love
+    from: 2026-12-20
+    length: "4:48"
+    youtubeId: slyevQ1LW7A
+    sourceUrl: https://bibleproject.com/videos/agape-love/
+    intro: Love as a way of treating people.

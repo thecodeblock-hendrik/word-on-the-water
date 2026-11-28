@@ -131,7 +131,7 @@ No database, API, new secret or paid service is expected.
 - Before release, confirm all four still play: a video can be removed or replaced.
 
 ### The pages
-- `/videos` and `/videos/advent`, as described in "Layout and flow", with each series stored in a content file (for example `apps/web/content/videos/advent.yml`): its name, introduction and the date after which no week is current; then for each video its week, title, theme, Bible word, length, start date, YouTube ID, BibleProject page and one-line introduction. A check fails the build if a field is missing.
+- `/videos` and `/videos/advent`, as described in "Layout and flow", with each series stored in a content file (for example `apps/web/content/videos/advent.yml`): its name, introduction and the date after which no week is current; then for each video its week, title, theme, Bible word, length, start date, YouTube ID, BibleProject page and one-line introduction. A unit test on the real file fails CI if a field is missing or badly formed.
 - Check each introduction against its video before publishing; those in the mockup are drafts.
 - **Tap to play:** each video shows our own simple cover with a Play button. The player loads only after the tap, so opening a page does not contact YouTube and stays fast.
 - Under each player: the credit, a "Watch on BibleProject" link (also the fallback if the player fails or there is no JavaScript), and a short privacy line.
@@ -169,7 +169,7 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
 - [ ] 1a. **(Hendrik)** Watch all four through, with sound and English captions.
 - [x] 2. [ADR 0013](adr/0013-third-party-video-embeds.md) and threat model rows V1 to V6.
 - [x] 3. `VIDEOS_ENABLED`, off by default (`apps/web/src/lib/videos/flag.ts`).
-- [ ] 4. Content file, loader and check. Tests: a missing field or badly formed ID fails; the open week and label on the day before Advent, on each Sunday and the day before it, and from 27 December; a known and an unknown `?week=`.
+- [x] 4. Content file, loader and check (`apps/web/content/videos/advent.yml`, `src/lib/videos`; the check is a unit test on the real file, so CI fails). Tests: a missing field or badly formed ID fails; the open week and label on the day before Advent, on each Sunday and the day before it, and from 27 December; a known and an unknown `?week=`.
 - [ ] 5. The shelf and the weekly path, with covers, credits, links and notice. Tests: the shelf links to the path; four rows in week order; the right row open and labelled; a credit with every video; no player before a tap; rows open and close, one at a time, without JavaScript; the column is centred and no wider than 640px at 744, 1024 and 1280px.
 - [ ] 6. Tap to play and the `frame-src` change. Tests: the player has the right address, title and referrer policy and is at least 200px high at 320px wide; closing a row or opening another removes the player; no policy errors; no request to Google before the tap.
 - [ ] 7. Menu, header and card links, sitemap. Test that the header stays one row at 1024px. With the flag off, nothing changes.
