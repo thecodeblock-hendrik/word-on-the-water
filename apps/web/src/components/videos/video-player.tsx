@@ -82,7 +82,9 @@ export function VideoPlayer({ youtubeId, theme, length, linked, consent, childre
     <div
       ref={box}
       // The cover and the player keep the video's shape; the panel is as tall as its words need.
-      className={`relative w-full overflow-hidden rounded-xl ${view === "off" ? "" : "aspect-video min-h-[200px]"}`}
+      // A grid stretches the cover to the box. WebKit gave a full-height cover only the 16:9
+      // height where the 200px minimum made the box taller.
+      className={`relative grid w-full overflow-hidden rounded-xl ${view === "off" ? "" : "aspect-video min-h-[200px]"}`}
     >
       {view === "playing" && (
         <iframe

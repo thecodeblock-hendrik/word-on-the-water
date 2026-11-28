@@ -5,6 +5,3 @@ export const WEEK_COLOURS = [
   "bg-[linear-gradient(160deg,#6b2f45,#9a3f4d_55%,#6b2f3f)]",
   "bg-[linear-gradient(160deg,#2b2d42,#4a3f6b_60%,#2f2a4a)]",
 ];
-
-export const SERIES_COLOURS =
-  "bg-[linear-gradient(135deg,#a9501f,#9a3f4d_34%,#4a3f6b_66%,#1f5560)]";

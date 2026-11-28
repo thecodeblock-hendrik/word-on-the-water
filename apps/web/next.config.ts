@@ -19,7 +19,8 @@ const devotionalFiles = [
   "./content/site/**/*",
 ];
 
-const videoFiles = ["./content/videos/*.yml"];
+// The video pages also read the series art, to put its hash in the image address.
+const videoFiles = ["./content/videos/*.yml", "./content/series/**/*"];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,

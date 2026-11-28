@@ -74,6 +74,41 @@ describe("the headings on the video pages", () => {
   });
 });
 
+describe("the lighthouse banner", () => {
+  /** The art inside `box`: which picture is for which colour scheme, and what it says it shows. */
+  const art = (box: Element) =>
+    [...box.querySelectorAll("img")].map((img) => [
+      img.closest(".when-light") ? "light" : img.closest(".when-dark") ? "dark" : "both",
+      decodeURIComponent(img.getAttribute("src")!).match(
+        /series\/advent\/\w+\/(art-[a-z-]+)\.png/,
+      )?.[1],
+      img.getAttribute("alt"),
+      img.getAttribute("loading"),
+      img.getAttribute("fetchpriority"),
+      img.getAttribute("style"),
+    ]);
+  // Decoration beside the words, so no alt text. It is the largest paint, so it must not be lazy.
+  const both = [
+    ["light", "art-dawn-patrol", "", "eager", "high", null],
+    ["dark", "art-night-swell", "", "eager", "high", null],
+  ];
+
+  it("is the shelf's cover, with the same words on it", async () => {
+    await shelf();
+    const block = screen.getByRole("link", { name: /Advent word studies/ });
+    expect(art(block)).toEqual(both);
+    expect(block.textContent).toContain("4 videos, about 18 minutes");
+    expect(block.textContent).toContain("Advent");
+  });
+
+  it("sits behind the heading of the weekly path, and nowhere in the weeks", async () => {
+    const { container } = await path();
+    const heading = screen.getByRole("heading", { level: 1 }).closest("header")!;
+    expect(art(heading)).toEqual(both);
+    expect(container.querySelectorAll("img")).toHaveLength(2);
+  });
+});
+
 describe("/videos", () => {
   it.each([VideosPage, () => AdventVideosPage({ searchParams: Promise.resolve({}) })])(
     "is not found while VIDEOS_ENABLED is off",
@@ -172,7 +207,11 @@ describe("/videos/advent", () => {
   it("loads nothing from YouTube: no player and no image", async () => {
     const { container } = await path();
     // A link to YouTube's terms is fine: following it is the visitor's choice, and it loads nothing.
-    expect(container.querySelector("iframe, img, script, link, [src]")).toBeNull();
+    // The only pictures are our own banner.
+    expect(container.querySelector("iframe, script, link")).toBeNull();
+    for (const loaded of container.querySelectorAll("[src]")) {
+      expect(loaded.getAttribute("src")).toMatch(/^\/_next\/image\?url=%2Fcontent%2Fseries%2F/);
+    }
     expect(container.innerHTML).not.toMatch(/youtube-nocookie\.com|ytimg/);
   });
 

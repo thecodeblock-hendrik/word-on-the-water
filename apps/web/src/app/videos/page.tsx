@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { SERIES_COLOURS } from "@/components/videos/colours";
 import { ConsentBanner } from "@/components/videos/consent-banner";
+import { SeriesCover } from "@/components/videos/series-cover";
 import { ThisWeek } from "@/components/videos/this-week";
 import { VideoColumn } from "@/components/videos/video-column";
 import { today } from "@/lib/devotionals/format";
@@ -40,12 +40,11 @@ export default async function VideosPage() {
         href={SERIES_PATH}
         className="grid overflow-hidden rounded-[20px] border border-line bg-surface"
       >
-        <span className={`video-cover flex min-h-48 flex-col justify-end p-4 ${SERIES_COLOURS}`}>
-          <span className="font-ui text-sm font-semibold">
-            {series.videos.length} videos, about {totalMinutes(series)} minutes
-          </span>
-          <span className="font-display text-5xl font-bold uppercase">{series.season}</span>
-        </span>
+        <SeriesCover
+          art={series.art}
+          count={`${series.videos.length} videos, about ${totalMinutes(series)} minutes`}
+          name={series.season}
+        />
         <div className="grid justify-items-start gap-1.5 px-4 py-3.5">
           {thisWeek && <ThisWeek>This week: {thisWeek.theme}</ThisWeek>}
           <h2 className="font-ui text-lg font-semibold">{series.title}</h2>

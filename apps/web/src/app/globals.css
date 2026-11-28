@@ -13,6 +13,8 @@
   --color-on-deep: var(--on-deep);
   --color-on-deep-muted: var(--on-deep-muted);
   --color-accent-on-deep: var(--accent-on-deep);
+  --color-art: var(--art-ground);
+  --color-accent-on-art: var(--accent-on-art);
   --font-display: var(--font-barlow-condensed), "Arial Narrow", Arial, sans-serif;
   --font-ui: var(--font-barlow), "Helvetica Neue", Arial, sans-serif;
   --radius-sm: 4px;

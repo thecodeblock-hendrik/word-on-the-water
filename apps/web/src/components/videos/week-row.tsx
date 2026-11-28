@@ -64,7 +64,7 @@ export function WeekRow({ video, number, open, thisWeek, linked, consent }: Prop
           linked={linked}
           consent={consent}
         >
-          <div className={`video-cover flex size-full flex-col justify-end p-4 pr-16 ${colour}`}>
+          <div className={`video-cover flex flex-col justify-end p-4 pr-16 ${colour}`}>
             <span aria-hidden="true" className="font-serif text-sm font-semibold italic">
               {video.word}
             </span>

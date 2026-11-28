@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 
+import { mediaUrl } from "@/components/devotional/media";
+import { SERIES_ART } from "@/lib/devotionals/series";
 import { loadVideoSeries } from "@/lib/videos/load";
 import { parseVideoSeries, totalMinutes, weekState } from "@/lib/videos/series";
 
 const source = `season: Advent
 title: Advent word studies
 introduction: Four short videos.
+art: advent
 noCurrentWeekFrom: 2026-12-27
 videos:
   - { theme: Hope, word: Yakhal, title: Hope, from: 2026-11-29, length: "4:33", youtubeId: 4WYNBjJSYvE, sourceUrl: "https://bibleproject.com/videos/yakhal-hope/", intro: One. }
@@ -29,14 +32,22 @@ describe("parseVideoSeries", () => {
     },
   );
 
-  it.each(["season", "title", "introduction", "noCurrentWeekFrom"])("fails without %s", (field) => {
-    const without = source.replace(new RegExp(`^${field}: .*\n`, "m"), "");
-    expect(() => parseVideoSeries(without, "advent")).toThrow(new RegExp(field));
-  });
+  it.each(["season", "title", "introduction", "art", "noCurrentWeekFrom"])(
+    "fails without %s",
+    (field) => {
+      const without = source.replace(new RegExp(`^${field}: .*\n`, "m"), "");
+      expect(() => parseVideoSeries(without, "advent")).toThrow(new RegExp(field));
+    },
+  );
 
   it.each(["tooShort", "4WYNBjJSYvE?x=1", "../../abcdefg"])("refuses the video id %s", (id) => {
     const bad = source.replace("4WYNBjJSYvE", `"${id}"`);
     expect(() => parseVideoSeries(bad, "advent")).toThrow(/youtubeId/);
+  });
+
+  it.each(["../advent", "Advent", "advent/x"])("refuses the art name %s", (name) => {
+    const bad = source.replace("art: advent", `art: "${name}"`);
+    expect(() => parseVideoSeries(bad, "advent")).toThrow(/art/);
   });
 
   it("refuses a source link that is not a BibleProject video page", () => {
@@ -60,6 +71,15 @@ describe("the Advent series file", () => {
       ["joy", "2026-12-13", "qvOhQTuD2e0"],
       ["love", "2026-12-20", "slyevQ1LW7A"],
     ]);
+  });
+
+  it("uses the Advent devotional series art, in both colours", () => {
+    expect(advent.art).toBe("advent");
+    for (const file of SERIES_ART) {
+      expect(mediaUrl("series", advent.art, file)).toMatch(
+        new RegExp(`^/content/series/advent/[0-9a-f]{8}/${file}$`),
+      );
+    }
   });
 
   it("adds up to about 18 minutes", () => {

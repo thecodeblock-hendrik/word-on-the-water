@@ -32,6 +32,18 @@ test("the policy allows the player only where videos are on", async ({ page }) =
   expect(await frames(`${ON}/`)).toContain("https://www.youtube-nocookie.com");
 });
 
+test("a week's cover fills the whole of its player box", async ({ page }) => {
+  for (const width of [320, 375, 1280]) {
+    await page.setViewportSize({ width, height: 740 });
+    await page.goto(`${ON}/videos/advent`);
+    const gap = await page.locator("details[open] .video-cover").evaluate((cover) => {
+      const box = cover.parentElement!.getBoundingClientRect();
+      return Math.round(box.height - cover.getBoundingClientRect().height);
+    });
+    expect(gap, `${width}px`).toBe(0);
+  }
+});
+
 test("Play puts the player in, and closing or changing rows takes it out", async ({ page }) => {
   await stubPlayer(page);
   const violations: string[] = [];
@@ -275,6 +287,24 @@ test("the privacy page links Google's and YouTube's terms and fits a 320px phone
   expect(overflow).toBeLessThanOrEqual(0);
   const { violations } = await new AxeBuilder({ page }).analyze();
   expect(violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+});
+
+test("the banner shows the dawn art in light and the night art in dark", async ({ page }) => {
+  for (const [scheme, wanted, other] of [
+    ["light", "art-dawn-patrol", "art-night-swell"],
+    ["dark", "art-night-swell", "art-dawn-patrol"],
+  ] as const) {
+    for (const path of ["/videos", "/videos/advent"]) {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.goto(`${ON}${path}`);
+      const shown = page.locator(`main img[src*="${wanted}"]`);
+      await expect(shown, `${scheme} ${path}`).toBeVisible();
+      await expect
+        .poll(() => shown.evaluate((img: HTMLImageElement) => img.naturalWidth))
+        .toBeGreaterThan(0);
+      await expect(page.locator(`main img[src*="${other}"]`)).toBeHidden();
+    }
+  }
 });
 
 test("the shelf leads to the weekly path, with this week open", async ({ page }) => {

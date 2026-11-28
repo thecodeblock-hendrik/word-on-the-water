@@ -77,6 +77,8 @@ By UTC date, as devotionals are published (2am in South Africa). A week in the a
 ### The Advent banner (approved 2026-11-28)
 Mockup: [design/videos_advent_banner.html](design/videos_advent_banner.html). Our own Advent series art, the lighthouse (dawn in light, teal in Night swell), replaces the flat cover on the shelf and sits behind the heading of the weekly path. Hendrik confirmed that the image is free to use. The weekly covers keep their colours.
 
+Built 2026-11-28. Both colour versions load at once, because the banner is the largest thing on these pages: loading them lazily put the largest paint at 2.9s on Lighthouse (limit 2.0s), against 1.65 to 1.71s now, for one extra picture of about 5 to 8 KB. At build, text over the art measured at least 6.2:1 on the real pages. Found while checking: on narrow screens WebKit left a gap under each week's cover; fixed, with a browser test.
+
 BibleProject's artwork is not used. Their [brand page](https://bibleproject.com/brand/) (read 2026-11-28) says artwork is freely available, but not to be edited or used as a background for text or graphics, and to be cited; their terms give no trademark licence.
 
 ### Screens

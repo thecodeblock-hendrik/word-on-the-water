@@ -23,6 +23,8 @@ const videoSeries = z
     season: text,
     title: text,
     introduction: text.max(200),
+    /** The folder in content/series whose art is the series' banner. */
+    art: z.string().regex(/^[a-z0-9-]+$/, "must be a folder name in content/series"),
     /** From this day no week is current. */
     noCurrentWeekFrom: z.iso.date(),
     videos: z.array(video).min(1),
