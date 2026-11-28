@@ -12,6 +12,8 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ## Where we stand (2026-11-21, one week before launch)
 
+**Note, 2026-11-28 (launch day):** the table and the text below are as of 21 November; no box has been re-checked or ticked since. Merged since: the first phone bar, new What's coming copy, dependency updates with an API privacy fix (#179, reaches production only through the `wotw-api` deployment), and the liquid glass navigation (#181 to #183; Hendrik promoted it on 28 November and reported it and all its real-phone checks in order, [nav_new.md](nav_new.md) step 13; the boxes of this checklist are separate). Hendrik also confirmed on 28 November that the API fix is live. Seen from the repository: the nightly database backup ran successfully on 28 November (that is not a restore test). Checked 28 November against the lockfile and OSV: the `glob` exception was no longer needed and the `picomatch` advisory had been withdrawn (18 November), so #185 removes both entries. Only `minimatch` (10.2.6) is still accepted, until 31 December. See [post_launch.md](post_launch.md), section 2.
+
 The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook is skipped and replaced by a daily sync (Part H), and the Part D checks that need no staging are done. Counts are of ticked and unticked boxes in each part:
 
 | Part | Subject | Done | Open | Who and what |

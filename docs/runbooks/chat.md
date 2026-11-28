@@ -26,7 +26,7 @@ Scope: [chat.md](../archive/chat.md). Decision: [ADR 0009](../adr/0009-chat-loca
 
 ## Crisis numbers
 
-They live in the KB's `responses.crisis` text (SADAG 0800 567 567, LifeLine 0861 322 322; checked on the providers' sites 2026-11-15). Re-check them before launch and each year, edit the markdown, run `make kb`.
+They live in the KB's `responses.crisis` text (SADAG 0800 567 567, LifeLine 0861 322 322; checked on the providers' sites 2026-11-15). Re-check them each year, edit the markdown, run `make kb`.
 
 ## What is logged
 
@@ -36,7 +36,7 @@ Weekly in the first month: the share of `no_answer` and `clarify` lines. A high 
 
 ## Rate limit
 
-30 messages per 10 minutes per visitor address (`CHAT_LIMIT`, `CHAT_WINDOW_SECONDS`); a bot check rejects a message sent under `CHAT_MIN_SECONDS` (0.5) after the panel opened. A visitor over the limit sees "You have asked a lot of questions". Add a Vercel Firewall rate-limit rule on `/v1/chat/messages` at launch.
+30 messages per 10 minutes per visitor address (`CHAT_LIMIT`, `CHAT_WINDOW_SECONDS`); a bot check rejects a message sent under `CHAT_MIN_SECONDS` (0.5) after the panel opened. A visitor over the limit sees "You have asked a lot of questions". A Vercel Firewall rate-limit rule on the web project covers the chat too (set up 2026-11-21, matched by Server Action name, since the browser never calls the API: [deploy.md](deploy.md), "Firewall rules").
 
 ## Where things are
 

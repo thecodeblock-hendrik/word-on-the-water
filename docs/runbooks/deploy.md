@@ -47,7 +47,7 @@ Vercel does not proxy the data services. The Neon and Upstash integrations put e
 | Region | `fra1` | `fra1` |
 | Fluid compute | on (checked 2026-11-17 from the project API) | on |
 | Node | `engines.node` 24.x in `package.json`, which overrides the dashboard's 26.x ("Project Setting overridden by package.json"); matches CI and local | not used (Python) |
-| Production URL | `wotw-web.vercel.app`; custom domain `wordonthewater.net` is a launch step (see [production_checklist.md](../production_checklist.md)); DNS stays at Squarespace and the old site is still live | `wotw-api.vercel.app` (stays on its protected URL) |
+| Production URL | `wordonthewater.net` (live since 2026-11-21; `www` redirects to it), also `wotw-web.vercel.app`; DNS stays at Squarespace | `wotw-api.vercel.app` (stays on its protected URL) |
 | Deployment Protection | Previews (Standard) | All deployments; the web passes the automation bypass |
 | Data | none | Neon `wotw-db` (`NEON_*`), Upstash `wotw-redis` (`UPSTASH_*`) |
 
@@ -115,7 +115,7 @@ ENVIRONMENT=production uv run alembic upgrade head
 
 ## Cron
 
-Three crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON_SECRET`:
+Three crons in `apps/api/vercel.json`, all sent with `Authorization: Bearer $CRON_SECRET`:
 
 | Path | When | What |
 |---|---|---|
@@ -129,6 +129,7 @@ The drain runs every 5 minutes (changed on the move to Pro, 2026-11-21); on Hobb
 
 ```json
 "schedules": {
+  "sync-kit":     { "schedule": "0 3 * * *",   "path": "/cron/sync-kit",     "requestMethod": "GET" },
   "retention":    { "schedule": "30 3 * * *", "path": "/cron/retention",    "requestMethod": "GET" },
   "drain-outbox": { "schedule": "*/5 * * * *", "path": "/cron/drain-outbox", "requestMethod": "GET" }
 }

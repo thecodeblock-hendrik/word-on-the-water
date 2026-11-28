@@ -1,6 +1,6 @@
 # Restore the database
 
-Neon hosts the database (`wotw-db`, `aws-eu-central-1`). Two recovery routes: Neon's point-in-time restore and a restore from the nightly encrypted dump in Cloudflare R2. **Neither has been rehearsed yet;** the first drill is part of step 1.9 and the result goes in the table at the end. Menu names below are from Neon's console and may have moved; check them before an emergency.
+Neon hosts the database (`wotw-db`, `aws-eu-central-1`). Two recovery routes: Neon's point-in-time restore and a restore from the nightly encrypted dump in Cloudflare R2. **The nightly dump route was rehearsed on 2026-11-01** (before there was user data); **point-in-time restore has not been rehearsed yet.** Results go in the table at the end. Menu names below are from Neon's console and may have moved; check them before an emergency.
 
 ## When to restore
 
