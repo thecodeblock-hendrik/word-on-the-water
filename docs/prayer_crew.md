@@ -127,7 +127,7 @@ When this is agreed, one PR on this branch updates:
 - **ADR 0003 (auth approach):** amend or supersede for public accounts. **ADR 0006:** keep, note the new table. **New ADR 0012:** prayer crews (decision, alternatives, consequences).
 - **Runbooks:** incident (a breach now means prayer data), restore-db, rotate-secrets (the encryption key).
 - **Code:** `apps/api/app/models/prayer_request.py` and `jobs/retention.py` stay for the form; the crew adds its own models.
-- **Navigation:** Prayer shows only after sign-in, first as an entry in the menu (a drop-down on desktop, the menu on phones). The phone bottom bar ([landing_page_nav.md](landing_page_nav.md)) is unchanged for now; a dedicated navigation for signed-in users can be designed later.
+- **Navigation:** Prayer shows only after sign-in, first as an entry in the menu (a drop-down on desktop, the menu on phones). The phone bottom bar ([nav_new.md](nav_new.md)) is unchanged for now; a dedicated navigation for signed-in users can be designed later.
 
 ## Decisions (2026-11-22)
 

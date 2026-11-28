@@ -47,11 +47,11 @@ Vercel does not proxy the data services. The Neon and Upstash integrations put e
 | Region | `fra1` | `fra1` |
 | Fluid compute | on (checked 2026-11-17 from the project API) | on |
 | Node | `engines.node` 24.x in `package.json`, which overrides the dashboard's 26.x ("Project Setting overridden by package.json"); matches CI and local | not used (Python) |
-| Production URL | `wotw-web.vercel.app`; custom domain `wordonthewater.net` is a launch step (see [production_checklist.md](../production_checklist.md)); DNS stays at Squarespace and the old site is still live | `wotw-api.vercel.app` (stays on its protected URL) |
+| Production URL | `wordonthewater.net` (live since 2026-11-21; `www` redirects to it), also `wotw-web.vercel.app`; DNS stays at Squarespace | `wotw-api.vercel.app` (stays on its protected URL) |
 | Deployment Protection | Previews (Standard) | All deployments; the web passes the automation bypass |
 | Data | none | Neon `wotw-db` (`NEON_*`), Upstash `wotw-redis` (`UPSTASH_*`) |
 
-Team `thecodeblock`, **Pro plan since 2026-11-21** (it was Hobby while building). Vercel's Git integration deploys every push: a branch gets previews, `main` builds a production deployment, but **production auto-promotion is off** in both projects (`autoAssignCustomDomains` is false), so a production build is served, and crons run on it, only after it is promoted by hand: Vercel, the project, Deployments, the newest Ready production one, three dots, Promote to Production, or `vercel promote <url>` from `apps/api` or `apps/web`. Check what is live with `vercel inspect wotw-api.vercel.app`. A docs-only merge builds nothing (the `ignoreCommand` cancels it), so there is nothing to promote.
+Team `thecodeblock`, **Pro plan since 2026-11-21** (it was Hobby while building). Vercel's Git integration deploys every push: a branch gets previews, `main` builds a production deployment, but **production auto-promotion is off** in both projects (`autoAssignCustomDomains` is false), so a production build is served, and crons run on it, only after it is promoted by hand: Vercel, the project, Deployments, the newest Ready production one, three dots, Promote to Production, or `vercel promote <url>` from `apps/api` or `apps/web`. Check what is live with `vercel inspect wotw-api.vercel.app`. **To confirm (noted 2026-11-28):** the public site served the build of `ef08a71` within 17 minutes of its merge; whether it was promoted by hand or auto-promotion has been switched on is not recorded here. Check the setting in both projects, then correct this paragraph and Rollback below. A docs-only merge builds nothing (the `ignoreCommand` cancels it), so there is nothing to promote.
 
 **Speed (measured on Hobby, 2026-11-17).** Both functions scale to zero when idle, so the first request after about 8 minutes takes about 2 s (API 2.1 s cold against 0.7 s warm; the web function the same), and one more round trip from South Africa to `fra1` adds a few hundred ms. Fluid compute is already on. **On Pro (measured 2026-11-21)** there is no separate Cold Start Prevention toggle: it is built into Fluid Compute and enabled on both projects, the first web request after 15 minutes idle took 0.95 s against 0.28 s warm, and the API stays warm because the 5-minute outbox cron calls it (production_checklist.md, Part B). Two code-side measures are in place: opening the chat sends one `warmChat` call that wakes the web function and the API behind it, and content images are served `immutable` for a year with `images.minimumCacheTTL` to match (their addresses carry a content hash), because an optimizer cache miss cost 1.2 to 1.9 s against 0.25 s on a hit. To measure again: `vercel curl /health/live --deployment <api url>` for the API and `vercel curl /api/health --deployment <web url>` for both (the project IDs are in `apps/*/.vercel/project.json`; `vercel api /v9/projects/<id>` shows `resourceConfig.fluid`).
 
@@ -115,7 +115,7 @@ ENVIRONMENT=production uv run alembic upgrade head
 
 ## Cron
 
-Three crons in `apps/api/vercel.json`, both sent with `Authorization: Bearer $CRON_SECRET`:
+Three crons in `apps/api/vercel.json`, all sent with `Authorization: Bearer $CRON_SECRET`:
 
 | Path | When | What |
 |---|---|---|
@@ -129,6 +129,7 @@ The drain runs every 5 minutes (changed on the move to Pro, 2026-11-21); on Hobb
 
 ```json
 "schedules": {
+  "sync-kit":     { "schedule": "0 3 * * *",   "path": "/cron/sync-kit",     "requestMethod": "GET" },
   "retention":    { "schedule": "30 3 * * *", "path": "/cron/retention",    "requestMethod": "GET" },
   "drain-outbox": { "schedule": "*/5 * * * *", "path": "/cron/drain-outbox", "requestMethod": "GET" }
 }

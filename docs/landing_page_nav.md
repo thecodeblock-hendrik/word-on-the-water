@@ -1,5 +1,7 @@
 # Landing page bottom navigation
 
+> **Replaced on 28 November 2026** by the liquid glass navigation: see [nav_new.md](nav_new.md). Kept as the record of the first bar. The raised shape, its toast and the open ideas here no longer describe the site. What carried over: which places the buttons go (plus Shore on devotional pages), clearing the chat on leaving it on a phone, Undo for 8 seconds, and the keyboard rules. Its open phone check is now step 13 of nav_new.md.
+
 Mockups: [design/landing_nav.html](design/landing_nav.html) (New A raised tab, light and dark; section G is the undo toast, option 3). Built 2026-11-22 (steps 1 to 15 done; the real phone check is left).
 
 ## Behaviour

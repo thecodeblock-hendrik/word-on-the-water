@@ -10,16 +10,17 @@ Christian ministry web app publishing devotionals and Bible teaching for surfers
 
 ## Status
 
-Phase 0 (foundations) is complete. Phase 1 (the public landing page) is built and the site has been **live on `wordonthewater.net` since 2026-11-21** (Vercel Pro). The launch is **Saturday 28 November 2026**, when the first devotional goes out; what is still open is in [docs/production_checklist.md](docs/production_checklist.md), and what we decided to do afterwards is in [docs/post_launch.md](docs/post_launch.md).
+Phase 0 (foundations) is complete. Phase 1 (the public landing page) is built and the site has been **live on `wordonthewater.net` since 2026-11-21** (Vercel Pro). The launch is **Saturday 28 November 2026**, when the first devotional goes out; what its checklist still has open is in [docs/production_checklist.md](docs/production_checklist.md), and what we decided to do afterwards is in [docs/post_launch.md](docs/post_launch.md).
 
 Built and checked on the live domain:
 - the landing page with its real copy, light and dark themes, the privacy page and the devotional pages (five Advent devotionals, the first published on launch day);
 - email sign-up with Kit double opt-in (Turnstile, rate limits, an outbox with retries, `/thank-you`) and a daily sync of the Kit list into our database (Kit's webhooks need a paid plan, so none is registered);
-- the Got Questions chat, answering from our own knowledge base with nothing stored on the server;
+- the Ask the Word chat, answering from our own knowledge base with nothing stored on the server;
+- on phones and tablets, a floating "liquid glass" bottom bar that hides while you scroll, with "Chat cleared" and Undo as a shelf on it (merged 2026-11-28; the checks on real phones are still open, [docs/nav_new.md](docs/nav_new.md));
 - a Bible reader (BSB and WEB) and an installable PWA (no offline mode yet);
 - the weekly email as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email and creates a Kit draft that you review and schedule in Kit. A test broadcast reached the inbox with SPF, DKIM and DMARC passing.
 
-The prayer request form and the contact form come after launch; until then the page shows `hello@wordonthewater.net`. Production deployments are promoted by hand (auto-promotion is off), see [docs/runbooks/deploy.md](docs/runbooks/deploy.md).
+The prayer request form and the contact form come after launch; until then the page shows `hello@wordonthewater.net`. Production deployments were set up to be promoted by hand (auto-promotion off), see [docs/runbooks/deploy.md](docs/runbooks/deploy.md), which also notes what was seen on 28 November.
 
 ## Stack
 
@@ -63,7 +64,7 @@ Mailpit UI: http://localhost:8025
 make lint        # ruff, eslint, prettier
 make typecheck   # mypy, tsc
 make test        # pytest, vitest
-make e2e         # playwright, all browsers
+make e2e         # playwright, all browsers (desktop Firefox does not start on the current macOS beta; CI runs it)
 make types       # regenerate API types
 make kb          # rebuild the chat knowledge base JSON from apps/api/kb/faith_kb.md
 make kb-check    # fail if the committed knowledge base JSON is stale (runs in CI)
@@ -73,4 +74,4 @@ make down        # stop services
 
 In `apps/web`: `pnpm make:icons` and `pnpm make:screenshots` rebuild the app icons and the manifest screenshots, `pnpm check:placeholders` and `pnpm check:devotionals` are the content gates, `pnpm build:bible` regenerates the Bible data, and `pnpm broadcast:devotional <folder> --tag <id>|--all` creates a Kit draft for the weekly email (never sends; steps in [devotional format](docs/devotional_format.md)).
 
-Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `CHAT_ENABLED=1` shows the Got Questions chat (see [docs/chat.md](docs/archive/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` the first three in your shell: the unit tests read them and fail (run them with `env -u DEVOTIONAL_TODAY -u BIBLE_ENABLED -u CHAT_ENABLED` if you did). A real value in your root `.env` also breaks a few local tests, for example `test_chat_off_is_a_503`; CI has no `.env` and is the judge.
+Handy flags in the root `.env`: `DEVOTIONAL_TODAY=2026-12-12` previews a future day, `BIBLE_ENABLED=1` shows the Bible reader at `/bible` (plan in [docs/bible_feature.md](docs/bible_feature.md)), `CHAT_ENABLED=1` shows the Ask the Word chat (see [docs/chat.md](docs/archive/chat.md) and the [runbook](docs/runbooks/chat.md)); start the API with it too, and `DEV_ORIGINS=<your Wi-Fi address>` lets a phone on the same network open `pnpm dev`. Do not `export` the first three in your shell: the unit tests read them and fail (run them with `env -u DEVOTIONAL_TODAY -u BIBLE_ENABLED -u CHAT_ENABLED` if you did). CI has no `.env` and is the judge.

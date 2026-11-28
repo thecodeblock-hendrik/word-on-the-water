@@ -228,6 +228,8 @@ A static table `bible-books.ts`: 66 books with display name, slug, testament and
 
 ### 4.8 Previous and next
 
+> **Update 2026-11-28:** on phones and tablets the two full-height buttons described below are now two tabs of the glass bar (a chevron over the short name, "Start" and "End" at the ends of the Bible), with Shore or Your chat between; the bar floats, and hides while the page scrolls. The links, the arrow keys and the desktop buttons are as described. See [nav_new.md](nav_new.md).
+
 - Mobile bottom bar with two full-height buttons that are links to the neighbouring chapter URL (they work without JavaScript).
 - Desktop: links under the text and the left and right arrow keys (not while an input has focus).
 - Swipe is optional polish and is not built (see B6): ignore horizontal swipes starting within 24px of the screen edge (iOS back gesture) and while text is being selected.

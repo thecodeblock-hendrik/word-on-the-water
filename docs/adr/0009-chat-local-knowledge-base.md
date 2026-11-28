@@ -28,6 +28,9 @@ No AI model and no web search in v1. Answers come from our own reviewed knowledg
 
 ## Updates
 
+### 2026-11-22: the name
+The chat is called **Ask the Word** (it was Got Questions, as in this record's title and the Decision above). The knowledge base has since grown: 228 entries and 41 glossary terms on 2026-11-28.
+
 ### 2026-11-21: what the walk-through on the production chat changed
 - **Spelling.** The knowledge base is British; visitors type both. `kb_search.tokens` folds `-our`/`-or`, `-ise`/`-ize` and `judgement`/`judgment` before stemming, and joins "baptism" with "baptised" (the stemmer never matched them). Both sides of a search use the same folding, so it only adds matches. Measured before and after: no change in the retrieval figures (own questions 0.994 first, real world 60/62 first, 62/62 top three).
 - **Typed glossary words.** The glossary (41 terms) was only reachable by tapping a term chip, so 136 of 276 typed glossary questions got no answer. A question that is only a glossary word or alias ("define lord", "what does covenant mean", a bare "messiah") now gets the definition when the search is not confident, including right after an answer, where the context boost used to lift it into a "did you mean" list. A confident answer still wins ("what is grace" keeps entry 3.5), and a bare "amen" stays small talk. After the change 0 of 294 typed glossary questions get no answer.

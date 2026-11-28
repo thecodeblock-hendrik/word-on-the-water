@@ -12,6 +12,8 @@ Related guides: [PWA_checklist.md](PWA_checklist.md) (the PWA, step by step), [r
 
 ## Where we stand (2026-11-21, one week before launch)
 
+**Note, 2026-11-28 (launch day):** the table and the text below are as of 21 November; no box has been re-checked or ticked since. Merged since: the first phone bar, new What's coming copy, dependency updates with an API privacy fix (#179, reaches production only through the `wotw-api` deployment), and the liquid glass navigation (#181 to #183; the public site was serving it on 28 November, and its real-phone checks are open: [nav_new.md](nav_new.md) step 13). Seen from the repository: the nightly database backup ran successfully on 28 November (that is not a restore test). The accepted `glob` advisory lapses on 1 December.
+
 The domain `wordonthewater.net` is live on Vercel Pro (Part G), the Kit webhook is skipped and replaced by a daily sync (Part H), and the Part D checks that need no staging are done. Counts are of ticked and unticked boxes in each part:
 
 | Part | Subject | Done | Open | Who and what |

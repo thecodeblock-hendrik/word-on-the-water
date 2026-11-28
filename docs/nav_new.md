@@ -1,12 +1,16 @@
 # Liquid glass bottom navigation: build plan
 
-Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces the raised-tab bar in [landing_page_nav.md](landing_page_nav.md). Build it after the 28 November launch.
+Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces the raised-tab bar in [landing_page_nav.md](landing_page_nav.md).
+
+**Status (28 November 2026):** the plan and mockup were merged on 27 November (#181); a timer fix (#183) and the build (#182, `ef08a71`) were merged on launch day, earlier than first planned, which was after the launch. The public site was serving it the same day. **Open: step 13, the checks on real phones.**
 
 **Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while the page scrolls, down or up, and returns when the scrolling stops (changed 28 November, after the first phone test). The "Chat cleared" popup becomes a shelf on the bar (option C in [design/new_nav_chat.html](design/new_nav_chat.html), chosen 28 November). Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
 
 **Unchanged:** routes, what the other buttons do, clearing the chat with Undo, hiding for the chat keyboard, and everything from `lg` up (including the desktop chapter buttons and the "Your chat" edge tab). The bar still needs both `BIBLE_ENABLED` and `CHAT_ENABLED`.
 
 ## How to work
+
+How the build was run; kept as the record, and the rules that still hold are in [CLAUDE.md](../CLAUDE.md) sections 10 and 14.
 
 - One branch for the whole plan (`feat/liquid-glass-nav`), one commit per step with its box ticked. Merge only when the plan is done.
 - Push only when the whole build is complete (decided 27 November, after the step 0 push). CI does not run until then, so the local checks after each step matter; desktop Firefox is only checked by CI.
@@ -142,6 +146,7 @@ Design: option C in [design/new_nav_chat.html](design/new_nav_chat.html). After 
   - Result (local, 27 November, after the fix below): five projects in parallel, 1,084 passed, 306 skipped, none failed, in 4.0 minutes. Axe checks in light and dark are part of that run. **Desktop Firefox is not checked:** it does not launch on this Mac (`browserType.launch: Failed to launch`, seen today); CI at the final push is its first run. Lighthouse passed with the bar on screen (seen in its screenshots), figures below. `make lint typecheck test types-check` pass: 1,007 web and 671 API tests.
   - Fixed on the way: the WebKit failures seen since step 0 (parallel or one at a time; a one-at-a-time full run had 13). Tests opened browser contexts and did not close them; in the layout test, closing each took it from times rising past 12 s to a steady 0.5 s. `tests/e2e/fixtures.ts` closes them after every test. Not established: why the devotional page slowed far more than the landing page, and the one Chromium picker failure in step 9 (20 repeats passed) is not explained by this.
 - [ ] **13. Real phones (Hendrik).** iPhone Safari (also as an installed PWA) and a mid-range Android phone:
+  - A first look over Wi-Fi on 28 November led to the two hide-on-scroll changes under step 11. No result has been recorded for the boxes below, so they stay open. WebKit's blur and the shelf's look on an iPhone can only be judged there.
   - [ ] Scrolling stays smooth with the blur on
   - [ ] No flicker when Safari's toolbar collapses
   - [ ] Safe area above the home indicator
@@ -151,9 +156,10 @@ Design: option C in [design/new_nav_chat.html](design/new_nav_chat.html). After 
   - [ ] Chat keyboard hides the bar and brings it back
   - [ ] Readable in sunlight, in both themes
   - [ ] iPad, if one is available: portrait shows the centred bar; check rotating with the chat open (a width of 1024px or more swaps to the desktop layout)
-- [ ] **14. Docs.** Update CLAUDE.md (section 5, Bible reader and chat notes, layout), PLAN.md 1.10b, and mark landing_page_nav.md as replaced. Then open the PR with phone screenshots.
+- [x] **14. Docs.** Update CLAUDE.md (section 5, Bible reader and chat notes, layout), PLAN.md 1.10b, and mark landing_page_nav.md as replaced. Then open the PR with phone screenshots.
+  - Done 28 November, after the merge: CLAUDE.md, PLAN.md 1.10b, landing_page_nav.md marked replaced, and the other documents brought up to date. Phone screenshots were not attached to the pull request.
 
-If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen readers cannot reach the hidden bar, stop and fix that before merging.
+If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen readers cannot reach the hidden bar, fix that. (This was a condition for merging. #182 was merged on 28 November with step 13 open, at Hendrik's request, so a failure now means a fix or a rollback: the build of `38f386b` has the timer fix without the new bar.)
 
 ## Measurements
 
@@ -167,3 +173,5 @@ If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen
 Step 0, 27 November, local macOS, Bible and chat on. Lighthouse: median of 3 runs, performance 99, accessibility 100, best practices 96, SEO 100 on both pages. JS: measured by the `chat.spec.ts` size check in desktop Chromium. End to end: five local projects (not desktop Firefox), 986 passed, 184 skipped, 10 WebKit tests failed in the parallel run and passed when rerun one at a time. CI is the check for all six.
 
 CI on `86f88bd` (PR 182): every check passed, including end to end on all six projects. CI Lighthouse: median of 3 runs, performance 98 on both pages. Compare CI figures with CI figures and local with local.
+
+CI on the final commit of PR #182 (`0ef8656`, 28 November): every check passed; end to end on all six projects, desktop Firefox included, 1,340 passed, 526 skipped, none failed or flaky. Two earlier runs on the PR did not pass everything: CodeQL flagged one unit test, and one motion test depended on which frames were drawn (both fixed, see S6).
