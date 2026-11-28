@@ -91,3 +91,13 @@ describe("loadSeries", () => {
     expect(() => loadSeries(dir)).toThrow(/advent[\s\S]*art-dawn-patrol\.png/);
   });
 });
+
+describe("the Advent series art", () => {
+  it("is described as what the pictures show: a lighthouse, with nobody in the water", () => {
+    const advent = loadSeries(join(process.cwd(), "content", "series")).find(
+      (s) => s.slug === "advent",
+    )!;
+    expect(advent.artAlt).toMatch(/lighthouse/i);
+    expect(advent.artAlt).not.toMatch(/surfer|lineup|watchtower/i);
+  });
+});
