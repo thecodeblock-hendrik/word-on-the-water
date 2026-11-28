@@ -8,6 +8,8 @@ type Props = {
   sizes: string;
   className?: string;
   priority?: boolean;
+  loading?: "eager" | "lazy";
+  fetchPriority?: "high" | "low" | "auto";
 };
 
 /**

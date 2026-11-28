@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 const port = 3100;
 // The same build with Got Questions switched on; the main server has it off (the flag unset, so the
 // button stays a mail link).
+// It also has the videos on.
 const chatPort = 3102;
 
 export default defineConfig({
@@ -32,6 +33,7 @@ export default defineConfig({
         // This is the chat-off server (the mail-link fallback). Say so, or a CHAT_ENABLED in the shell
         // or the root .env (the dev setup) turns it on here and not in CI.
         CHAT_ENABLED: "0",
+        VIDEOS_ENABLED: "0",
         API_BASE_URL: "http://localhost:3101",
         SERVICE_TOKEN: "e2e-service-token-0123456789",
         // Cloudflare's always-pass test site key.
@@ -48,6 +50,7 @@ export default defineConfig({
         SITE_URL: `http://localhost:${chatPort}`,
         BIBLE_ENABLED: "1",
         CHAT_ENABLED: "1",
+        VIDEOS_ENABLED: "1",
         API_BASE_URL: "http://localhost:3101",
         SERVICE_TOKEN: "e2e-service-token-0123456789",
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",

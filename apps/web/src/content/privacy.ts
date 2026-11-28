@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "../lib/site.ts";
 
 /** The day the policy was last changed. Change it whenever the text below changes. */
-export const PRIVACY_UPDATED = "2026-11-18";
+export const PRIVACY_UPDATED = "2026-11-28";
 
 export type PolicyItem = { term: string; text: string };
 export type PolicySection = {
@@ -26,14 +26,17 @@ const POSTAL = "PO Box 6055, Port Elizabeth, Eastern Cape 6001";
 /**
  * The public privacy policy, written from docs/privacy.md (keep the two in step). It says only what
  * is true today: the weekly email sign-up, and email you send us. The Bible cookies are listed only
- * while the Bible reader is switched on, and the Ask the Word chat is described only while it is.
+ * while the Bible reader is switched on, and the Ask the Word chat and the videos are described only
+ * while they are. The videos wording carries what YouTube's developer policies (III.A) ask for.
  */
 export function privacyPolicy({
   bibleEnabled,
   chatEnabled = false,
+  videosEnabled = false,
 }: {
   bibleEnabled: boolean;
   chatEnabled?: boolean;
+  videosEnabled?: boolean;
 }): PrivacyPolicy {
   return {
     title: "Privacy policy",
@@ -86,6 +89,14 @@ export function privacyPolicy({
                 },
               ]
             : []),
+          ...(videosEnabled
+            ? [
+                {
+                  term: "Watching videos",
+                  text: "Our video pages show our own covers, so opening them sends nothing to YouTube or Google. A banner on the video pages asks whether you accept YouTube, and unless you accept, we load nothing from YouTube. You can change your choice with Cookie settings at the foot of the video pages. When you have accepted and you press play, the video loads in YouTube's player from youtube-nocookie.com, YouTube's privacy-enhanced address. YouTube is a Google service, and this part of the site uses YouTube API Services. Google then receives data such as your IP address and details of your browser and device, and may set cookies or store similar data on your device. What the player shows, which may include other videos or advertising, is chosen by YouTube. We add no tracking of our own to the videos. By playing a video you agree to be bound by the YouTube Terms of Service (https://www.youtube.com/t/terms). Google handles your data under the Google Privacy Policy (https://www.google.com/policies/privacy). If you would rather not, choose Decline: the pages and the links to BibleProject still work.",
+                },
+              ]
+            : []),
           {
             term: "Emails you send us",
             text: `If you email ${CONTACT_EMAIL}, it is ordinary email: it passes through our email host (Squarespace) to our own Gmail mailbox (Google). We keep it only as long as we need to answer you. Please do not send anything you would not want to put in an email.`,
@@ -96,7 +107,9 @@ export function privacyPolicy({
         id: "cookies",
         heading: "Cookies",
         paragraphs: [
-          "We use no advertising or tracking cookies. The only cookies are small first-party ones that remember a choice you made, so no cookie banner is needed:",
+          videosEnabled
+            ? "We set no advertising or tracking cookies of our own. If you accept YouTube and press play on a video, YouTube may set cookies or store data on your device (see Watching videos). The cookies we set ourselves are small first-party ones that remember a choice you made:"
+            : "We use no advertising or tracking cookies. The only cookies are small first-party ones that remember a choice you made:",
         ],
         items: [
           {
@@ -108,6 +121,14 @@ export function privacyPolicy({
                 {
                   term: "bible-version and bible-passage",
                   text: "The Bible you read last and the passage you were reading, so that the Bible reader opens where you left off. Each lasts a year. They hold no personal details.",
+                },
+              ]
+            : []),
+          ...(videosEnabled
+            ? [
+                {
+                  term: "youtube-consent",
+                  text: "Whether you accepted or declined YouTube on the video pages. It holds only yes or no, and lasts six months.",
                 },
               ]
             : []),
@@ -146,7 +167,11 @@ export function privacyPolicy({
       {
         id: "who-else",
         heading: "Who else handles your details",
-        paragraphs: ["We use these services to run the site. They handle your details only for us:"],
+        paragraphs: [
+          videosEnabled
+            ? "We use these services to run the site. They handle your details only for us, except YouTube, as noted below:"
+            : "We use these services to run the site. They handle your details only for us:",
+        ],
         items: [
           { term: "Kit", text: "Sends the weekly email and holds the subscriber list." },
           { term: "Vercel", text: "Hosts the site, and records visits and speed." },
@@ -165,6 +190,14 @@ export function privacyPolicy({
           },
           { term: "Squarespace", text: "Our domain name, and the forwarding of email sent to us." },
           { term: "Google", text: "Runs the Gmail mailbox that the email you send us is forwarded to." },
+          ...(videosEnabled
+            ? [
+                {
+                  term: "YouTube (Google)",
+                  text: "Plays our videos, only if you accept it and press play. Google uses the data it receives under its own privacy policy, not only for us.",
+                },
+              ]
+            : []),
         ],
         closing: [
           "Some of these services are based outside the EU and South Africa, mainly in the United States, and each is bound by its own data-protection terms. We do not sell your details and we do not share them with anyone else.",

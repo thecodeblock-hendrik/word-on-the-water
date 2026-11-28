@@ -1,6 +1,6 @@
 # BibleProject videos
 
-Status: **planned, nothing built** (2026-11-28). Pages were read on this date; check the terms again before release.
+Status: **being built** on `feat/videos-page`, nothing live (2026-11-28). Pages were read on this date; check the terms again before release.
 
 **Decided:** videos are **embedded** on a **new `/videos` page**. The first series is the **Advent word studies** (option A below), laid out as **concept C, a series shelf and then a weekly path**: all four weeks are listed in order, with the current week's open. Mockups: [design/bible_project_advent.html](design/bible_project_advent.html): C first, with its date states and tablet and desktop screens; A and B at the end.
 
@@ -74,6 +74,13 @@ By UTC date, as devotionals are published (2am in South Africa). A week in the a
 | 20 to 26 December | Love | Love |
 | From 27 December | none | none, on the page and on the shelf |
 
+### The Advent banner (approved 2026-11-28)
+Mockup: [design/videos_advent_banner.html](design/videos_advent_banner.html). Our own Advent series art, the lighthouse (dawn in light, teal in Night swell), replaces the flat cover on the shelf and sits behind the heading of the weekly path. Hendrik confirmed that the image is free to use. The weekly covers keep their colours.
+
+Built 2026-11-28. Both colour versions load at once, because the banner is the largest thing on these pages: loading them lazily put the largest paint at 2.9s on Lighthouse (limit 2.0s), against 1.65 to 1.71s now, for one extra picture of about 5 to 8 KB. At build, text over the art measured at least 6.2:1 on the real pages. Found while checking: on narrow screens WebKit left a gap under each week's cover; fixed, with a browser test.
+
+BibleProject's artwork is not used. Their [brand page](https://bibleproject.com/brand/) (read 2026-11-28) says artwork is freely available, but not to be edited or used as a background for text or graphics, and to be cited; their terms give no trademark licence.
+
 ### Screens
 - **Phones from 320px:** as drawn. The player stays at least 200px high inside the block.
 - **Tablet and desktop (drawn and approved 2026-11-28):** one centred column of at most 640px on both pages, so the player is never larger than about 640 by 360 and YouTube's fullscreen button gives a larger view. Below `lg`, including a 744px tablet, the header and bar are as on a phone, the bar 440px and centred. From `lg`, the desktop header and no bar. On a short desktop window, an open week pushes the later weeks below the fold.
@@ -131,8 +138,9 @@ No database, API, new secret or paid service is expected.
 - Before release, confirm all four still play: a video can be removed or replaced.
 
 ### The pages
-- `/videos` and `/videos/advent`, as described in "Layout and flow", with each series stored in a content file (for example `apps/web/content/videos/advent.yml`): its name, introduction and the date after which no week is current; then for each video its week, title, theme, Bible word, length, start date, YouTube ID, BibleProject page and one-line introduction. A check fails the build if a field is missing.
+- `/videos` and `/videos/advent`, as described in "Layout and flow", with each series stored in a content file (for example `apps/web/content/videos/advent.yml`): its name, introduction and the date after which no week is current; then for each video its week, title, theme, Bible word, length, start date, YouTube ID, BibleProject page and one-line introduction. A unit test on the real file fails CI if a field is missing or badly formed.
 - Check each introduction against its video before publishing; those in the mockup are drafts.
+- **Consent first:** the banner on both video pages, and no player without Accept (step 8b).
 - **Tap to play:** each video shows our own simple cover with a Play button. The player loads only after the tap, so opening a page does not contact YouTube and stays fast.
 - Under each player: the credit, a "Watch on BibleProject" link (also the fallback if the player fails or there is no JavaScript), and a short privacy line.
 - The shelf names BibleProject too, with a link, since it presents their videos.
@@ -153,6 +161,7 @@ No database, API, new secret or paid service is expected.
 - Playing a video sends data (such as the visitor's IP address and device details) to Google. Say so beside the player and add Google/YouTube to `docs/privacy.md` and `apps/web/src/content/privacy.ts`.
 - [Privacy-enhanced mode](https://support.google.com/youtube/answer/171780?expand=PrivacyEnhancedMode) stops these views personalising YouTube. We did **not** confirm that it sets no cookies, so do not claim that.
 - **(Hendrik)** Have someone qualified confirm that tapping Play, with the notice, is enough under POPIA and the GDPR.
+- YouTube's own terms also ask for certain wording and links in the privacy policy (step 8 and [privacy.md](privacy.md)).
 - We add no video tracking of our own.
 
 ### Records
@@ -167,16 +176,34 @@ One branch (for example `feat/videos-page`), tests first, one commit per step, o
 - [x] 0. **(Hendrik)** Series A and layout C chosen (2026-11-28).
 - [x] 1. Collect and check the four YouTube IDs (2026-11-28, results under "Video source").
 - [ ] 1a. **(Hendrik)** Watch all four through, with sound and English captions.
-- [ ] 2. ADR 0013 and threat model rows.
-- [ ] 3. `VIDEOS_ENABLED`, off by default.
-- [ ] 4. Content file, loader and check. Tests: a missing field or badly formed ID fails; the open week and label on the day before Advent, on each Sunday and the day before it, and from 27 December; a known and an unknown `?week=`.
-- [ ] 5. The shelf and the weekly path, with covers, credits, links and notice. Tests: the shelf links to the path; four rows in week order; the right row open and labelled; a credit with every video; no player before a tap; rows open and close, one at a time, without JavaScript; the column is centred and no wider than 640px at 744, 1024 and 1280px.
-- [ ] 6. Tap to play and the `frame-src` change. Tests: the player has the right address, title and referrer policy and is at least 200px high at 320px wide; closing a row or opening another removes the player; no policy errors; no request to Google before the tap.
-- [ ] 7. Menu, header and card links, sitemap. Test that the header stays one row at 1024px. With the flag off, nothing changes.
-- [ ] 8. Privacy policy text. **(Hendrik)** qualified check.
-- [ ] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
+- [x] 2. [ADR 0013](adr/0013-third-party-video-embeds.md) and threat model rows V1 to V6.
+- [x] 3. `VIDEOS_ENABLED`, off by default (`apps/web/src/lib/videos/flag.ts`).
+- [x] 4. Content file, loader and check (`apps/web/content/videos/advent.yml`, `src/lib/videos`; the check is a unit test on the real file, so CI fails). Tests: a missing field or badly formed ID fails; the open week and label on the day before Advent, on each Sunday and the day before it, and from 27 December; a known and an unknown `?week=`.
+- [x] 5. The shelf and the weekly path, with covers, credits, links and notice. Tests: the shelf links to the path; four rows in week order; the right row open and labelled; a credit with every video; no player before a tap; rows open and close, one at a time, without JavaScript; the column is centred and no wider than 640px at 744, 1024 and 1280px.
+- [x] 6. Tap to play (the Play button comes with the player, so there is never a button that does nothing), scrolling to a `?week=` row, keeping an opened row in view, and the `frame-src` change. Tests: the player has the right address, title and referrer policy and is at least 200px high at 320px wide; closing a row or opening another removes the player; no policy errors; no request to Google before the tap.
+  - Checked 2026-11-28 on a local build with the real player, headless desktop Chromium, muted, 375px: no request to Google before the tap, all four played, no policy messages. After a tap the browser contacted `www.youtube-nocookie.com`, `www.google.com`, `googlevideo.com`, `i.ytimg.com`, `yt3.ggpht.com` and `jnn-pa.googleapis.com`: step 8 should name Google as well as YouTube. Not checked: sound, captions, phones, a preview or the live domain.
+- [x] 7. Menu, header and card links, sitemap. Test that the header stays one row at 1024px. With the flag off, nothing changes.
+  - 2026-11-28: with the Bible and chat on too, the header was one row at 1024px in desktop Chromium and WebKit. The mockup's "New" label on the menu link is not built: this list never asked for it, and it would need its own date rule.
+- [x] 8. Privacy policy text, shown only while videos are on, with its own date. The notice beside Play now names Google.
+  - 2026-11-28: Hendrik read the new text, and chose to add "By playing, you agree to the YouTube Terms and our Privacy policy" to the notice beside Play. The policy date is 28 November 2026.
+  - 2026-11-28: YouTube says its API terms and developer policies apply to the embedded player, which this plan had not covered. The text now includes what they ask a privacy policy to say and link; [privacy.md](privacy.md) lists each point. They also say users must agree to the privacy policy before using the features; the line beside Play is our answer, with no separate tick or button.
+- [ ] 8a. **(Hendrik)** Get a qualified check: consent under POPIA and the GDPR, and whether the line beside Play is enough for the "agree before access" rule.
+- [x] 8b. Cookie banner, built 2026-11-28. **Decided 2026-11-28 (Hendrik):** on the video pages only, with the recommendations below. **Placement A, in the page, and its wording approved 2026-11-28:** [design/cookie_banner_videos.html](design/cookie_banner_videos.html) (B, floating above the bar, was not chosen).
+  - Shown on `/videos` and `/videos/advent`, only while videos are on. Decline and Accept look alike, with a privacy policy link.
+  - Without Accept the pages and BibleProject links work; Play says YouTube is turned off and offers to allow it. Accept does not load anything by itself: the player still waits for Play.
+  - The choice is kept for six months in a cookie of our own and can be changed with "Cookie settings" in the footer of the video pages.
+  - It must not cover Play or the bottom bar.
+  - Found at build: the "YouTube is off" panel is taller than the cover, and when Play was pressed low on a phone its buttons were left under the bottom bar. The panel now scrolls itself clear; a browser test covers it.
+  - The video pages have no sign-up form, so they do not load Cloudflare Turnstile. Whether Turnstile sets cookies where it does load was not settled by the Cloudflare pages read on 2026-11-28; it is outside this banner.
+  - The privacy policy describes the banner and its cookie while videos are on, and no longer says "no cookie banner is needed" with videos off.
+- [x] 9. `make lint typecheck test e2e`, accessibility check, Lighthouse and the landing page JavaScript budget (about 3.5 KB was free on 28 November).
+  - 2026-11-28, on this branch: lint and type checks passed for both apps; 1,163 web unit tests and 671 API tests passed; browser tests 1,257 passed and 403 skipped on five projects, none failed. Firefox does not run on this Mac: CI covers it once there is a pull request.
+  - Two API config tests fail on this Mac only: they build production settings, and the Cloudflare test secret in the shell and the root `.env` is picked up. All 671 passed with that one value overridden by a placeholder. This branch does not change the API.
+  - Lighthouse (mobile, local build, videos on) passed on the home page, a devotional, `/videos` and `/videos/advent`: performance 99, accessibility 100, best practices 96, SEO 100. The first run scored the video pages 98 for accessibility (the footer's level 3 headings had no level 2 above them); fixed, with a unit test.
+  - Home page JavaScript: 161.71 KB gzipped, videos off and on (limit 165 KB, 3.29 KB free).
+  - The accessibility check was automatic. Nobody has done a keyboard or screen reader pass by hand.
 - [ ] 10. On a preview with the flag on, **(Hendrik)** play all four on an iPhone (browser and installed app) and an Android phone: sound, fullscreen and captions. Check each video's captions; do not promise them before this.
-- [ ] 11. **(Hendrik)** Read the terms again, merge, set `VIDEOS_ENABLED` in Production, and promote.
+- [ ] 11. **(Hendrik)** Read the terms again (BibleProject's and YouTube's), check the privacy policy date, merge, set `VIDEOS_ENABLED` in Production, and promote.
 
 **Turning it off:** unset `VIDEOS_ENABLED` and redeploy. Do this at once if BibleProject asks.
 

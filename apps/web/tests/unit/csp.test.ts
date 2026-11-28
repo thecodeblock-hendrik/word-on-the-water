@@ -58,3 +58,18 @@ describe("buildCsp (development)", () => {
     expect(csp).not.toContain("upgrade-insecure-requests");
   });
 });
+
+describe("buildCsp (videos on)", () => {
+  const csp = buildCsp({ nonce: "abc123", isDev: false, upgradeInsecure: true, videos: true });
+  const off = buildCsp({ nonce: "abc123", isDev: false, upgradeInsecure: true });
+
+  it("lets only the privacy-enhanced YouTube player be framed, besides Turnstile", () => {
+    expect(directive(csp, "frame-src")).toBe(
+      "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com",
+    );
+  });
+
+  it("changes nothing else", () => {
+    expect(csp.replace(" https://www.youtube-nocookie.com", "")).toBe(off);
+  });
+});

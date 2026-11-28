@@ -5,6 +5,7 @@ import { PRIVACY_UPDATED, privacyPolicy } from "@/content/privacy";
 import { formatDate } from "@/lib/devotionals/format";
 import { isBibleEnabled } from "@/lib/bible/flag";
 import { isChatEnabled } from "@/lib/chat/flag";
+import { isVideosEnabled } from "@/lib/videos/flag";
 
 export const metadata: Metadata = {
   title: "Privacy policy",
@@ -12,13 +13,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const EMAIL = /([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/;
+// An email address, or a web address up to its last letter, digit or slash.
+const LINKED = /([\w.+-]+@[\w-]+(?:\.[\w-]+)+|https:\/\/\S*[\w/])/;
 
-/** Policy text: email addresses become links, and any [placeholder] is highlighted. */
+/** Policy text: email and web addresses become links, and any [placeholder] is highlighted. */
 function PolicyText({ children }: { children: string }) {
-  return children.split(EMAIL).map((part, i) =>
+  return children.split(LINKED).map((part, i) =>
     i % 2 === 1 ? (
-      <a key={i} href={`mailto:${part}`} className="underline hover:text-accent-ink">
+      <a
+        key={i}
+        href={part.startsWith("https://") ? part : `mailto:${part}`}
+        className="wrap-anywhere underline hover:text-accent-ink"
+      >
         {part}
       </a>
     ) : (
@@ -32,7 +38,11 @@ const heading =
 
 /** What we collect, why, how long we keep it and your rights, in plain language. */
 export default function PrivacyPage() {
-  const policy = privacyPolicy({ bibleEnabled: isBibleEnabled(), chatEnabled: isChatEnabled() });
+  const policy = privacyPolicy({
+    bibleEnabled: isBibleEnabled(),
+    chatEnabled: isChatEnabled(),
+    videosEnabled: isVideosEnabled(),
+  });
   return (
     <article className="mx-auto max-w-[1080px] py-10 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:py-16">
       <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)] font-semibold uppercase leading-[1.05] tracking-[.03em] text-balance">

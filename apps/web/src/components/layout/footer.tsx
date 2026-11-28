@@ -2,8 +2,10 @@ import Link from "next/link";
 
 import { NavLink } from "@/components/layout/nav-link";
 import { Logo } from "@/components/logo";
+import { CookieSettings } from "@/components/videos/cookie-settings";
 import { footer, hero } from "@/content/landing";
 import { isBibleEnabled } from "@/lib/bible/flag";
+import { isVideosEnabled } from "@/lib/videos/flag";
 import { ESV_LIMITS, ESV_NOTICE, ESV_URL, formatReference } from "@/lib/scripture";
 
 const linkClass = "inline-flex min-h-11 items-center text-on-deep-muted hover:text-on-deep";
@@ -99,6 +101,7 @@ export function Footer({ year = new Date().getFullYear(), privacyHref = "/privac
                   </Link>
                 </>
               ) : null}
+              {isVideosEnabled() && <CookieSettings />}
             </p>
           </div>
         </div>

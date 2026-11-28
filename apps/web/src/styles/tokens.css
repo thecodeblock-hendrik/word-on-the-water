@@ -15,6 +15,8 @@
   --on-deep: #fbf3e8;
   --on-deep-muted: #c4c3cf;
   --accent-on-deep: #f0955f;
+  --art-ground: #12121c;
+  --accent-on-art: #ffd9c2;
   --glass-tint: 72%;
   --glass-lens: rgb(43 45 66 / 0.1);
   --glass-rim: rgb(255 255 255 / 0.85);
@@ -36,6 +38,7 @@
     --on-deep: #f4f1ea;
     --on-deep-muted: #9fb0bd;
     --accent-on-deep: #4fa9a6;
+    --accent-on-art: #a8e4e1;
     --glass-tint: 72%;
     --glass-lens: rgb(10 24 37 / 0.45);
     --glass-rim: rgb(255 255 255 / 0.22);
@@ -57,6 +60,7 @@
   --on-deep: #f4f1ea;
   --on-deep-muted: #9fb0bd;
   --accent-on-deep: #4fa9a6;
+  --accent-on-art: #a8e4e1;
   --glass-tint: 72%;
   --glass-lens: rgb(10 24 37 / 0.45);
   --glass-rim: rgb(255 255 255 / 0.22);

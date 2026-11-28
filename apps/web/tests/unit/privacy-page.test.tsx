@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import PrivacyPage, { metadata } from "@/app/privacy/page";
 
@@ -10,11 +10,13 @@ afterEach(() => {
 });
 
 describe("the privacy page", () => {
+  beforeEach(() => vi.stubEnv("VIDEOS_ENABLED", ""));
+
   it("has one h1, the date it was updated and a heading for each section", () => {
     render(<PrivacyPage />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1, name: "Privacy policy" })).toBeInTheDocument();
-    expect(screen.getByText("Last updated 18 November 2026")).toBeInTheDocument();
+    expect(screen.getByText("Last updated 28 November 2026")).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(9);
   });
 
@@ -43,6 +45,18 @@ describe("the privacy page", () => {
     render(<PrivacyPage />);
     const cookies = screen.getByRole("heading", { level: 2, name: /cookies/i }).closest("section")!;
     expect(within(cookies).getByText("bible-version and bible-passage")).toBeInTheDocument();
+  });
+
+  it("describes the videos, with working links, only while they are on", () => {
+    vi.stubEnv("VIDEOS_ENABLED", "1");
+    render(<PrivacyPage />);
+    expect(screen.getByText("Watching videos")).toBeInTheDocument();
+    for (const url of [
+      "https://www.youtube.com/t/terms",
+      "https://www.google.com/policies/privacy",
+    ]) {
+      expect(screen.getByRole("link", { name: url })).toHaveAttribute("href", url);
+    }
   });
 
   it("has a title, a description and its own canonical address, and may be indexed", () => {

@@ -138,3 +138,72 @@ describe("the Ask the Word chat in the policy", () => {
     expect(findPlaceholders(withChat)).toEqual([]);
   });
 });
+
+describe("the videos in the policy", () => {
+  const withVideos = privacyPolicy({ bibleEnabled: false, videosEnabled: true });
+  const part = (id: string) => withVideos.sections.find((s) => s.id === id)!;
+  const item = part("what-we-collect").items!.find((i) => i.term === "Watching videos");
+  const text = item?.text ?? "";
+
+  it("is dated 28 November 2026", () => {
+    expect(PRIVACY_UPDATED).toBe("2026-11-28");
+  });
+
+  it("changes nothing in the text while videos are off", () => {
+    expect(privacyPolicy({ bibleEnabled: false, videosEnabled: false })).toEqual(policy());
+    expect(everything()).not.toMatch(/video|YouTube/i);
+  });
+
+  it("says nothing is sent before play, then what Google receives and may store", () => {
+    expect(text).toMatch(/opening them sends nothing to YouTube or Google/);
+    expect(text).toMatch(/press play/i);
+    expect(text).toMatch(/Google/);
+    expect(text).toMatch(/IP address/);
+    expect(text).toMatch(/browser and device/);
+    expect(text).toMatch(/may set cookies or store/);
+    expect(text).toMatch(/advertising/);
+    expect(text).toContain("youtube-nocookie.com");
+    expect(text).toMatch(/add no tracking of our own to the videos/);
+  });
+
+  it("describes the banner, how to change the choice and the cookie that keeps it", () => {
+    expect(text).toMatch(/banner on the video pages/);
+    expect(text).toMatch(/unless you accept, we load nothing from YouTube/i);
+    expect(text).toMatch(/Cookie settings at the foot of the video pages/);
+    const cookie = part("cookies").items!.find((i) => i.term === "youtube-consent")!;
+    expect(cookie.text).toMatch(/six months/);
+    expect(cookie.text).toMatch(/only yes or no/);
+    expect(terms("cookies")).not.toContain("youtube-consent");
+  });
+
+  it("has what YouTube asks of a site that embeds its player", () => {
+    expect(text).toContain("YouTube API Services");
+    expect(text).toMatch(/agree to be bound by the YouTube Terms of Service/);
+    expect(text).toContain("https://www.youtube.com/t/terms");
+    expect(text).toContain("https://www.google.com/policies/privacy");
+  });
+
+  it("lists YouTube as a service that does not act only for us", () => {
+    const who = part("who-else");
+    expect(who.items!.at(-1)!.term).toBe("YouTube (Google)");
+    expect(who.items!.at(-1)!.text).toMatch(/only if you accept it and press play/i);
+    expect(who.paragraphs!.join(" ")).toMatch(/only for us, except YouTube/);
+  });
+
+  it("does not claim there are no cookies, or that no cookie banner is needed", () => {
+    const cookies = JSON.stringify(part("cookies"));
+    expect(cookies).toContain("no advertising or tracking cookies of our own");
+    expect(cookies).toMatch(/YouTube may set cookies/);
+    expect(cookies).not.toMatch(/The only cookies|no cookie banner/);
+  });
+
+  it("has no draft placeholders", () => {
+    expect(findPlaceholders(withVideos)).toEqual([]);
+  });
+});
+
+describe("the cookies section", () => {
+  it("no longer says that no cookie banner is needed", () => {
+    expect(JSON.stringify(section("cookies"))).not.toMatch(/cookie banner/);
+  });
+});

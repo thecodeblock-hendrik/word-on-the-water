@@ -74,6 +74,17 @@ describe("sitemap.xml", () => {
     expect(entry?.lastModified).toBe(PRIVACY_UPDATED);
   });
 
+  it("lists both video pages only while videos are on", async () => {
+    const videos = ["https://wordonthewater.net/videos", `${home}videos/advent`];
+    vi.stubEnv("VIDEOS_ENABLED", "");
+    const off = await urls("2026-12-21");
+    expect(off.filter((url) => url.includes("/videos"))).toEqual([]);
+    vi.stubEnv("VIDEOS_ENABLED", "1");
+    const on = await urls("2026-12-21");
+    expect(on.filter((url) => url.includes("/videos"))).toEqual(videos);
+    expect(on.filter((url) => !url.includes("/videos"))).toEqual(off);
+  });
+
   it("never lists the thank-you page or API routes, and every address is absolute", async () => {
     const all = await urls("2026-12-21");
     expect(all.some((url) => /thank-you|\/api\//.test(url))).toBe(false);

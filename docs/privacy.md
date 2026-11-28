@@ -20,10 +20,12 @@ Designed to comply with the **GDPR** and **POPIA** by default: collect the minim
 | Last Bible and passage read | Open the Bible reader in the Bible you used last, at the passage you were reading (John 3:16 on a first visit) | Two first-party cookies (`bible-version` and `bible-passage`, for example `web` and `romans.8.28-30`, a year each, no personal data) | Strictly necessary for a feature the visitor asked for |
 | Chat questions (Ask the Word, behind `CHAT_ENABLED`) | Answer a question about the faith | Not stored. The text is matched in memory on our API against a local knowledge base, never sent to a third party, and never written to logs or error reports; only the outcome kind, the matched entry id and the time taken are logged (a test proves no message text reaches logs or Sentry). Personal details are rejected before use | Consent (the visitor asks the question); data minimised by design |
 | Chat thread in the browser | Let a visitor ask follow-up questions | The visitor's own tab (`sessionStorage`), gone when the tab closes or when they press Clear chat; never sent to us except the new message and the ids of entries already shown. On a phone, leaving the chat clears it; the cleared thread and draft are then held in the page's memory only (never in storage) while Undo is offered, 8 seconds or longer while Undo has keyboard focus, and are dropped when the offer ends or the chat is opened afresh | Strictly necessary for a feature the visitor asked for |
+| Playing a video (BibleProject videos, behind `VIDEOS_ENABLED`, not live) | Show the video the visitor chose | Nothing on our side: no record of what is watched. Only after Play does the browser load YouTube's player from `youtube-nocookie.com`; Google then receives the visitor's IP address and browser and device details, and may set cookies or store data on the device. Seen in a test on 2026-11-28: after Play the browser also contacted `www.google.com`, `googlevideo.com`, `i.ytimg.com`, `yt3.ggpht.com` and `jnn-pa.googleapis.com` | Consent: a banner on the video pages (Accept or Decline, nothing pre-chosen), without which Play loads nothing and offers to allow it, and a notice beside the button. Whether that is enough consent under POPIA and the GDPR needs a qualified check |
+| Choice about YouTube on the video pages (behind `VIDEOS_ENABLED`, not live) | Remember whether the visitor accepted or declined | One first-party cookie (`youtube-consent`, `yes` or `no`, six months) on the visitor's device. Nothing kept on our side | Needed to respect the choice the visitor made |
 | Bot check result | Block automated submissions | Cloudflare Turnstile, loaded only when a visitor reaches or uses the sign-up form (not on every page view); Cloudflare receives the visitor's IP address and browser signals to judge the check | Legitimate interest in security |
 | Error reports | Fix faults | Sentry with the collection of personal data switched off and scrubbing before sending (web and API) | Legitimate interest; no personal data is sent |
 
-No data about children is sought and the site is not aimed at them. No advertising or tracking cookies are used.
+No data about children is sought and the site is not aimed at them. We set no advertising or tracking cookies of our own. While videos are on, YouTube may set cookies or store data on the device of a visitor who presses Play, so the policy drops the line that no cookie banner is needed; the video pages have a cookie banner (Hendrik's decision, 2026-11-28), changed through "Cookie settings" in their footer.
 
 ## Retention
 
@@ -53,6 +55,7 @@ Enforced by a daily retention job (`/cron/retention`, 03:30 UTC, step 1.7). Pray
 | Postmark | Notification and transactional email in transit | Provider's locations |
 | Cloudflare | Turnstile bot check; R2 storage of the nightly database dumps, encrypted before upload so Cloudflare cannot read them | Turnstile global; R2 bucket in Western Europe (WEUR) |
 | Sentry | Scrubbed error reports | Provider's locations |
+| Google (YouTube) | While `VIDEOS_ENABLED` is on, and only for a visitor who presses Play: the video player. Google decides how it uses this data (it does not act for us, and there is no DPA to sign for the embedded player) | Provider's locations |
 | Squarespace | DNS, and forwarding of `hello@` and `prayer@` to the owner's own mailbox | Provider's locations |
 | Google (Gmail), the owner's own mailbox | Mail forwarded from `hello@` (and later `prayer@`), including consented prayer text. A personal Gmail has no signable DPA; accepted for launch because forwarding carries only mail people send us. Revisit (Google Workspace) before the prayer form is built | Provider's locations (confirmed 2026-11-18) |
 
@@ -70,6 +73,20 @@ Providers outside the EU and South Africa are covered by their standard contract
 | Upstash | Incorporated through its Terms, no signature needed | Updated April 2025 | None (PDF saved). Both Redis databases (production and preview) are in Frankfurt |
 
 Vercel's "Improve models with my data" setting was on until 2026-11-18 and was switched off that day (Settings, Data Preferences). Vercel says this stops sharing going forward only. The site was not public, so the data involved was test data and source code, not visitor data. Neither Vercel nor Google (Gmail, a personal account with no signable DPA, accepted for launch) is a gap in the public policy, but both are the first things to revisit: Vercel on the move to Pro, Google before the prayer form.
+
+## BibleProject videos (behind `VIDEOS_ENABLED`, not live, ADR 0013)
+
+The public policy describes the videos only while the flag is on. Its "Last updated" date is 28 November 2026 with videos on or off (`PRIVACY_UPDATED` in `src/content/privacy.ts`, set by Hendrik); move it if the text changes again, including if the videos go live with different wording.
+
+[YouTube's help page](https://support.google.com/youtube/answer/171780) says the API Services Terms and the Developer Policies apply to the embedded player (read 2026-11-28). What the [Developer Policies](https://developers.google.com/youtube/terms/developer-policies), III.A, ask of a privacy policy, and where we stand. Part of that page was read word for word and the rest only in summary.
+
+| Asked | Where we stand |
+|---|---|
+| Link to YouTube's Terms of Service and say that users agree to be bound by them | In the "Watching videos" item of the privacy policy. We have no separate terms page |
+| Say that the site uses YouTube API Services; link the Google Privacy Policy | In the same item |
+| Say what is collected, that third parties may serve content including ads, and that cookies or similar may be used | In the same item |
+| Require users to agree to the privacy policy **before** they can use the features | Beside Play: "By playing, you agree to the YouTube Terms and our Privacy policy", with both links (decided 2026-11-28). There is no separate tick or button. Whether this is enough is part of the qualified check |
+| Keep the policy easy to reach at all times | Linked in the footer of every page with a footer, and beside Play |
 
 ## Prayer crew (proposed 2026-11-22, not built, ADR 0012)
 
@@ -107,6 +124,8 @@ Contain, assess, then notify. Under the GDPR the authority is told within 72 hou
 3. ~~How long nightly dumps are kept.~~ Decided: 30 days, enforced by an R2 lifecycle rule. A dump holds deleted-on-request data until it expires, so erased data is gone from backups within 30 days.
 4. ~~Upstash region and the mailbox provider.~~ Answered 2026-11-18: Upstash in Frankfurt, forwards received by Gmail.
 5. ~~A data processing agreement with each provider.~~ Checked 2026-11-18, see the table above. Open: print the Kit and Vercel DPAs to PDF, review the Vercel plan (Hobby is non-commercial), and decide on Neon's optional e-signature.
+
+6. **BibleProject videos:** a qualified person to confirm, before the videos go live, that tapping Play with the notice is enough consent under POPIA and the GDPR (and under the EU User Consent Policy that YouTube's terms point to, not yet read), and whether the line beside Play meets YouTube's "agree before access" rule. Open. A cookie banner was added on 2026-11-28 (video pages only); have it checked too, and whether Cloudflare Turnstile, on the sign-up form, sets anything that needs consent (the Cloudflare pages read that day did not say).
 
 Keep this file in step with the code: when a feature adds a field, a service or a retention rule, update it in the same change.
 
