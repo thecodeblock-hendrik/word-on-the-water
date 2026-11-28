@@ -105,6 +105,28 @@ async function leaveChatWithDraft(page: Page) {
   await expect.poll(() => page.evaluate(() => document.activeElement !== document.body)).toBe(true);
 }
 
+/**
+ * Keeps a note of each time the bar is sent away and brought back. A bar that returns when the
+ * scrolling stops is only away for a moment, which a test looking now and then can miss.
+ */
+const noteComings = (page: Page) =>
+  page.evaluate(() => {
+    const comings: string[] = [];
+    (window as unknown as { comings: string[] }).comings = comings;
+    const root = document.documentElement;
+    new MutationObserver(() =>
+      comings.push(root.hasAttribute("data-nav-away") ? "away" : "back"),
+    ).observe(root, { attributeFilter: ["data-nav-away"] });
+  });
+
+/** Scrolls to `top` and waits until the bar has left and then returned by itself. */
+async function scrollAndStop(page: Page, top: number) {
+  const comings = () => page.evaluate(() => (window as unknown as { comings: string[] }).comings);
+  const before = (await comings()).length;
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top);
+  await expect.poll(async () => (await comings()).slice(before)).toEqual(["away", "back"]);
+}
+
 /** Waits for the shelf to finish moving (the countdown ring's own time is not waited for). */
 const settled = (page: Page) =>
   page.locator("[data-shelf]").evaluate((el) =>
@@ -286,55 +308,89 @@ test.describe("the countdown ring in Undo", () => {
 });
 
 test.describe("the shelf growing and settling", () => {
-  type Frame = { height: number; words: number; buttons: number; closing: boolean; glass: string };
+  type Moment = {
+    height: number;
+    /** How far its bottom edge is above the bottom of the screen. */
+    up: number;
+    words: number;
+    buttons: number;
+    barBackground: string;
+  };
+  type Moves = { open?: Moment[]; closing?: Moment[] };
 
-  /** Notes the shelf and the bar under it at every frame in which the shelf is there. */
-  const watchShelf = (page: Page) =>
+  /**
+   * As each pane of the shelf arrives (the offer, and later the picture of it closing), steps its
+   * own animations through the whole 350ms, 10ms at a time, notes what is there at each step, and
+   * sets them going again. It happens before the browser draws, so a slow machine that misses
+   * frames sees exactly the same.
+   */
+  const recordMoves = (page: Page) =>
     page.evaluate(() => {
-      const frames: unknown[] = [];
-      (window as unknown as { shelfFrames: unknown[] }).shelfFrames = frames;
-      const look = () => {
-        const shelf = document.querySelector("[data-shelf]");
-        const nav = document.querySelector("nav[data-hides]");
-        if (shelf && nav) {
-          frames.push({
-            height: Math.round(shelf.getBoundingClientRect().height),
+      const moves: Record<string, unknown[]> = {};
+      (window as unknown as { moves: typeof moves }).moves = moves;
+      const timeline = (shelf: Element) => {
+        const own = shelf
+          .getAnimations({ subtree: true })
+          .filter((a) => (a as CSSAnimation).animationName?.startsWith("shelf-"));
+        const moments = [...Array(35).keys()].map((i) => i * 10).concat(349.9);
+        const seen = moments.map((at) => {
+          for (const animation of own) animation.currentTime = at;
+          const box = shelf.getBoundingClientRect();
+          return {
+            height: box.height,
+            up: window.innerHeight - box.bottom,
             words: Number(getComputedStyle(shelf.querySelector("[data-shelf-row]")!).opacity),
             buttons: shelf.querySelectorAll("button").length,
-            closing: shelf.getAttribute("data-shelf") === "closing",
-            glass: getComputedStyle(nav).backgroundColor,
-          });
-        }
-        requestAnimationFrame(look);
+            barBackground: getComputedStyle(document.querySelector("nav[data-hides]")!)
+              .backgroundColor,
+          };
+        });
+        for (const animation of own) animation.currentTime = 0;
+        return seen;
       };
-      look();
+      new MutationObserver((changes) => {
+        for (const node of changes.flatMap((change) => [...change.addedNodes])) {
+          if (!(node instanceof Element)) continue;
+          const shelf = node.matches("[data-shelf]") ? node : node.querySelector("[data-shelf]");
+          if (!shelf) continue;
+          const kind = shelf.getAttribute("data-shelf") === "closing" ? "closing" : "open";
+          moves[kind] = timeline(shelf);
+        }
+      }).observe(document.body, { childList: true, subtree: true });
     });
-  const framesSeen = (page: Page) =>
-    page.evaluate(() => (window as unknown as { shelfFrames: Frame[] }).shelfFrames);
+  const movesSeen = (page: Page) =>
+    page.evaluate(() => (window as unknown as { moves: Moves }).moves);
 
-  /** The chat left with a draft in it, from `/privacy`, with every frame of the shelf noted. */
-  async function leaveAndWatch(page: Page) {
+  /** The chat left with a draft in it, from `/privacy`; the shelf's movements noted if asked. */
+  async function leaveToShelf(page: Page, { record = true } = {}) {
     await page.goto(`${CHAT}/privacy`);
     await page.waitForLoadState("networkidle");
     await bar(page).getByText("Ask the Word").click();
-    await watchShelf(page);
+    if (record) await recordMoves(page);
     await leaveChatWithDraft(page);
     await expect(page.locator("[data-shelf]")).toHaveCount(1);
     await settled(page);
   }
 
+  const NO_BACKGROUND = "rgba(0, 0, 0, 0)";
+  // The words are the shelf's top 52px; below about 100px they would reach into the tabs.
+  const overTheTabs = (moments: Moment[]) =>
+    moments.filter((m) => m.height < 100 && m.words > 0.35);
+  const heightsOf = (moments: Moment[]) => new Set(moments.map((m) => Math.round(m.height)));
+
   test("it grows out of the bar, its words unseen until they are clear of the tabs", async ({
     page,
   }) => {
-    await leaveAndWatch(page);
-    const seen = await framesSeen(page);
-    expect(seen[0].height, "starts at about the bar's height").toBeLessThan(90);
-    expect(seen.at(-1)).toMatchObject({ height: 116, words: 1 });
-    expect(new Set(seen.map((f) => f.height)).size, "it moved, not jumped").toBeGreaterThan(3);
-    // The words are the shelf's top 52px; below about 106px they would reach into the tabs.
-    expect(seen.filter((f) => f.height < 100 && f.words > 0.35)).toEqual([]);
+    await leaveToShelf(page);
+    const open = (await movesSeen(page)).open!;
+    expect(open[0].height, "starts at the bar's height").toBeCloseTo(64, 0);
+    expect(open[0].words).toBe(0);
+    expect(open.at(-1)!.height).toBeCloseTo(116, 0);
+    expect(open.at(-1)!.words).toBeGreaterThan(0.99);
+    expect(heightsOf(open).size, "it moves, not jumps").toBeGreaterThan(8);
+    expect(overTheTabs(open)).toEqual([]);
     expect(
-      seen.filter((f) => f.glass !== "rgba(0, 0, 0, 0)"),
+      open.filter((m) => m.barBackground !== NO_BACKGROUND),
       "always one pane",
     ).toEqual([]);
   });
@@ -342,24 +398,23 @@ test.describe("the shelf growing and settling", () => {
   test("when time runs out it settles into the bar, with nothing to tap, and the bar gets its glass back", async ({
     page,
   }) => {
-    const own = await (async () => {
-      await page.goto(`${CHAT}/privacy`);
-      return bar(page).evaluate((el) => getComputedStyle(el).backgroundColor);
-    })();
-    await leaveAndWatch(page);
+    await page.goto(`${CHAT}/privacy`);
+    const background = () => bar(page).evaluate((el) => getComputedStyle(el).backgroundColor);
+    const own = await background();
+    await leaveToShelf(page);
     await expect(page.locator("[data-shelf]")).toHaveCount(0, { timeout: 12_000 });
-    const closing = (await framesSeen(page)).filter((f) => f.closing);
-    expect(closing.length, "it was seen closing").toBeGreaterThan(3);
-    expect(closing.filter((f) => f.buttons > 0)).toEqual([]);
-    expect(Math.min(...closing.map((f) => f.height))).toBeLessThan(80);
-    expect(closing.filter((f) => f.glass !== "rgba(0, 0, 0, 0)")).toEqual([]);
-    await expect
-      .poll(() => bar(page).evaluate((el) => getComputedStyle(el).backgroundColor))
-      .toBe(own);
+    const closing = (await movesSeen(page)).closing!;
+    expect(closing[0].height).toBeCloseTo(116, 0);
+    expect(closing.at(-1)!.height, "ends at the bar's height").toBeCloseTo(64, 0);
+    expect(heightsOf(closing).size).toBeGreaterThan(8);
+    expect(closing.filter((m) => m.buttons > 0)).toEqual([]);
+    expect(overTheTabs(closing)).toEqual([]);
+    expect(closing.filter((m) => m.barBackground !== NO_BACKGROUND)).toEqual([]);
+    await expect.poll(background).toBe(own);
   });
 
   test("scrolling after it has appeared does not play the entrance again", async ({ page }) => {
-    await leaveAndWatch(page);
+    await leaveToShelf(page);
     const moving = () =>
       page.locator("[data-shelf]").evaluate((el) =>
         el
@@ -377,10 +432,11 @@ test.describe("the shelf growing and settling", () => {
 
   test("with reduced motion it appears at its height and goes at once", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await leaveAndWatch(page);
+    await leaveToShelf(page);
     await expect(page.locator("[data-shelf]")).toHaveCount(0, { timeout: 12_000 });
-    const seen = await framesSeen(page);
-    expect(seen.filter((f) => f.height !== 116 || f.words !== 1 || f.closing)).toEqual([]);
+    const { open, closing } = await movesSeen(page);
+    expect(closing, "no picture of it closing").toBeUndefined();
+    expect(open!.filter((m) => Math.round(m.height) !== 116 || m.words !== 1)).toEqual([]);
   });
 
   /** Notes every layout shift that Chrome would count against the page. */
@@ -402,7 +458,7 @@ test.describe("the shelf growing and settling", () => {
   test("settling shifts nothing on the page", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "only Chromium reports layout shifts");
     await countShifts(page);
-    await leaveAndWatch(page);
+    await leaveToShelf(page, { record: false });
     const before = (await shiftsSoFar(page)).length;
     await expect(page.locator("[data-shelf]")).toHaveCount(0, { timeout: 12_000 });
     await frames(page);
@@ -415,58 +471,54 @@ test.describe("the shelf growing and settling", () => {
   }) => {
     test.skip(browserName !== "chromium", "only Chromium reports layout shifts");
     await countShifts(page);
-    await leaveAndWatch(page);
+    await leaveToShelf(page, { record: false });
     await page.getByRole("button", { name: "Undo" }).focus(); // holds the timer
     // A scroll made by a script is not "input", so any shift after it is counted.
     const before = (await shiftsSoFar(page)).length;
-    const height = () =>
-      page.locator("[data-shelf]").evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    await noteComings(page);
     for (const top of [400, 600, 800]) {
-      await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top);
-      await expect.poll(height).toBe(54); // the bar is away
-      await expect.poll(height).toBe(116); // the scrolling stopped: joined again
+      await scrollAndStop(page, top); // away, then back and joined: both resizes happen
       await settled(page);
     }
     await frames(page);
     expect(total((await shiftsSoFar(page)).slice(before))).toBeLessThan(0.001);
   });
 
-  test("its bottom edge stays put in every frame while it grows, shrinks and settles", async ({
+  test("its bottom edge stays put all the way while it grows, shrinks, joins and settles", async ({
     page,
   }) => {
-    await page.goto(`${CHAT}/privacy`);
-    await page.waitForLoadState("networkidle");
-    await bar(page).getByText("Ask the Word").click();
-    await page.evaluate(() => {
-      const seen: [number, number][] = [];
-      (window as unknown as { edges: [number, number][] }).edges = seen;
-      const look = () => {
-        const box = document.querySelector("[data-shelf]")?.getBoundingClientRect();
-        if (box) seen.push([window.innerHeight - box.bottom, Math.round(box.height)]);
-        requestAnimationFrame(look);
-      };
-      look();
-    });
-    await leaveChatWithDraft(page);
-    await settled(page);
-    const undo = page.getByRole("button", { name: "Undo" });
-    await undo.focus();
-    await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
-    await page.waitForFunction(
-      () => document.querySelector("[data-shelf]")!.getBoundingClientRect().height < 55,
+    await leaveToShelf(page);
+    await page.getByRole("button", { name: "Undo" }).focus(); // holds the timer
+    // The bar sent away and brought back, as scrolling does, with each 200ms resize stepped through.
+    const resizes = await page.evaluate(() =>
+      [true, false].map((away) => {
+        document.documentElement.toggleAttribute("data-nav-away", away);
+        const shelf = document.querySelector("[data-shelf]")!;
+        const resizing = shelf
+          .getAnimations()
+          .filter((a) => (a as CSSTransition).transitionProperty === "--shelf-h");
+        const seen = [...Array(21).keys()].map((i) => {
+          for (const transition of resizing) transition.currentTime = i * 10;
+          const box = shelf.getBoundingClientRect();
+          return { height: box.height, up: window.innerHeight - box.bottom };
+        });
+        for (const transition of resizing) transition.finish();
+        return { transitions: resizing.length, seen };
+      }),
     );
-    await page.waitForFunction(
-      () => document.querySelector("[data-shelf]")!.getBoundingClientRect().height > 115.5,
-    );
-    await settled(page);
-    await undo.evaluate((el: HTMLElement) => el.blur());
+    expect(resizes.map((r) => r.transitions)).toEqual([1, 1]);
+    expect(Math.round(resizes[0].seen.at(-1)!.height)).toBe(54);
+    expect(Math.round(resizes[1].seen.at(-1)!.height)).toBe(116);
+    await page.getByRole("button", { name: "Undo" }).evaluate((el: HTMLElement) => el.blur());
     await expect(page.locator("[data-shelf]")).toHaveCount(0, { timeout: 12_000 });
-    const edges = await page.evaluate(
-      () => (window as unknown as { edges: [number, number][] }).edges,
-    );
+
+    const { open, closing } = await movesSeen(page);
+    const all = [...open!, ...resizes.flatMap((r) => r.seen), ...closing!];
     // Sinking, when it is alone, is the one time the edge moves; here it always has a bar.
-    expect(edges.filter(([up]) => Math.abs(up - 14) > 0.5)).toEqual([]);
-    expect(new Set(edges.map(([, height]) => height)).size, "it moved smoothly").toBeGreaterThan(8);
+    expect(all.filter((m) => Math.abs(m.up - 14) > 0.5)).toEqual([]);
+    for (const { seen } of resizes) {
+      expect(new Set(seen.map((m) => Math.round(m.height))).size).toBeGreaterThan(8);
+    }
   });
 });
 
@@ -1196,15 +1248,13 @@ test.describe("hiding while scrolling", () => {
     test(`${name} comes back when the scrolling stops, and leaves again`, async ({ page }) => {
       await ready(page, path, { returns: true });
       const nav = find(page);
-      await scroll(page, 600);
-      await expectAway(nav);
-      await expectShown(nav); // no more scrolling: it returns by itself
-      expect(await page.evaluate(() => Math.round(scrollY))).toBe(600);
-      await scroll(page, 700);
-      await expectAway(nav);
+      await noteComings(page);
+      await scrollAndStop(page, 600); // no more scrolling: it returns by itself
       await expectShown(nav);
-      await scroll(page, 400); // and the same on the way up
-      await expectAway(nav);
+      expect(await page.evaluate(() => Math.round(scrollY))).toBe(600);
+      await scrollAndStop(page, 700);
+      await expectShown(nav);
+      await scrollAndStop(page, 400); // and the same on the way up
       await expectShown(nav);
     });
   }
@@ -1312,8 +1362,8 @@ test.describe("hiding while scrolling", () => {
     }) => {
       const { bar, shelf } = await openShelfToScroll(page, on);
       await page.waitForLoadState("networkidle");
-      await scroll(page, 600);
-      await expectAway(bar);
+      await noteComings(page);
+      await scrollAndStop(page, 600);
       await expect.poll(() => place(shelf)).toEqual(JOINED); // no more scrolling
       await expectShown(bar);
     });
