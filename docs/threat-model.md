@@ -124,14 +124,18 @@ A visitor types free text; the API answers from a local knowledge base. No model
 | PC2 | Prayer text leaks through logs, Sentry, analytics or email | Same rules as I1; no prayer text in any email (sign-in and invite emails carry none); encrypted at rest (ADR 0006); a log-capture test | Planned |
 | PC3 | The encryption key is lost or leaked | Sensitive variable on the API project only, key id per row, rotation and a key backup in the rotate-secrets runbook; backups hold ciphertext only | Planned |
 | PC4 | Account enumeration through sign-in or invites | Same response whether or not an address has an account; invites never reveal membership | Planned |
-| PC5 | Magic-link abuse: guessing, replay, email flooding of a victim | 256-bit random token, stored hashed, single use, 15 minutes; rate limits per hashed IP and per address; Turnstile on the send step | Planned |
-| PC6 | Session theft or fixation | Opaque id in a `__Host-` `HttpOnly; Secure; SameSite=Lax` cookie; a new id on sign-in; revoke on sign-out; 30 days idle | Planned |
-| PC7 | Invite spam, or a leaked or forwarded invite link | Owner-only invites, verified users only, 10 pending per crew, per-user and per-address rate limits, one email per invite, single use, 7 days, owner can revoke | Planned |
+| PC5 | Magic-link abuse: guessing, replay, email flooding of a victim | 256-bit random token, stored hashed, single use, 15 minutes; only a button press uses it, so mail scanners cannot; the 6-digit code fallback is bound to the asking browser, stops after 5 tries and is stored as an HMAC; rate limits per hashed IP and per address; Turnstile on the send step | Planned |
+| PC6 | Session theft or fixation | Opaque id in a `__Host-` `HttpOnly; Secure; SameSite=Lax` cookie; a new id on sign-in; revoke on sign-out and on all devices; 30 days idle, 90 days at most | Planned |
+| PC7 | Invite spam, or a leaked or forwarded invite link | Owner-only invites, verified users only, 10 pending per crew, per-user and per-address rate limits, one email per invite, single use, 7 days, owner can revoke; an email invite works only for the account with that address | Planned |
 | PC8 | A stranger's address is kept as an invitee | Kept only until the invite closes or expires, deleted by the retention job, named in the privacy policy | Planned |
 | PC9 | Cross-site request forgery on crew and prayer actions | Server Actions origin check, `SameSite=Lax`, state changes only by POST | Planned |
 | PC10 | A removed member keeps seeing requests | Shares count only while author and recipient share a crew, checked on every read | Planned |
 | PC11 | Account deletion leaves data behind | One deletion path removes requests, shares, memberships and invites, with a test | Planned |
-| PC12 | Sign-in emails land in spam or are rejected (DMARC `p=reject`, strict alignment) | Postmark DKIM and return path set up first, tested to Gmail; a typed code as a fallback | Planned |
+| PC12 | Sign-in emails land in spam or are rejected (DMARC `p=reject`, strict alignment) | Postmark DKIM and return path set up first, tested to Gmail; a typed code in the same email for links that open in the wrong browser | Planned |
+| PC13 | A sign-in or invite token is recorded from the page address by Vercel logs, Web Analytics, Speed Insights or Sentry, or leaks as a referrer | Spike before building (checklist A0.1), proven on a preview; `Referrer-Policy: no-referrer` on those pages; no Postmark click tracking | Planned |
+| PC14 | Sign-in is used to send a person to another site (open redirect) | The return address is accepted only as a path on our own site; tested | Planned |
+| PC15 | Prayer text or names are kept by a browser or shared cache, or show in titles and history | `no-store`; no text or names in titles, addresses or events; unsaved text is not stored on the device | Planned |
+| PC16 | An old share reappears when two people join a crew together again | Shares and taps between the two are deleted in the same transaction that ends their last common crew; the read-time check stays; rejoin and concurrent-removal tests | Planned |
 
 ### Denial of service
 
