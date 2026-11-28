@@ -20,7 +20,7 @@ Built and checked on the live domain:
 - a Bible reader (BSB and WEB) and an installable PWA (no offline mode yet);
 - the weekly email as a draft command (`pnpm broadcast:devotional`): it renders a devotional as a dark email and creates a Kit draft that you review and schedule in Kit. A test broadcast reached the inbox with SPF, DKIM and DMARC passing.
 
-The prayer request form and the contact form come after launch; until then the page shows `hello@wordonthewater.net`. Production deployments were set up to be promoted by hand (auto-promotion off), see [docs/runbooks/deploy.md](docs/runbooks/deploy.md), which also notes what was seen on 28 November.
+The prayer request form and the contact form come after launch; until then the page shows `hello@wordonthewater.net`. Production deployments are promoted by hand (auto-promotion is off), see [docs/runbooks/deploy.md](docs/runbooks/deploy.md).
 
 ## Stack
 
