@@ -36,7 +36,7 @@ export function BottomNav({
     <nav
       aria-label={bottomNav.landmark}
       data-bottom-nav
-      // The site's bar hides while reading; the chat's only hides for the keyboard.
+      // The site's bar hides while the page scrolls; the chat's only hides for the keyboard.
       data-hides={variant === "site" ? "" : undefined}
       className="glass-dock glass-bar fixed z-30 mx-auto flex max-w-[440px] lg:hidden"
     >

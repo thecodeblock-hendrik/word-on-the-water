@@ -38,13 +38,14 @@ afterEach(() => {
 });
 
 describe("HideBarOnScroll", () => {
-  it("marks the page while the bar should be away, on the way down and not on the way up", () => {
+  it("marks the page while the bar should be away, scrolling down or up", () => {
+    scrollY = 900;
     render(<HideBarOnScroll />);
     expect(away()).toBe(false);
-    scrollTo(300);
+    scrollTo(600);
     expect(away()).toBe(true);
-    scrollTo(290);
-    expect(away()).toBe(false);
+    scrollTo(590);
+    expect(away()).toBe(true);
   });
 
   it("brings the bar back at the end of the page", () => {
@@ -134,13 +135,15 @@ describe("when the scrolling stops", () => {
     expect(away()).toBe(false);
   });
 
-  it("hides again only after more than 40px further down", () => {
+  it("hides again only after more than 40px either way from where it stopped", () => {
     render(<HideBarOnScroll />);
     scrollTo(300);
     wait(600);
     scrollTo(340);
     expect(away()).toBe(false);
-    scrollTo(341);
+    scrollTo(260);
+    expect(away()).toBe(false);
+    scrollTo(259);
     expect(away()).toBe(true);
   });
 

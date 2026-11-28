@@ -2,7 +2,7 @@
 
 Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces the raised-tab bar in [landing_page_nav.md](landing_page_nav.md). Build it after the 28 November launch.
 
-**Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while scrolling down and returns when the scrolling stops (added 28 November, after the first phone test). Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
+**Decided:** light glass in Dawn patrol and dark glass in Night swell; plain chevrons for Previous and Next; no resting pill on any screen; on a devotional page the Devotional button becomes Shore and opens the landing page; the bar hides while the page scrolls, down or up, and returns when the scrolling stops (changed 28 November, after the first phone test). Below `lg`, tablets use the same bar; the bar, chat message pill and Undo toast are at most 440px wide and centred (section 13 of the mockup).
 
 **Unchanged:** routes, what the other buttons do, clearing the chat with Undo, hiding for the chat keyboard, and everything from `lg` up (including the desktop chapter buttons and the "Your chat" edge tab). The bar still needs both `BIBLE_ENABLED` and `CHAT_ENABLED`.
 
@@ -73,7 +73,8 @@ Design: [design/landing_nav_new.html](design/landing_nav_new.html). It replaces 
   - Test first: unit tests for the reset and the chat exception; e2e on the phone projects for hide, return, end of page, keyboard focus, the toast, the reader and reduced motion.
   - Done when: the e2e journeys pass without fixed sleeps and CLS is unchanged.
   - Result: journeys pass on the three phone projects (keyboard focus in Chromium only: Safari does not Tab to links). The hidden bar moves by its height, its distance from the edge (with the home indicator) and its shadow; the mockup's height plus 24px would have left a strip showing on an iPhone, which only a real phone can confirm (step 13). The watcher is mounted whenever the Bible reader is on, since the reader has its bar without the chat. Two older tests were updated: one tapped the bar while it is now hidden, one measured it mid-slide after a fixed wait. Local Lighthouse: CLS 0.0002 and 0.0001, as at step 0; LCP 1.63 s and 1.62 s. Landing JS 164,948 bytes, 4,012 under the limit.
-  - Change after the first phone test (28 November): the bar stayed away after scrolling down stopped. It now returns once no scroll event has arrived for 600 ms (`RETURN_AFTER` in `follow-scroll.ts`, a timer, so it does not depend on the `scrollend` event), and hides again after another 40px down. Browser tests that need the bar to stay away hold back that one timer. Full run on five projects: 1,090 passed, 310 skipped, none failed; 1,011 web unit tests pass.
+  - Change after the first phone test (28 November): the bar stayed away after scrolling down stopped. It now returns once no scroll event has arrived for 600 ms (`RETURN_AFTER` in `follow-scroll.ts`, a timer, so it does not depend on the `scrollend` event), and hides again after another 40px down. Browser tests that need the bar to stay away hold back that one timer.
+  - Second change the same day: scrolling up no longer shows the bar at once. It hides after more than 40px of scrolling either way from where it was last shown, and returns on stopping, or at the top (8px) or end (24px) of the page. This replaces the step 10 rule that 4px or more up shows it. Full run on five projects: 1,090 passed, 310 skipped, none failed; 1,011 web unit tests pass.
 
 ## Part 4: prove and finish
 

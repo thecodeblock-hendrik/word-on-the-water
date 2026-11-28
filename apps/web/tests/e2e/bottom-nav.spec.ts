@@ -347,9 +347,7 @@ test("Devotional opens the devotional at its top, wherever the landing page was 
       fraction,
     );
     await frames(page); // or the next scroll could merge with this one into a single event
-    // Partway down, the bar is away: a little scroll up brings it back, as a visitor would.
-    await page.evaluate(() => window.scrollBy({ top: -10, behavior: "instant" }));
-    await frames(page);
+    // Partway down, the bar is away until the scrolling stops, as a visitor would see.
     await expect(page.locator("html")).not.toHaveAttribute("data-nav-away", "");
     await bar(page).getByRole("link", { name: "Devotional" }).click();
     await expect(page).toHaveURL(`${CHAT}${DEVOTIONAL}`);
@@ -716,7 +714,7 @@ test.describe("hiding while scrolling", () => {
     ["the site bar", "/privacy", bar],
     ["the Bible reader's bar", "/bible/web/psalms/119", chapterBar],
   ] as const) {
-    test(`${name} leaves on the way down, returns on the way up and is there at the end`, async ({
+    test(`${name} leaves on the way down and up, and is there at the top and the end`, async ({
       page,
     }) => {
       await ready(page, path);
@@ -729,13 +727,17 @@ test.describe("hiding while scrolling", () => {
       await expectAway(nav);
       expect(await padding()).toBe(before); // nothing jumps
 
-      await scroll(page, 590);
+      await scroll(page, 500); // on the way up it stays away too
+      await expectAway(nav);
+      await scroll(page, 0);
       await expectShown(nav);
       await scroll(page, 700);
       await expectAway(nav);
 
       await scroll(page, 1_000_000);
       await expectShown(nav);
+      await scroll(page, (await page.evaluate(() => Math.round(scrollY))) - 300);
+      await expectAway(nav); // leaving the end upwards hides it as well
     });
   }
 
@@ -752,6 +754,10 @@ test.describe("hiding while scrolling", () => {
       expect(await page.evaluate(() => Math.round(scrollY))).toBe(600);
       await scroll(page, 700);
       await expectAway(nav);
+      await expectShown(nav);
+      await scroll(page, 400); // and the same on the way up
+      await expectAway(nav);
+      await expectShown(nav);
     });
   }
 
@@ -802,7 +808,7 @@ test.describe("hiding while scrolling", () => {
     await scroll(page, 600);
     await expectAway(bar(page));
     await expect.poll(fromBottom).toBe(14);
-    await scroll(page, 580);
+    await scroll(page, 0); // the top shows the bar
     await expect.poll(fromBottom).toBe(SHOWN + 12);
   });
 

@@ -19,47 +19,41 @@ describe("the bar while scrolling", () => {
     expect(barAt(900, END).hidden).toBe(false);
   });
 
-  it("hides after more than 40px of scrolling down, not at 40", () => {
-    expect(hidden([300, 340])).toBe(false);
-    expect(hidden([300, 341])).toBe(true);
+  it.each([
+    ["down", 1],
+    ["up", -1],
+  ])("hides after more than 40px of scrolling %s, not at 40", (_, way) => {
+    expect(hidden([300, 300 + way * 40])).toBe(false);
+    expect(hidden([300, 300 + way * 41])).toBe(true);
   });
 
-  it("adds up small steps down", () => {
-    expect(hidden([300, 310, 320, 330, 340])).toBe(false);
-    expect(hidden([300, 310, 320, 330, 340, 350])).toBe(true);
+  it.each([
+    ["down", 1],
+    ["up", -1],
+  ])("adds up small steps %s", (_, way) => {
+    const steps = [0, 10, 20, 30, 40].map((step) => 300 + way * step);
+    expect(hidden(steps)).toBe(false);
+    expect(hidden([...steps, 300 + way * 50])).toBe(true);
   });
 
-  it("measures the 40px from the highest point reached, so scrolling up starts it again", () => {
-    expect(hidden([300, 250, 290])).toBe(false);
-    expect(hidden([300, 250, 291])).toBe(true);
+  it("measures the 40px from where the bar was shown, not from the last turn", () => {
+    expect(hidden([300, 330, 270])).toBe(false);
+    expect(hidden([300, 330, 259])).toBe(true);
   });
 
-  it("comes back after 4px up, not 3", () => {
-    expect(hidden([300, 400, 397])).toBe(true);
-    expect(hidden([300, 400, 396])).toBe(false);
-  });
-
-  it("adds up tiny steps up", () => {
-    expect(hidden([300, 400, 398])).toBe(true);
-    expect(hidden([300, 400, 398, 396])).toBe(false);
-  });
-
-  it("measures the 4px from the furthest point reached while hidden", () => {
-    expect(hidden([300, 400, 700, 697])).toBe(true);
-    expect(hidden([300, 400, 700, 696])).toBe(false);
-  });
-
-  it("hides again after another 40px down", () => {
-    expect(hidden([300, 400, 390, 430])).toBe(false);
-    expect(hidden([300, 400, 390, 431])).toBe(true);
+  it("stays away whichever way the page then moves: only stopping brings it back", () => {
+    expect(hidden([300, 400, 396])).toBe(true);
+    expect(hidden([300, 400, 200])).toBe(true);
+    expect(hidden([600, 500, 700, 500])).toBe(true);
   });
 
   it("is always shown within 8px of the top", () => {
     expect(hidden([0, 100])).toBe(true);
-    expect(after([0, 100, 9]).hidden).toBe(false);
+    expect(hidden([0, 100, 9])).toBe(true);
+    expect(hidden([0, 100, 8])).toBe(false);
     // Reached going down, from a hidden bar.
-    expect(barAfterScroll({ hidden: true, turn: 0 }, 8, END).hidden).toBe(false);
-    expect(barAfterScroll({ hidden: true, turn: 0 }, 9, END).hidden).toBe(true);
+    expect(barAfterScroll({ hidden: true, from: 0 }, 8, END).hidden).toBe(false);
+    expect(barAfterScroll({ hidden: true, from: 0 }, 9, END).hidden).toBe(true);
   });
 
   it("is always shown within 24px of the end", () => {
@@ -86,9 +80,9 @@ describe("the bar while scrolling", () => {
   });
 
   it("does not flicker with a small wobble, shown or hidden", () => {
-    const wobble = (around: number) => [3, 0, 3, 0, 3, 0].map((offset) => around + offset);
+    const wobble = (around: number) => [3, -3, 3, -3, 3, 0].map((offset) => around + offset);
     expect(hidden([500, ...wobble(500)])).toBe(false);
-    expect(hidden([300, 500, ...wobble(497)])).toBe(true);
+    expect(hidden([300, 500, ...wobble(500)])).toBe(true);
   });
 
   it("does not change the state it is given", () => {
