@@ -2,8 +2,8 @@ import { barAfterScroll, barAt } from "./hide-on-scroll";
 
 /** Set on <html> while the bar should be out of the way; globals.css does the moving. */
 const AWAY = "data-nav-away";
-/** A hidden bar comes back after the page has been still this long: longer than between flicks. */
-const RETURN_AFTER = 600;
+/** A hidden bar comes back after the page has been still this long. */
+const RETURN_AFTER = 400;
 
 /**
  * Follows the page's scrolling, starting with the bar shown. The bar and the Undo toast are

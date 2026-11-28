@@ -691,7 +691,7 @@ test.describe("hiding while scrolling", () => {
     page.addInitScript(() => {
       const later = window.setTimeout.bind(window);
       window.setTimeout = ((run: TimerHandler, ms?: number, ...rest: unknown[]) =>
-        ms === 600 ? 0 : later(run, ms, ...rest)) as typeof window.setTimeout;
+        ms === 400 ? 0 : later(run, ms, ...rest)) as typeof window.setTimeout;
     });
 
   async function ready(page: Page, path: string, { returns = false } = {}) {

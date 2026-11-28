@@ -115,10 +115,10 @@ describe("when the scrolling stops", () => {
     vi.useRealTimers();
   });
 
-  it("brings the bar back once the page has been still for 600ms, not before", () => {
+  it("brings the bar back once the page has been still for 400ms, not before", () => {
     render(<HideBarOnScroll />);
     scrollTo(300);
-    wait(599);
+    wait(399);
     expect(away()).toBe(true);
     wait(1);
     expect(away()).toBe(false);
@@ -128,7 +128,7 @@ describe("when the scrolling stops", () => {
     render(<HideBarOnScroll />);
     for (const y of [300, 320, 340, 360]) {
       scrollTo(y);
-      wait(500);
+      wait(300);
       expect(away()).toBe(true);
     }
     wait(100);
@@ -138,7 +138,7 @@ describe("when the scrolling stops", () => {
   it("hides again only after more than 40px either way from where it stopped", () => {
     render(<HideBarOnScroll />);
     scrollTo(300);
-    wait(600);
+    wait(400);
     scrollTo(340);
     expect(away()).toBe(false);
     scrollTo(260);
