@@ -12,8 +12,10 @@ test.beforeEach(({ viewport }) => {
   test.skip((viewport?.width ?? 0) >= 1024, "The bottom bar is for phones");
 });
 
-async function noSeriousProblems(page: Page, label: string) {
-  const { violations } = await new AxeBuilder({ page }).analyze();
+async function noSeriousProblems(page: Page, label: string, only: string[] = []) {
+  const axe = new AxeBuilder({ page });
+  for (const part of only) axe.include(part);
+  const { violations } = await axe.analyze();
   expect(
     violations
       .filter((v) => v.impact === "serious" || v.impact === "critical")
@@ -839,6 +841,79 @@ test.describe("the solid fallbacks", () => {
       await expect.poll(() => look(find(page))).toEqual({ blur: "none", alpha: 1 });
     });
   }
+
+  /** Turns on one of the settings that call for a solid bar. */
+  async function ask(page: Page, setting: "contrast" | "transparency" | "forced colours") {
+    if (setting === "contrast") return page.emulateMedia({ contrast: "more" });
+    if (setting === "forced colours") return page.emulateMedia({ forcedColors: "active" });
+    const session = await page.context().newCDPSession(page);
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-transparency", value: "reduce" }],
+    });
+  }
+
+  for (const on of ["site", "reader"] as const) {
+    test(`with the Undo shelf over the ${on} bar, the one pane is see-through by default`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== "pixel-7", "measured in one mobile Chromium");
+      const { bar, shelf } = await openShelf(page, on);
+      const pane = await look(shelf);
+      expect(pane.blur).toContain("blur(18px)");
+      expect(pane.alpha).toBeCloseTo(0.72, 2);
+      expect(await look(bar)).toEqual({ blur: "none", alpha: 0 });
+    });
+
+    for (const setting of ["contrast", "transparency", "forced colours"] as const) {
+      test(`with the Undo shelf over the ${on} bar, ${setting} makes the one pane solid`, async ({
+        page,
+      }, testInfo) => {
+        test.skip(
+          testInfo.project.name !== "pixel-7" &&
+            !(setting === "contrast" && testInfo.project.name === "iphone-13"),
+          "Chromium emulates all three; WebKit only increased contrast",
+        );
+        await ask(page, setting);
+        const { bar, shelf } = await openShelf(page, on);
+        await expect.poll(() => look(shelf)).toEqual({ blur: "none", alpha: 1 });
+        expect(await look(bar), "the bar still draws nothing of its own").toEqual({
+          blur: "none",
+          alpha: 0,
+        });
+        // With forced colours emulated, axe also reports the header, hero and footer, with no shelf
+        // on the page at all, so there only the shelf and the bar are audited.
+        const only = setting === "forced colours" ? ["[data-shelf]", "nav[data-hides]"] : [];
+        await noSeriousProblems(page, `shelf, ${setting}`, only);
+      });
+    }
+  }
+
+  test("in forced colours the shelf has a system edge, Undo an outline, and the bar no second edge", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "pixel-7", "measured in one mobile Chromium");
+    await ask(page, "forced colours");
+    const { bar, shelf, undo } = await openShelf(page, "site");
+    /** A system colour as this browser computes it. */
+    const system = (name: string) =>
+      page.evaluate((colour) => {
+        const probe = document.body.appendChild(document.createElement("span"));
+        probe.style.color = colour;
+        const computed = getComputedStyle(probe).color;
+        probe.remove();
+        return computed;
+      }, name);
+    const edge = (target: ReturnType<Page["locator"]>) =>
+      target.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return [parseFloat(style.borderTopWidth), style.borderTopColor] as const;
+      });
+    expect(await edge(shelf)).toEqual([1, await system("CanvasText")]);
+    expect(await edge(undo)).toEqual([2, await system("Highlight")]);
+    const [width, colour] = await edge(bar);
+    const seen = width > 0 && !/(, 0\)|\/ 0\))$/.test(colour);
+    expect(seen, `the bar's own edge: ${width}px ${colour}`).toBe(false);
+  });
 });
 
 test.describe("the liquid pill", () => {

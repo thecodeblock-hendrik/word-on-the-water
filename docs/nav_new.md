@@ -129,9 +129,11 @@ Design: option C in [design/new_nav_chat.html](design/new_nav_chat.html). After 
   - **Found while checking CLS, and missed in S2 and S3:** changing the height of a pane fixed at the bottom moves its top edge, which Chrome counts as a layout shift. In the committed S2 shelf, one scroll away and back scored 0.0234, and three within the 8 seconds 0.0701, over our 0.05 budget (the S5 closing added 0.0079). Lighthouse never opens the chat, so it could not see this. Option A, chosen after a throwaway check: in layout the pane's top never moves; it changes height downwards and a `translate` keeps its bottom edge in place, both from one `@property` length, `--shelf-h`. A pseudo-element was tried first and was counted just the same. The check: 0.0000 against 0.0701 and 0.0079 in 3 of 3 runs, rest states identical to the old shelf, bottom edge within 0.02px in every frame in Chromium and WebKit.
   - Tests now count layout shifts while it settles and over three scrolls away and back (red before: 0.0079 and 0.061). Full run on five projects: 1,144 passed, 366 skipped, none failed; shelf and scrolling tests 980 of 980 over 10 repeats; 1,055 web unit tests, lint and types pass.
 
-- [ ] **S6. Gates and fallbacks.** Full run on five projects, `make lint typecheck test`, Lighthouse, landing JS (4,012 bytes were left after step 12). Solid pane for reduced transparency, increased contrast and no `backdrop-filter`; system colours in forced colours, with a visible edge and Undo outline.
+- [x] **S6. Gates and fallbacks.** Full run on five projects, `make lint typecheck test`, Lighthouse, landing JS (4,012 bytes were left after step 12). Solid pane for reduced transparency, increased contrast and no `backdrop-filter`; system colours in forced colours, with a visible edge and Undo outline.
   - Test first: extend the fallback tests of step 6 to the shelf.
   - Done when: all pass and the figures are under "Measurements".
+  - Result (local, 28 November): done, with no change to app code: the pane shares `glass-surface`, so it has the bar's fallbacks. New browser tests cover the pane see-through by default, and solid with increased contrast, reduced transparency and forced colours (system edge, Undo outline, no second edge from the bar); removing either fallback, or the rule that takes the bar's glass away, was caught. A browser without blur cannot be emulated: the unit tests cover that rule on the shared surface. Full run on five projects: 1,155 passed, 400 skipped, none failed; `make lint typecheck test types-check kb-check` pass (671 API and 1,055 web tests). Lighthouse passes; figures below.
+  - Noted, not part of this work: with forced colours emulated, axe reports low contrast on the header's Subscribe button (and on `/privacy` also the hero and footer) with no shelf on the page. Not established whether that is real or the emulation, so that one scan is limited to the shelf and the bar.
 
 ## Part 5: prove and finish
 
@@ -159,6 +161,7 @@ If step 13 shows poor scrolling, reduce the blur or use the solid bar. If screen
 | Before (step 0) | 163,496 bytes (159.7 KiB; 5,464 bytes under the limit) | landing 1.67 s, devotional 1.66 s | 0.0002, 0.0001 | 47 ms, 51 ms |
 | Before (step 0), CI | not printed by CI (the size check passed) | landing 1.76 s, devotional 1.72 s | 0.0004, 0.0009 | 95 ms, 98 ms |
 | After (step 12), local | 164,948 bytes (161.1 KiB; 4,012 bytes under the limit; 1,452 more than step 0) | landing 1.63 s, devotional 1.62 s | 0.0002, 0.0001 | 20 ms, 19 ms |
+| After the Undo shelf (S6), local | 165,446 bytes (161.6 KiB; 3,514 bytes under the limit; 498 more than step 12) | landing 1.66 s, devotional 1.64 s | 0.0002, 0.0001 | 16 ms, 16 ms |
 
 Step 0, 27 November, local macOS, Bible and chat on. Lighthouse: median of 3 runs, performance 99, accessibility 100, best practices 96, SEO 100 on both pages. JS: measured by the `chat.spec.ts` size check in desktop Chromium. End to end: five local projects (not desktop Firefox), 986 passed, 184 skipped, 10 WebKit tests failed in the parallel run and passed when rerun one at a time. CI is the check for all six.
 
