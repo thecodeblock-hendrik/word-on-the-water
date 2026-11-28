@@ -137,17 +137,17 @@ A visitor types free text; the API answers from a local knowledge base. No model
 | PC15 | Prayer text or names are kept by a browser or shared cache, or show in titles and history | `no-store`; no text or names in titles, addresses or events; unsaved text is not stored on the device | Planned |
 | PC16 | An old share reappears when two people join a crew together again | Shares and taps between the two are deleted in the same transaction that ends their last common crew; the read-time check stays; rejoin and concurrent-removal tests | Planned |
 
-### New in BibleProject videos (ADR 0013, behind `VIDEOS_ENABLED`, not built)
+### New in BibleProject videos (ADR 0013, behind `VIDEOS_ENABLED`, being built)
 
 YouTube's player in a frame, loaded only when a visitor taps Play ([bibleproject.md](bibleproject.md)).
 
 | ID | Threat | Mitigation | Status |
 |---|---|---|---|
-| V1 | Opening a video page sends the visitor's data to Google without their choice | Tap to play: our own covers, and no player, thumbnail, script or preconnect from Google before the tap; a browser test records every request | Planned |
+| V1 | Opening a video page sends the visitor's data to Google without their choice | Tap to play: our own covers, and no player, thumbnail, script or preconnect from Google before the tap; a browser test records every request | Done. Proof: e2e `videos.spec.ts` (no outside request before a tap) |
 | V2 | A visitor plays a video without knowing Google receives their data | A notice beside each video, before Play; Google/YouTube in the privacy policy; no claim that there are no cookies; consent wording to get a qualified check | Planned |
-| V3 | A forged address puts another video or site in the frame | The player address is built only from an ID in our content file, checked against the ID format; `?week=` accepts four known names; tested | Planned |
-| V4 | Widening the policy lets other third-party content in | Only `https://www.youtube-nocookie.com`, only in `frame-src`, only while videos are on; the CSP unit test pins the directives | Planned |
-| V5 | The framed player reaches our page or takes the visitor elsewhere | The frame is another origin, so the browser keeps it out of our page; only playback permissions are allowed; `frame-ancestors 'none'` is unchanged. YouTube's own links can still open YouTube | Planned |
+| V3 | A forged address puts another video or site in the frame | The player address is built only from an ID in our content file, checked against the ID format; `?week=` accepts four known names; tested | Done. Proof: `tests/unit/videos-series.test.ts` |
+| V4 | Widening the policy lets other third-party content in | Only `https://www.youtube-nocookie.com`, only in `frame-src`, only while videos are on; the CSP unit test pins the directives | Done. Proof: `tests/unit/csp.test.ts`, e2e `videos.spec.ts` |
+| V5 | The framed player reaches our page or takes the visitor elsewhere | The frame is another origin, so the browser keeps it out of our page; only playback permissions are allowed; `frame-ancestors 'none'` is unchanged. YouTube's own links can still open YouTube | Done. Proof: `tests/unit/video-player.test.tsx` |
 | V6 | A video is removed, replaced or restricted, or BibleProject asks us to stop | Official channel only; all four checked before release; a link to BibleProject beside each video; unsetting `VIDEOS_ENABLED` and redeploying removes the pages and links | Planned |
 
 ### Denial of service

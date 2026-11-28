@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { buildCsp } from "@/lib/csp";
+import { isVideosEnabled } from "@/lib/videos/flag";
 
 /** Sets a per-request CSP nonce. Report-only mode (CSP_REPORT_ONLY=1) is for staging. */
 export function proxy(request: NextRequest) {
@@ -16,6 +17,8 @@ export function proxy(request: NextRequest) {
     nonce,
     isDev: process.env.NODE_ENV === "development",
     upgradeInsecure: protocol.replace(":", "").toLowerCase() === "https",
+    // On every page: a visitor can reach the videos without loading a new document.
+    videos: isVideosEnabled(),
   });
 
   const requestHeaders = new Headers(request.headers);

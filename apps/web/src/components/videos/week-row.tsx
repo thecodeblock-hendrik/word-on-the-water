@@ -6,24 +6,31 @@ import type { Video } from "@/lib/videos/series";
 
 import { WEEK_COLOURS } from "./colours";
 import { ThisWeek } from "./this-week";
+import { VideoPlayer } from "./video-player";
 
 const link = "underline underline-offset-2 hover:text-ink text-accent-ink";
 const bigLink = `inline-flex min-h-11 items-center font-semibold ${link}`;
 
-type Props = { video: Video; number: number; open: boolean; thisWeek: boolean };
+type Props = {
+  video: Video;
+  number: number;
+  open: boolean;
+  thisWeek: boolean;
+  linked: boolean;
+};
 
 /**
  * One week of the path. The rows share a name, so the browser keeps only one open, with or
  * without JavaScript.
  */
-export function WeekRow({ video, number, open, thisWeek }: Props) {
+export function WeekRow({ video, number, open, thisWeek, linked }: Props) {
   const colour = WEEK_COLOURS[(number - 1) % WEEK_COLOURS.length];
   return (
     <details
       id={video.week}
       name="video-week"
       open={open}
-      className="group scroll-mt-20 rounded-[14px] bg-surface text-ink"
+      className="group rounded-[14px] bg-surface text-ink"
     >
       <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 rounded-[14px] px-3 py-2 [&::-webkit-details-marker]:hidden">
         <span
@@ -48,16 +55,21 @@ export function WeekRow({ video, number, open, thisWeek }: Props) {
         />
       </summary>
       <div className="grid gap-2 px-2 pb-3">
-        <div
-          className={`video-cover flex aspect-video min-h-[200px] w-full flex-col justify-end rounded-xl p-4 ${colour}`}
+        <VideoPlayer
+          youtubeId={video.youtubeId}
+          theme={video.theme}
+          length={video.length}
+          linked={linked}
         >
-          <span aria-hidden="true" className="font-serif text-sm font-semibold italic">
-            {video.word}
-          </span>
-          <span aria-hidden="true" className="font-display text-4xl font-bold uppercase">
-            {video.theme}
-          </span>
-        </div>
+          <div className={`video-cover flex size-full flex-col justify-end p-4 pr-16 ${colour}`}>
+            <span aria-hidden="true" className="font-serif text-sm font-semibold italic">
+              {video.word}
+            </span>
+            <span aria-hidden="true" className="font-display text-4xl font-bold uppercase">
+              {video.theme}
+            </span>
+          </div>
+        </VideoPlayer>
         <div className="grid px-1">
           <p className="font-ui text-sm text-muted">
             Video by BibleProject, its author and owner.{" "}

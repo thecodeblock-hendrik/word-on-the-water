@@ -6,6 +6,8 @@ import AdventVideosPage from "@/app/videos/advent/page";
 import VideosPage from "@/app/videos/page";
 
 beforeEach(() => {
+  // jsdom has no layout, so it has no scrolling either.
+  Element.prototype.scrollIntoView = () => {};
   vi.stubEnv("VIDEOS_ENABLED", "1");
   vi.stubEnv("DEVOTIONAL_TODAY", "2026-12-06");
 });

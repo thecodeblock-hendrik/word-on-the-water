@@ -10,6 +10,81 @@ const ON = "http://localhost:3102";
 const openThemes = (page: Page) =>
   page.locator("details[open] summary [data-theme-name]").allTextContents();
 const summary = (page: Page, theme: string) => page.locator("summary", { hasText: theme });
+const play = (page: Page, theme: string) => page.getByRole("button", { name: `Play ${theme}` });
+const PLAYER = "https://www.youtube-nocookie.com/";
+
+/** Stands in for YouTube, so the tests do not depend on it. The page's CSP still applies. */
+async function stubPlayer(page: Page) {
+  await page.route(`${PLAYER}**`, (route) =>
+    route.fulfill({ contentType: "text/html", body: "<p>stand-in player</p>" }),
+  );
+}
+
+test("the policy allows the player only where videos are on", async ({ page }) => {
+  const frames = async (url: string) =>
+    (await page.goto(url))!.headers()["content-security-policy"].match(/frame-src[^;]*/)![0];
+  expect(await frames("/")).not.toContain("youtube");
+  expect(await frames(`${ON}/`)).toContain("https://www.youtube-nocookie.com");
+});
+
+test("Play puts the player in, and closing or changing rows takes it out", async ({ page }) => {
+  await stubPlayer(page);
+  const violations: string[] = [];
+  page.on("console", (m) => {
+    if (m.text().includes("Content Security Policy")) violations.push(m.text());
+  });
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto(`${ON}/videos/advent`);
+  const frames = page.locator("iframe");
+  await expect(frames).toHaveCount(0);
+
+  const button = play(page, "Hope");
+  const size = (await button.boundingBox())!;
+  expect(Math.min(size.width, size.height)).toBeGreaterThanOrEqual(44);
+  const loaded = page.waitForResponse((r) => r.url().startsWith(PLAYER));
+  await button.click();
+  expect((await loaded).url()).toBe(`${PLAYER}embed/4WYNBjJSYvE?autoplay=1&playsinline=1&rel=0`);
+  await expect(frames).toHaveAttribute("title", "Hope, a video by BibleProject");
+  await expect(page.frameLocator("iframe").locator("body")).toHaveText("stand-in player");
+  expect((await frames.boundingBox())!.height).toBeGreaterThanOrEqual(200);
+
+  await summary(page, "Hope").click();
+  await expect(frames).toHaveCount(0);
+
+  await summary(page, "Hope").click();
+  await play(page, "Hope").click();
+  await expect(frames).toHaveCount(1);
+  await summary(page, "Love").click();
+  await expect(frames).toHaveCount(0);
+  await play(page, "Love").click();
+  await expect(frames).toHaveCount(1);
+  await expect(frames).toHaveAttribute("title", "Love, a video by BibleProject");
+  expect(violations).toEqual([]);
+});
+
+test("a ?week= address scrolls to its row, below the header", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 600 });
+  await page.goto(`${ON}/videos/advent?week=love`);
+  expect(await openThemes(page)).toEqual(["Love"]);
+  const top = () => page.locator("#love").evaluate((row) => row.getBoundingClientRect().top);
+  await expect.poll(top).toBeLessThan(120);
+  expect(await top()).toBeGreaterThanOrEqual(60);
+});
+
+test("an opened row stays in view when the one above it closes", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 500 });
+  await page.goto(`${ON}/videos/advent`);
+  // Bring Peace's heading near the top, with Hope open above it.
+  await page.locator("#peace").evaluate((row) => {
+    window.scrollTo({
+      top: row.getBoundingClientRect().top + window.scrollY - 90,
+      behavior: "instant",
+    });
+  });
+  await summary(page, "Peace").click();
+  await expect.poll(() => openThemes(page)).toEqual(["Peace"]);
+  await expect(summary(page, "Peace")).toBeInViewport({ ratio: 1 });
+});
 
 test("the video pages are not found while videos are off", async ({ page }) => {
   for (const path of ["/videos", "/videos/advent"]) {
@@ -34,6 +109,7 @@ test("rows open and close one at a time without JavaScript", async ({ browser })
   await expect(page.locator("details[open]").getByText("Watch on BibleProject")).toBeVisible();
   await summary(page, "Joy").click();
   await expect.poll(() => openThemes(page)).toEqual([]);
+  await expect(page.getByRole("button", { name: /^Play / })).toHaveCount(0);
 });
 
 test("opening and reading the pages asks nothing of any other site", async ({ page }) => {

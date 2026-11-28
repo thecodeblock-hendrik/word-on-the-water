@@ -22,7 +22,8 @@ type Props = { searchParams: Promise<{ [key: string]: string | string[] | undefi
 export default async function AdventVideosPage({ searchParams }: Props) {
   if (!isVideosEnabled()) notFound();
   const series = loadVideoSeries("advent");
-  const { open, current } = weekState(series, today(), (await searchParams).week);
+  const { week } = await searchParams;
+  const { open, current } = weekState(series, today(), week);
   return (
     <VideoColumn>
       <Link
@@ -50,6 +51,7 @@ export default async function AdventVideosPage({ searchParams }: Props) {
               number={i + 1}
               open={video.week === open}
               thisWeek={video.week === current}
+              linked={video.week === week}
             />
           ))}
         </div>
