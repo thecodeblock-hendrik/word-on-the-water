@@ -120,11 +120,7 @@ async function openShelf(page: Page, on: "site" | "reader") {
     on === "reader" ? page.getByRole("navigation", { name: "Previous and next chapter" }) : quick;
   // Focus on Undo holds the 8 second timer, so the shelf cannot go while it is measured.
   await undo.focus();
-  const shelf = page.locator("[data-shelf]");
-  // On the way to the reader there can be a moment with no bar, when the shelf shrinks to itself
-  // and then grows back as the new bar arrives. Wait until it has joined before measuring.
-  await expect.poll(async () => Math.round((await shelf.boundingBox())!.height)).toBe(116);
-  return { undo, bar, shelf };
+  return { undo, bar, shelf: page.locator("[data-shelf]") };
 }
 
 /** How the bar's own glass is drawn. */
@@ -397,6 +393,70 @@ test("Devotional opens the devotional at its top, wherever the landing page was 
     await page.waitForTimeout(1500);
     expect(await page.evaluate(() => Math.round(scrollY)), `from ${fraction}`).toBeLessThan(5);
   }
+});
+
+/** Notes, at every frame, the tabs of each bar on the page and the height of the Undo shelf. */
+const watchBars = (page: Page) =>
+  page.evaluate(() => {
+    const seen: string[] = [];
+    (window as unknown as { seen: string[] }).seen = seen;
+    const look = () => {
+      const bars = [...document.querySelectorAll("nav[data-hides]")].map((nav) =>
+        [...nav.querySelectorAll("a, button")].map((tab) => tab.textContent).join("|"),
+      );
+      const shelf = document.querySelector("[data-shelf]");
+      const height = shelf ? ` shelf ${Math.round(shelf.getBoundingClientRect().height)}` : "";
+      const now = `${bars.join(" and ") || "NO BAR"}${height}`;
+      if (now !== seen.at(-1)) seen.push(now);
+      requestAnimationFrame(look);
+    };
+    look();
+  });
+const barsSeen = (page: Page) =>
+  page.evaluate(() => (window as unknown as { seen: string[] }).seen);
+
+/** A slow connection for the Bible's pages, so any gap on the way there lasts long enough to see. */
+const slowBible = (page: Page) =>
+  page.route(/localhost:3102\/bible(\/|\?|$)/, async (route) => {
+    await new Promise((done) => setTimeout(done, 700));
+    await route.continue();
+  });
+
+test.describe("into the Bible on a slow connection", () => {
+  for (const [from, path, left] of [
+    ["the landing page", "/", "Devotional"],
+    ["a devotional", "/devotionals/advent-01-more-than-watchmen", "Shore"],
+  ] as const) {
+    test(`from ${from} the bar stays as it is until the reader's bar replaces it`, async ({
+      page,
+    }) => {
+      await slowBible(page);
+      await page.goto(`${CHAT}${path}`);
+      await page.waitForLoadState("networkidle");
+      await watchBars(page);
+      await bar(page).getByRole("link", { name: "Bible" }).click();
+      await expect(chapterBar(page)).toBeVisible();
+      const seen = await barsSeen(page);
+      expect(seen).toHaveLength(2);
+      expect(seen[0]).toBe(`${left}|Bible|Ask the Word`);
+      expect(seen[1]).toMatch(/Previous chapter.*Shore.*Next chapter/);
+    });
+  }
+
+  test("from the chat the Undo shelf stays joined all the way", async ({ page }) => {
+    await slowBible(page);
+    await page.goto(`${CHAT}/privacy`);
+    await page.waitForLoadState("networkidle");
+    await bar(page).getByText("Ask the Word").click();
+    await chatDialog(page).getByRole("textbox", { name: "Your question" }).fill("a draft");
+    await watchBars(page);
+    await chatDialog(page).getByRole("link", { name: "Bible" }).click();
+    await expect(chapterBar(page)).toBeVisible();
+    // Leaving the chat shows the shelf; from then on it never changes height.
+    const withShelf = (await barsSeen(page)).filter((state) => state.includes("shelf"));
+    expect(withShelf.length).toBeGreaterThan(0);
+    expect(withShelf.filter((state) => !state.endsWith("shelf 116"))).toEqual([]);
+  });
 });
 
 test.describe("the chat, the Bible and back", () => {
